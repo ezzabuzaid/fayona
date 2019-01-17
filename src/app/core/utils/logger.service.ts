@@ -1,4 +1,4 @@
-import * as colors from 'ansi-colors';
+import colors = require('ansi-colors');
 
 /**
  * Simple logger system with the possibility of registering custom outputs.

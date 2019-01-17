@@ -9,3 +9,13 @@
 // });
 
 // gulp.task('default', ['schema']);
+
+// const swaggerGenerator = require('gulp-apidoc-swagger');
+
+
+// gulp.task('swaggerGenerator', function () {
+//     swaggerGenerator.exec({
+//         src: "src/",
+//         dest: "doc/"
+//     });
+// });
