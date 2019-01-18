@@ -1,9 +1,7 @@
-import { Wrapper } from "./wrapper";
-// import { app } from "./app";
-import { ServerResponse } from "http";
-import * as mongoose from 'mongoose';
-import { Logger } from "./core/utils/logger.service";
+import mongoose = require('mongoose');
 import appService from "./app.service";
+import { Wrapper } from "./wrapper";
+import { Logger } from "./core/utils/logger.service";
 import { Application } from "./app";
 
 const log = new Logger('Server init');
@@ -16,15 +14,15 @@ export class Server extends Application {
          * @param port server port
          * @param cb callback function, will be called when server start
          */
-        static bootstrap(port, cb?): Promise<Server> {
-                return Promise.resolve(new Server(port, cb));
+        static bootstrap(port): Promise<Server> {
+                return Promise.resolve(new Server(port));
         }
 
         resolverRouters() {
                 this.app.use('/', ...Wrapper.routerList);
         }
 
-        private constructor(port, cb) {
+        private constructor(port) {
                 super();
                 port && (this.port = port);
                 this.init()

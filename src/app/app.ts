@@ -1,14 +1,11 @@
 import express = require('express');
-import { config as envConfig } from "dotenv";
-import * as morgan from 'morgan';
-import * as compression from 'compression';
-import * as helmet from 'helmet';
-import { AppUtils } from './core/utils';
-import * as  session from 'express-session';
-import { Passport } from './core/config/passport';
-
-import { Logger } from './core/utils/logger.service';
+import morgan =  require('morgan');
+import compression  =  require ('compression');
+import helmet =  require( 'helmet');
 import { environment } from '../environment/env';
+import { Logger } from '@core/utils';
+
+// import { Logger } from './core/utils/logger.service';
 const log = new Logger('Application instance');
 
 export class Application {
@@ -17,8 +14,8 @@ export class Application {
         environment.load();
         this.configure();
         this.allowCors();
+        
     }
-
     get applicationInstance() {
         return this.app;
     }
@@ -44,9 +41,9 @@ export class Application {
         this.app
             .use(express.json())
             .use(express.urlencoded({ extended: true }))
-            .use((morgan('dev') as any))
+            .use((morgan('dev')))
             .use(helmet())
-            .use((compression() as any))
+            .use((compression()))
 
         this.set('host', process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1');
         this.set('port', process.env.OPENSHIFT_NODEJS_PORT || 8080)
