@@ -1,12 +1,15 @@
 import { AppUtils } from '../../app/core/utils';
+import { RouterMethodDecorator } from '@lib/typing';
+import { ErrorHandling } from '@core/helpers';
 
-export function Get(routerPath: string) {
-    return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+
+export function Get(routerPath: string): any {
+    return function (target: RouterMethodDecorator, propertyKey: string, descriptor: PropertyDescriptor) {
         const method = descriptor.value;
         descriptor.value = function () {
             //* any code here will be executed when the marked method get called 
             //* bind a router class instance
-            return method.apply(target.instance, arguments);
+            return method.apply(target, arguments);
         }
 
         //* since the method decorator called before the class decorator we have no access to any of
@@ -18,9 +21,10 @@ export function Get(routerPath: string) {
             routerPath = AppUtils.joinPath(target.routesPath, '/', routerPath);
 
             //* assign the router
-            target.get(routerPath, function () {
-                target[propertyKey](...arguments);
-            })
+            target.get(routerPath, ErrorHandling.wrapRoute(function () {
+               return target[propertyKey](...arguments);
+            }))
+
         }, 0);
     }
 }

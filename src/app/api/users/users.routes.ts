@@ -1,14 +1,12 @@
-import { Request, Response, RouterOptions, NextFunction, Router as ex } from 'express';
-import { Router } from '../../../lib/core';
-import { Get, Post } from '../../../lib/methods';
-import { UsersModel } from './users.model';
-import { ErrorResponse, SuccessResponse } from '../../core/helpers/response';
-import * as HttpStatusCodes from 'http-status-codes';
-import auth from '../auth/auth';
+import { Request, Response, NextFunction } from 'express';
+import { Router } from '@lib/core';
+import { Post, Get } from '@lib/methods';
+import { ErrorResponse, SuccessResponse } from '@core/helpers';
+import { UsersRepo } from './users.repo';
+import { AppUtils, Logger } from '@core/utils';
+import HttpStatusCodes = require('http-status-codes');
+import auth from '@auth/auth';
 
-import { AppUtils } from '../../core/utils/utils.service';
-
-import { Logger } from '../../core/utils/logger.service';
 const log = new Logger('User Router');
 
 @Router('users')
@@ -18,46 +16,69 @@ export class UsersRouter {
 
     @Post('login')
     async login(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { username, password } = req.body;
-            const currentUser = await UsersModel.getUser(username);
-            if (!!currentUser) {
-                const isPasswordEqual = await currentUser.comparePassword(password);
-                if (isPasswordEqual) {
-                    const responseData = AppUtils.removeKey('password', currentUser.toObject());
-                    responseData.token = auth.generateToken({ id: currentUser.id });
-                    const response = new SuccessResponse(responseData, 'Register successfully', HttpStatusCodes.OK);
-                    res.status(response.code).json(response);
-                    return next();
-                }
+        const { username, password } = req.body;
+        const currentUser = await UsersRepo.getUser({ username });
+        if (!!currentUser) {
+            const isPasswordEqual = await currentUser.comparePassword(password);
+            if (isPasswordEqual) {
+                const responseData = AppUtils.removeKey('password', currentUser.toObject());
+                responseData.token = await auth.generateToken({ id: currentUser.id });
+                const response = new SuccessResponse(responseData, 'Register successfully', HttpStatusCodes.OK);
+                res.status(response.code).json(response);
+                return next();
             }
-            const response = new ErrorResponse('Try to enter another username', HttpStatusCodes.CONFLICT);
-            return res.status(response.code).json(response);
-        } catch (error) {
-            log.error('@Post Login error', error);
         }
+        const response = new ErrorResponse('username or password wrong', HttpStatusCodes.CONFLICT);
+        return res.status(response.code).json(response);
     }
 
     @Post('register')
     async register(req: Request, res: Response, next: NextFunction) {
         // Validate the input
-        try {
-            const { username, password } = req.body;
-            const currentUser = await UsersModel.getUser(username);
-            log.debug(currentUser)
-            if (!!currentUser) {
-                const response = new ErrorResponse('Try to enter another username', HttpStatusCodes.BAD_REQUEST);
-                return res.status(response.code).json(response);
-            }
-            const user = new UsersModel({ username, password })
-            await user.save();
-            const responseData = AppUtils.removeKey('password', user.toObject());
-            const response = new SuccessResponse<{}>(responseData, 'Register successfully', HttpStatusCodes.CREATED);
-            res.status(response.code).json(response);
-            next();
-        } catch (error) {
-            log.error('@Post Register error', error);
+        const { username, password } = req.body;
+        const currentUser = await UsersRepo.getUser({ username });
+        if (!!currentUser) {
+            log.debug('cannot complete the register, user found');
+            const response = new ErrorResponse('Try to enter another username', HttpStatusCodes.BAD_REQUEST);
+            return res.status(response.code).json(response);
         }
+        const user = await UsersRepo.createUser({ username, password });
+        const responseData = AppUtils.removeKey('password', user.toObject());
+
+        // Send the response
+        const response = new SuccessResponse<{}>(responseData, 'Register successfully', HttpStatusCodes.CREATED);
+        res.status(response.code).json(response);
+        next();
+    }
+
+    @Get('/')
+    async fetchUsers(req: Request, res: Response, next: NextFunction) {
+        const allUsers = await UsersRepo.find({}).select({ password: 0 });
+        const response = new SuccessResponse(allUsers, 'Fetch all user', HttpStatusCodes.OK);
+        res.status(response.code).json(response);
     }
 
 }
+
+// import { RequestHandlerParams, Router as expressRouter } from "express-serve-static-core";
+
+// interface ExpressRouter {
+//     new(options: RouterOptions): expressRouter;
+// }
+
+// class ExpressRouter implements ExpressRouter  {
+//     constructor(options: RouterOptions) {
+//         return (new (ex(options) as any));
+//     }
+// }
+
+
+// const e = new ExpressRouter({});
+// e.
+// class T extends ExpressRouter {
+//     constructor() {
+//         super({});
+//     }
+// }
+
+// new T()

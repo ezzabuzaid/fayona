@@ -13,7 +13,9 @@
     "baseUrl": "./src/",
     "paths": {
       "@core/*":["app/core/*"],
-      "@api/*":["app/api/*"]
+      "@api/*":["app/api/*"],
+      "@auth/*":["app/auth/*"],
+      "@lib/*":["lib/*"]
     },
     "typeRoots": [
       "node_modules/@types"

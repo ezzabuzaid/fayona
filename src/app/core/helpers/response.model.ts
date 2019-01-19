@@ -1,7 +1,6 @@
 import * as HttpStatusCodes from 'http-status-codes';
 
-abstract class Response {
-    message: string;
+abstract class Response extends Error {
     status: string;
     code: number;
 }
@@ -18,7 +17,7 @@ export class SuccessResponse<T> extends Response {
 
 }
 
-export class ErrorResponse<T> extends Response {
+export class ErrorResponse extends Response {
     error: string;
     constructor(message: string, code: number, status?: string) {
         super();

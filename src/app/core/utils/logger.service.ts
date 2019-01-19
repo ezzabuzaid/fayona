@@ -75,7 +75,7 @@ export class Logger {
    * Works the same as console.log().
    */
   debug(...objects: any[]) {
-    this.colorizeText(objects, 'bgCyan');
+    this.colorizeText(objects, 'cyan');
     this.log(console.log, LogLevel.Debug, objects);
   }
 

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 lib-cov
 *.seed
 *.log
@@ -98,4 +97,3 @@ typings/
 
 # next.js build output
 .next
->>>>>>> 4e26f96278a34ac4d7bc8e09bd1bb0e53cbdb1fd

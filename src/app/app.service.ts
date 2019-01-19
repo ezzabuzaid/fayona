@@ -1,4 +1,4 @@
-import { Reactor } from "./core/helpers/reactor";
+import { Reactor } from "./core/config/reactor";
 
 class AppService {
     _reactor = new Reactor('build');

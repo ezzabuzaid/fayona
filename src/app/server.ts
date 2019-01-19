@@ -3,6 +3,7 @@ import appService from "./app.service";
 import { Wrapper } from "./wrapper";
 import { Logger } from "./core/utils/logger.service";
 import { Application } from "./app";
+import { ErrorHandling } from './core/helpers/errors.service';
 
 const log = new Logger('Server init');
 export class Server extends Application {
@@ -20,6 +21,12 @@ export class Server extends Application {
 
         resolverRouters() {
                 this.app.use('/', ...Wrapper.routerList);
+
+                // * Globally catch error
+                this.app.use(ErrorHandling.catchError);
+
+                // * catch not found error
+                this.app.use(ErrorHandling.notFound);
         }
 
         private constructor(port) {
@@ -30,8 +37,8 @@ export class Server extends Application {
         }
 
         private populateMongoose() {
-                const { MONGO_USER, MONGO_PASSWORD, MONGO_PATH, } = process.env;
-                return mongoose.connect(`mongodb+srv://ezzabuzaid:haEfc7i5AQxMpdzi@cluster0-hp3qr.mongodb.net/test`, { useNewUrlParser: true })
+                const { MONGO_USER, MONGO_PASSWORD, MONGO_PATH } = process.env;
+                return mongoose.connect(`mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@cluster0-hp3qr.mongodb.net/${MONGO_PATH}`, { useNewUrlParser: true })
                         .then(() => log.debug('Database Connected'))
                         .catch((error) => log.error("Database Not Connected", error))
         }

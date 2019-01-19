@@ -1,9 +1,10 @@
 import express = require('express');
-import morgan =  require('morgan');
-import compression  =  require ('compression');
-import helmet =  require( 'helmet');
+import morgan = require('morgan');
+import compression = require('compression');
+import helmet = require('helmet');
 import { environment } from '../environment/env';
 import { Logger } from '@core/utils';
+import { ErrorHandling } from './core/helpers/errors.service';
 
 // import { Logger } from './core/utils/logger.service';
 const log = new Logger('Application instance');
@@ -14,7 +15,7 @@ export class Application {
         environment.load();
         this.configure();
         this.allowCors();
-        
+
     }
     get applicationInstance() {
         return this.app;
@@ -43,8 +44,8 @@ export class Application {
             .use(express.urlencoded({ extended: true }))
             .use((morgan('dev')))
             .use(helmet())
-            .use((compression()))
-
+            .use((compression()));
+            
         this.set('host', process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1');
         this.set('port', process.env.OPENSHIFT_NODEJS_PORT || 8080)
     }
@@ -59,8 +60,36 @@ export class Application {
     }
 }
 
-// const application = new Application();
-// export const app = application.applicationInstance as express.Application;
-// export const instance = application;
-
 // TODO add lusca lib
+
+// import { AssertionError } from 'assert';
+
+// function handleAssertionError(error, req, res, next) {
+//     if (error instanceof AssertionError) {
+//         return res.status(400).json({
+//             type: 'AssertionError',
+//             message: error.message
+//         });
+//     }
+//     next(error);
+// }
+
+// const { MongoError } = require('mongodb');
+
+// app.use(function handleDatabaseError(error, req, res, next) {
+//   if (error instanceof MongoError) {
+//     return res.status(503).json({
+//       type: 'MongoError',
+//       message: error.message
+//     });
+//   }
+//   next(error);
+// });
+
+// function wrapAsync(fn) {
+//     return function (req, res, next) {
+//         // Make sure to `.catch()` any errors and pass them along to the `next()`
+//         // middleware in the chain, in this case the error handler.
+//         fn(req, res, next).catch(next);
+//     };
+// }

@@ -1,5 +1,4 @@
-import { inherits } from 'util';
-import { Request, Response, RouterOptions, NextFunction, Router as expressRouter, RequestHandler } from 'express';
+import { Router as expressRouter } from 'express';
 import { RouterDecorationOption } from '../typing';
 import { AppUtils } from '../../app/core/utils';
 export function Router(routerPath: string, options: RouterDecorationOption = {}) {

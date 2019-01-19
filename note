@@ -1,201 +1,41 @@
-1_ use new event emitter instance for each module 
 2_ use dependency injection to resolve mongoose models
-3_ create class or enum for http status (DONE)
 4_ read about localization
 5_ validate input
 6_ refactor class reactor, mostly the remove event method, and complete method;
-7_ internal server error handling
-8_ page not found handling
 9_ send emails
 11_ upload image
 12_ upload files
+13_ mongoose error nandling
+14_ wrapping sub router, remember there's two way
+15_ create an interface for repo model class (eg. create doc)
+16_ when creating a documnent a proper way needed to know if the key is correct 
+17_ convert express router to class in order to give the developer the ability to accsess any method or property explicty
+18_ validation layer for input
+19_ unit test
+20_ put, patch, delete, and intercept decorator
+21_ move login, register and each thing related to auth (to auth class), as note the function it self will be there but the actual invking will be in users
+22_ class for database
+23_ connect to swagger and postman 
 
-install helemt types and compression
 Features
 1_ eleminate register mutiple router to the same app or router instance
+2_ mongoose schema and model in one base class
 
 TODO
 1_ implement deferent auth strategies
 2_ Work in group logger 
 3_ send sms
 
+IMPORTANT
+1_ an application instance not allowed to be accesses, just in server class
+2_ upon the validation layer hierarchy the nested object request not allowed
+3_ user model should not be used explicty
+4_ model, repo and routes used as component 
+
+DONE
+1_ endpoint not found 
+2_ internal server error
+3_ http status codes
+4_ wrap router and register it in app instance
 
 https://www.npmjs.com/package/injection-js
-  
-export class HeroModel {
-
-    private _heroModel: IHeroModel;
-
-    constructor(heroModel: IHeroModel) {
-        this._heroModel = heroModel;
-    }
-    get name(): string {
-        return this._heroModel.name;
-    }
-
-    get power(): string {
-        return this._heroModel.power;
-    }
-
-    get amountPeopleSaved(): number {
-        return this._heroModel.amountPeopleSaved;
-    }
-
-    static createHero(name: string, power: string): Promise.IThenable<IHeroModel> {
-        let p = new Promise((resolve, reject) => {
-
-            let repo = new HeroRepository();
-
-            let hero = <IHeroModel>{
-                name: name,
-                power: power,
-                amountPeopleSaved: 0
-            };
-
-            repo.create(hero, (err, res) => {
-                if (err) {
-                    reject(err);
-                }
-                else {
-                    resolve(res);
-                }
-            });
-
-        });
-
-        return p;
-
-    }
-
-    static findHero(name: string): Promise.IThenable<IHeroModel> {
-        let p = new Promise((resolve, reject) => {
-            let repo = new HeroRepository();
-
-            repo.find({ name: name }).sort({ createdAt: -1 }).limit(1).exec((err, res) => {
-                if (err) {
-                    reject(err);
-                }
-                else {
-                    if (res.length) {
-                        resolve(res[0]);
-                    }
-                    else {
-                        resolve(null);
-                    }
-                }
-            });
-        });
-
-        return p;
-    }
-
-}
-
-Object.seal(HeroModel);
-
-export interface IRead<T> {
-    retrieve: (callback: (error: any, result: any) => void) => void;
-    findById: (id: string, callback: (error: any, result: T) => void) => void;
-    findOne(cond?: Object, callback?: (err: any, res: T) => void): mongoose.Query<T>;
-    find(cond: Object, fields: Object, options: Object, callback?: (err: any, res: T[]) => void): mongoose.Query<T[]>;
-}
-
-export interface IWrite<T> {
-    create: (item: T, callback: (error: any, result: any) => void) => void;
-    update: (_id: mongoose.Types.ObjectId, item: T, callback: (error: any, result: any) => void) => void;
-    delete: (_id: string, callback: (error: any, result: any) => void) => void;
-}
-
-export class RepositoryBase<T extends mongoose.Document> implements IRead<T>, IWrite<T> {
-
-    private _model: mongoose.Model<mongoose.Document>;
-
-    constructor(schemaModel: mongoose.Model<mongoose.Document>) {
-        this._model = schemaModel;
-    }
-
-    create(item: T, callback: (error: any, result: T) => void) {
-        this._model.create(item, callback);
-    }
-
-    retrieve(callback: (error: any, result: T) => void) {
-        this._model.find({}, callback);
-    }
-
-    update(_id: mongoose.Types.ObjectId, item: T, callback: (error: any, result: any) => void) {
-        this._model.update({ _id: _id }, item, callback);
-    }
-
-    delete(_id: string, callback: (error: any, result: any) => void) {
-        this._model.remove({ _id: this.toObjectId(_id) }, (err) => callback(err, null));
-    }
-
-    findById(_id: string, callback: (error: any, result: T) => void) {
-        this._model.findById(_id, callback);
-    }
-
-    findOne(cond?: Object, callback?: (err: any, res: T) => void): mongoose.Query<T> {
-        return this._model.findOne(cond, callback);
-    }
-
-    find(cond?: Object, fields?: Object, options?: Object, callback?: (err: any, res: T[]) => void): mongoose.Query<T[]> {
-        return this._model.find(cond, options, callback);
-    }
-
-    private toObjectId(_id: string): mongoose.Types.ObjectId {
-        return mongoose.Types.ObjectId.createFromHexString(_id);
-    }
-
-}
-
-export class HeroRepository extends RepositoryBase<IHeroModel> {
-    constructor() {
-        super(HeroSchema);
-    }
-}
-
-Object.seal(HeroRepository);
-
-let uri = 'mongodb://localhost/heroes';
-mongoose.connect(uri, (err) => {
-    if (err) {
-        console.log(err.message);
-        console.log(err);
-    }
-    else {
-        console.log('Connected to MongoDb');
-    }
-});
-
-HeroModel.createHero('Steve', 'Flying').then((res) => {
-    console.log('### Created Hero ###');
-    console.log(res);
-
-    HeroModel.findHero('Steve').then((res) => {
-        console.log('### Found Hero ###');
-        console.log(res);
-
-        // now update the Hero
-        let hero = <IHeroModel>res;
-        hero.power = 'Invisibility';
-        hero.save((err, res) => {
-            if (err) {
-                console.log(err.message);
-                console.log(err);
-            }
-            else {
-                console.log(res);
-            }
-        });
-    }, (err) => {
-        if (err) {
-            console.log(err.message);
-        }
-    });
-},
- (err) => {
-    if (err) {
-        console.log(err.message);
-        console.log(err);
-    }
-});

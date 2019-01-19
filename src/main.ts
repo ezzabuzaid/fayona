@@ -4,7 +4,7 @@ import { Logger } from "./app/core/utils/logger.service";
 const log = new Logger('Main begain');
 
 Server.bootstrap(null)
-    .then(() => log.info('Bootstrab begain'))
+    .then(() => log.info('Bootstrap begain'))
 
 
 process.chdir('./src/');
