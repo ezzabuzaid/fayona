@@ -28,6 +28,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "importHelpers": true,
-    "noEmitHelpers": true
+    "noEmitHelpers": true,
+    "resolveJsonModule": true
   }
 }

@@ -1,5 +1,5 @@
 import mongoose = require('mongoose');
-import appService from "./app.service";
+import appService from "./core/app.service";
 import { Wrapper } from "./wrapper";
 import { Logger } from "./core/utils/logger.service";
 import { Application } from "./app";

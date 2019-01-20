@@ -39,7 +39,7 @@ export class UsersRouter {
         const currentUser = await UsersRepo.getUser({ username });
         if (!!currentUser) {
             log.debug('cannot complete the register, user found');
-            const response = new ErrorResponse('Try to enter another username', HttpStatusCodes.BAD_REQUEST);
+            const response = new ErrorResponse('username_exist', HttpStatusCodes.BAD_REQUEST);
             return res.status(response.code).json(response);
         }
         const user = await UsersRepo.createUser({ username, password });

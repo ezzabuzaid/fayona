@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Logger } from '@core/utils';
 import jwt = require('jsonwebtoken');
-import appService from 'app/app.service';
+import appService from '@core/app.service';
 
 const log = new Logger('Auth Module');
 

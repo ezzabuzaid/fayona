@@ -16,6 +16,8 @@
 21_ move login, register and each thing related to auth (to auth class), as note the function it self will be there but the actual invking will be in users
 22_ class for database
 23_ connect to swagger and postman 
+24_ move reactor inside lib folder
+25_ linting roles
 
 Features
 1_ eleminate register mutiple router to the same app or router instance
