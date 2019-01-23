@@ -3,10 +3,11 @@ import { Router } from '@lib/core';
 import { Post, Get } from '@lib/methods';
 import { ErrorResponse, SuccessResponse } from '@core/helpers';
 import { UsersRepo } from './users.repo';
-import { AppUtils, Logger } from '@core/utils';
 import HttpStatusCodes = require('http-status-codes');
-import auth from '@auth/auth';
 
+import { translate } from '@lib/localization';
+
+import { AppUtils, Logger } from '@core/utils';
 const log = new Logger('User Router');
 
 @Router('users')
@@ -14,50 +15,47 @@ export class UsersRouter {
 
     constructor() { }
 
-    @Post('login')
-    async login(req: Request, res: Response, next: NextFunction) {
-        const { username, password } = req.body;
-        const currentUser = await UsersRepo.getUser({ username });
-        if (!!currentUser) {
-            const isPasswordEqual = await currentUser.comparePassword(password);
-            if (isPasswordEqual) {
-                const responseData = AppUtils.removeKey('password', currentUser.toObject());
-                responseData.token = await auth.generateToken({ id: currentUser.id });
-                const response = new SuccessResponse(responseData, 'Register successfully', HttpStatusCodes.OK);
-                res.status(response.code).json(response);
-                return next();
-            }
-        }
-        const response = new ErrorResponse('username or password wrong', HttpStatusCodes.CONFLICT);
-        return res.status(response.code).json(response);
-    }
-
-    @Post('register')
+    @Post('/')
     async register(req: Request, res: Response, next: NextFunction) {
         // Validate the input
         const { username, password } = req.body;
-        const currentUser = await UsersRepo.getUser({ username });
+        const currentUser = await UsersRepo.fetchUser({ username });
+
         if (!!currentUser) {
             log.debug('cannot complete the register, user found');
-            const response = new ErrorResponse('username_exist', HttpStatusCodes.BAD_REQUEST);
+            const response = new ErrorResponse(translate('username_exist'), HttpStatusCodes.BAD_REQUEST);
             return res.status(response.code).json(response);
         }
+
         const user = await UsersRepo.createUser({ username, password });
         const responseData = AppUtils.removeKey('password', user.toObject());
 
-        // Send the response
-        const response = new SuccessResponse<{}>(responseData, 'Register successfully', HttpStatusCodes.CREATED);
+        const response = new SuccessResponse<{}>(responseData, translate('user_register_success'), HttpStatusCodes.CREATED);
         res.status(response.code).json(response);
         next();
     }
 
     @Get('/')
     async fetchUsers(req: Request, res: Response, next: NextFunction) {
-        const allUsers = await UsersRepo.find({}).select({ password: 0 });
-        const response = new SuccessResponse(allUsers, 'Fetch all user', HttpStatusCodes.OK);
+        const allUsers = await UsersRepo.fetchUsers({}, '-password');
+        const response = new SuccessResponse(allUsers, translate('fetch_users'), HttpStatusCodes.OK);
         res.status(response.code).json(response);
     }
 
+    
+    // @Put('/:id')
+    // async updateUser() {
+
+    // }
+
+    @Get('/:id')
+    async fetchUser(req: Request, res: Response, next: NextFunction) {
+        const { id } = req.params;
+        const currentUser = await UsersRepo.fetchUser({ _id: id }, '-password');
+
+        const response = new SuccessResponse(currentUser, translate('fetch_user'), HttpStatusCodes.OK);
+        res.status(response.code).json(response);
+    }
 }
 
 // import { RequestHandlerParams, Router as expressRouter } from "express-serve-static-core";

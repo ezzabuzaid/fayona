@@ -67,7 +67,7 @@ export class Logger {
   }
 
   constructor(private source?: string) {
-    this.log(console.log, LogLevel.Debug, [colors.bold(source)]);
+    this.log(console.log, LogLevel.Info, [colors.bold(source)]);
   }
 
   /**

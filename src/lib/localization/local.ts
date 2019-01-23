@@ -1,3 +1,8 @@
+import { development } from '@core/helpers';
+
+import { Logger } from '@core/utils';
+const log = new Logger('Local Class');
+
 export class Local {
     /**
      * the local object
@@ -7,7 +12,7 @@ export class Local {
     /**
      * name of the local
      */
-    private _name: string;
+    name: string;
 
     /**
      * 
@@ -15,7 +20,7 @@ export class Local {
      * @param language local object
      */
     constructor(name, language: object) {
-        this._name = name;
+        this.name = name;
         this._language = language;
     }
 
@@ -33,7 +38,11 @@ export class Local {
      * @param value 
      */
     set(key: string, value: any) {
-        // throw an error in dev mode to tell him that you create a new one not override an exisiting one
+        development(
+            () => {
+                log.warn(`a key with name ${key} is already hold a value`);
+            }
+        )
         this.language[key] = value;
     }
 
@@ -42,10 +51,11 @@ export class Local {
      * @param key get the value by it's key for this local
      */
 
-    get(key: string) {
+    get(key: string): string {
         const value = this.language[key];
-
-        if (!value) throw new Error(`the key { ${key} } is not found in local { ${this._name} }`)
+        if (!value) {
+            throw new Error(`the key { ${key} } is not found in local { ${this.name} }`);
+        }
 
         return value;
     }

@@ -12,4 +12,4 @@ class AppService {
     }
 
 }
-export default new AppService();
+export const appService = new AppService();

@@ -18,8 +18,13 @@
 23_ connect to swagger and postman 
 24_ move reactor inside lib folder
 25_ linting roles
+26_ intercept not for router it self, maybe it will be for just a param !!!!
 
-Features
+
+
+
+
+REVIEW Features
 1_ eleminate register mutiple router to the same app or router instance
 2_ mongoose schema and model in one base class
 
@@ -27,17 +32,33 @@ TODO
 1_ implement deferent auth strategies
 2_ Work in group logger 
 3_ send sms
+4_ import excel and convert it to json, charts
+5_ create and export cvs
+6_ upload files
+7_ read all files to get the string in translate function and auto export it to json file
 
-IMPORTANT
+SECTION IMPORTANT
 1_ an application instance not allowed to be accesses, just in server class
 2_ upon the validation layer hierarchy the nested object request not allowed
 3_ user model should not be used explicty
 4_ model, repo and routes used as component 
 
-DONE
+SECTION DONE
 1_ endpoint not found 
 2_ internal server error
 3_ http status codes
 4_ wrap router and register it in app instance
 
 https://www.npmjs.com/package/injection-js
+
+
+1_ end users routes
+2_ write testing cases
+3_ finish DELETE and PUT decoration
+
+// GET user
+// GET all user
+// POST create user
+// PUT update user
+// DELETE delete user
+// DELETE delete bulk of users

@@ -1,9 +1,8 @@
-import { Logger } from '@core/utils';
-import { UsersModel, UsersType } from './users.model';
+import { UsersModel } from './users.model';
 import { HashService } from '@core/helpers';
 
+import { Logger } from '@core/utils';
 const log = new Logger('Users Repo');
-log.info('User repo');
 
 export class UsersRepo extends UsersModel {
     private constructor(doc) {
@@ -17,10 +16,14 @@ export class UsersRepo extends UsersModel {
         return user.save();
     }
 
-    static async getUser(obj) {
+    static fetchUser(obj, ...args) {
         // obj must be of type user
-        const user = await this.findOne(obj);
-        return user;
+        return this.findOne(obj, ...args);
+    };
+
+    static fetchUsers(obj?, ...args) {
+        // obj must be of type user
+        return this.find(obj, ...args);
     };
 
     async comparePassword(candidatePassword: string) {

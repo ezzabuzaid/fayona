@@ -1,13 +1,19 @@
 import { Local } from './local';
+import { LocalizationService } from './localization.service';
+import { development } from '@core/helpers';
 
+import { Logger } from '@core/utils';
+const log = new Logger('Localization Class');
 
-class Localization {
+class Localization extends LocalizationService {
     /**
      * list of observed locals
      */
-    private locals = [];
+    private locals: Local[] = [];
 
-    constructor() { }
+    constructor() {
+        super()
+    }
 
     /**
      * 
@@ -15,10 +21,28 @@ class Localization {
      * @param local the local to add
      */
     add(name: string, local: object): Local {
-        // Must check if local is exist
-        // if throw an error
+        // if there's already throw an error in dev mode
+
+        development(
+            () => {
+                if (this.get(name)) {
+                    throw new Error(`Local ${name} is already exist`);
+                }
+            }
+        )
+
+        // create a new local
         const newLocal = new Local(name, local);
+
+        // register the local
         this.locals.push(newLocal);
+
+        // emit a value to localAdded event
+        this.localAdded.emit(local);
+
+        log.info(`local with name ${name} is added, consider using set(local) to use it`);
+
+
         return newLocal;
     }
 
@@ -33,10 +57,17 @@ class Localization {
         const local = this.get(name);
 
         // check if the local is exist
-        if (!local) throw new Error('local not found, please consider add it');
+        if (!local) {
+            throw new Error('local not found, please consider add it');
+        }
 
         // set the local is active local
         this.local = local
+
+        // emit a value to changeLocal event
+        this.localChange.emit(local);
+
+        log.info(`local with name ${name} is active`);
 
         return local;
     }
@@ -49,7 +80,7 @@ class Localization {
         // find the local
         const local = this.locals.find(loc => loc.name === name);
 
-        return local;
+        return local || null;
     }
 
     /**
@@ -73,11 +104,12 @@ class Localization {
 
 }
 
-// create a new instance from Localization class
 const localization = new Localization();
-
 // export the created instance, it must be a singelton 
-export default localization;
+export { localization };
+
+
+// scoping not allowed until i18n service resolved in api module
 
 /**
  * 
@@ -88,10 +120,3 @@ export function translate(key: string) {
     return localization.local.get(key);
 }
 
-// on local change reaction
-
-// scoping not allowed until i18n service resolved in api module
-
-// like a set in local class it's mean override an existing key, maybe he will set a new key by mistake, so an error need here to tell him what exactle he doing
-// but this error mustly ignored in production mode
-// so an init method needed to tell the translate, the state of our server 

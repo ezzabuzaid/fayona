@@ -32,30 +32,36 @@ export class Reactor {
     constructor(name: string) {
         this.event = new Broadcast(name);
         this.name = name;
+        this.index = Reactor.eventNumber++;
         Reactor.events.push(this.event);
-        this.index = Reactor.eventsCount++;
     }
     /**
      * List of all event 
      */
     private static events: Broadcast[] = [];
-    private static eventsCount = 0;
+
+    private static eventNumber = 0;
+
     private static getEvent(name: string) {
         const event = this.events.find(event => event.name === name);
         if (!event) throw new Error('Event cannot find!');
         return event;
     }
+
     static listen(name: string, func: Function) {
         const event = this.getEvent(name);
         event.registerCallback(func);
     }
+
     /**
      * 
      * @param value argument to send to callbacks
      */
+
     emit(value) {
         this.event.callbacks.forEach(func => func(value));
     }
+
     /**
      * 
      * @param func register a new callback
@@ -63,6 +69,7 @@ export class Reactor {
     register(func) {
         this.event.registerCallback(func);
     }
+
     /**
      * This will remove the event from the event list
      * and remove the event itself that was create implicitly in the constructor
@@ -74,3 +81,8 @@ export class Reactor {
         this.event = null;
     }
 }
+
+
+// NOTE remove event is diffrent from unregister
+// unregister mean remove the passed function, therefore it will not be fired because it's removed
+// remove mean, delete the event it self 

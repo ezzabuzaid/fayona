@@ -1,12 +1,18 @@
-import mongoose = require('mongoose');
-import appService from "./core/app.service";
+import { appService } from "./core/app.service";
 import { Wrapper } from "./wrapper";
-import { Logger } from "./core/utils/logger.service";
 import { Application } from "./app";
 import { ErrorHandling } from './core/helpers/errors.service';
+import { localization } from '@lib/localization';
+import { ServerLevels } from '@core/helpers';
+import en from "../languages/en.json";
+import mongoose = require('mongoose');
 
+import { Logger } from "./core/utils/logger.service";
+import { Server as httpServer } from 'http';
 const log = new Logger('Server init');
+
 export class Server extends Application {
+        static LEVEL = ServerLevels.DEV;
         private port = this.get('port');
         private host = this.get('host');
 
@@ -19,7 +25,7 @@ export class Server extends Application {
                 return Promise.resolve(new Server(port));
         }
 
-        resolverRouters() {
+        private resolverRouters() {
                 this.app.use('/', ...Wrapper.routerList);
 
                 // * Globally catch error
@@ -32,28 +38,27 @@ export class Server extends Application {
         private constructor(port) {
                 super();
                 port && (this.port = port);
-                this.init()
-                        .catch(() => { new Error('Faild to init the server') });
+                this.init().catch(() => new Error('Faild to init the server'));
         }
 
         private populateMongoose() {
                 const { MONGO_USER, MONGO_PASSWORD, MONGO_PATH } = process.env;
                 return mongoose.connect(`mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@cluster0-hp3qr.mongodb.net/${MONGO_PATH}`, { useNewUrlParser: true })
-                        .then(() => log.debug('Database Connected'))
+                        .then(() => log.info('Database Connected'))
                         .catch((error) => log.error("Database Not Connected", error))
         }
 
         /**
          * 
-         * it's call the app.listen to start the server
-         * @returns {Promise} 
+         * Call the app.listen to start the server
+         * @returns {Promise<httpServer>} 
          */
-        private populateServer() {
-                const promise = new Promise((resolve) => {
-                        this.app.listen(this.port, this.host, () => {
+        private populateServer(): Promise<httpServer> {
+                const promise = new Promise<httpServer>((resolve) => {
+                        const server = this.app.listen(this.port, this.host, () => {
                                 log.info(`${new Date()} Server host ${this.host} Server port ${this.port}`)
-                                resolve();
-                        })
+                                resolve(server);
+                        });
                 })
                 return promise;
         }
@@ -62,35 +67,20 @@ export class Server extends Application {
          * 
          */
         private async init() {
+                this.resolverRouters();
+                localization.add('en', en);
+                localization.use('en');
+                // localization.add('ar', ar);
+                // return it arrayAsObject
                 await Promise.all([
-                        this.populateMongoose(),
-                        this.resolverRouters(),
-                        this.populateServer()
+                        this.populateServer(),
+                        this.populateMongoose()
                 ]);
+
                 appService.broadcast(null);
         }
 }
 
-
-// import {
-//     Response, Params, Controller, Get,
-//     bootstrapControllers, Middleware
-// } from '@decorators/express';
-
-// @Controller('/')
-// class UsersController {
-//     @Get('/users/:id')
-//     @Middleware((req, res, next) => {
-//         console.log('route middleware');
-//         next();
-//     })
-//     getData(@Response() res, @Params('id') id: string) {
-//         res.send(Users.findById(id));
-//     }
-// }
-
-// let app = express();
-// bootstrapControllers(app, [UsersController]);
 
 
 // router.use('/user', function (req, res, next) {

@@ -3,10 +3,8 @@ import morgan = require('morgan');
 import compression = require('compression');
 import helmet = require('helmet');
 import { environment } from '../environment/env';
-import { Logger } from '@core/utils';
-import { ErrorHandling } from './core/helpers/errors.service';
 
-// import { Logger } from './core/utils/logger.service';
+import { Logger } from '@core/utils';
 const log = new Logger('Application instance');
 
 export class Application {
