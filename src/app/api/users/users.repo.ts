@@ -21,6 +21,12 @@ export class UsersRepo extends UsersModel {
         return this.findOne(obj, ...args);
     };
 
+    static async userExist(obj) {
+        // '-password'
+        const user = await this.findOne(obj, {}, { lean: true });
+        return !!user;
+    }
+
     static fetchUsers(obj?, ...args) {
         // obj must be of type user
         return this.find(obj, ...args);

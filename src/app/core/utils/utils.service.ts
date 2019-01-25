@@ -1,7 +1,7 @@
 import setPrototypeOf = require('setprototypeof');
 import { randomBytes } from 'crypto';
 
-class AppUtils {
+export class AppUtils {
     static setPrototypeOf(constructor: object, superConstructor: object) {
         setPrototypeOf(constructor, superConstructor);
     }
@@ -64,11 +64,9 @@ class AppUtils {
 }
 
 //* Utility class to be extended, so when you call build it will construct an instance from that class
-class Singelton {
+export class Singelton {
     private static instance = null;
     static build() {
         return this.instance || (this.instance = new this());
     }
 }
-
-export { Singelton, AppUtils }

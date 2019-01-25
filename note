@@ -19,8 +19,8 @@
 24_ move reactor inside lib folder
 25_ linting roles
 26_ intercept not for router it self, maybe it will be for just a param !!!!
-
-
+27_ auto export postman collection using npm postman collection (create json postman, upload it to cloud use it in postman using url)
+28_ modify the routes method to call next implicty, and bind responsdWith to res object, this will hold the response object; 
 
 
 
@@ -51,14 +51,24 @@ SECTION DONE
 
 https://www.npmjs.com/package/injection-js
 
-
+ANCHOR task 1
 1_ end users routes
 2_ write testing cases
 3_ finish DELETE and PUT decoration
-
 // GET user
 // GET all user
 // POST create user
 // PUT update user
 // DELETE delete user
 // DELETE delete bulk of users
+
+ANCHOR task 2
+1_ complete auth routes
+2_ forget password
+3_ verify email and mobile
+4_ send email and sms
+// use click on forget password, complete info, send request, check if exist, send email to him to confirm that the email belong to and so on, the link must have a token linked with website and deeplink to retrive password page, if token is expired, terminate, otherwise, password and confirm password must be filled, search for forget password mechanisim
+// send email or sms, that mean he can inseart phone number of password, it will be asked for that
+// after register he need to be noticed that he will recive an pin code or email verification
+
+ANCHOR task 3

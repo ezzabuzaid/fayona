@@ -1,14 +1,14 @@
-import { appService } from "./core/app.service";
 import { Wrapper } from "./wrapper";
 import { Application } from "./app";
 import { ErrorHandling } from './core/helpers/errors.service';
 import { localization } from '@lib/localization';
 import { ServerLevels } from '@core/helpers';
+import { Server as httpServer } from 'http';
+import { appService } from './core';
 import en from "../languages/en.json";
 import mongoose = require('mongoose');
 
 import { Logger } from "./core/utils/logger.service";
-import { Server as httpServer } from 'http';
 const log = new Logger('Server init');
 
 export class Server extends Application {
@@ -56,7 +56,7 @@ export class Server extends Application {
         private populateServer(): Promise<httpServer> {
                 const promise = new Promise<httpServer>((resolve) => {
                         const server = this.app.listen(this.port, this.host, () => {
-                                log.info(`${new Date()} Server host ${this.host} Server port ${this.port}`)
+                                log.info(`${new Date()} Server running at http://${this.host}:${this.port}`)
                                 resolve(server);
                         });
                 })

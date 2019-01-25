@@ -1,4 +1,4 @@
-import * as HttpStatusCodes from 'http-status-codes';
+import HttpStatusCodes = require('http-status-codes');
 
 abstract class Response extends Error {
     status: string;
@@ -7,7 +7,7 @@ abstract class Response extends Error {
 
 export class SuccessResponse<T> extends Response {
     data: T;
-    constructor(data: T, message: string, code: number, status?: string) {
+    constructor(data: T, message: string, code = HttpStatusCodes.OK, status?: string) {
         super();
         this.message = message;
         this.code = code;
@@ -19,7 +19,7 @@ export class SuccessResponse<T> extends Response {
 
 export class ErrorResponse extends Response {
     error: string;
-    constructor(message: string, code: number, status?: string) {
+    constructor(message: string, code = HttpStatusCodes.INTERNAL_SERVER_ERROR, status?: string) {
         super();
         this.message = message;
         this.code = code;
@@ -27,3 +27,11 @@ export class ErrorResponse extends Response {
     }
 
 }
+
+// HTTP 200 OK: Standard response for successful HTTP requests. The actual response will depend on the request method used.
+
+// HTTP 204 No Content: The server successfully processed the request, but is not returning any content
+
+// HTTP 404 Not Found - The server has not found anything matching the Request-URI.
+
+// HTTP 503 Service Unavailable: The server is currently unable to handle the request due to a temporary overloading or maintenance of the server.

@@ -1,8 +1,8 @@
 import { Logger } from '@core/utils';
-const log = new Logger('Hash service');
 import bcrypt = require('bcryptjs')
 
 // extends the bcrypt
+const log = new Logger('Hash service');
 export class HashService {
 
     constructor() {

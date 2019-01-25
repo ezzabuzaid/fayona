@@ -1,6 +1,8 @@
 import { Router as expressRouter } from 'express';
 import { RouterDecorationOption } from '../typing';
-import { AppUtils } from '../../app/core/utils';
+import { AppUtils, Logger } from '@core/utils';
+const log = new Logger('Router Decorator');
+
 export function Router(routerPath: string, options: RouterDecorationOption = {}) {
     return function <T extends new (...args: any[]) => any>(constructor: T) {
 
@@ -8,7 +10,6 @@ export function Router(routerPath: string, options: RouterDecorationOption = {})
         routerPath = AppUtils.joinPath(routerPath);
         const { prototype } = constructor;
         const router = expressRouter(options);
-
         //* extend router        
         const routerPrototype = AppUtils.getPrototypeOf(router);
         for (const i in routerPrototype) {

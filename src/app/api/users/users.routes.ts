@@ -1,11 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction, RouterOptions, Express } from 'express';
 import { Router } from '@lib/core';
-import { Post, Get } from '@lib/methods';
+import { Post, Get, Put } from '@lib/methods';
 import { ErrorResponse, SuccessResponse } from '@core/helpers';
 import { UsersRepo } from './users.repo';
-import HttpStatusCodes = require('http-status-codes');
-
 import { translate } from '@lib/localization';
+import { Delete } from '@lib/methods/delete.decorator';
+import HttpStatusCodes = require('http-status-codes');
 
 import { AppUtils, Logger } from '@core/utils';
 const log = new Logger('User Router');
@@ -18,13 +18,12 @@ export class UsersRouter {
     @Post('/')
     async register(req: Request, res: Response, next: NextFunction) {
         // Validate the input
-        const { username, password } = req.body;
-        const currentUser = await UsersRepo.fetchUser({ username });
+        const { username, password } = req.body;;
 
-        if (!!currentUser) {
-            log.debug('cannot complete the register, user found');
+        if (await UsersRepo.userExist({ username })) {
             const response = new ErrorResponse(translate('username_exist'), HttpStatusCodes.BAD_REQUEST);
-            return res.status(response.code).json(response);
+            res.status(response.code).json(response);
+            next();
         }
 
         const user = await UsersRepo.createUser({ username, password });
@@ -35,48 +34,62 @@ export class UsersRouter {
         next();
     }
 
-    @Get('/')
-    async fetchUsers(req: Request, res: Response, next: NextFunction) {
-        const allUsers = await UsersRepo.fetchUsers({}, '-password');
-        const response = new SuccessResponse(allUsers, translate('fetch_users'), HttpStatusCodes.OK);
+    @Put('/:id')
+    async updateUser(req: Request, res: Response, next: NextFunction) {
+        // Validate the input
+        const { id } = req.params;
+        const user = await UsersRepo.fetchUser({ _id: id });
+        let response;
+        if (!user) {
+            response = new ErrorResponse(translate('user_not_found'), HttpStatusCodes.BAD_REQUEST);
+        } else {
+            const { username } = req.body;
+            user.set({ username })
+            await user.save();
+            response = new SuccessResponse(user, translate('user_updated'), HttpStatusCodes.OK);
+        }
         res.status(response.code).json(response);
+        next();
     }
 
-    
-    // @Put('/:id')
-    // async updateUser() {
-
-    // }
+    @Delete('/:id')
+    async deleteUser(req: Request, res: Response, next: NextFunction) {
+        const { id } = req.params;
+        const user = await UsersRepo.findByIdAndDelete(id);
+        let response;
+        if (!user) {
+            response = new ErrorResponse(translate('user_not_found'), HttpStatusCodes.NOT_ACCEPTABLE)
+        } else {
+            response = new SuccessResponse(null, translate('delete_user'), HttpStatusCodes.OK);
+        }
+        res.status(response.code).json(response);
+        next();
+    }
 
     @Get('/:id')
     async fetchUser(req: Request, res: Response, next: NextFunction) {
         const { id } = req.params;
-        const currentUser = await UsersRepo.fetchUser({ _id: id }, '-password');
+        const currentUser = await UsersRepo.fetchUser({ _id: id });
+        const response = new SuccessResponse(currentUser, translate('fetch_user'));
 
-        const response = new SuccessResponse(currentUser, translate('fetch_user'), HttpStatusCodes.OK);
+        if (!currentUser) {
+            response.code = HttpStatusCodes.NO_CONTENT;
+            // user not found
+            // but the request successed
+            // ask if throw an error is good
+        }
+
         res.status(response.code).json(response);
+        next();
     }
+
+    @Get('/')
+    async fetchUsers(req: Request, res: Response, next: NextFunction) {
+        const allUsers = await UsersRepo.fetchUsers({});
+        const response = new SuccessResponse(allUsers, translate('fetch_users'), HttpStatusCodes.OK);
+        res.status(response.code).json(response);
+        next();
+    }
+
 }
 
-// import { RequestHandlerParams, Router as expressRouter } from "express-serve-static-core";
-
-// interface ExpressRouter {
-//     new(options: RouterOptions): expressRouter;
-// }
-
-// class ExpressRouter implements ExpressRouter  {
-//     constructor(options: RouterOptions) {
-//         return (new (ex(options) as any));
-//     }
-// }
-
-
-// const e = new ExpressRouter({});
-// e.
-// class T extends ExpressRouter {
-//     constructor() {
-//         super({});
-//     }
-// }
-
-// new T()

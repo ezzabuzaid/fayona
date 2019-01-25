@@ -4,5 +4,9 @@
     "fetch_users": "Fetch all user",
     "fetch_user": "User fetched",
     "register_success": "Register successfully",
-    "wrong_credintals": "username or password wrong"
+    "wrong_credintals": "username or password wrong",
+    "internal_server_error": "internal_server_error",
+    "delete_user": "delete_user",
+    "user_not_found": "user not found",
+    "invalid_syntax": "invalid path syntax, please make sure that the requested valid entity"
 }

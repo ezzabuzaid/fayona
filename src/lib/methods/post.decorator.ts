@@ -21,7 +21,6 @@ export function Post(routerPath: string) {
             routerPath = AppUtils.joinPath(target.routesPath, '/', routerPath);
 
             //* assign the router
-
             target.post(routerPath, ErrorHandling.wrapRoute(function () {
                 return target[propertyKey](...arguments);
             }));
