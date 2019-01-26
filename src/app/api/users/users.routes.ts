@@ -12,7 +12,6 @@ const log = new Logger('User Router');
 
 @Router('users')
 export class UsersRouter {
-
     constructor() { }
 
     @Post('/')

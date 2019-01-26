@@ -61,6 +61,14 @@ export class AppUtils {
         const { [key]: foo, ...rest } = obj;
         return rest;
     }
+
+    static pick(obj, keys) {
+        return {...{...keys.map(k => k in obj ? { [k]: obj[k] } : {})}}
+    }
+
+    static reject(obj, keys) {
+        return Object.assign({}, ...Object.keys(obj).filter(k => !keys.includes(k)).map(k => ({ [k]: obj[k] })))
+    }
 }
 
 //* Utility class to be extended, so when you call build it will construct an instance from that class

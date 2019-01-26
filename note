@@ -21,7 +21,7 @@
 26_ intercept not for router it self, maybe it will be for just a param !!!!
 27_ auto export postman collection using npm postman collection (create json postman, upload it to cloud use it in postman using url)
 28_ modify the routes method to call next implicty, and bind responsdWith to res object, this will hold the response object; 
-
+29_ server events
 
 
 REVIEW Features
@@ -36,6 +36,7 @@ TODO
 5_ create and export cvs
 6_ upload files
 7_ read all files to get the string in translate function and auto export it to json file
+8_ refresh token
 
 SECTION IMPORTANT
 1_ an application instance not allowed to be accesses, just in server class
@@ -72,3 +73,37 @@ ANCHOR task 2
 // after register he need to be noticed that he will recive an pin code or email verification
 
 ANCHOR task 3
+
+server event:: connection, refresh, error, exit 
+public createServer() {
+        if (this.isServerRunning) {
+            this.server.stop();
+            this.isServerRunning = false;
+            return;
+        } else {
+            this.server = new Server(this.config);
+            let path = this.getCurrentWorkSpace();
+            this.server.watch(path);
+            this.isServerRunning = true;
+        }
+
+        this.server.on('start', () => {
+            StatusBarUi.listening();
+        });
+
+        this.server.on('stop', () => {
+            StatusBarUi.stopListening();
+        });
+
+        this.server.on('refresh', () => {
+            StatusBarUi.refresh();
+        });
+
+        this.server.on('connected', () => {
+            StatusBarUi.connected();
+        });
+
+        this.server.on('disconnected', () => {
+            StatusBarUi.disconnected();
+        });
+

@@ -4,7 +4,8 @@
   "description": "",
   "main": "main.ts",
   "scripts": {
-    "test": "snyk test",
+    "snyk": "snyk test",
+    "test": "jest",
     "build": "tsc",
     "dev": "ts-node -r tsconfig-paths/register ./src/main.ts",
     "watch:dev": "nodemon -e ts -w ./src -x npm run dev",
@@ -51,9 +52,6 @@
     "typescript": "^3.2.2"
   },
   "devDependencies": {
-    "nodemon": "^1.18.9",
-    "ts-node": "^7.0.1",
-    "ts-node-dev": "^1.0.0-pre.32",
     "@types/dotenv": "^6.1.0",
     "@types/express": "^4.16.0",
     "@types/mongodb": "^3.1.18",
@@ -64,8 +62,12 @@
     "gulp-apidoc-swagger": "^0.2.2",
     "gulp-typescript": "^5.0.0",
     "gulp-util": "^3.0.8",
+    "jest": "^24.0.0",
     "logger": "0.0.1",
+    "nodemon": "^1.18.9",
     "snyk": "^1.122.0",
+    "ts-node": "^7.0.1",
+    "ts-node-dev": "^1.0.0-pre.32",
     "tsconfig-paths": "^3.7.0",
     "tsify": "^4.0.1",
     "tslint": "^5.12.1",
