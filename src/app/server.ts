@@ -27,10 +27,10 @@ export class Server extends Application {
 
         private resolverRouters() {
                 this.app.use('/', ...Wrapper.routerList);
-
+                
                 // * Globally catch error
                 this.app.use(ErrorHandling.catchError);
-
+                
                 // * catch not found error
                 this.app.use(ErrorHandling.notFound);
         }
@@ -56,7 +56,9 @@ export class Server extends Application {
         private populateServer(): Promise<httpServer> {
                 const promise = new Promise<httpServer>((resolve) => {
                         const server = this.app.listen(this.port, this.host, () => {
-                                log.info(`${new Date()} Server running at http://${this.host}:${this.port}`)
+                                const url = `http://${this.host}:${this.port};`
+                                process.env['URL'] = url;
+                                log.info(`${new Date()} Server running at ${url}`)
                                 resolve(server);
                         });
                 })

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2017",
     "module": "commonjs",
     "lib": [
       "es2015"
@@ -21,7 +21,8 @@
       "node_modules/@types"
     ],
     "types": [
-      "node"
+      "node",
+      "jest"
     ],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
