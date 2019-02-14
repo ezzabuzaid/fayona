@@ -1,6 +1,6 @@
 import { Wrapper } from "./wrapper";
 import { Application } from "./app";
-import { ErrorHandling } from './core/helpers/errors.service';
+import { ErrorHandling } from './core/helpers/errors';
 import { localization } from '@lib/localization';
 import { ServerLevel } from '@core/helpers';
 import { Server as httpServer } from 'http';

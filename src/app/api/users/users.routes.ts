@@ -1,159 +1,95 @@
 import { Request, Response, NextFunction, RouterOptions, Express } from 'express';
 import { Router } from '@lib/core';
 import { Post, Get, Put } from '@lib/methods';
-import { ErrorResponse, SuccessResponse } from '@core/helpers';
+import { ErrorResponse, SuccessResponse, ErrorHandling } from '@core/helpers';
 import { UsersRepo } from './users.repo';
 import { translate } from '@lib/localization';
 import { Delete } from '@lib/methods/delete.decorator';
 import HttpStatusCodes = require('http-status-codes');
 
-import { Logger } from '@core/utils';
+import { Logger, AppUtils } from '@core/utils';
 const log = new Logger('User Router');
 
 @Router('users')
 export class UsersRouter {
     constructor() { }
 
-    // @Post('/')
-    // async register(req: Request, res: Response, next: NextFunction) {
-    //     // Validate the input
-    //     const { username, password } = req.body;;
+    @Post('/')
+    async register(req: Request, res: Response, next: NextFunction) {
+        log.info('start register');
 
-    //     if (await UsersRepo.userExist({ username })) {
-    //         const response = new ErrorResponse(translate('username_exist'), HttpStatusCodes.BAD_REQUEST);
-    //         res.status(response.code).json(response);
-    //         next();
-    //     }
+        // Validate the input
+        const { username, password } = req.body;;
 
-    //     const user = await UsersRepo.createUser({ username, password });
-    //     const
-    // async register(req: Request, res: Response, next: NextFunction) {
-    //     // Validate the input
-    //     const { username, password } = req.body;;
+        if (await UsersRepo.userExist({ username })) {
+            throw new ErrorResponse(translate('username_exist'), HttpStatusCodes.BAD_REQUEST);
+        }
 
-    //     if (await UsersRepo.userExist({ username })) {
-    //         const response = new ErrorResponse(translate('username_exist'), HttpStatusCodes.BAD_REQUEST);
-    //         res.status(response.code).json(response);
-    //         next();
-    //     }
+        log.warn('checking out');
 
-    //     const user = await UsersRepo.createUser({ username, password });
-    //     const responseData = AppUtils.removeKey('password', user.toObject());
+        const user = await UsersRepo.createUser({ username, password });
+        const responseData = AppUtils.removeKey('password', user.toObject());
 
-    //     const response = new SuccessResponse<{}>(responseData, translate('user_register_success'), HttpStatusCodes.CREATED);
-    //     res.status(response.code).json(response);
-    //     next();
-    // }
+        const response = new SuccessResponse<{}>(responseData, translate('user_register_success'), HttpStatusCodes.CREATED);
+        res.status(response.code).json(response);
+    }
 
-    // @Put('/:id')
-    // async updateUser(req: Request, res: Response, next: NextFunction) {
-    //     // Validate the input
-    //     const { id } = req.params;
-    //     const user = await UsersRepo.fetchUser({ _id: id });
-    //     let response;
-    //     if (!user) {
-    //         response = new ErrorResponse(translate('user_not_found'), HttpStatusCodes.BAD_REQUEST);
-    //     } else {
-    //         const { username } = req.body;
-    //         user.set({ username })
-    //         await user.save();
-    //         response = new SuccessResponse(user, translate('user_updated'), HttpStatusCodes.OK);
-    //     }
-    //     res.status(response.code).json(response);
-    //     next();
-    // }
+    @Put('/:id')
+    async updateUser(req: Request, res: Response, next: NextFunction) {
+        log.info('start updateUser');
+        // Validate the input
+        const { id } = req.params;
+        const user = await UsersRepo.fetchUser({ _id: id });
 
-    // @Delete('/:id')
-    // async deleteUser(req: Request, res: Response, next: NextFunction) {
-    //     const { id } = req.params;
-    //     const user = await UsersRepo.findByIdAndDelete(id);
-    //     let response;
-    //     if (!user) {
-    //         response = new ErrorResponse(translate('user_not_found'), HttpStatusCodes.NOT_ACCEPTABLE)
-    //     } else {
-    //         response = new SuccessResponse(null, translate('delete_user'), HttpStatusCodes.OK);
-    //     }
-    //     res.status(response.code).json(response);
-    //     next();
-    // }
+        // global error if entity doesn't exist
 
-    // @Get('/:id')
-    // async fetchUser(req: Request, res: Response, next: NextFunction) {
-    //     const { id } = req.params;
-    //     const currentUser = await UsersRepo.fetchUser({ _id: id });
-    //     const response = new SuccessResponse(currentUser, translate('fetch_user'));
+        if (!user) {
+            throw new ErrorResponse(translate('entity_not_found'), HttpStatusCodes.NOT_ACCEPTABLE);
+        }
 
-    //     if (!currentUser) {
-    //         response.code = HttpStatusCodes.OK;
-    //         // user not found
-    //         // but the request successed
-    //         // ask if throw an error is good
-    //     }
+        const { username } = req.body;
+        user.set({ username });
+        await user.save();
+        const response = new SuccessResponse(user, translate('updated', { name: 'user' }), HttpStatusCodes.OK);
+        res.status(response.code).json(response);
+    }
 
-    //     res.status(response.code).json(response);
-    //     next();
-    // } responseData = AppUtils.removeKey('password', user.toObject());
+    @Delete('/:id')
+    async deleteUser(req: Request, res: Response, next: NextFunction) {
+        log.info('start deleteUser');
 
-    //     const response = new SuccessResponse<{}>(responseData, translate('user_register_success'), HttpStatusCodes.CREATED);
-    //     res.status(response.code).json(response);
-    //     next();
-    // }
+        const { id } = req.params;
+        const user = await UsersRepo.findOneAndDelete(id);
 
-    // @Put('/:id')
-    // async updateUser(req: Request, res: Response, next: NextFunction) {
-    //     // Validate the input
-    //     const { id } = req.params;
-    //     const user = await UsersRepo.fetchUser({ _id: id });
-    //     let response;
-    //     if (!user) {
-    //         response = new ErrorResponse(translate('user_not_found'), HttpStatusCodes.BAD_REQUEST);
-    //     } else {
-    //         const { username } = req.body;
-    //         user.set({ username })
-    //         await user.save();
-    //         response = new SuccessResponse(user, translate('user_updated'), HttpStatusCodes.OK);
-    //     }
-    //     res.status(response.code).json(response);
-    //     next();
-    // }
+        if (!user) {
+            throw new ErrorResponse(translate('entity_not_found'), HttpStatusCodes.NOT_ACCEPTABLE)
+        }
 
-    // @Delete('/:id')
-    // async deleteUser(req: Request, res: Response, next: NextFunction) {
-    //     const { id } = req.params;
-    //     const user = await UsersRepo.findByIdAndDelete(id);
-    //     let response;
-    //     if (!user) {
-    //         response = new ErrorResponse(translate('user_not_found'), HttpStatusCodes.NOT_ACCEPTABLE)
-    //     } else {
-    //         response = new SuccessResponse(null, translate('delete_user'), HttpStatusCodes.OK);
-    //     }
-    //     res.status(response.code).json(response);
-    //     next();
-    // }
+        const response = new SuccessResponse(null, translate('delete_user'), HttpStatusCodes.OK);
+        res.status(response.code).json(response);
+    }
 
-    // @Get('/:id')
-    // async fetchUser(req: Request, res: Response, next: NextFunction) {
-    //     const { id } = req.params;
-    //     const currentUser = await UsersRepo.fetchUser({ _id: id });
-    //     const response = new SuccessResponse(currentUser, translate('fetch_user'));
+    @Get('/:id')
+    async fetchUser(req: Request, res: Response, next: NextFunction) {
+        log.info('start fetchUser');
 
-    //     if (!currentUser) {
-    //         response.code = HttpStatusCodes.OK;
-    //         // user not found
-    //         // but the request successed
-    //         // ask if throw an error is good
-    //     }
+        const { id } = req.params;
+        const user = await UsersRepo.fetchUser({ _id: id });
 
-    //     res.status(response.code).json(response);
-    //     next();
-    // }
+        if (!user) {
+            throw new ErrorResponse(translate('entity_not_found'), HttpStatusCodes.NOT_ACCEPTABLE);
+        }
+
+        const response = new SuccessResponse(user, translate('fetch_user'));
+        res.status(response.code).json(response);
+    }
 
     @Get('/')
     async fetchUsers(req: Request, res: Response, next: NextFunction) {
+        log.info('start fetchUsers');
         const users = await UsersRepo.fetchUsers({});
         const response = new SuccessResponse(users, translate('fetch_users'), HttpStatusCodes.OK);
         res.status(response.code).json(response);
-        // next();
     }
 
 }

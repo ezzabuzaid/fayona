@@ -116,7 +116,15 @@ export { localization };
  * @param key the key that hold the value
  * @returns the value of the key from the active local
  */
-export function translate(key: string) {
-    return localization.local.get(key);
+export function translate(key: string, params: object = {}) {
+    let value = localization.local.get(key);
+    const rawParams = value.match(/\{(.*?)\}/ig);
+    if (rawParams) {
+        value = rawParams.reduce((acc, el) => {
+            const param = el.substring(1, el.length - 1);
+            return acc += value.replace(/\{(.*?)\}/, params[param]);
+        }, '');
+    }
+    return value;
 }
 

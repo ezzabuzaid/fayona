@@ -21,6 +21,11 @@ export class UsersRepo extends UsersModel {
         return this.findOne(obj, ...args);
     };
 
+    static deleteUser(obj) {
+        // obj must be of type user
+        UsersRepo.findOneAndDelete(obj);
+    }
+
     static async userExist(obj) {
         // '-password'
         const user = await this.findOne(obj, {}, { lean: true });

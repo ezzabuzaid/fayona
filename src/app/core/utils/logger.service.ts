@@ -53,15 +53,8 @@ export class Logger {
    */
   static level = LogLevel.Debug;
 
-  /**
-   * Additional log outputs.
-   */
   static outputs: LogOutput[] = [];
 
-  /**
-   * Enables production mode.
-   * Sets logging level to LogLevel.Warning.
-   */
   static enableProductionMode() {
     Logger.level = LogLevel.Warning;
   }
@@ -70,37 +63,21 @@ export class Logger {
     this.log(console.log, LogLevel.Info, [colors.bold(source)]);
   }
 
-  /**
-   * Logs messages or objects  with the debug level.
-   * Works the same as console.log().
-   */
   debug(...objects: any[]) {
     this.colorizeText(objects, 'cyan');
     this.log(console.log, LogLevel.Debug, objects);
   }
 
-  /**
-   * Logs messages or objects  with the info level.
-   * Works the same as console.log().
-   */
   info(...objects: any[]) {
     this.colorizeText(objects, 'green');
     this.log(console.info, LogLevel.Info, objects);
   }
 
-  /**
-   * Logs messages or objects  with the warning level.
-   * Works the same as console.log().
-   */
   warn(...objects: any[]) {
     this.colorizeText(objects, 'yellow');
     this.log(console.warn, LogLevel.Warning, objects);
   }
 
-  /**
-   * Logs messages or objects  with the error level.
-   * Works the same as console.log().
-   */
   error(...objects: any[]) {
     this.colorizeText(objects, 'red');
     this.log(console.error, LogLevel.Error, objects);

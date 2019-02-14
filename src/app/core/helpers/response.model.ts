@@ -19,7 +19,7 @@ export class SuccessResponse<T> extends Response {
 
 export class ErrorResponse extends Response {
     error: string;
-    constructor(message: string, code = HttpStatusCodes.INTERNAL_SERVER_ERROR, status?: string) {
+    constructor(message: string, code = HttpStatusCodes.BAD_REQUEST, status?: string) {
         super();
         this.message = message;
         this.code = code;

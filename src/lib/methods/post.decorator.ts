@@ -1,6 +1,6 @@
 import { AppUtils } from '../../app/core/utils';
 import { RouterMethodDecorator } from '@lib/typing';
-import { ErrorHandling } from '@core/helpers/errors.service';
+import { ErrorHandling } from '@core/helpers/errors';
 
 export function Post(routerPath: string) {
     return function (target: RouterMethodDecorator & any, propertyKey: string, descriptor: PropertyDescriptor) {
