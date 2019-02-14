@@ -1,6 +1,6 @@
 import { Server } from 'app/server';
 
-export enum ServerLevels {
+export enum ServerLevel {
     OFF = 0,
     DEV,
     TEST,
@@ -9,25 +9,25 @@ export enum ServerLevels {
 }
 
 export function development(cb, level = Server.LEVEL) {
-    if (ServerLevels.DEV <= level) {
+    if (ServerLevel.DEV <= level) {
         cb();
     }
 }
 
 export function production(cb, level = Server.LEVEL) {
-    if (ServerLevels.PROD <= level) {
+    if (ServerLevel.PROD <= level) {
         cb();
     }
 }
 
 export function staging(cb, level = Server.LEVEL) {
-    if (ServerLevels.STAGE <= level) {
+    if (ServerLevel.STAGE <= level) {
         cb();
     }
 }
 
 export function testing(cb, level = Server.LEVEL) {
-    if (ServerLevels.TEST <= level) {
+    if (ServerLevel.TEST <= level) {
         cb();
     }
 }

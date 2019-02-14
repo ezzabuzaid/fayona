@@ -43,12 +43,12 @@ export class Application {
             .use((morgan('dev')))
             .use(helmet())
             .use((compression()));
-            
+
         this.set('host', process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1');
         this.set('port', process.env.OPENSHIFT_NODEJS_PORT || 8080)
     }
 
-    get(key: string) {
+    get(key: string): string {
         return this.app.get(key);
     }
 
@@ -83,11 +83,3 @@ export class Application {
 //   }
 //   next(error);
 // });
-
-// function wrapAsync(fn) {
-//     return function (req, res, next) {
-//         // Make sure to `.catch()` any errors and pass them along to the `next()`
-//         // middleware in the chain, in this case the error handler.
-//         fn(req, res, next).catch(next);
-//     };
-// }

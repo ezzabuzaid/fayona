@@ -1,7 +1,7 @@
 import { config as envConfig } from "dotenv";
 
-import { Logger } from '../app/core/utils/logger.service';
-const log = new Logger('Application instance');
+import { Logger } from '@core/utils';
+const log = new Logger('Envirnoment Class');
 
 class Envirnoment {
     static load(state = '') {

@@ -2,7 +2,7 @@ import { Wrapper } from "./wrapper";
 import { Application } from "./app";
 import { ErrorHandling } from './core/helpers/errors.service';
 import { localization } from '@lib/localization';
-import { ServerLevels } from '@core/helpers';
+import { ServerLevel } from '@core/helpers';
 import { Server as httpServer } from 'http';
 import { appService } from './core';
 import en from "../languages/en.json";
@@ -12,8 +12,8 @@ import { Logger } from "./core/utils/logger.service";
 const log = new Logger('Server init');
 
 export class Server extends Application {
-        static LEVEL = ServerLevels.DEV;
-        private port = this.get('port');
+        static LEVEL = ServerLevel.DEV;
+        private port: number = +this.get('port');
         private host = this.get('host');
 
         /**
@@ -21,21 +21,21 @@ export class Server extends Application {
          * @param port server port
          * @param cb callback function, will be called when server start
          */
-        static bootstrap(port): Promise<Server> {
+        static bootstrap(port: number): Promise<Server> {
                 return Promise.resolve(new Server(port));
         }
 
         private resolverRouters() {
                 this.app.use('/', ...Wrapper.routerList);
-                
+
                 // * Globally catch error
                 this.app.use(ErrorHandling.catchError);
-                
+
                 // * catch not found error
                 this.app.use(ErrorHandling.notFound);
         }
 
-        private constructor(port) {
+        private constructor(port: number) {
                 super();
                 port && (this.port = port);
                 this.init().catch(() => new Error('Faild to init the server'));
@@ -55,8 +55,8 @@ export class Server extends Application {
          */
         private populateServer(): Promise<httpServer> {
                 const promise = new Promise<httpServer>((resolve) => {
+                        const url = `http://${this.host}:${this.port}`;
                         const server = this.app.listen(this.port, this.host, () => {
-                                const url = `http://${this.host}:${this.port};`
                                 process.env['URL'] = url;
                                 log.info(`${new Date()} Server running at ${url}`)
                                 resolve(server);
@@ -65,14 +65,18 @@ export class Server extends Application {
                 return promise;
         }
 
+        private setupLocalization() {
+                localization.add('en', en);
+                // localization.add('ar', ar);
+                localization.use('en');
+        }
+
         /**
          * 
          */
         private async init() {
                 this.resolverRouters();
-                localization.add('en', en);
-                localization.use('en');
-                // localization.add('ar', ar);
+                this.setupLocalization();
                 // return it arrayAsObject
                 await Promise.all([
                         this.populateServer(),
