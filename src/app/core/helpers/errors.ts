@@ -14,7 +14,9 @@ export enum Errors {
     CastError = 'CastError',
     AssertionError = 'AssertionError',
     MongoError = 'MongoError',
-    EntityNotFound = 'EntityNotFound'
+    ErrorResponse = 'ErrorResponse',
+    SuccessResponse = 'SuccessResponse',
+    JsonWebTokenError = 'JsonWebTokenError'
 }
 
 export class ErrorHandling {
@@ -37,20 +39,17 @@ export class ErrorHandling {
         return;
     }
 
-    static throwError(message, code = HttpStatusCodes.INTERNAL_SERVER_ERROR): ErrorResponse {
-        throw new ErrorResponse(message);
+    static throwError(message, code = HttpStatusCodes.INTERNAL_SERVER_ERROR) {
+        throw new ErrorResponse(message, code);
     }
 
     static notFound(req: Request, res: Response, next: NextFunction) {
         const error = new ErrorResponse(translate('endpoint_not_found'), HttpStatusCodes.NOT_FOUND);
-        res.status(error.code).json(error);
+        return res.status(error.code).json(error);
     }
 
-    static wrapRoute(fn) {
-        return (...args) => {
-            return fn(...args)
-                .catch(args[2]);
-        }
+    static wrapRoute(...func) {
+        return func.map(fn => (...args) => fn(...args).catch(args[2]));
     }
 
 }

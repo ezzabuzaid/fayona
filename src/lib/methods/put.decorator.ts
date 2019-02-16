@@ -1,8 +1,9 @@
 import { RouterMethodDecorator } from '@lib/typing';
 import { ErrorHandling } from '@core/helpers';
 import { AppUtils } from '@core/utils';
+import { RequestHandler } from 'express';
 
-export function Put(routerPath: string) {
+export function Put(routerPath: string, ...middlewares: RequestHandler[]) {
     return function (target: RouterMethodDecorator & any, propertyKey: string, descriptor: PropertyDescriptor) {
         const method = descriptor.value;
         descriptor.value = function () {
@@ -19,8 +20,7 @@ export function Put(routerPath: string) {
             routerPath = AppUtils.joinPath(target.routesPath, '/', routerPath);
 
             //* assign the router
-
-            target.put(routerPath, ErrorHandling.wrapRoute(function () {
+            target.put(routerPath, ErrorHandling.wrapRoute(...middlewares, function () {
                 return target[propertyKey](...arguments);
             }));
 

@@ -23,7 +23,7 @@ export class UsersRepo extends UsersModel {
 
     static deleteUser(obj) {
         // obj must be of type user
-        UsersRepo.findOneAndDelete(obj);
+        return UsersRepo.findOneAndDelete(obj);
     }
 
     static async userExist(obj) {

@@ -24,13 +24,14 @@
 29_ server events
 30_ make a custome interface that will make sure that the schema 
 31_ url class
+32_ Mongoose Query Helpers
 REVIEW Features
 1_ eleminate register mutiple router to the same app or router instance
 2_ mongoose schema and model in one base class
 
 TODO
 1_ implement deferent auth strategies
-2_ Work in group logger 
+2_ Work in group logger | IGNORE
 3_ send sms
 4_ import excel and convert it to json, charts
 5_ create and export cvs
@@ -55,12 +56,12 @@ https://www.npmjs.com/package/injection-js
 ANCHOR task 1
 1_ end users routes
 2_ write testing cases
-3_ finish DELETE and PUT decoration
-// GET user
-// GET all user
-// POST create user
-// PUT update user
-// DELETE delete user
+3_ finish DELETE and PUT decoration | DONE
+// GET user | DONE
+// GET all user | DONE
+// POST create user | DONE
+// PUT update user | DONE
+// DELETE delete user  | DONE
 // DELETE delete bulk of users
 
 ANCHOR task 2

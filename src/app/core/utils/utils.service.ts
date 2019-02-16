@@ -63,7 +63,7 @@ export class AppUtils {
     }
 
     static pick(obj, keys) {
-        return {...{...keys.map(k => k in obj ? { [k]: obj[k] } : {})}}
+        return { ...{ ...keys.map(k => k in obj ? { [k]: obj[k] } : {}) } }
     }
 
     static reject(obj, keys) {

@@ -1,19 +1,24 @@
 import { Router as expressRouter } from 'express';
 import { RouterDecorationOption } from '../typing';
 import { AppUtils, Logger } from '@core/utils';
+import { ErrorHandling } from '@core/helpers';
 const log = new Logger('Router Decorator');
 
 export function Router(routerPath: string, options: RouterDecorationOption = {}) {
     return function <T extends new (...args: any[]) => any>(constructor: T) {
 
-        //* a way fix path to router slashes
+        // NOTE  a way to fix path to router slashes
         routerPath = AppUtils.joinPath(routerPath);
         const { prototype } = constructor;
         const router = expressRouter(options);
-        //* extend router        
+        // NOTE  extend router        
         const routerPrototype = AppUtils.getPrototypeOf(router);
         for (const i in routerPrototype) {
             prototype[i] = routerPrototype[i].bind(router);
+        }
+
+        if (options.middleware && options.middleware.length) {
+            router.use(ErrorHandling.wrapRoute(...options.middleware));
         }
 
         //* define getter for router instance

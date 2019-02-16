@@ -43,7 +43,10 @@ export class Server extends Application {
 
         private populateMongoose() {
                 const { MONGO_USER, MONGO_PASSWORD, MONGO_PATH } = process.env;
-                return mongoose.connect(`mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@cluster0-hp3qr.mongodb.net/${MONGO_PATH}`, { useNewUrlParser: true })
+                return mongoose.connect(`mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@cluster0-hp3qr.mongodb.net/${MONGO_PATH}`, {
+                        useNewUrlParser: true,
+                        autoIndex: false
+                })
                         .then(() => log.info('Database Connected'))
                         .catch((error) => log.error("Database Not Connected", error))
         }
@@ -57,7 +60,7 @@ export class Server extends Application {
                 const promise = new Promise<httpServer>((resolve) => {
                         const url = `http://${this.host}:${this.port}`;
                         const server = this.app.listen(this.port, this.host, () => {
-                                process.env['URL'] = url;
+                                process.env.URL = url;
                                 log.info(`${new Date()} Server running at ${url}`)
                                 resolve(server);
                         });

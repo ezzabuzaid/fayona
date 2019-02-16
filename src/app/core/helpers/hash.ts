@@ -1,5 +1,6 @@
 import { Logger } from '@core/utils';
 import bcrypt = require('bcryptjs')
+import { ErrorResponse } from './response.model';
 
 // extends the bcrypt
 const log = new Logger('Hash service');
@@ -13,24 +14,28 @@ export class HashService {
         return bcrypt.hash(text, 10);
     }
 
-    static async hashPassword(text) {
-        try {
-            log.info('Start hashing password');
-            return await this.hashText(text);
-        } catch (error) {
-            log.error('an error accured while hashing the password');
-            throw new Error(error);
-        }
+    static hashPassword(text) {
+        // try {
+        // } catch (error) {
+        //     log.error('an error accured while hashing the password');
+        //     throw new ErrorResponse(error);
+        // }
+
+        log.info('Start hashing password');
+        return this.hashText(text);
     }
 
-    static async comparePassword(candidatePassword, actualPassword) {
-        try {
-            log.info('Start hashing password');
-            return await bcrypt.compare(candidatePassword, actualPassword);
-        } catch (error) {
-            log.error('an error accured while hashing the password');
-            throw new Error(error);
-        }
+    static comparePassword(candidatePassword, actualPassword) {
+        log.info('Start comparePassword');
+        return bcrypt.compare(candidatePassword, actualPassword);
+
+        // try {
+        //     log.info('Start comparePassword');
+        //     return bcrypt.compare(candidatePassword, actualPassword);
+        // } catch (error) {
+        //     log.error('an error accured while hashing the password');
+        //     throw new ErrorResponse(error);
+        // }
     }
 
 }

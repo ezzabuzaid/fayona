@@ -15,3 +15,16 @@ module.exports = {
     "node"
   ],
 }
+// const { config } = require("dotenv");
+
+
+// export class Envirnoment {
+//   static load(state = '') {
+//     const { error, parsed } = envConfig({ path: `./src/environment/.env${state}` });
+//     if (error) {
+//       throw new Error('an error accourd while loading the env file')
+//     }
+//     log.info('Envirnoment file loaded');
+//     return parsed;
+//   }
+// }

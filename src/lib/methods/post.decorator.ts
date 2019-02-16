@@ -1,9 +1,10 @@
 import { AppUtils } from '../../app/core/utils';
 import { RouterMethodDecorator } from '@lib/typing';
 import { ErrorHandling } from '@core/helpers/errors';
+import { RequestHandler } from 'express';
 
-export function Post(routerPath: string) {
-    return function (target: RouterMethodDecorator & any, propertyKey: string, descriptor: PropertyDescriptor) {
+export function Post(routerPath: string, ...middlewares: RequestHandler[]) {
+    return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
         const method = descriptor.value;
         descriptor.value = function () {
             //* any code here will be executed when the marked method get called 
@@ -21,7 +22,7 @@ export function Post(routerPath: string) {
             routerPath = AppUtils.joinPath(target.routesPath, '/', routerPath);
 
             //* assign the router
-            target.post(routerPath, ErrorHandling.wrapRoute(function () {
+            target.post(routerPath, ErrorHandling.wrapRoute(...middlewares, function () {
                 return target[propertyKey](...arguments);
             }));
 

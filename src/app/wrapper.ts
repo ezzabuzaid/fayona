@@ -3,6 +3,7 @@ import { RequestHandler } from "express-serve-static-core";
 import { AppUtils } from "./core/utils";
 import { Schema, model, Document } from "mongoose";
 import { UsersRouter } from "./api/users/users.routes";
+import { AuthRoutes } from '@auth/auth.routes';
 
 export class Wrapper {
     private static list = [];
@@ -62,3 +63,4 @@ export class Wrapper {
 
 // Wrapper.registerRouter(CustomersRouter);
 Wrapper.registerRouter(UsersRouter);
+Wrapper.registerRouter(AuthRoutes);

@@ -1,23 +1,27 @@
 
-import { Schema, model, Document } from 'mongoose';
 import { Logger } from '../../core/utils/logger.service';
-import { HashService } from '@core/helpers';
+import { BaseSchema } from '@core/database';
+import { Document, model, Model } from 'mongoose';
+import { UsersRepo } from './users.repo';
 
 const log = new Logger('Users Model');
-let schema = new Schema({
-    username: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    password: {
-        type: String,
-        required: true
+
+const schema = new BaseSchema<UsersType.Model>(
+    {
+        username: {
+            type: String,
+            required: true,
+            unique: true
+        },
+        password: {
+            type: String,
+            required: true
+        }
     }
-}, { timestamps: true });
+);
 
 export namespace UsersType {
-    export interface Schema extends Document {
+    export interface Model extends Document {
         username: string;
         password: string;
         /**
@@ -29,7 +33,7 @@ export namespace UsersType {
 
 }
 export const schemaName = 'users';
-export const UsersModel = model<UsersType.Schema>(schemaName, schema);
+export const UsersModel = model<UsersType.Model>(schemaName, schema);
 
 // export const UsersModel = function <T extends Document>() { return model<T>(schemaName, schema); };
 // A repo used to talk to other module
@@ -42,26 +46,26 @@ export const UsersModel = model<UsersType.Schema>(schemaName, schema);
 // class Job {
 //     @prop()
 //     title?: string;
-  
+
 //     @prop()
 //     position?: string;
 //   }
-  
+
 //   class Car extends Typegoose {
 //     @prop()
 //     model?: string;
 //   }
-  
+
 // class User extends Typegoose {
 //     @prop()
 //     name?: string;
-  
+
 //     @prop({ required: true })
 //     age: number;
-  
+
 //     @prop()
 //     job?: Job;
-  
+
 //     @prop({ ref: Car, required: true })
 //     car: Ref<Car>;
 //   }

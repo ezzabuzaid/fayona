@@ -2,7 +2,7 @@ import express = require('express');
 import morgan = require('morgan');
 import compression = require('compression');
 import helmet = require('helmet');
-import { environment } from '../environment/env';
+import { Envirnoment } from 'environment/env';
 
 import { Logger } from '@core/utils';
 const log = new Logger('Application instance');
@@ -10,7 +10,7 @@ const log = new Logger('Application instance');
 export class Application {
     app = express();
     constructor() {
-        environment.load();
+        Envirnoment.load();
         this.configure();
         this.allowCors();
 

@@ -6,6 +6,7 @@ abstract class Response extends Error {
 }
 
 export class SuccessResponse<T> extends Response {
+    name = 'SuccessResponse';
     data: T;
     constructor(data: T, message: string, code = HttpStatusCodes.OK, status?: string) {
         super();
@@ -18,6 +19,7 @@ export class SuccessResponse<T> extends Response {
 }
 
 export class ErrorResponse extends Response {
+    name = 'ErrorResponse';
     error: string;
     constructor(message: string, code = HttpStatusCodes.BAD_REQUEST, status?: string) {
         super();
