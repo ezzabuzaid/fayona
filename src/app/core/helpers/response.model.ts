@@ -1,4 +1,4 @@
-import HttpStatusCodes = require('http-status-codes');
+import { NetworkStatus } from './network-status';
 
 abstract class Response extends Error {
     status: string;
@@ -8,12 +8,12 @@ abstract class Response extends Error {
 export class SuccessResponse<T> extends Response {
     name = 'SuccessResponse';
     data: T;
-    constructor(data: T, message: string, code = HttpStatusCodes.OK, status?: string) {
+    constructor(data: T, message: string, code = NetworkStatus.OK, status?: string) {
         super();
         this.message = message;
         this.code = code;
         this.data = data;
-        this.status = status || HttpStatusCodes.getStatusText(code);
+        this.status = status || NetworkStatus.getStatusText(code);
     }
 
 }
@@ -21,11 +21,11 @@ export class SuccessResponse<T> extends Response {
 export class ErrorResponse extends Response {
     name = 'ErrorResponse';
     error: string;
-    constructor(message: string, code = HttpStatusCodes.BAD_REQUEST, status?: string) {
+    constructor(message: string, code = NetworkStatus.BAD_REQUEST, status?: string) {
         super();
         this.message = message;
         this.code = code;
-        this.status = status || HttpStatusCodes.getStatusText(code);
+        this.status = status || NetworkStatus.getStatusText(code);
     }
 
 }

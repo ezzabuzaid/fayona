@@ -31,3 +31,7 @@ export function testing(cb, level = Server.LEVEL) {
         cb();
     }
 }
+
+export class AppHelpers {
+    static EmailValidation = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+}

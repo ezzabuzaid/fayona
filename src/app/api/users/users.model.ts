@@ -1,22 +1,30 @@
-
-import { Logger } from '../../core/utils/logger.service';
 import { BaseSchema } from '@core/database';
-import { Document, model, Model } from 'mongoose';
-import { UsersRepo } from './users.repo';
+import { Document, model } from 'mongoose';
 
+import { AppHelpers } from '@core/helpers';
+
+import { Logger } from '@core/utils';
 const log = new Logger('Users Model');
-
 const schema = new BaseSchema<UsersType.Model>(
     {
         username: {
             type: String,
             required: true,
-            unique: true
+            unique: true,
+            lowercase: true,
+            trim: true
+        },
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            match: [AppHelpers.EmailValidation, 'Please provide a valid email address']
         },
         password: {
             type: String,
-            required: true
-        }
+            required: true,
+            trim: true
+        },
     }
 );
 
@@ -30,8 +38,8 @@ export namespace UsersType {
          */
         comparePassword(candidatePassword: string): Promise<boolean>;
     }
-
 }
+
 export const schemaName = 'users';
 export const UsersModel = model<UsersType.Model>(schemaName, schema);
 
@@ -39,7 +47,6 @@ export const UsersModel = model<UsersType.Model>(schemaName, schema);
 // A repo used to talk to other module
 // A repo will act as the base component
 // Will have the functionality that needed for the router
-
 
 // extend schema instead of Typegoose
 // make the decorator for porp, methods, statics, virtuals(deffer it)
@@ -56,7 +63,7 @@ export const UsersModel = model<UsersType.Model>(schemaName, schema);
 //     model?: string;
 //   }
 
-// class User extends Typegoose {
+// class User extends Typegoose { 
 //     @prop()
 //     name?: string;
 

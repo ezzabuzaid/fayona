@@ -1,9 +1,8 @@
 import { Router } from '@lib/core';
 import { Request, Response, NextFunction } from 'express';
 import { Post } from '@lib/methods';
-import { SuccessResponse, ErrorResponse } from '@core/helpers';
+import { SuccessResponse, ErrorResponse, NetworkStatus } from '@core/helpers';
 import { translate } from '@lib/localization';
-import HttpStatusCodes = require('http-status-codes');
 
 
 import { Logger, AppUtils } from '@core/utils';
@@ -26,14 +25,14 @@ export class AuthRoutes {
             const isPasswordEqual = await currentUser.comparePassword(password);
             if (isPasswordEqual) {
                 const userWithoutPassword = AppUtils.removeKey('password', currentUser.toObject());
-                const response = new SuccessResponse(userWithoutPassword, translate('register_success'), HttpStatusCodes.OK);
+                const response = new SuccessResponse(userWithoutPassword, translate('register_success'), NetworkStatus.OK);
                 log.debug('Start generateToken');
                 response['token'] = Auth.generateToken({ id: currentUser.id });
                 return res.status(response.code).json(response);
             }
         }
 
-        throw new ErrorResponse(translate('wrong_credintals'), HttpStatusCodes.CONFLICT);
+        throw new ErrorResponse(translate('wrong_credintals'), NetworkStatus.CONFLICT);
     }
 
 }

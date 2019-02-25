@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Logger } from '@core/utils';
-import { ErrorResponse } from '@core/helpers';
+import { ErrorResponse, NetworkStatus } from '@core/helpers';
 import jwt = require('jsonwebtoken');
-import HttpStatusCodes = require('http-status-codes');
 
 const log = new Logger('Auth Module');
 
@@ -10,7 +9,7 @@ export class Auth {
     static async isAuthenticated(req: Request, res: Response, next: NextFunction) {
         log.info('Start verifing JWT')
         const token = req.headers.authorization;
-        const unauth = new ErrorResponse('Not authorized', HttpStatusCodes.UNAUTHORIZED);
+        const unauth = new ErrorResponse('Not authorized', NetworkStatus.UNAUTHORIZED);
         try {
             const decodedToken = await verify(token);
             log.info('Start checking JWT')
@@ -32,7 +31,7 @@ export class Auth {
         return jwt.sign(data, process.env.JWT_SECRET_KEY);
         // try {
         // } catch {
-        //     throw new ErrorResponse('Cannot generate token', HttpStatusCodes.INTERNAL_SERVER_ERROR);
+        //     throw new ErrorResponse('Cannot generate token', NetworkStatus.INTERNAL_SERVER_ERROR);
         // }
     }
 }

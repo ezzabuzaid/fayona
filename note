@@ -1,41 +1,12 @@
 2_ use dependency injection to resolve mongoose models
-4_ read about localization
-5_ validate input
-6_ refactor class reactor, mostly the remove event method, and complete method;
-9_ send emails
-11_ upload image
-12_ upload files
-13_ mongoose error nandling
-14_ wrapping sub router, remember there's two way
-15_ create an interface for repo model class (eg. create doc)
-16_ when creating a documnent a proper way needed to know if the key is correct 
-17_ convert express router to class in order to give the developer the ability to accsess any method or property explicty
-18_ validation layer for input
-19_ unit test
-20_ put, patch, delete, and intercept decorator
-21_ move login, register and each thing related to auth (to auth class), as note the function it self will be there but the actual invking will be in users
-22_ class for database
-23_ connect to swagger and postman 
-24_ move reactor inside lib folder
-25_ linting roles
-26_ intercept not for router it self, maybe it will be for just a param !!!!
-27_ auto export postman collection using npm postman collection (create json postman, upload it to cloud use it in postman using url)
-28_ modify the routes method to call next implicty, and bind responsdWith to res object, this will hold the response object; 
-29_ server events
-30_ make a custome interface that will make sure that the schema 
-31_ url class
 32_ Mongoose Query Helpers
+
 REVIEW Features
 1_ eleminate register mutiple router to the same app or router instance
-2_ mongoose schema and model in one base class
 
 TODO
 1_ implement deferent auth strategies
 2_ Work in group logger | IGNORE
-3_ send sms
-4_ import excel and convert it to json, charts
-5_ create and export cvs
-6_ upload files
 7_ read all files to get the string in translate function and auto export it to json file
 8_ refresh token
 
@@ -53,59 +24,5 @@ SECTION DONE
 
 https://www.npmjs.com/package/injection-js
 
-ANCHOR task 1
-1_ end users routes
-2_ write testing cases
-3_ finish DELETE and PUT decoration | DONE
-// GET user | DONE
-// GET all user | DONE
-// POST create user | DONE
-// PUT update user | DONE
-// DELETE delete user  | DONE
-// DELETE delete bulk of users
-
-ANCHOR task 2
-1_ complete auth routes
-2_ forget password
-3_ verify email and mobile
-4_ send email and sms
-// use click on forget password, complete info, send request, check if exist, send email to him to confirm that the email belong to and so on, the link must have a token linked with website and deeplink to retrive password page, if token is expired, terminate, otherwise, password and confirm password must be filled, search for forget password mechanisim
-// send email or sms, that mean he can inseart phone number of password, it will be asked for that
-// after register he need to be noticed that he will recive an pin code or email verification
-
-ANCHOR task 3
-
-server event:: connection, refresh, error, exit 
-public createServer() {
-        if (this.isServerRunning) {
-            this.server.stop();
-            this.isServerRunning = false;
-            return;
-        } else {
-            this.server = new Server(this.config);
-            let path = this.getCurrentWorkSpace();
-            this.server.watch(path);
-            this.isServerRunning = true;
-        }
-
-        this.server.on('start', () => {
-            StatusBarUi.listening();
-        });
-
-        this.server.on('stop', () => {
-            StatusBarUi.stopListening();
-        });
-
-        this.server.on('refresh', () => {
-            StatusBarUi.refresh();
-        });
-
-        this.server.on('connected', () => {
-            StatusBarUi.connected();
-        });
-
-        this.server.on('disconnected', () => {
-            StatusBarUi.disconnected();
-        });
 
         

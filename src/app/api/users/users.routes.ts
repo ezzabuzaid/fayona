@@ -1,15 +1,13 @@
-import { Request, Response, NextFunction, RouterOptions, Express } from 'express';
+import { Request, Response } from 'express';
 import { Router } from '@lib/core';
 import { Post, Get, Put, Delete } from '@lib/methods';
-import { ErrorResponse, SuccessResponse, ErrorHandling } from '@core/helpers';
+import { ErrorResponse, SuccessResponse, NetworkStatus } from '@core/helpers';
 import { UsersRepo } from './users.repo';
 import { translate } from '@lib/localization';
-import HttpStatusCodes = require('http-status-codes');
+import { Auth } from '@auth/auth';
 
 import { Logger, AppUtils } from '@core/utils';
-import { Auth } from '@auth/auth';
 const log = new Logger('User Router');
-
 @Router('users', {
     middleware: [Auth.isAuthenticated]
 })
@@ -25,7 +23,7 @@ export class UsersRouter {
 
         if (await UsersRepo.userExist({ username })) {
             log.debug(`User with username ${username} is exist`);
-            throw new ErrorResponse(translate('username_exist'), HttpStatusCodes.BAD_REQUEST);
+            throw new ErrorResponse(translate('username_exist'), NetworkStatus.BAD_REQUEST);
         }
 
         log.warn('New user');
@@ -33,7 +31,7 @@ export class UsersRouter {
         const user = await UsersRepo.createUser({ username, password });
         const responseData = AppUtils.removeKey('password', user.toObject());
 
-        const response = new SuccessResponse<{}>(responseData, translate('user_register_success'), HttpStatusCodes.CREATED);
+        const response = new SuccessResponse<{}>(responseData, translate('user_register_success'), NetworkStatus.CREATED);
         res.status(response.code).json(response);
     }
 
@@ -45,13 +43,13 @@ export class UsersRouter {
         const user = await UsersRepo.fetchUser({ _id: id });
 
         if (!user) {
-            throw new ErrorResponse(translate('entity_not_found'), HttpStatusCodes.NOT_ACCEPTABLE);
+            throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
         }
 
         const { username } = req.body;
         user.set({ username });
         await user.save();
-        const response = new SuccessResponse(user, translate('updated', { name: 'user' }), HttpStatusCodes.OK);
+        const response = new SuccessResponse(user, translate('updated', { name: 'user' }), NetworkStatus.OK);
         res.status(response.code).json(response);
     }
 
@@ -63,10 +61,10 @@ export class UsersRouter {
         const user = await UsersRepo.deleteUser({ _id: id });
 
         if (!user) {
-            throw new ErrorResponse(translate('entity_not_found'), HttpStatusCodes.NOT_ACCEPTABLE)
+            throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE)
         }
 
-        const response = new SuccessResponse(null, translate('delete_user'), HttpStatusCodes.OK);
+        const response = new SuccessResponse(null, translate('delete_user'), NetworkStatus.OK);
         res.status(response.code).json(response);
     }
 
@@ -78,7 +76,7 @@ export class UsersRouter {
         const user = await UsersRepo.fetchUser({ _id: id }, { password: 0 });
 
         if (!user) {
-            throw new ErrorResponse(translate('entity_not_found'), HttpStatusCodes.NOT_ACCEPTABLE);
+            throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
         }
 
         const response = new SuccessResponse(user, translate('fetch_user'));
@@ -91,7 +89,7 @@ export class UsersRouter {
 
         const users = await UsersRepo.fetchUsers({}, { password: 0 });
 
-        const response = new SuccessResponse(users, translate('fetch_users'), HttpStatusCodes.OK);
+        const response = new SuccessResponse(users, translate('fetch_users'), NetworkStatus.OK);
         res.status(response.code).json(response);
     }
 
