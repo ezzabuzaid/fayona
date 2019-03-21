@@ -31,6 +31,10 @@ export class Server extends Application {
                 // SECTION routes resolving event
                 this.app.use('/', ...Wrapper.routerList);
 
+                this.app.use('/', (req, res) => {
+                        res.status(200).json({ work: 'Server work' });
+                });
+
                 // * Globally catch error
                 this.app.use(ErrorHandling.catchError);
 
@@ -39,6 +43,7 @@ export class Server extends Application {
 
                 // catch favIcon request
                 this.app.use(ErrorHandling.favIcon);
+
         }
 
         private constructor(port: number) {
