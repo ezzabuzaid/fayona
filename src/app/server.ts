@@ -36,6 +36,9 @@ export class Server extends Application {
 
                 // * catch not found error
                 this.app.use(ErrorHandling.notFound);
+
+                // catch favIcon request
+                this.app.use(ErrorHandling.favIcon);
         }
 
         private constructor(port: number) {

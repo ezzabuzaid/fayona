@@ -49,6 +49,13 @@ export class ErrorHandling {
         return res.status(error.code).json(error);
     }
 
+    static favIcon(req: Request, res: Response, next: NextFunction) {
+        if (req.originalUrl && req.originalUrl.split("/").pop() === 'favicon.ico') {
+            return res.sendStatus(204);
+        }
+        return next();
+    }
+
     static wrapRoute(...func) {
         return func.map(fn => (...args) => fn(...args).catch(args[2]));
     }
