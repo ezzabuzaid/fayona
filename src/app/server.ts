@@ -35,14 +35,15 @@ export class Server extends Application {
                         res.status(200).json({ work: 'Server work' });
                 });
 
+                // catch favIcon request
+                this.app.use(ErrorHandling.favIcon);
+
                 // * Globally catch error
                 this.app.use(ErrorHandling.catchError);
 
                 // * catch not found error
                 this.app.use(ErrorHandling.notFound);
 
-                // catch favIcon request
-                this.app.use(ErrorHandling.favIcon);
 
         }
 
