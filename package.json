@@ -10,7 +10,8 @@
     "dev": "ts-node -r tsconfig-paths/register ./src/main.ts",
     "watch:dev": "nodemon -e ts -w ./src -x npm run dev",
     "watch:prod": "node -r ./tsconfig-paths-bootstrap.js dist/main.js",
-    "start": "nodemon ./dist/main.js"
+    "start": "npm run watch:prod",
+    "lint": "tslint -c tslint.json 'src/**/*.ts'"
   },
   "author": "",
   "license": "ISC",
@@ -59,7 +60,10 @@
     "browserify": "^16.2.3",
     "gulp": "^4.0.0",
     "gulp-apidoc-swagger": "^0.2.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-minify": "^3.1.0",
     "gulp-typescript": "^5.0.1",
+    "gulp-uglify-es": "^1.0.4",
     "gulp-util": "^3.0.8",
     "jest": "^24.5.0",
     "logger": "0.0.1",
@@ -71,9 +75,6 @@
     "tsconfig-paths": "^3.8.0",
     "tsify": "^4.0.1",
     "tslint": "^5.14.0",
-    "vinyl-source-stream": "^2.0.0",
-    "gulp-concat": "^2.6.1",
-    "gulp-minify": "^3.1.0",
-    "gulp-uglify-es": "^1.0.4"
+    "vinyl-source-stream": "^2.0.0"
   }
 }
