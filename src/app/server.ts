@@ -9,6 +9,7 @@ import en from "../languages/en.json";
 import mongoose = require('mongoose');
 
 import { Logger } from "./core/utils/logger.service";
+import { URL } from 'url';
 const log = new Logger('Server init');
 
 export class Server extends Application {
@@ -22,10 +23,12 @@ export class Server extends Application {
          * @param cb callback function, will be called when server start
          */
         static bootstrap(port: number): Promise<Server> {
+                // SECTION server init event
                 return Promise.resolve(new Server(port));
         }
 
         private resolverRouters() {
+                // SECTION routes resolving event
                 this.app.use('/', ...Wrapper.routerList);
 
                 // * Globally catch error
@@ -42,6 +45,7 @@ export class Server extends Application {
         }
 
         private populateMongoose() {
+                // REVIEW  move it to Database class with it's own event
                 const { MONGO_USER, MONGO_PASSWORD, MONGO_PATH } = process.env;
                 return mongoose.connect(`mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@cluster0-hp3qr.mongodb.net/${MONGO_PATH}`, {
                         useNewUrlParser: true,
@@ -57,15 +61,15 @@ export class Server extends Application {
          * @returns {Promise<httpServer>} 
          */
         private populateServer(): Promise<httpServer> {
-                const promise = new Promise<httpServer>((resolve) => {
-                        const url = `http://${this.host}:${this.port}`;
+                return new Promise<httpServer>((resolve) => {
+                        const url = new URL(`http://${this.host}:${this.port}`);
                         const server = this.app.listen(this.port, this.host, () => {
-                                process.env.URL = url;
+                                // process.env.URL = url;
                                 log.info(`${new Date()} Server running at ${url}`)
                                 resolve(server);
+                                // SECTION server start event
                         });
                 })
-                return promise;
         }
 
         private setupLocalization() {

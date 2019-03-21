@@ -6,17 +6,27 @@
       "es2015"
     ],
     "declaration": true,
-    "outDir": "./dist/","removeComments": true,
+    "outDir": "./dist/",
+    "removeComments": true,
     "downlevelIteration": true,
-    "strict": false, 
+    "strict": false,
     "moduleResolution": "node",
     "baseUrl": "./src/",
     "paths": {
-      "@core/*":["app/core/*"],
-      "@api/*":["app/api/*"],
-      "@auth/*":["app/auth/*"],
-      "@lib/*":["lib/*"]
+      "@core/*": [
+        "app/core/*"
+      ],
+      "@api/*": [
+        "app/api/*"
+      ],
+      "@auth/*": [
+        "app/auth/*"
+      ],
+      "@lib/*": [
+        "lib/*"
+      ]
     },
+    "noStrictGenericChecks": false,
     "typeRoots": [
       "node_modules/@types"
     ],

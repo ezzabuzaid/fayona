@@ -17,7 +17,6 @@ export class AuthRoutes {
 
     @Post('login')
     async login(req: Request, res: Response, next: NextFunction) {
-
         const { username, password } = req.body;
         const currentUser = await UsersRepo.fetchUser({ username });
         log.debug('Check if user exist');

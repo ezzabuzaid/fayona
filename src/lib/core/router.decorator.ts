@@ -18,7 +18,7 @@ export function Router(routerPath: string, options: RouterDecorationOption = {})
         }
 
         if (options.middleware && options.middleware.length) {
-            router.use(ErrorHandling.wrapRoute(...options.middleware));
+            router.all(`${routerPath}/*`,ErrorHandling.wrapRoute(...options.middleware));
         }
 
         //* define getter for router instance

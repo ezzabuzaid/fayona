@@ -9,7 +9,7 @@ import { Auth } from '@auth/auth';
 import { Logger, AppUtils } from '@core/utils';
 const log = new Logger('User Router');
 @Router('users', {
-    middleware: [Auth.isAuthenticated]
+    middleware: []
 })
 export class UsersRouter {
     constructor() { }
@@ -19,23 +19,23 @@ export class UsersRouter {
         log.info('start register');
 
         // Validate the input
-        const { username, password } = req.body;;
-
-        if (await UsersRepo.userExist({ username })) {
+        const { username, password, email } = req.body;
+        const userExist = await UsersRepo.userExist({ username });
+        log.debug(userExist);
+        if (userExist) {
             log.debug(`User with username ${username} is exist`);
             throw new ErrorResponse(translate('username_exist'), NetworkStatus.BAD_REQUEST);
         }
 
-        log.warn('New user');
-
-        const user = await UsersRepo.createUser({ username, password });
+        const user = await UsersRepo.createUser({ username, password, email });
         const responseData = AppUtils.removeKey('password', user.toObject());
+        log.warn('New user created');
 
         const response = new SuccessResponse<{}>(responseData, translate('user_register_success'), NetworkStatus.CREATED);
         res.status(response.code).json(response);
     }
 
-    @Put('/:id')
+    @Put('/:id', Auth.isAuthenticated)
     async updateUser(req: Request, res: Response) {
         log.info('start updateUser');
         // Validate the input
@@ -53,7 +53,7 @@ export class UsersRouter {
         res.status(response.code).json(response);
     }
 
-    @Delete('/:id')
+    @Delete('/:id', Auth.isAuthenticated)
     async deleteUser(req: Request, res: Response) {
         log.info('start deleteUser');
 
@@ -68,7 +68,7 @@ export class UsersRouter {
         res.status(response.code).json(response);
     }
 
-    @Get('/:id')
+    @Get('/:id', Auth.isAuthenticated)
     async fetchUser(req: Request, res: Response) {
         log.info('start fetchUser');
 
@@ -83,7 +83,7 @@ export class UsersRouter {
         res.status(response.code).json(response);
     }
 
-    @Get('/')
+    @Get('/', Auth.isAuthenticated)
     async fetchUsers(req: Request, res: Response) {
         log.info('start fetchUsers');
 

@@ -26,10 +26,8 @@ export class UsersRepo extends UsersModel {
         return UsersRepo.findOneAndDelete(obj);
     }
 
-    static async userExist(obj) {
-        // '-password'
-        const user = await this.findOne(obj, {}, { lean: true });
-        return !!user;
+    static userExist(obj) {
+        return this.findOne(obj, {}, { lean: true });
     }
 
     static fetchUsers(obj?, ...args) {

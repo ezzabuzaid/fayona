@@ -1,7 +1,5 @@
-import { Router } from "express";
-import { RequestHandler } from "express-serve-static-core";
+import { Router, RequestHandler } from "express";
 import { AppUtils } from "./core/utils";
-import { Schema, model, Document } from "mongoose";
 import { UsersRouter } from "./api/users/users.routes";
 import { AuthRoutes } from '@auth/auth.routes';
 
@@ -27,7 +25,7 @@ export class Wrapper {
             if (!router.id) {
                 new Error('please consider add @Router to the top of class');
             }
-            this.list.push({ router, id: router.id });
+            this.list.push(router);
         } catch (error) {
             new Error('The provided router is not constructor');
         }
@@ -46,11 +44,11 @@ export class Wrapper {
     }
 
     static get routerList(): RequestHandler[] {
-        return this.list.map(({ router }) => router);
+        return this.list;
     }
 
     static getRouter({ id }) {
-        const { router } = this.list.find(router => router.id === id);
+        const { router } = this.list.find(({ router }) => router.id === id);
         return router;
     }
 

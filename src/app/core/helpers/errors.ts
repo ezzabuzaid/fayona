@@ -12,7 +12,8 @@ export enum Errors {
     MongoError = 'MongoError',
     ErrorResponse = 'ErrorResponse',
     SuccessResponse = 'SuccessResponse',
-    JsonWebTokenError = 'JsonWebTokenError'
+    JsonWebTokenError = 'JsonWebTokenError',
+    ValidationError = 'ValidationError'
 }
 
 export class ErrorHandling {
@@ -21,8 +22,12 @@ export class ErrorHandling {
         switch (error.name) {
             case Errors.CastError:
                 // FIXME  error accoured when try to use with id mongoose method and the id is undefined usually when you get the id from the req.params.id
-                // message = 'some usefulEntityNotFoundl message';
+                // message = 'some usefulEntityNotFound message';
                 response.message = translate('invalid_syntax');
+                response.code = NetworkStatus.BAD_REQUEST;
+                break;
+            case Errors.ValidationError:
+                // Mongoose validation error
                 response.code = NetworkStatus.BAD_REQUEST;
                 break;
         }
