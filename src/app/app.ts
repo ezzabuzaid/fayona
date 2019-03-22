@@ -45,7 +45,7 @@ export class Application {
             .use((compression()));
 
         this.set('host', process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1');
-        this.set('port', process.env.OPENSHIFT_NODEJS_PORT || 8080)
+        this.set('port', process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 8080)
     }
 
     get(key: string): string {

@@ -21,8 +21,13 @@ jobs: # a collection of steps
       #     command: npm run lint
       - run: # deploy
           name: deploy
-          command: git push heroku master
-    #   - run: # run coverage report
+          command: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git HEAD
+          # command: |
+          #   if [ "${CIRCLE_BRANCH}" == "master" ]; then
+          #     git push --force git@heroku.com:$HEROKU_APP_NAME.git HEAD:refs/heads/master
+          #     <any other necessary commands for heroku deployment you might need can go here>
+          #   fi
+      # - run: # run coverage report
     #       name: code-coverage
     #       command: './node_modules/.bin/nyc report --reporter=text-lcov'
     #   - store_artifacts: # special step to save test results as as artifact
