@@ -7,7 +7,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+          # Read about caching dependencies: https://circleci.com/docs/2.0/caching
           key: v1-dependency-cache-{{ checksum "package.json" }}
       - run:
           name: install npm packages
