@@ -1,7 +1,8 @@
 import { Router, RequestHandler } from "express";
 import { AppUtils } from "./core/utils";
-import { UsersRouter } from "./api/users/users.routes";
+import { UsersRouter as UsersRoutes } from "./api/users/users.routes";
 import { AuthRoutes } from '@auth/auth.routes';
+import { CountriesRoutes } from '@api/countries/countries.routes';
 
 export class Wrapper {
     private static list = [];
@@ -60,5 +61,6 @@ export class Wrapper {
 }
 
 // Wrapper.registerRouter(CustomersRouter);
-Wrapper.registerRouter(UsersRouter);
+Wrapper.registerRouter(UsersRoutes);
 Wrapper.registerRouter(AuthRoutes);
+Wrapper.registerRouter(CountriesRoutes);

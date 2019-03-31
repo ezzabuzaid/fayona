@@ -4,7 +4,7 @@ import { ErrorHandling } from '@core/helpers';
 import { RequestHandler } from 'express';
 
 
-export function Get(routerPath: string, ...middlewares: RequestHandler[]): any {
+export function Get(uri: string, ...middlewares: RequestHandler[]): any {
     return function (target: RouterMethodDecorator, propertyKey: string, descriptor: PropertyDescriptor) {
         const method = descriptor.value;
         descriptor.value = function () {
@@ -19,10 +19,10 @@ export function Get(routerPath: string, ...middlewares: RequestHandler[]): any {
         setTimeout(() => {
             //* a way fix path to router slashes
             //* join router path and get path
-            routerPath = AppUtils.joinPath(target.routesPath, '/', routerPath);
+            uri = AppUtils.joinPath(target.routeUri, '/', uri);
 
             //* assign the router
-            target.get(routerPath, ErrorHandling.wrapRoute(...middlewares, function () {
+            target.get(uri, ErrorHandling.wrapRoute(...middlewares, function () {
                 return target[propertyKey](...arguments);
             }));
 

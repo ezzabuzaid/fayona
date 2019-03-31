@@ -6,10 +6,10 @@ import { ServerLevel } from '@core/helpers';
 import { Server as httpServer } from 'http';
 import { appService } from './core';
 import en from "../languages/en.json";
-import mongoose = require('mongoose');
 
 import { Logger } from "./core/utils/logger.service";
 import { URL } from 'url';
+import { Database } from '@core/database/database';
 const log = new Logger('Server init');
 
 export class Server extends Application {
@@ -18,9 +18,8 @@ export class Server extends Application {
         private host = this.get('host');
 
         /**
-         * 
+         * Invoke this method to start the server
          * @param port server port
-         * @param cb callback function, will be called when server start
          */
         static bootstrap(port: number): Promise<Server> {
                 // SECTION server init event
@@ -29,22 +28,22 @@ export class Server extends Application {
 
         private resolverRouters() {
                 // SECTION routes resolving event
+                
                 this.app.use('/', ...Wrapper.routerList);
-
-                this.app.use('/', (req, res) => {
-                        res.status(200).json({ work: 'Server work' });
-                });
 
                 // catch favIcon request
                 this.app.use(ErrorHandling.favIcon);
 
                 // * Globally catch error
                 this.app.use(ErrorHandling.catchError);
-
+                // it must allow to hit the root but the order is not clear, above the not found middleware or below it
+                // this.app.use('/', (req, res) => {
+                //         res.status(200).json({ work: 'Server work' });
+                // });
                 // * catch not found error
                 this.app.use(ErrorHandling.notFound);
 
-
+                
         }
 
         private constructor(port: number) {
@@ -53,28 +52,16 @@ export class Server extends Application {
                 this.init().catch(() => new Error('Faild to init the server'));
         }
 
-        private populateMongoose() {
-                // REVIEW  move it to Database class with it's own event
-                const { MONGO_USER, MONGO_PASSWORD, MONGO_PATH } = process.env;
-                return mongoose.connect(`mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@cluster0-hp3qr.mongodb.net/${MONGO_PATH}`, {
-                        useNewUrlParser: true,
-                        autoIndex: false
-                })
-                        .then(() => log.info('Database Connected'))
-                        .catch((error) => log.error("Database Not Connected", error))
-        }
-
         /**
          * 
-         * Call the app.listen to start the server
+         * Start the server and return an instance of it.
          * @returns {Promise<httpServer>} 
          */
         private populateServer(): Promise<httpServer> {
                 return new Promise<httpServer>((resolve) => {
                         const url = new URL(`http://${this.host}:${this.port}`);
                         const server = this.app.listen(this.port, this.host, () => {
-                                // process.env.URL = url;
-                                log.info(`${new Date()} Server running at ${url}`)
+                                log.info(`${new Date()} Server running at ${url.origin}`)
                                 resolve(server);
                                 // SECTION server start event
                         });
@@ -91,14 +78,13 @@ export class Server extends Application {
          * 
          */
         private async init() {
-                this.resolverRouters();
-                this.setupLocalization();
-                // return it arrayAsObject
-                await Promise.all([
+          await Promise.all([
+                        this.resolverRouters(),
+                        this.setupLocalization(),
                         this.populateServer(),
-                        this.populateMongoose()
+                        Database.load()
                 ]);
-
+                // refactor the "Reactor" class
                 appService.broadcast(null);
         }
 }

@@ -3,7 +3,7 @@ import { ErrorHandling } from '@core/helpers';
 import { AppUtils } from '@core/utils';
 import { RequestHandler } from 'express';
 
-export function Patch(routerPath: string,...middlewares: RequestHandler[]) {
+export function Patch(uri: string,...middlewares: RequestHandler[]) {
     return function (target: RouterMethodDecorator & any, propertyKey: string, descriptor: PropertyDescriptor) {
         const method = descriptor.value;
         descriptor.value = function () {
@@ -17,10 +17,10 @@ export function Patch(routerPath: string,...middlewares: RequestHandler[]) {
         setTimeout(() => {
             //* a way fix path to router slashes
             //* join router path and get path
-            routerPath = AppUtils.joinPath(target.routesPath, '/', routerPath);
+            uri = AppUtils.joinPath(target.routesPath, '/', uri);
 
             //* assign the router
-            target.patch(routerPath, ErrorHandling.wrapRoute(...middlewares, function () {
+            target.patch(uri, ErrorHandling.wrapRoute(...middlewares, function () {
                 return target[propertyKey](...arguments);
             }));
 

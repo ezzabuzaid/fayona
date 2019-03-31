@@ -3,9 +3,10 @@ import { ErrorHandling } from '@core/helpers';
 import { AppUtils } from '@core/utils';
 import { RequestHandler } from 'express';
 
-export function Delete(routerPath: string, ...middlewares: RequestHandler[]) {
-    return function (target: RouterMethodDecorator & any, propertyKey: string, descriptor: PropertyDescriptor) {
+export function Delete<T=any>(uri: string, ...middlewares: RequestHandler[]) {
+    return function (target: RouterMethodDecorator & T, propertyKey: string, descriptor: PropertyDescriptor) {
         const method = descriptor.value;
+        const instance: RouterMethodDecorator = target;
         descriptor.value = function () {
             //* any code here will be executed when the marked method get called 
             return method.apply(target, arguments);
@@ -17,10 +18,10 @@ export function Delete(routerPath: string, ...middlewares: RequestHandler[]) {
         setTimeout(() => {
             //* a way fix path to router slashes
             //* join router path and get path
-            routerPath = AppUtils.joinPath(target.routesPath, '/', routerPath);
+            uri = AppUtils.joinPath(target.routeUri, '/', uri);
 
             //* assign the router
-            target.delete(routerPath, ErrorHandling.wrapRoute(...middlewares, function () {
+            instance.delete(uri, ErrorHandling.wrapRoute(...middlewares, function () {
                 return target[propertyKey](...arguments);
             }));
 

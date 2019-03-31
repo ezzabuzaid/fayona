@@ -2,7 +2,7 @@ import express = require('express');
 import morgan = require('morgan');
 import compression = require('compression');
 import helmet = require('helmet');
-import { Envirnoment } from 'environment/env';
+import { envirnoment } from 'environment/env';
 
 import { Logger } from '@core/utils';
 const log = new Logger('Application instance');
@@ -10,7 +10,7 @@ const log = new Logger('Application instance');
 export class Application {
     app = express();
     constructor() {
-        Envirnoment.load();
+        envirnoment.load();
         this.configure();
         this.allowCors();
 
@@ -59,27 +59,3 @@ export class Application {
 }
 
 // TODO add lusca lib
-
-// import { AssertionError } from 'assert';
-
-// function handleAssertionError(error, req, res, next) {
-//     if (error instanceof AssertionError) {
-//         return res.status(400).json({
-//             type: 'AssertionError',
-//             message: error.message
-//         });
-//     }
-//     next(error);
-// }
-
-// const { MongoError } = require('mongodb');
-
-// app.use(function handleDatabaseError(error, req, res, next) {
-//   if (error instanceof MongoError) {
-//     return res.status(503).json({
-//       type: 'MongoError',
-//       message: error.message
-//     });
-//   }
-//   next(error);
-// });

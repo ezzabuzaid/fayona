@@ -1,14 +1,14 @@
 import { Router as expressRouter } from 'express';
-import { RouterDecorationOption } from '../typing';
+import { RouterDecorationOption, RouterProperties } from '../typing';
 import { AppUtils, Logger } from '@core/utils';
 import { ErrorHandling } from '@core/helpers';
 const log = new Logger('Router Decorator');
 
-export function Router(routerPath: string, options: RouterDecorationOption = {}) {
+export function Router(uri: string, options: RouterDecorationOption = {}) {
     return function <T extends new (...args: any[]) => any>(constructor: T) {
 
         // NOTE  a way to fix path to router slashes
-        routerPath = AppUtils.joinPath(routerPath);
+        uri = AppUtils.joinPath(uri);
         const { prototype } = constructor;
         const router = expressRouter(options);
         // NOTE  extend router        
@@ -18,7 +18,7 @@ export function Router(routerPath: string, options: RouterDecorationOption = {})
         }
 
         if (options.middleware && options.middleware.length) {
-            router.all(`${routerPath}/*`,ErrorHandling.wrapRoute(...options.middleware));
+            router.use(`${uri}`, ErrorHandling.wrapRoute(...options.middleware));
         }
 
         //* define getter for router instance
@@ -27,11 +27,11 @@ export function Router(routerPath: string, options: RouterDecorationOption = {})
 
         //* the controller router | base path for router class
         //* all routes will be under this path
-        AppUtils.defineProperty(prototype, 'routesPath', { get() { return routerPath } });
+        AppUtils.defineProperty(prototype, RouterProperties.RoutesPath, { get() { return uri } });
 
         //* mark a class with id
         const id = AppUtils.generateHash();
-        AppUtils.defineProperty(prototype, 'id', { get() { return id } })
+        AppUtils.defineProperty(prototype, RouterProperties.ID, { get() { return id } })
 
 
         //* construct the Router class

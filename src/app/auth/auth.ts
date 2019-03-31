@@ -8,9 +8,9 @@ const log = new Logger('Auth Module');
 export class Auth {
     static async isAuthenticated(req: Request, res: Response, next: NextFunction) {
         log.info('Start verifing JWT')
-        const token = req.headers.authorization;
         const unauth = new ErrorResponse('Not authorized', NetworkStatus.UNAUTHORIZED);
         try {
+            const token = req.headers.authorization;
             const decodedToken = await verify(token);
             log.info('Start checking JWT')
             if (!decodedToken) {

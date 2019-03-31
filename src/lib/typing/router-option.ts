@@ -1,24 +1,15 @@
 import { RequestHandler, RouterOptions, Router } from "express";
-import { RequestHandlerParams, Router as expressRouter } from "express-serve-static-core";
+import { RequestHandlerParams } from 'express-serve-static-core';
 
 
 export interface RouterDecorationOption extends RouterOptions {
-    middleware?: MiddlewareType[]
+    middleware?:  RequestHandler[] | RequestHandlerParams[]
 }
 
-export type MiddlewareType = RequestHandler | RequestHandlerParams;
-
-interface RouterDecorator<T> {
-    instance?: T;
-    router?: expressRouter;
-    routesPath?: string;
+export enum RouterProperties {
+    RoutesPath = 'routeUri',
+    ID = 'id',
 }
 
-type Optional<T> = { [P in keyof T]?: T[P] }
-export type RouterDec<T> = Optional<RouterDecorator<T>>;
+export type RouterMethodDecorator = Router & { routeUri: string }
 
-
-export interface RouterMethodDecorator<T=any> extends expressRouter {
-    instance: string;
-    routesPath: string;
-}

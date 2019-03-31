@@ -3,8 +3,8 @@ import { ErrorHandling } from '@core/helpers';
 import { AppUtils } from '@core/utils';
 import { RequestHandler } from 'express';
 
-export function Put(routerPath: string, ...middlewares: RequestHandler[]) {
-    return function (target: RouterMethodDecorator & any, propertyKey: string, descriptor: PropertyDescriptor) {
+export function Put<T=any>(uri: string, ...middlewares: RequestHandler[]) {
+    return function (target: RouterMethodDecorator & T, propertyKey: string, descriptor: PropertyDescriptor) {
         const method = descriptor.value;
         descriptor.value = function () {
             //* any code here will be executed when the marked method get called 
@@ -17,10 +17,10 @@ export function Put(routerPath: string, ...middlewares: RequestHandler[]) {
         setTimeout(() => {
             //* a way fix path to router slashes
             //* join router path and get path
-            routerPath = AppUtils.joinPath(target.routesPath, '/', routerPath);
+            uri = AppUtils.joinPath(target.routeUri, '/', uri);
 
             //* assign the router
-            target.put(routerPath, ErrorHandling.wrapRoute(...middlewares, function () {
+            target.put(uri, ErrorHandling.wrapRoute(...middlewares, function () {
                 return target[propertyKey](...arguments);
             }));
 

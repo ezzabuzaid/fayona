@@ -3,8 +3,8 @@ import { RouterMethodDecorator } from '@lib/typing';
 import { ErrorHandling } from '@core/helpers/errors';
 import { RequestHandler } from 'express';
 
-export function Post(routerPath: string, ...middlewares: RequestHandler[]) {
-    return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
+export function Post<T=any>(uri: string, ...middlewares: RequestHandler[]) {
+    return function (target:RouterMethodDecorator & T, propertyKey: string, descriptor: PropertyDescriptor) {
         const method = descriptor.value;
         descriptor.value = function () {
             //* any code here will be executed when the marked method get called 
@@ -19,10 +19,10 @@ export function Post(routerPath: string, ...middlewares: RequestHandler[]) {
         setTimeout(() => {
             //* a way fix path to router slashes
             //* join router path and get path
-            routerPath = AppUtils.joinPath(target.routesPath, '/', routerPath);
+            uri = AppUtils.joinPath(target.routeUri, '/', uri);
 
             //* assign the router
-            target.post(routerPath, ErrorHandling.wrapRoute(...middlewares, function () {
+            target.post(uri, ErrorHandling.wrapRoute(...middlewares, function () {
                 return target[propertyKey](...arguments);
             }));
 

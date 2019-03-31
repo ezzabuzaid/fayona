@@ -5,6 +5,7 @@ export class BaseSchema<T> extends MongooseSchema<T> {
             timestamps: true,
             skipVersioning: true,
             useNestedStrict: true,
+            id: false,
             ...opt
         });
         // this.loadClass(model);
