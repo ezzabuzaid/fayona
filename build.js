@@ -1,7 +1,6 @@
 const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-spawn('npm run build', { shell: true });
 
 function copyFile(file, directory) {
     // get the ext
@@ -15,15 +14,19 @@ function copyFile(file, directory) {
     source.on('error', function (err) { console.log(err); });
 };
 
-function readFileStream(file) {
-    return fs.createReadStream(file);
-}
+// function readFileStream(file) {
+//     return fs.createReadStream(file);
+// }
 
-function writeFileStream(file) {
-    return fs.createWriteStream(file);
-}
+// function writeFileStream(file) {
+//     return fs.createWriteStream(file);
+// }
 
-readFileStream('./src/environment/.env')
-    .pipe(writeFileStream('./dist/src/environment/.env'));
-
-// copyFile('./src/environment/.env', './dist/src/environment');
+// readFileStream('./src/environment/.env')
+//     .pipe(writeFileStream('./dist/src/environment/.env'));
+console.log(path.join(__dirname, './src/environment/.env'));
+spawn('tsc', { shell: true })
+    .on('exit', () => copyFile(
+        path.join(__dirname, './src/environment/.env'),
+        path.join(__dirname, './dist/src/environment')
+    ));
