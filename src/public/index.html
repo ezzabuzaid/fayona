@@ -1,0 +1,62 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>WebSocket Test</title>
+</head>
+
+<body>
+    <div id="output"></div>
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script>
+        window.onload = function () {
+            class socket extends WebSocket {
+                constructor() {
+                    super(`ws://${location.href.split('//')[1]}`);
+                }
+
+                onOpen(evt) {
+                }
+
+                onClose(evt) {
+                }
+
+                onError(evt) {
+                }
+            }
+            const wss = new socket();
+            var chart = new CanvasJS.Chart("chartContainer", {
+                animationEnabled: true,
+                title: {
+                    text: "Desktop Search Engine Market Share - 2016"
+                },
+                data: [{
+                    type: "pie",
+                    startAngle: 240,
+                    yValueFormatString: "##0.00\"%\"",
+                    indexLabel: "{label} {y}",
+                    dataPoints: []
+                }]
+            });
+            chart.render();
+            wss.onmessage = (({ data }) => {
+                data = JSON.parse(data);
+                const dataPoints = chart.options.data[0].dataPoints = [];
+                Object.keys(data).forEach(el => {
+                    const value = data[el];
+                    if (typeof value === 'number') {
+                        console.log({ el, value });
+                        dataPoints.push({ y: value, label: el });
+                    }
+                });
+                chart.render();
+            });
+        }
+    </script>
+
+</body>
+
+</html>

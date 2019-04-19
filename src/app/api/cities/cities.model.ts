@@ -10,6 +10,7 @@ export namespace CitiesType {
         name_ar: string;
         name_en: string;
         placeId: string;
+        countryId: string;
     }
     export class Schema extends BaseSchema<Model>{
         static schemaName = 'cities'
@@ -33,7 +34,11 @@ export namespace CitiesType {
                     type: String,
                     required: true,
                     unique: true
-                }
+                },
+                countryId: {
+                    type: BaseSchema.Types.ObjectId,
+                    required: true
+                },
             })
         }
     }

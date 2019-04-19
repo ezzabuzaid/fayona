@@ -20,18 +20,8 @@ export function production(cb, level = Server.LEVEL) {
     }
 }
 
-export function staging(cb, level = Server.LEVEL) {
-    if (ServerLevel.STAGE <= level) {
-        cb();
-    }
-}
-
 export function testing(cb, level = Server.LEVEL) {
     if (ServerLevel.TEST <= level) {
         cb();
     }
-}
-
-export class AppHelpers {
-    static EmailValidation = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 }

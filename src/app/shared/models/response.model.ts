@@ -1,4 +1,4 @@
-import { NetworkStatus } from './network-status';
+import { NetworkStatus } from '../../core/helpers/network-status';
 
 abstract class Response extends Error {
     status: string;
@@ -6,7 +6,7 @@ abstract class Response extends Error {
 }
 
 export class SuccessResponse<T> extends Response {
-    name = 'SuccessResponse';
+    name = SuccessResponse.name;
     data: T;
     constructor(data: T, message: string, code = NetworkStatus.OK, status?: string) {
         super();
@@ -19,7 +19,7 @@ export class SuccessResponse<T> extends Response {
 }
 
 export class ErrorResponse extends Response {
-    name = 'ErrorResponse';
+    name = ErrorResponse.name;
     error: string;
     constructor(message: string, code = NetworkStatus.BAD_REQUEST, status?: string) {
         super();

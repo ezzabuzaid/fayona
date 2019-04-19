@@ -5,7 +5,10 @@
     ],
     "jsRules": {},
     "rules": {
-        "no-namespaces":false
+        "no-namespaces": false,
+        "indent": true,
+        "no-unused-expression": true,
+        "no-unused-variable": true
     },
     "rulesDirectory": [],
 }

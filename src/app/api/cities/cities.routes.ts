@@ -5,6 +5,7 @@ import { Logger } from '@core/utils';
 import { ErrorResponse, NetworkStatus, SuccessResponse } from '@core/helpers';
 import { translate } from '@lib/localization';
 import { Auth } from '@auth/auth';
+import { CountriesRepo } from '@api/countries';
 const log = new Logger('CountriesRoutes');
 
 @Router('countries', {
@@ -14,7 +15,7 @@ export class CitiesRoutes {
 
     @Post('/')
     async createCity(req: Request, res: Response) {
-        const { name_ar, name_en, placeId } = req.body;
+        const { name_ar, name_en, placeId, countryId } = req.body;
 
         const entityExist = await CitiesRepo.entityExist({ placeId });
         if (entityExist) {
@@ -22,7 +23,7 @@ export class CitiesRoutes {
             throw new ErrorResponse(translate('entity_exist'), NetworkStatus.BAD_REQUEST);
         }
 
-        const entity = await CitiesRepo.create({ name_ar, name_en, placeId });
+        const entity = await CitiesRepo.create({ name_ar, name_en, placeId, countryId });
         log.info('New entity created');
 
         const response = new SuccessResponse<{}>(entity, translate('created_success'), NetworkStatus.CREATED);
@@ -66,10 +67,18 @@ export class CitiesRoutes {
         res.status(response.code).json(response);
     }
 
+    @Get('/:countryId')
+    async fetchCitiesByCountryId(req: Request, res: Response) {
+        const { countryId } = req.params;
+        const entites = await CitiesRepo.fetchEntities({ countryId });
+        const response = new SuccessResponse(entites, translate('success'), NetworkStatus.OK);
+        res.status(response.code).json(response);
+    }
+
     @Get('/:id')
     async fetchCity(req: Request, res: Response) {
-        const { id } = req.params;
-        const entity = await CitiesRepo.fetchEntity({ _id: id }, {}, { lean: true });
+        const { id: _id } = req.params;
+        const entity = await CitiesRepo.fetchEntity({ _id }, {}, { lean: true });
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
         }

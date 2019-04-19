@@ -1,7 +1,7 @@
 import { BaseSchema } from '@core/database';
 import { Document, model } from 'mongoose';
 
-import { AppHelpers } from '@core/helpers';
+import { Validation } from '@shared/common';
 
 import { Logger } from '@core/utils';
 const log = new Logger('Users Model');
@@ -31,7 +31,7 @@ export namespace UsersType {
                     type: String,
                     required: true,
                     unique: true,
-                    match: [AppHelpers.EmailValidation, 'Please provide a valid email address']
+                    match: [Validation.EmailValidation, 'Please provide a valid email address']
                 },
                 password: {
                     type: String,

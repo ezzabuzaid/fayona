@@ -1,6 +1,6 @@
 import setPrototypeOf = require('setprototypeof');
 import { randomBytes } from 'crypto';
-
+import axios from 'axios';
 export class AppUtils {
     static setPrototypeOf(constructor: object, superConstructor: object) {
         setPrototypeOf(constructor, superConstructor);
@@ -68,6 +68,11 @@ export class AppUtils {
 
     static reject(obj, keys) {
         return Object.assign({}, ...Object.keys(obj).filter(k => !keys.includes(k)).map(k => ({ [k]: obj[k] })))
+    }
+
+    static async getHtml(uri) {
+        const { data } = await axios.get(uri);
+        return data;
     }
 }
 

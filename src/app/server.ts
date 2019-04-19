@@ -5,13 +5,20 @@ import { localization } from '@lib/localization';
 import { ServerLevel } from '@core/helpers';
 import { Server as httpServer } from 'http';
 import { appService } from './core';
-import en from "../languages/en.json";
-
 import { Logger } from "./core/utils/logger.service";
 import { URL } from 'url';
 import { Database } from '@core/database/database';
+import en from "../languages/en.json";
+import dummyData from "../../data/local-air-quality.json";
+import WebSocket from 'ws';
+import puppeteer from 'puppeteer';
+import path from 'path';
+import { AppUtils } from '@core/utils';
 const log = new Logger('Server init');
 
+interface Element { }
+interface Node { }
+interface NodeListOf<TNode = Node> { }
 export class Server extends Application {
         static LEVEL = ServerLevel.DEV;
         private port: number = +this.get('port');
@@ -28,28 +35,31 @@ export class Server extends Application {
 
         private resolverRouters() {
                 // SECTION routes resolving event
-                
-                this.app.use('/', ...Wrapper.routerList);
 
+                this.app.use('/api', ...Wrapper.routerList, (req, res) => res.status(200).json({ work: '/API hitted' }));
+                this.app.use('/', (req, res) => {
+                        res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
+                });
                 // catch favIcon request
                 this.app.use(ErrorHandling.favIcon);
 
                 // * Globally catch error
                 this.app.use(ErrorHandling.catchError);
-                // it must allow to hit the root but the order is not clear, above the not found middleware or below it
-                // this.app.use('/', (req, res) => {
-                //         res.status(200).json({ work: 'Server work' });
-                // });
+
                 // * catch not found error
                 this.app.use(ErrorHandling.notFound);
 
-                
         }
 
         private constructor(port: number) {
                 super();
                 port && (this.port = port);
-                this.init().catch(() => new Error('Faild to init the server'));
+                try {
+                        this.init()
+
+                } catch (error) {
+                        throw new Error('Faild to init the server')
+                }
         }
 
         /**
@@ -60,12 +70,12 @@ export class Server extends Application {
         private populateServer(): Promise<httpServer> {
                 return new Promise<httpServer>((resolve) => {
                         const url = new URL(`http://${this.host}:${this.port}`);
-                        const server = this.app.listen(this.port, this.host, () => {
+                        const server = this.app.listen(+this.port, this.host, () => {
                                 log.info(`${new Date()} Server running at ${url.origin}`)
                                 resolve(server);
                                 // SECTION server start event
                         });
-                })
+                });
         }
 
         private setupLocalization() {
@@ -77,15 +87,43 @@ export class Server extends Application {
         /**
          * 
          */
-        private async init() {
-          await Promise.all([
-                        this.resolverRouters(),
-                        this.setupLocalization(),
-                        this.populateServer(),
-                        Database.load()
-                ]);
+        private init() {
+                this.populateServer()
+                        .then(server => {
+                                const wss = new WebSocket.Server({ server });
+                                wss.on('connection', (ws: WebSocket) => {
+                                        const interval = setInterval(() => {
+                                                ws.send(JSON.stringify(dummyData[Math.floor(dummyData.length * Math.random())]));
+                                        }, 500);
+                                        ws.on('close', () => clearInterval(interval));
+                                        ws.on('error', () => clearInterval(interval));
+                                        // ws.on('message', (message: string) => {
+                                        //         console.log('received: %s', message);
+                                        // });
+                                });
+                                // puppeteer
+                                //         .launch().then((browser) => browser.newPage())
+                                //         .then((page) => {
+                                //                 page.goto('https://twitter.com/ezzabuzaid')
+                                //                 return page;
+                                //         })
+                                //         .then((page) => page.content())
+                                //         .then(function (html) {
+                                //                 log.warn();
+                                //         })
+                                //         .catch(function (err) {
+                                //                 //handle error
+                                //         });
+                                // AppUtils.getHtml('https://dev.tradehub.com/en/lp/workshops').then(console.log);
+
+                        });
+                Database.load();
+                this.resolverRouters();
+                this.setupLocalization();
                 // refactor the "Reactor" class
+
                 appService.broadcast(null);
+
         }
 }
 

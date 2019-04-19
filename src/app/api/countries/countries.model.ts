@@ -3,6 +3,7 @@ import { BaseSchema } from '@core/database';
 import { Document, model } from 'mongoose';
 
 import { Logger } from '@core/utils';
+import { CitiesType } from '@api/cities';
 const log = new Logger('CountriesModel');
 
 export namespace CountriesType {
@@ -10,6 +11,7 @@ export namespace CountriesType {
         name_ar: string;
         name_en: string;
         placeId: string;
+        citiesIds: string[]
     }
     export class Schema extends BaseSchema<Model>{
         static schemaName = 'countries'
@@ -33,10 +35,7 @@ export namespace CountriesType {
                     type: String,
                     required: true,
                     unique: true
-                },
-                cities: [{
-                    
-                }]
+                }
             })
         }
     }
