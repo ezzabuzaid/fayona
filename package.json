@@ -13,7 +13,10 @@
     "start": "npm run watch:prod",
     "lint": "tslint -c tslint.json 'src/**/*.ts'"
   },
-  "author": "",
+  "author": "ezzabuzaid",
+  "engines": {
+    "node": "10.15.1"
+  },
   "license": "ISC",
   "dependencies": {
     "@decorators/di": "^1.0.2",
