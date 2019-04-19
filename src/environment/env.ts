@@ -11,21 +11,21 @@ class Envirnoment {
             log.debug(error);
             throw new Error('an error accourd while loading the env file');
         }
-        log.info('Envirnoment file loaded');
-        this.env =parsed;
+        log.info('Envirnoment file loaded', parsed);
+        this.env = parsed;
         return parsed;
     }
 
-    set(envKey:string, value:string){
+    set(envKey: string, value: string) {
         const key = this.env[envKey];
-        if (!key){
-            log.warn(`you're about adding a new key to the environment ${envKey}`);    
+        if (!key) {
+            log.warn(`you're about adding a new key to the environment ${envKey}`);
         }
         this.env[envKey] = value;
         return value;
     }
 
-    get(envKey:string){
+    get(envKey: string) {
         return this.env[envKey];
     }
 
