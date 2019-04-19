@@ -24,10 +24,12 @@ function copyFile(file, directory) {
 // readFileStream('./src/environment/.env')
 //     .pipe(writeFileStream('./dist/src/environment/.env'));
 spawnSync('tsc', { shell: true });
-fs.readdirSync('./').forEach(file => {
-    console.log(file);
-});
+
 copyFile(
     path.join(__dirname, './src/environment/.env'),
     path.join(__dirname, './dist/src/environment')
 )
+
+fs.readdirSync('./').forEach(file => {
+    console.log(file);
+});

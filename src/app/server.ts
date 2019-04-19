@@ -23,31 +23,31 @@ export class Server extends Application {
         static LEVEL = ServerLevel.DEV;
         private port: number = +this.get('port');
         private host = this.get('host');
-
         /**
          * Invoke this method to start the server
          * @param port server port
          */
-        static bootstrap(port: number): Promise<Server> {
+        static bootstrap(port: number): Server {
                 // SECTION server init event
-                return Promise.resolve(new Server(port));
+                // return Promise.resolve();
+                return new Server(port);
         }
 
         private resolverRouters() {
                 // SECTION routes resolving event
 
-                this.app.use('/api', ...Wrapper.routerList, (req, res) => res.status(200).json({ work: '/API hitted' }));
-                this.app.use('/', (req, res) => {
+                this.application.use('/api', ...Wrapper.routerList, (req, res) => res.status(200).json({ work: '/API hitted' }));
+                this.application.use('/', (req, res) => {
                         res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
                 });
                 // catch favIcon request
-                this.app.use(ErrorHandling.favIcon);
+                this.application.use(ErrorHandling.favIcon);
 
                 // * Globally catch error
-                this.app.use(ErrorHandling.catchError);
+                this.application.use(ErrorHandling.catchError);
 
                 // * catch not found error
-                this.app.use(ErrorHandling.notFound);
+                this.application.use(ErrorHandling.notFound);
 
         }
 
@@ -70,7 +70,7 @@ export class Server extends Application {
         private populateServer(): Promise<httpServer> {
                 return new Promise<httpServer>((resolve) => {
                         const url = new URL(`http://${this.host}:${this.port}`);
-                        const server = this.app.listen(+this.port, this.host, () => {
+                        const server = this.application.listen(+this.port, this.host, () => {
                                 log.info(`${new Date()} Server running at ${url.origin}`)
                                 resolve(server);
                                 // SECTION server start event

@@ -19,8 +19,8 @@ export class UsersRouter {
 
         // Validate the input
         const { username, password, email } = req.body;
+        log.debug(req.body);
         const userExist = await UsersRepo.entityExist({ username });
-        log.debug(userExist);
         if (userExist) {
             log.debug(`User with username ${username} is exist`);
             throw new ErrorResponse(translate('username_exist'), NetworkStatus.BAD_REQUEST);

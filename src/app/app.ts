@@ -8,14 +8,14 @@ import { Logger } from '@core/utils';
 const log = new Logger('Application instance');
 
 export class Application {
-    app = express();
+    private app = express();
     constructor() {
         envirnoment.load();
         this.configure();
         this.allowCors();
 
     }
-    get applicationInstance() {
+    get application() {
         return this.app;
     }
 
