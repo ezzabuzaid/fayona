@@ -4,7 +4,7 @@ const log = new Logger('Main begin');
 import { Server } from "./app/server";
 import postman from '@lib/postman/postman';
 
-const server = Server.bootstrap(null)
+const server = Server.bootstrap(null);
 // .then(() => log.info('Bootstrap begain'))
 process.chdir('./src/');
 

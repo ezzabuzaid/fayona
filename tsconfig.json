@@ -12,6 +12,16 @@
     "strict": false,
     "moduleResolution": "node",
     "baseUrl": "./src/",
+    "noImplicitReturns": false,
+    "noUnusedLocals": true,
+    "sourceMap": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "importHelpers": true,
+    "noEmitHelpers": true,
+    "resolveJsonModule": true,
     "paths": {
       "@core/*": [
         "app/core/*"
@@ -25,6 +35,9 @@
       "@shared/*": [
         "app/shared/*"
       ],
+      "@environment/*": [
+        "environment/*"
+      ],
       "@lib/*": [
         "lib/*"
       ]
@@ -36,13 +49,6 @@
     "types": [
       "node",
       "jest"
-    ],
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "importHelpers": true,
-    "noEmitHelpers": true,
-    "resolveJsonModule": true
+    ]
   }
 }

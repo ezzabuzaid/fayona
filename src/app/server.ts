@@ -9,16 +9,16 @@ import { Logger } from "./core/utils/logger.service";
 import { URL } from 'url';
 import { Database } from '@core/database/database';
 import en from "../languages/en.json";
-import dummyData from "../../data/local-air-quality.json";
+import dummyData from "../data/local-air-quality.json";
 import WebSocket from 'ws';
-import puppeteer from 'puppeteer';
 import path from 'path';
-import { AppUtils } from '@core/utils';
+import { envirnoment } from '@environment/env';
 const log = new Logger('Server init');
 
-interface Element { }
-interface Node { }
-interface NodeListOf<TNode = Node> { }
+// import puppeteer from 'puppeteer';
+// interface Element { }
+// interface Node { }
+// interface NodeListOf<TNode = Node> { }
 export class Server extends Application {
         static LEVEL = ServerLevel.DEV;
         private port: number = +this.get('port');
@@ -30,6 +30,7 @@ export class Server extends Application {
         static bootstrap(port: number): Server {
                 // SECTION server init event
                 // return Promise.resolve();
+                log.debug('Start boostrapping server');
                 return new Server(port);
         }
 
@@ -54,11 +55,12 @@ export class Server extends Application {
         private constructor(port: number) {
                 super();
                 port && (this.port = port);
+                envirnoment.load();
                 try {
                         this.init()
 
                 } catch (error) {
-                        throw new Error('Faild to init the server')
+                        throw new Error('Faild to init the server');
                 }
         }
 

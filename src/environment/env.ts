@@ -5,8 +5,8 @@ const log = new Logger('Envirnoment Class');
 
 class Envirnoment {
     private env = {};
-    load(state = '') {
-        const { error, parsed } = envConfig({ path: join(__dirname, `.env${state}`) });
+    load(state = EnvirnomentStages.DEV) {
+        const { error, parsed } = envConfig({ path: join(__dirname, `.env.${state}`) });
         if (error) {
             log.debug(error);
             throw new Error('an error accourd while loading the env file');
@@ -30,5 +30,9 @@ class Envirnoment {
     }
 
 }
-
+export enum EnvirnomentStages {
+    DEV = 'dev',
+    TEST = 'test',
+    PROD = 'prod'
+}
 export const envirnoment = new Envirnoment;
