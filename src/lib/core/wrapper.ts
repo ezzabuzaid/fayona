@@ -1,8 +1,6 @@
-import { Router, RequestHandler } from "express";
-import { AppUtils } from "./core/utils";
-import { UsersRouter as UsersRoutes } from "./api/users/users.routes";
-import { AuthRoutes } from '@auth/auth.routes';
-import { CountriesRoutes } from '@api/countries/countries.routes';
+import { RequestHandler } from "express";
+import { AppUtils } from '@core/utils';
+import { Router } from '@lib/methods';
 
 export class Wrapper {
     private static list = [];
@@ -34,12 +32,10 @@ export class Wrapper {
 
     private static assignRouterTo(subRouter, superRouter) {
         //* To check if the router is alredy registerd
-        const parentRouter: Router = this.getRouter(superRouter);
+        const parentRouter = this.getRouter(superRouter);
         if (!parentRouter) {
             throw new Error('Please register the parent router first, then try');
         }
-
-        const path = AppUtils.joinPath(superRouter.routesPath, subRouter.routesPath);
 
         parentRouter.use(superRouter.routesPath, subRouter.router);
     }
@@ -60,7 +56,6 @@ export class Wrapper {
 
 }
 
-// Wrapper.registerRouter(CustomersRouter);
-Wrapper.registerRouter(UsersRoutes);
-Wrapper.registerRouter(AuthRoutes);
-Wrapper.registerRouter(CountriesRoutes);
+// Wrapper.registerRouter(UsersRoutes);
+// Wrapper.registerRouter(AuthRoutes);
+// Wrapper.registerRouter(CountriesRoutes);

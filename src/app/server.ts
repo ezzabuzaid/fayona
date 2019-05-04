@@ -1,4 +1,4 @@
-import { Wrapper } from "./wrapper";
+import { Wrapper } from "../lib/core/wrapper";
 import { Application } from "./app";
 import { ErrorHandling } from './core/helpers/errors';
 import { localization } from '@lib/localization';
@@ -8,11 +8,12 @@ import { appService } from './core';
 import { Logger } from "./core/utils/logger.service";
 import { URL } from 'url';
 import { Database } from '@core/database/database';
-import en from "../languages/en.json";
-import dummyData from "../data/local-air-quality.json";
+import en from "@assets/languages/en.json";
+import dummyData from "@assets/data/local-air-quality.json";
 import WebSocket from 'ws';
 import path from 'path';
 import { envirnoment } from '@environment/env';
+import http = require('http');
 const log = new Logger('Server init');
 
 // import puppeteer from 'puppeteer';
@@ -21,8 +22,10 @@ const log = new Logger('Server init');
 // interface NodeListOf<TNode = Node> { }
 export class Server extends Application {
         static LEVEL = ServerLevel.DEV;
-        private port: number = +this.get('port');
+        private port = +this.get('port');
         private host = this.get('host');
+        public path: URL = null;
+
         /**
          * Invoke this method to start the server
          * @param port server port
@@ -36,12 +39,14 @@ export class Server extends Application {
 
         private resolverRouters() {
                 // SECTION routes resolving event
-
+                // REVIEW {ISSUE} GET api/test reject to api
                 this.application.use('/api', ...Wrapper.routerList, (req, res) => res.status(200).json({ work: '/API hitted' }));
+                // REVIEW {ISSUE} GET apis reject to "/ root"
                 this.application.use('/', (req, res) => {
                         res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
                 });
-                // catch favIcon request
+
+                // * catch favIcon request
                 this.application.use(ErrorHandling.favIcon);
 
                 // * Globally catch error
@@ -55,9 +60,9 @@ export class Server extends Application {
         private constructor(port: number) {
                 super();
                 port && (this.port = port);
-                envirnoment.load();
+                this.path = new URL(`http://${this.host}:${this.port}`)
                 try {
-                        this.init()
+                        this.init();
 
                 } catch (error) {
                         throw new Error('Faild to init the server');
@@ -70,13 +75,21 @@ export class Server extends Application {
          * @returns {Promise<httpServer>} 
          */
         private populateServer(): Promise<httpServer> {
-                return new Promise<httpServer>((resolve) => {
-                        const url = new URL(`http://${this.host}:${this.port}`);
-                        const server = this.application.listen(+this.port, this.host, () => {
-                                log.info(`${new Date()} Server running at ${url.origin}`)
-                                resolve(server);
-                                // SECTION server start event
-                        });
+                return Promise.resolve<httpServer>(this.startServer(this.createServer()));
+                // return new Promise<httpServer>((resolve) => resolve(this.startServer(this.createServer())));
+        }
+
+        private createServer() {
+                //     key: fs.readFileSync('./key.pem'),
+                //     cert: fs.readFileSync('./cert.pem'),
+                //     passphrase: 'YOUR PASSPHRASE HERE'
+                return http.createServer(this.application);
+        }
+
+        private startServer(server: httpServer) {
+                return server.listen(this.path.port, +this.path.hostname, () => {
+                        log.info(`${new Date()} Server running at ${this.path.href}`)
+                        // SECTION server start event
                 });
         }
 

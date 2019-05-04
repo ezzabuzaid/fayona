@@ -2,4 +2,6 @@ const gulp = require("gulp");
 const del = require('del');
 const { configuration } = require('./gulp.config');
 
-module.exports = () => gulp.task('clean', () => del([configuration.paths.dist.entry]));
+const NAME = 'clean';
+exports.name = NAME;
+exports.func = gulp.task(NAME, () => del([configuration.paths.dist.entry]));

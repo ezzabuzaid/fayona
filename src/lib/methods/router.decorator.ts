@@ -2,11 +2,19 @@ import { Router as expressRouter } from 'express';
 import { RouterDecorationOption, RouterProperties } from '../typing';
 import { AppUtils, Logger } from '@core/utils';
 import { ErrorHandling } from '@core/helpers';
+import { Wrapper } from '@lib/core';
 const log = new Logger('Router Decorator');
 
 export function Router(uri: string, options: RouterDecorationOption = {}) {
+    // AppUtils.defineProperty(Router, '_list', { value: [] });
+    // AppUtils.defineProperty(Router, 'list', { get() { return Router['_list'] } });
+    // AppUtils.defineProperty(Router, 'include', {
+    //     value: (value) => {
+    //         Router['list'].push(value);
+    //         console.log(value);
+    //     }
+    // });
     return function <T extends new (...args: any[]) => any>(constructor: T) {
-
         // NOTE  a way to fix path to router slashes
         uri = AppUtils.joinPath(uri);
         const { prototype } = constructor;
@@ -33,7 +41,7 @@ export function Router(uri: string, options: RouterDecorationOption = {}) {
         const id = AppUtils.generateHash();
         AppUtils.defineProperty(prototype, RouterProperties.ID, { get() { return id } })
 
-
+        Wrapper.registerRouter(constructor);
         //* construct the Router class
         //! #issue {one}, the developer must have the ability to construct their own objects
         // const routerClassinstance = new constructor;

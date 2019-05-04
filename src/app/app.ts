@@ -4,11 +4,13 @@ import compression = require('compression');
 import helmet = require('helmet');
 
 import { Logger } from '@core/utils';
+import { envirnoment } from '@environment/env';
 const log = new Logger('Application instance');
 
 export class Application {
     private app = express();
     constructor() {
+        envirnoment.load();
         this.configure();
         this.allowCors();
 
@@ -42,8 +44,8 @@ export class Application {
             .use(helmet())
             .use((compression()));
 
-        this.set('host', process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1');
-        this.set('port', process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 8080)
+        this.set('host', envirnoment.get('HOST') || 'localhost');
+        this.set('port', envirnoment.get('PORT') || 8080)
     }
 
     get(key: string): string {

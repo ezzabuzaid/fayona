@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "es6",
     "module": "commonjs",
     "lib": [
       "es2015"
     ],
-    "declaration": true,
+    "declaration": false,
     "outDir": "./dist/",
     "removeComments": true,
     "downlevelIteration": true,
@@ -40,6 +40,9 @@
       ],
       "@lib/*": [
         "lib/*"
+      ],
+      "@assets/*": [
+        "assets/*"
       ]
     },
     "noStrictGenericChecks": false,

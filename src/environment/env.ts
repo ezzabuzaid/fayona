@@ -11,7 +11,6 @@ class Envirnoment {
             log.debug(error);
             throw new Error('an error accourd while loading the env file');
         }
-        log.info('Envirnoment file loaded', parsed);
         this.env = parsed;
         return parsed;
     }

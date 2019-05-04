@@ -13,23 +13,9 @@ function copyFile(file, directory) {
     source.on('error', function (err) { console.log(err); });
 };
 
-// function readFileStream(file) {
-//     return fs.createReadStream(file);
-// }
-
-// function writeFileStream(file) {
-//     return fs.createWriteStream(file);
-// }
-
-// readFileStream('./src/environment/.env')
-//     .pipe(writeFileStream('./dist/src/environment/.env'));
 spawnSync('tsc', { shell: true });
 const pwd = process.cwd();
 copyFile(
     path.join(pwd, 'src/environment/.env.dev'),
     path.join(pwd, './dist/environment')
-)
-
-// fs.readdirSync('./').forEach(file => {
-//     console.log(file);
-// });
+);

@@ -31,7 +31,7 @@ export class ErrorHandling {
                 response.code = NetworkStatus.BAD_REQUEST;
                 break;
         }
-
+        log.error(error.name);
         // production(() => {
         //     response.message = translate('internal_server_error');
         // });
@@ -45,7 +45,7 @@ export class ErrorHandling {
     }
 
     static notFound(req: Request, res: Response, next: NextFunction) {
-        const error = new ErrorResponse(translate('endpoint_not_found'), NetworkStatus.NOT_FOUND);
+        const error = new ErrorResponse(`${req.originalUrl} => ${translate('endpoint_not_found')}`, NetworkStatus.NOT_FOUND);
         return res.status(error.code).json(error);
     }
 

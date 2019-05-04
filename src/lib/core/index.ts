@@ -1,2 +1,2 @@
-// export * from '../methods/router.decorator';
 export * from '../methods';
+export * from './wrapper';
