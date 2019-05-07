@@ -4,15 +4,15 @@ import compression = require('compression');
 import helmet = require('helmet');
 import path from 'path';
 import { Logger } from '@core/utils';
-import { envirnoment } from '@environment/env';
+import { envirnoment, EnvirnomentStages } from '@environment/env';
 import { Wrapper } from '@lib/core';
-import { ErrorHandling } from '@core/helpers';
+import { ErrorHandling, development } from '@core/helpers';
 const log = new Logger('Application instance');
 
 export class Application {
     private _application = express();
     constructor() {
-        envirnoment.load();
+        envirnoment.load(EnvirnomentStages.DEV);
         this.configure();
         this.allowCors();
 
@@ -45,9 +45,12 @@ export class Application {
             .use((morgan('dev')))
             .use(helmet())
             .use(compression());
-
-        this.set('host', envirnoment.get('HOST') || 'localhost');
-        this.set('port', envirnoment.get('PORT') || 8080)
+        development(() => {
+            this.set('host', envirnoment.get('HOST') || 'localhost');
+        });
+        // npm install && npm start
+        console.log('port is ', process.env.PORT || envirnoment.get('PORT') || 8080);
+        this.set('port', process.env.PORT || envirnoment.get('PORT') || 8080);
     }
 
     protected populateRoutes() {

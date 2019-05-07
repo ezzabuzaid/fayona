@@ -1,5 +1,5 @@
 import { config as envConfig } from "dotenv";
-import { join } from 'path';
+import { join, posix } from 'path';
 import { Logger } from '@core/utils';
 const log = new Logger('Envirnoment Class');
 
@@ -24,7 +24,7 @@ class Envirnoment {
         return value;
     }
 
-    get(envKey: string) {
+    get(envKey: string): string {
         return this.env[envKey];
     }
 
