@@ -4,14 +4,12 @@ import { Logger } from '@core/utils';
 const log = new Logger('Envirnoment Class');
 
 class Envirnoment {
-    private env = {};
     load(state = EnvirnomentStages.DEV) {
         const { error, parsed } = envConfig({ path: join(__dirname, `.env.${state}`) });
         if (error) {
             log.debug(error);
             throw new Error('an error accourd while loading the env file');
         }
-        this.env = parsed;
         return parsed;
     }
 
@@ -26,6 +24,10 @@ class Envirnoment {
 
     get(envKey: string): string {
         return this.env[envKey];
+    }
+
+    get env() {
+        return process.env;
     }
 
 }

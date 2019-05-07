@@ -15,7 +15,11 @@ export class Application {
         envirnoment.load(EnvirnomentStages.DEV);
         this.configure();
         this.allowCors();
-
+        development(() => {
+            this.set('host', envirnoment.get('HOST') || 'localhost');
+        });
+        console.log('port is ', process.env.PORT || envirnoment.get('PORT') || 8080);
+        this.set('port', envirnoment.get('PORT') || 8080);
     }
     get application() {
         return this._application;
@@ -45,23 +49,16 @@ export class Application {
             .use((morgan('dev')))
             .use(helmet())
             .use(compression());
-        development(() => {
-            this.set('host', envirnoment.get('HOST') || 'localhost');
-        });
-        // npm install && npm start
-        console.log('port is ', process.env.PORT || envirnoment.get('PORT') || 8080);
-        this.set('port', process.env.PORT || envirnoment.get('PORT') || 8080);
     }
 
     protected populateRoutes() {
         return new Promise((resolve) => {
             // SECTION routes resolving event
-            // REVIEW {ISSUE} GET api/test reject to api
-            this.application.use('/api', ...Wrapper.routerList, (req, res) => res.status(200).json({ work: '/API hitted' }));
-            // REVIEW {ISSUE} GET apis reject to "/ root"
-            // this.application.use('/', (req, res) => {
-            //     res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
-            // });
+            this.application.use('/api', ...Wrapper.routerList)
+            this.application.get('/api', (req, res) => res.status(200).json({ work: '/API hitted' }));
+            this.application.get('/', (req, res) => {
+                res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
+            });
 
             // * catch favIcon request
             this.application.use(ErrorHandling.favIcon);
