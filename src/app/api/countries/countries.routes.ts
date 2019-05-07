@@ -5,7 +5,7 @@ import { CountriesRepo } from './countries.repo';
 import { Logger } from '@core/utils';
 import { ErrorResponse, NetworkStatus, SuccessResponse } from '@core/helpers';
 import { translate } from '@lib/localization';
-import { Auth } from '@auth/auth';
+import { Auth } from '@api/auth/auth';
 const log = new Logger('CountriesRoutes');
 
 @Router('countries', {

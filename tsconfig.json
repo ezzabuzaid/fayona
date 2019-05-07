@@ -53,5 +53,6 @@
       "node",
       "jest"
     ]
-  }
+  },
+  "files": ["./src/main.ts"]
 }

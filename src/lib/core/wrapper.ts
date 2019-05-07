@@ -1,7 +1,9 @@
 import { RequestHandler } from "express";
-import { AppUtils } from '@core/utils';
-import { Router } from '@lib/methods';
-
+import { CountriesRoutes } from '@api/countries';
+import { UsersRouter } from '@api/users';
+import { AuthRoutes } from '@api/auth';
+import 'reflect-metadata';
+import { Injectable, Container } from '@decorators/di';
 export class Wrapper {
     private static list = [];
     //! #issue fix type any, the router should defined in RouterClass
@@ -56,6 +58,6 @@ export class Wrapper {
 
 }
 
-// Wrapper.registerRouter(UsersRoutes);
-// Wrapper.registerRouter(AuthRoutes);
-// Wrapper.registerRouter(CountriesRoutes);
+Wrapper.registerRouter(UsersRouter);
+Wrapper.registerRouter(AuthRoutes);
+Wrapper.registerRouter(CountriesRoutes);

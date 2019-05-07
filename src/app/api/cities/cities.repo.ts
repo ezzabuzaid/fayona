@@ -1,6 +1,6 @@
-import { CountriesModel, CitiesType } from './cities.model';
+import { CitiesModel, CitiesType } from './cities.model';
 
-export class CitiesRepo extends CountriesModel {
+export class CitiesRepo extends CitiesModel {
 
     static async entityExist(obj: Partial<CitiesType.Model>) {
         return this.fetchEntity(obj, {}, { lean: true });

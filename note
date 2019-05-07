@@ -25,4 +25,10 @@ SECTION DONE
 https://www.npmjs.com/package/injection-js
 
 web socket class
+
+   @Model('cities')
+    export class Schema {
+        @Attr({ required: true, unique: true, lowercase: true, trim: true }) name_ar: string;
+        }
+    }
         

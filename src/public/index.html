@@ -42,13 +42,13 @@
                 }]
             });
             chart.render();
-            wss.onmessage = (({ data }) => {
-                data = JSON.parse(data);
+            wss.onmessage = ((message) => {
+                console.log(message);
+                const data = JSON.parse(message.data);
                 const dataPoints = chart.options.data[0].dataPoints = [];
                 Object.keys(data).forEach(el => {
                     const value = data[el];
                     if (typeof value === 'number') {
-                        console.log({ el, value });
                         dataPoints.push({ y: value, label: el });
                     }
                 });

@@ -9,6 +9,5 @@ export class BaseSchema<T> extends MongooseSchema<T> {
             id: true,
             ...opt
         });
-        // this.loadClass(model);
     }
 }

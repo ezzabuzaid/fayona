@@ -1,6 +1,4 @@
-import { Wrapper } from "../lib/core/wrapper";
 import { Application } from "./app";
-import { ErrorHandling } from './core/helpers/errors';
 import { localization } from '@lib/localization';
 import { ServerLevel } from '@core/helpers';
 import { Server as httpServer } from 'http';
@@ -9,17 +7,11 @@ import { Logger } from "./core/utils/logger.service";
 import { URL } from 'url';
 import { Database } from '@core/database/database';
 import en from "@assets/languages/en.json";
-import dummyData from "@assets/data/local-air-quality.json";
-import WebSocket from 'ws';
-import path from 'path';
-import { envirnoment } from '@environment/env';
 import http = require('http');
+import { Injectable } from '@decorators/di';
 const log = new Logger('Server init');
 
-// import puppeteer from 'puppeteer';
-// interface Element { }
-// interface Node { }
-// interface NodeListOf<TNode = Node> { }
+@Injectable()
 export class Server extends Application {
         static LEVEL = ServerLevel.DEV;
         private port = +this.get('port');
@@ -37,27 +29,7 @@ export class Server extends Application {
                 return new Server(port);
         }
 
-        private resolverRouters() {
-                // SECTION routes resolving event
-                // REVIEW {ISSUE} GET api/test reject to api
-                this.application.use('/api', ...Wrapper.routerList, (req, res) => res.status(200).json({ work: '/API hitted' }));
-                // REVIEW {ISSUE} GET apis reject to "/ root"
-                this.application.use('/', (req, res) => {
-                        res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
-                });
-
-                // * catch favIcon request
-                this.application.use(ErrorHandling.favIcon);
-
-                // * Globally catch error
-                this.application.use(ErrorHandling.catchError);
-
-                // * catch not found error
-                this.application.use(ErrorHandling.notFound);
-
-        }
-
-        private constructor(port: number) {
+        constructor(port: number) {
                 super();
                 port && (this.port = port);
                 this.path = new URL(`http://${this.host}:${this.port}`)
@@ -76,7 +48,6 @@ export class Server extends Application {
          */
         private populateServer(): Promise<httpServer> {
                 return Promise.resolve<httpServer>(this.startServer(this.createServer()));
-                // return new Promise<httpServer>((resolve) => resolve(this.startServer(this.createServer())));
         }
 
         private createServer() {
@@ -103,40 +74,9 @@ export class Server extends Application {
          * 
          */
         private init() {
-                this.populateServer()
-                        .then(server => {
-                                const wss = new WebSocket.Server({ server });
-                                wss.on('connection', (ws: WebSocket) => {
-                                        const interval = setInterval(() => {
-                                                ws.send(JSON.stringify(dummyData[Math.floor(dummyData.length * Math.random())]));
-                                        }, 500);
-                                        ws.on('close', () => clearInterval(interval));
-                                        ws.on('error', () => clearInterval(interval));
-                                        // ws.on('message', (message: string) => {
-                                        //         console.log('received: %s', message);
-                                        // });
-                                });
-                                // puppeteer
-                                //         .launch().then((browser) => browser.newPage())
-                                //         .then((page) => {
-                                //                 page.goto('https://twitter.com/ezzabuzaid')
-                                //                 return page;
-                                //         })
-                                //         .then((page) => page.content())
-                                //         .then(function (html) {
-                                //                 log.warn();
-                                //         })
-                                //         .catch(function (err) {
-                                //                 //handle error
-                                //         });
-                                // AppUtils.getHtml('https://dev.tradehub.com/en/lp/workshops').then(console.log);
-
-                        });
-                Database.load();
-                this.resolverRouters();
+                Promise.all([this.populateServer(), Database.load(), this.populateRoutes()])
                 this.setupLocalization();
                 // refactor the "Reactor" class
-
                 appService.broadcast(null);
 
         }
@@ -171,12 +111,6 @@ export class Server extends Application {
 // to escape the next middleware call next('route')
 // will escape the all middleware but next() will continue to next middleware at specific point
 
-
-// This matching all route middleware under route instance (act as interceptor)
-// use router.all('*', requireAuthentication, loadUser);
-// or router.all('*', requireAuthentication)
-// router.all('*', loadUser);
-
 // This matching all route middleware under route instance and prefixed with api 
 // router.all('/api/*', requireAuthentication);
 
@@ -203,27 +137,3 @@ export class Server extends Application {
 //     console.log('and this matches too');
 //     res.end();
 // });
-
-
-// use the same route for crud operation
-// router.route('/users/:user_id')
-//     .all(function (req, res, next) {
-// runs for all HTTP verbs first
-// think of it as route specific middleware!
-//         next();
-//     })
-//     .get(function (req, res, next) {
-//         res.json(req.user);
-//     })
-//     .put(function (req, res, next) {
-//         // just an example of maybe updating the user
-//         req.user.name = req.params.name;
-//         // save user ... etc
-//         res.json(req.user);
-//     })
-//     .post(function (req, res, next) {
-//         next(new Error('not implemented'));
-//     })
-//     .delete(function (req, res, next) {
-//         next(new Error('not implemented'));
-//     });

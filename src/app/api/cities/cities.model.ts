@@ -44,4 +44,4 @@ export namespace CitiesType {
     }
 }
 
-export const CountriesModel = model<CitiesType.Model>(CitiesType.Schema.schemaName, new CitiesType.Schema());
+export const CitiesModel = model<CitiesType.Model>(CitiesType.Schema.schemaName, new CitiesType.Schema());

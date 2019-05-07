@@ -4,11 +4,11 @@ import { CitiesRepo } from './cities.repo';
 import { Logger } from '@core/utils';
 import { ErrorResponse, NetworkStatus, SuccessResponse } from '@core/helpers';
 import { translate } from '@lib/localization';
-import { Auth } from '@auth/auth';
+import { Auth } from '@api/auth/auth';
 import { CountriesRepo } from '@api/countries';
 const log = new Logger('CountriesRoutes');
 
-@Router('countries', {
+@Router('cities', {
     middleware: [Auth.isAuthenticated]
 })
 export class CitiesRoutes {

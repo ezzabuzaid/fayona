@@ -3,7 +3,7 @@ import { Post, Get, Put, Delete, Router } from '@lib/core';
 import { translate } from '@lib/localization';
 import { ErrorResponse, SuccessResponse, NetworkStatus } from '@core/helpers';
 import { UsersRepo } from './users.repo';
-import { Auth } from '@auth/auth';
+import { Auth } from '@api/auth/auth';
 
 import { Logger, AppUtils } from '@core/utils';
 import { ExpressRouter } from '@lib/core/express';

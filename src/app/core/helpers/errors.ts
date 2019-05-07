@@ -31,7 +31,6 @@ export class ErrorHandling {
                 response.code = NetworkStatus.BAD_REQUEST;
                 break;
         }
-        log.error(error.name);
         // production(() => {
         //     response.message = translate('internal_server_error');
         // });
