@@ -10,13 +10,13 @@ import { UsersRepo } from '@api/users';
 import { Auth } from './auth';
 const log = new Logger('Auth Router');
 
-@Router('/')
+@Router('/portal')
 export class AuthRoutes {
 
     constructor() { }
 
     @Post('login')
-    async login(req: Request, res: Response, next: NextFunction) {
+    async login(req: Request, res: Response) {
         const { username, password } = req.body;
         const currentUser = await UsersRepo.fetchEntity({ username });
         log.debug('Check if user exist');

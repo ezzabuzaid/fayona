@@ -18,7 +18,7 @@ export function Delete<T=any>(uri: string, ...middlewares: RequestHandler[]) {
         setTimeout(() => {
             //* a way fix path to router slashes
             //* join router path and get path
-            uri = AppUtils.joinPath(target.routeUri, '/', uri);
+            uri = AppUtils.joinPath(target.routeURI, '/', uri);
 
             //* assign the router
             instance.delete(uri, ErrorHandling.wrapRoute(...middlewares, function () {

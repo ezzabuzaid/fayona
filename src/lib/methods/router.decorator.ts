@@ -1,5 +1,5 @@
 import { Router as expressRouter } from 'express';
-import { RouterDecorationOption, RouterProperties } from '../typing';
+import { RouterDecorationOption, RouterProperties, IExpressRouter, IExpressInternal } from '../typing';
 import { AppUtils, Logger } from '@core/utils';
 import { ErrorHandling } from '@core/helpers';
 const log = new Logger('Router Decorator');
@@ -42,18 +42,20 @@ export function Router(uri: string, options: RouterDecorationOption = {}) {
         // const { instance } = routerClassinstance;
         // const { intercept } = instance;
         // if (!!intercept) {
-        //     //? fine a way to bind intercept method without init an instance of Router class 
+        //     //? fine a way tconstructoro bind intercept method without init an instance of Router class 
         //     router.all(`${routerPath}*`, ...(options.middleware || []), intercept.bind(instance));
         // }
         // //* retrun the created instance mean it will not be able to create another one
         // ! #issue {two} because of the #issue {one} we return the instance and the result will be as discused there
         // return instance;
-        // constructor.prototype = ;
-        return class extends constructor {
+        return class extends constructor implements IExpressInternal {
             constructor(...args) {
                 super(...args);
-                return router;
+            }
+            __router() {
+                return { router, id, uri };
             }
         }
     }
 }
+

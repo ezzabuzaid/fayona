@@ -1,13 +1,22 @@
 import setPrototypeOf = require('setprototypeof');
 import { randomBytes } from 'crypto';
 import axios from 'axios';
+
+export interface Type<T> extends Function {
+    new(...args: any[]): T;
+}
 export class AppUtils {
     static setPrototypeOf(constructor: object, superConstructor: object) {
-        setPrototypeOf(constructor, superConstructor);
+        const fn = Object.setPrototypeOf || setPrototypeOf;
+        fn(constructor, superConstructor);
     }
 
-    static getPrototypeOf(constructor: object) {
+    static getPrototypeOf<T>(constructor): Type<T> {
         return Object.getPrototypeOf(constructor);
+    }
+
+    static getTypeOf<T>(constructor): Type<T> {
+        return this.getPrototypeOf<T>(constructor).constructor as any;
     }
 
     static cloneObject(obj) {
@@ -20,7 +29,7 @@ export class AppUtils {
     }
 
     static defineProperty(prototype: object, propertyKey: string, options: PropertyDescriptor) {
-        Object.defineProperty(prototype, propertyKey, {
+        return Object.defineProperty(prototype, propertyKey, {
             enumerable: false, // cannot show in keys and for in
             configurable: false // the settings cannot be changed anymore
             , ...options

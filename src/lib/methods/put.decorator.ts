@@ -17,7 +17,7 @@ export function Put<T=any>(uri: string, ...middlewares: RequestHandler[]) {
         setTimeout(() => {
             //* a way fix path to router slashes
             //* join router path and get path
-            uri = AppUtils.joinPath(target.routeUri, '/', uri);
+            uri = AppUtils.joinPath(target.uri, '/', uri);
 
             //* assign the router
             target.put(uri, ErrorHandling.wrapRoute(...middlewares, function () {

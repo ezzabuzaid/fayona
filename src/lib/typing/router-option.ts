@@ -3,13 +3,22 @@ import { RequestHandlerParams } from 'express-serve-static-core';
 
 
 export interface RouterDecorationOption extends RouterOptions {
-    middleware?:  RequestHandler[] | RequestHandlerParams[]
+    middleware?: RequestHandler[] | RequestHandlerParams[]
 }
 
 export enum RouterProperties {
-    RoutesPath = 'routeUri',
+    RoutesPath = 'uri',
     ID = 'id',
 }
 
-export type RouterMethodDecorator = Router & { routeUri: string }
+export type RouterMethodDecorator = Router & { uri: string };
 
+export interface IExpressRouter {
+    router: RequestHandler;
+    id: string;
+    uri: string;
+}
+
+export interface IExpressInternal {
+    __router: () => IExpressRouter;
+}

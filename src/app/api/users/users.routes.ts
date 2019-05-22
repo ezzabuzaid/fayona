@@ -4,9 +4,7 @@ import { translate } from '@lib/localization';
 import { ErrorResponse, SuccessResponse, NetworkStatus } from '@core/helpers';
 import { UsersRepo } from './users.repo';
 import { Auth } from '@api/auth/auth';
-
 import { Logger, AppUtils } from '@core/utils';
-import { ExpressRouter } from '@lib/core/express';
 const log = new Logger('User Router');
 @Router('users', {
     middleware: []

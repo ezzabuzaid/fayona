@@ -1,6 +1,5 @@
 import { Application } from "./app";
 import { localization } from '@lib/localization';
-import { ServerLevel } from '@core/helpers';
 import { Server as httpServer } from 'http';
 import { appService } from './core';
 import { Logger } from "./core/utils/logger.service";
@@ -9,11 +8,12 @@ import { Database } from '@core/database/database';
 import en from "@assets/languages/en.json";
 import http = require('http');
 import { Injectable } from '@decorators/di';
+import { envirnoment, EnvirnomentStages } from '@environment/env';
+import { stage } from '@core/helpers';
 const log = new Logger('Server init');
-
 @Injectable()
 export class Server extends Application {
-        static LEVEL = ServerLevel.DEV;
+        static LEVEL = null;
         private port = +this.get('port');
         private host = this.get('host');
         public path: URL = null;
@@ -22,14 +22,16 @@ export class Server extends Application {
          * Invoke this method to start the server
          * @param port server port
          */
-        static bootstrap(port: number): Server {
+        static bootstrap(port: number, level: EnvirnomentStages): Server {
                 // SECTION server init event
                 // return Promise.resolve();
                 log.debug('Start boostrapping server');
-                return new Server(port);
+                envirnoment.load(level);
+                Server.LEVEL = level;
+                return new Server(port, level);
         }
 
-        constructor(port: number) {
+        private constructor(port: number, level) {
                 super();
                 port && (this.port = port);
                 this.path = new URL(`http://${this.host}:${this.port}`)
@@ -74,7 +76,12 @@ export class Server extends Application {
          * 
          */
         private init() {
-                Promise.all([this.populateServer(), Database.load(), this.populateRoutes()])
+                const { MONGO_USER: user, MONGO_PASSWORD: password, MONGO_PATH: path, MONGO_HOST: host } = envirnoment.env;
+                Promise.all([
+                        this.populateServer(),
+                        Database.load({ user, password, path, host, atlas: false }),
+                        this.populateRoutes()
+                ]);
                 this.setupLocalization();
                 // refactor the "Reactor" class
                 appService.broadcast(null);

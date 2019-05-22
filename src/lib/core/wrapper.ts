@@ -1,9 +1,12 @@
-import { RequestHandler } from "express";
+import { RequestHandler, Router } from "express";
 import { CountriesRoutes } from '@api/countries';
 import { UsersRouter } from '@api/users';
 import { AuthRoutes } from '@api/auth';
+import { AuthorsRoutes } from '@api/authors';
+import { BooksRoutes } from '@api/books';
 import 'reflect-metadata';
 import { Injectable, Container } from '@decorators/di';
+import { IExpressRouter, IExpressInternal } from '@lib/typing';
 export class Wrapper {
     private static list = [];
     //! #issue fix type any, the router should defined in RouterClass
@@ -20,13 +23,14 @@ export class Wrapper {
         }
     }
 
-    private static wrapRouter(Router) {
+    private static wrapRouter(Router: new () => IExpressInternal) {
         try {
             const router = new Router;
-            if (!router.id) {
+            const instance = router.__router();
+            if (!instance.id) {
                 new Error('please consider add @Router to the top of class');
             }
-            this.list.push(router);
+            this.list.push(instance);
         } catch (error) {
             new Error('The provided router is not constructor');
         }
@@ -42,7 +46,7 @@ export class Wrapper {
         parentRouter.use(superRouter.routesPath, subRouter.router);
     }
 
-    static get routerList(): RequestHandler[] {
+    static get routerList(): IExpressRouter[] {
         return this.list;
     }
 
@@ -58,6 +62,8 @@ export class Wrapper {
 
 }
 
-Wrapper.registerRouter(UsersRouter);
+// Wrapper.registerRouter(UsersRouter);
 Wrapper.registerRouter(AuthRoutes);
 Wrapper.registerRouter(CountriesRoutes);
+Wrapper.registerRouter(AuthorsRoutes);
+Wrapper.registerRouter(BooksRoutes);

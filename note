@@ -1,6 +1,7 @@
 2_ use dependency injection to resolve mongoose models
 32_ Mongoose Query Helpers
 33_ use mongoose plugin to retrive name depend on user language
+
 REVIEW Features
 1_ eleminate register mutiple router to the same app or router instance
 
@@ -9,6 +10,7 @@ TODO
 2_ Work in group logger | IGNORE
 7_ read all files to get the string in translate function and auto export it to json file
 8_ refresh token
+9_ curd generator
 
 SECTION IMPORTANT
 1_ an application instance not allowed to be accesses, just in server class
@@ -23,12 +25,4 @@ SECTION DONE
 4_ wrap router and register it in app instance
 
 https://www.npmjs.com/package/injection-js
-
 web socket class
-
-   @Model('cities')
-    export class Schema {
-        @Attr({ required: true, unique: true, lowercase: true, trim: true }) name_ar: string;
-        }
-    }
-        

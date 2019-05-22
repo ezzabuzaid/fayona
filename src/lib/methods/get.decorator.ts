@@ -19,7 +19,7 @@ export function Get(uri: string, ...middlewares: RequestHandler[]): any {
         setTimeout(() => {
             //* a way fix path to router slashes
             //* join router path and get path
-            uri = AppUtils.joinPath(target.routeUri, '/', uri);
+            uri = AppUtils.joinPath(target.routeURI, '/', uri);
 
             //* assign the router
             target.get(uri, ErrorHandling.wrapRoute(...middlewares, function () {

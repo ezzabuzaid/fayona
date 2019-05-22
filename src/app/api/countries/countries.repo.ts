@@ -1,26 +1,24 @@
-import { CountriesModel, CountriesType } from './countries.model';
-import { UsersType } from '@api/users';
-import { Mongoose } from 'mongoose';
+import { CountriesModel } from './countries.model';
 
 export class CountriesRepo extends CountriesModel {
 
-    static async entityExist(obj: Partial<CountriesType.Model>) {
+    static entityExist(obj: Partial<CountriesModel>) {
         return this.fetchEntity(obj, {}, { lean: true });
     }
 
-    static createEntity(obj: CountriesType.Model) {
-        return (new CountriesRepo(obj)).save()
+    static createEntity(obj: Partial<CountriesModel>) {
+        return (new CountriesModel(obj)).save()
     }
 
-    static fetchEntities(obj: Partial<CountriesType.Model> = {}) {
+    static fetchEntities(obj: Partial<CountriesModel> = {}) {
         return this.find(obj);
     }
 
-    static fetchEntity(obj: Partial<CountriesType.Model>, ...args) {
+    static fetchEntity(obj: Partial<CountriesModel>, ...args) {
         return this.findOne(obj, ...args);
     }
 
-    static deleteEntity(obj: Partial<CountriesType.Model>) {
+    static deleteEntity(obj: Partial<CountriesModel>) {
         // obj must be of type user
         return this.findOneAndDelete(obj);
     }

@@ -14,6 +14,7 @@ function copyFile(file, directory) {
 };
 
 spawnSync('tsc', { shell: true });
+
 const pwd = process.cwd();
 copyFile(
     path.join(pwd, 'src/environment/.env.dev'),

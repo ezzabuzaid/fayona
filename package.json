@@ -6,7 +6,7 @@
   "scripts": {
     "snyk": "snyk test",
     "test": "jest",
-    "build": "node ./build.js",
+    "build": "gulp --env=prod",
     "dev": "ts-node -r tsconfig-paths/register ./src/main.ts",
     "watch:dev": "nodemon -e ts -w ./src -x npm run dev",
     "watch:prod": "node -r ./tsconfig-paths-bootstrap.js ./dist/main.js",
@@ -20,6 +20,7 @@
   "license": "ISC",
   "dependencies": {
     "@decorators/di": "^1.0.2",
+    "@sentry/node": "^5.2.0",
     "@types/bcrypt": "^3.0.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/cheerio": "^0.22.11",
@@ -62,18 +63,25 @@
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
+    "@types/commander": "^2.12.2",
     "@types/dotenv": "^6.1.0",
     "@types/express": "^4.16.1",
+    "@types/gulp-copy": "0.0.4",
+    "@types/gulp-shell": "0.0.31",
     "@types/jest": "^23.3.13",
     "@types/mongodb": "^3.1.22",
     "@types/mongoose": "^5.3.23",
     "@types/morgan": "^1.7.35",
     "@types/node": "^10.14.4",
+    "@types/yargs": "^13.0.0",
     "browserify": "^16.2.3",
+    "commander": "^2.20.0",
     "gulp": "^4.0.0",
     "gulp-apidoc-swagger": "^0.2.2",
     "gulp-concat": "^2.6.1",
+    "gulp-copy": "^4.0.1",
     "gulp-minify": "^3.1.0",
+    "gulp-shell": "^0.7.0",
     "gulp-typescript": "^5.0.1",
     "gulp-uglify-es": "^1.0.4",
     "gulp-util": "^3.0.8",
@@ -87,6 +95,7 @@
     "ts-node-dev": "^1.0.0-pre.32",
     "tsify": "^4.0.1",
     "tslint": "^5.14.0",
-    "vinyl-source-stream": "^2.0.0"
+    "vinyl-source-stream": "^2.0.0",
+    "yargs": "^13.2.4"
   }
 }
