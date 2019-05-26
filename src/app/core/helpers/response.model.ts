@@ -1,4 +1,4 @@
-import { NetworkStatus } from '../../core/helpers/network-status';
+import { NetworkStatus } from '@core/helpers/network-status';
 
 abstract class Response extends Error {
     status: string;

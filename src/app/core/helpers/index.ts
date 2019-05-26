@@ -1,4 +1,4 @@
-export * from '../../shared/models/response.model';
+export * from './response.model';
 export * from './hash';
 export * from './errors';
 export * from './stages';

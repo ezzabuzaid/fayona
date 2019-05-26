@@ -3,8 +3,11 @@ import { randomBytes } from 'crypto';
 import axios from 'axios';
 
 export interface Type<T> extends Function {
-    new(...args: any[]): T;
+    new(...args: any): T;
 }
+
+export type Parameter<T extends (args: any) => any> = T extends (args: infer P) => any ? P : never;
+
 export class AppUtils {
     static setPrototypeOf(constructor: object, superConstructor: object) {
         const fn = Object.setPrototypeOf || setPrototypeOf;
@@ -58,14 +61,7 @@ export class AppUtils {
     static methods(object) {
         return Object.keys(object).filter(el => typeof object[el].value === 'function');
     }
-
-    // For schema decorator
-    static Schema(name) {
-        return function <T extends new (...args: any[]) => any>(constructor: T) {
-            return class { }
-        }
-    }
-
+    
     static removeKey(key, obj) {
         const { [key]: foo, ...rest } = obj;
         return rest;
@@ -85,7 +81,7 @@ export class AppUtils {
     }
 }
 
-//* Utility class to be extended, so when you call build it will construct an instance from that class
+// NOTE  Utility class to be extended, so when you call build it will construct an instance from that class
 export class Singelton {
     private static instance = null;
     static build() {

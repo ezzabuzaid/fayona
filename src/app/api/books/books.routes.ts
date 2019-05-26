@@ -1,18 +1,19 @@
-import { Router, Post, Get, Put, Delete } from "@lib/core";
+import { Router, Post, Get, Put, Delete } from "@lib/methods";
 import { Request, Response } from 'express';
 import { Logger } from '@core/utils';
 import { ErrorResponse, NetworkStatus, SuccessResponse } from '@core/helpers';
 import { translate } from '@lib/localization';
-import { Auth } from '@api/auth/auth';
 import { BooksRepo } from './books.repo';
 import { AuthorsRepo } from '@api/authors';
 const log = new Logger('CountriesRoutes');
+
 
 @Router('books')
 export class BooksRoutes {
     @Post('/')
     async createBook(req: Request, res: Response) {
         const { name_ar, name_en, rate, image, author_id } = req.body;
+
 
         const entityExist = await BooksRepo.entityExist({ name_en });
         if (entityExist) {
@@ -93,3 +94,5 @@ export class BooksRoutes {
 
     authorBooks() { }
 }
+
+

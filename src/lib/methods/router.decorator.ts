@@ -1,15 +1,17 @@
 import { Router as expressRouter } from 'express';
-import { RouterDecorationOption, RouterProperties, IExpressRouter, IExpressInternal } from '../typing';
 import { AppUtils, Logger } from '@core/utils';
 import { ErrorHandling } from '@core/helpers';
+import { RouterDecorationOption, RouterProperties, IExpressInternal } from './method-types';
 const log = new Logger('Router Decorator');
+import path = require('path');
 
 export function Router(uri: string, options: RouterDecorationOption = {}) {
     return function <T extends new (...args: any[]) => any>(constructor: T) {
         // NOTE  a way to fix path to router slashes
-        uri = AppUtils.joinPath(uri);
         const { prototype } = constructor;
         const router = expressRouter(options);
+        const _uri = path.normalize(path.join('/', uri, '/'));
+
         // NOTE  extend router        
         const routerPrototype = AppUtils.getPrototypeOf(router);
         for (const i in routerPrototype) {
@@ -17,7 +19,7 @@ export function Router(uri: string, options: RouterDecorationOption = {}) {
         }
 
         if (options.middleware && options.middleware.length) {
-            router.use(`${uri}`, ErrorHandling.wrapRoute(...options.middleware));
+            router.use(`${_uri}`, ErrorHandling.wrapRoute(...options.middleware));
         }
 
         //* define getter for router instance
@@ -26,7 +28,7 @@ export function Router(uri: string, options: RouterDecorationOption = {}) {
 
         //* the controller router | base path for router class
         //* all routes will be under this path
-        AppUtils.defineProperty(prototype, RouterProperties.RoutesPath, { get() { return uri } });
+        AppUtils.defineProperty(prototype, RouterProperties.RoutesPath, { get() { return _uri } });
 
         //* mark a class with id
         const id = AppUtils.generateHash();
@@ -53,7 +55,7 @@ export function Router(uri: string, options: RouterDecorationOption = {}) {
                 super(...args);
             }
             __router() {
-                return { router, id, uri };
+                return { router, id, uri: _uri };
             }
         }
     }

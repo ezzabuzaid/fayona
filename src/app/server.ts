@@ -1,43 +1,49 @@
 import { Application } from "./app";
 import { localization } from '@lib/localization';
 import { Server as httpServer } from 'http';
-import { appService } from './core';
 import { Logger } from "./core/utils/logger.service";
 import { URL } from 'url';
 import { Database } from '@core/database/database';
+import { envirnoment, EnvirnomentStages } from '@environment/env';
 import en from "@assets/languages/en.json";
 import http = require('http');
-import { Injectable } from '@decorators/di';
-import { envirnoment, EnvirnomentStages } from '@environment/env';
 import { stage } from '@core/helpers';
 const log = new Logger('Server init');
-@Injectable()
 export class Server extends Application {
-        static LEVEL = null;
-        private port = +this.get('port');
-        private host = this.get('host');
+        public static LEVEL = null;
+        private port = +envirnoment.get('PORT') || 8080;
+        private host = envirnoment.get('HOST') || 'localhost';
         public path: URL = null;
 
         /**
          * Invoke this method to start the server
          * @param port server port
          */
-        static bootstrap(port: number, level: EnvirnomentStages): Server {
+        static bootstrap(level: EnvirnomentStages): Server {
                 // SECTION server init event
-                // return Promise.resolve();
                 log.debug('Start boostrapping server');
                 envirnoment.load(level);
+                stage.LEVEL = level;
                 Server.LEVEL = level;
-                return new Server(port, level);
+                return new Server();
         }
 
-        private constructor(port: number, level) {
+        static test() {
+                log.debug('Start Testing');
+                const level = EnvirnomentStages.TEST;
+                envirnoment.load(level);
+                stage.LEVEL = level;
+                Server.LEVEL = level;
+                return new Server();
+        }
+
+
+        private constructor() {
                 super();
-                port && (this.port = port);
                 this.path = new URL(`http://${this.host}:${this.port}`)
                 try {
                         this.init();
-
+                        !stage.testing && this.populateServer();
                 } catch (error) {
                         throw new Error('Faild to init the server');
                 }
@@ -49,6 +55,7 @@ export class Server extends Application {
          * @returns {Promise<httpServer>} 
          */
         private populateServer(): Promise<httpServer> {
+                log.warn('stage.LEVEL => ', stage.LEVEL);
                 return Promise.resolve<httpServer>(this.startServer(this.createServer()));
         }
 
@@ -77,14 +84,9 @@ export class Server extends Application {
          */
         private init() {
                 const { MONGO_USER: user, MONGO_PASSWORD: password, MONGO_PATH: path, MONGO_HOST: host } = envirnoment.env;
-                Promise.all([
-                        this.populateServer(),
-                        Database.load({ user, password, path, host, atlas: false }),
-                        this.populateRoutes()
-                ]);
+                Database.load({ user, password, path, host, atlas: false })
+                this.populateRoutes()
                 this.setupLocalization();
-                // refactor the "Reactor" class
-                appService.broadcast(null);
 
         }
 }

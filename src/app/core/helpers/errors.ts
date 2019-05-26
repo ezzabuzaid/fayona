@@ -13,12 +13,13 @@ export enum Errors {
     ErrorResponse = 'ErrorResponse',
     SuccessResponse = 'SuccessResponse',
     JsonWebTokenError = 'JsonWebTokenError',
-    ValidationError = 'ValidationError'
+    ValidationError = 'ValidationError',
+    ENOENT = ''
 }
 
 export class ErrorHandling {
     static catchError(error: any, req: Request, res: Response, next: NextFunction): ErrorRequestHandler {
-        const response = new ErrorResponse(error.message, error.code || NetworkStatus.INTERNAL_SERVER_ERROR);
+        const response = new ErrorResponse(error.message, isNaN(error.code) ? NetworkStatus.INTERNAL_SERVER_ERROR : error.code);
         switch (error.name) {
             case Errors.CastError:
                 // FIXME  error accoured when try to use with id mongoose method and the id is undefined usually when you get the id from the req.params.id

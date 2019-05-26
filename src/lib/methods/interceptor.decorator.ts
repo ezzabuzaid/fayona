@@ -1,4 +1,4 @@
-import { RouterMethodDecorator } from '../typing';
+import { RouterMethodDecorator } from './method-types';
 import { ErrorHandling } from '@core/helpers';
 
 export function Intercept() {

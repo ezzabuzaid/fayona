@@ -1,15 +1,14 @@
-import { Router, Post, Get, Put, Delete } from "@lib/core";
+import { Router, Post, Get, Put, Delete } from "@lib/methods";
 import { Request, Response } from 'express';
 import { CountriesRepo } from './countries.repo';
 
 import { Logger } from '@core/utils';
 import { ErrorResponse, NetworkStatus, SuccessResponse } from '@core/helpers';
 import { translate } from '@lib/localization';
-import { Auth } from '@api/auth/auth';
+import { Auth } from '@api/portal/auth';
 const log = new Logger('CountriesRoutes');
 
-@Router('/countries', {
-})
+@Router('countries')
 export class CountriesRoutes {
 
     constructor() { }
@@ -61,14 +60,14 @@ export class CountriesRoutes {
         res.status(response.code).json(response);
     }
 
-    @Get('/')
+    @Get('')
     async fetchCountries(req: Request, res: Response) {
         const entites = await CountriesRepo.fetchEntities();
         const response = new SuccessResponse(entites, translate('success'), NetworkStatus.OK);
         res.status(response.code).json(response);
     }
 
-    @Get('/:id')
+    @Get(':id')
     async fetchCountry(req: Request, res: Response) {
         const { id } = req.params;
         const entity = await CountriesRepo.fetchEntity({ _id: id }, {}, { lean: true });

@@ -1,6 +1,5 @@
 import { Logger } from '@core/utils';
 import bcrypt = require('bcryptjs')
-import { ErrorResponse } from '../../shared/models/response.model';
 
 // extends the bcrypt
 const log = new Logger('Hash service');

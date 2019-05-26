@@ -26,3 +26,11 @@ SECTION DONE
 
 https://www.npmjs.com/package/injection-js
 web socket class
+
+
+in model class use constructor to execute the default options for all field constructor(){super({ required: true })}
+
+use http://www.hygen.io/create style for documention section
+
+
+Refactor the "Reactor" class to work with event

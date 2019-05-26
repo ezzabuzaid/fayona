@@ -1,12 +1,9 @@
-import { RequestHandler, Router } from "express";
 import { CountriesRoutes } from '@api/countries';
-import { UsersRouter } from '@api/users';
-import { AuthRoutes } from '@api/auth';
-import { AuthorsRoutes } from '@api/authors';
-import { BooksRoutes } from '@api/books';
+import { AuthRoutes } from '@api/portal';
+import { AuthorsRoutes } from '@api/authors/authors.routes';
+// import { BooksRoutes } from '@api/books';
 import 'reflect-metadata';
-import { Injectable, Container } from '@decorators/di';
-import { IExpressRouter, IExpressInternal } from '@lib/typing';
+import { IExpressInternal, IExpressRouter } from '@lib/methods';
 export class Wrapper {
     private static list = [];
     //! #issue fix type any, the router should defined in RouterClass
@@ -66,4 +63,4 @@ export class Wrapper {
 Wrapper.registerRouter(AuthRoutes);
 Wrapper.registerRouter(CountriesRoutes);
 Wrapper.registerRouter(AuthorsRoutes);
-Wrapper.registerRouter(BooksRoutes);
+// Wrapper.registerRouter(BooksRoutes);

@@ -1,15 +1,14 @@
-import { Router, Post, Get, Put, Delete } from "@lib/core";
+import { Router, Post, Get, Put, Delete } from "@lib/methods";
 import { Request, Response } from 'express';
 import { AuthorsRepo } from './authors.repo';
 import { Logger } from '@core/utils';
 import { ErrorResponse, NetworkStatus, SuccessResponse } from '@core/helpers';
 import { translate } from '@lib/localization';
-import { Auth } from '@api/auth';
+
 const log = new Logger('AuthorsRoutes');
 
 @Router('authors')
 export class AuthorsRoutes {
-
     @Post('/')
     async createAuthor(req: Request, res: Response) {
         const { name_ar, name_en, image, description } = req.body;
@@ -27,7 +26,7 @@ export class AuthorsRoutes {
         res.status(response.code).json(response);
     }
 
-    @Put('/:id')
+    @Put(':id')
     async updateAuthor(req: Request, res: Response) {
         const { id } = req.params;
         const entity = await AuthorsRepo.fetchEntity({ _id: id });
@@ -44,7 +43,7 @@ export class AuthorsRoutes {
         res.status(response.code).json(response);
     }
 
-    @Delete('/:id')
+    @Delete(':id')
     async deleteAuthor(req: Request, res: Response) {
         const { id } = req.params;
         const entity = await AuthorsRepo.deleteEntity({ _id: id });
@@ -64,7 +63,7 @@ export class AuthorsRoutes {
         res.status(response.code).json(response);
     }
 
-    @Get('/:id')
+    @Get(':id')
     async fetchAuthor(req: Request, res: Response) {
         const { id } = req.params;
         const entity = await AuthorsRepo.fetchEntity({ _id: id }, {}, { lean: true });

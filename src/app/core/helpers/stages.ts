@@ -1,51 +1,49 @@
-
-import { Server } from 'app/server';
 import { EnvirnomentStages } from '@environment/env';
-// export enum EnvirnomentStages {
-//     OFF = 0,
-//     DEV,
-//     TEST,
-//     PROD
-// }
 
-class _Stage {
+class Stage {
+    private _level = null;
+
     get LEVEL() {
-        return Server.LEVEL
+        return this._level
+    }
+
+    set LEVEL(value) {
+        this._level = value
     }
 
     get development() {
-        return EnvirnomentStages.DEV <= this.LEVEL;
+        return EnvirnomentStages.DEV === this.LEVEL;
     }
 
     get production() {
-        return EnvirnomentStages.PROD <= this.LEVEL;
+        return EnvirnomentStages.PROD === this.LEVEL;
     }
 
     get testing() {
-        return EnvirnomentStages.TEST <= this.LEVEL;
+        return EnvirnomentStages.TEST === this.LEVEL;
     }
 
     test(stage: EnvirnomentStages, cb: Function) {
-        if (stage === Server.LEVEL) {
+        if (stage === this.LEVEL) {
             cb();
         }
     }
 }
-export const stage = new _Stage;
+export const stage = new Stage;
 
-// REMOVE
+// FIXME REMOVE
 export function development(cb: Function) {
     if (stage.development) {
         cb();
     }
 }
-// REMOVE
+// FIXME REMOVE
 export function production(cb: Function) {
     if (stage.production) {
         cb();
     }
 }
-// REMOVE
+// FIXME REMOVE
 export function testing(cb: Function) {
     if (stage.testing) {
         cb();

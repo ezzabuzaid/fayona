@@ -11,7 +11,7 @@
     "downlevelIteration": true,
     "strict": false,
     "moduleResolution": "node",
-    "baseUrl": "./src/",
+    "baseUrl": "src",
     "noImplicitReturns": false,
     "noUnusedLocals": false,
     "sourceMap": false,

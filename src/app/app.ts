@@ -5,10 +5,8 @@ import helmet = require('helmet');
 import Sentry = require('@sentry/node')
 import path from 'path';
 import { Logger } from '@core/utils';
-import { envirnoment, EnvirnomentStages } from '@environment/env';
-import { Wrapper } from '@lib/core';
+import { Wrapper } from '@core/wrapper';
 import { ErrorHandling, production, stage } from '@core/helpers';
-import { RouterProperties } from '@lib/typing';
 const log = new Logger('Application instance');
 
 // Stage.tests(StageLevel.DEV, () => {
@@ -17,13 +15,11 @@ const log = new Logger('Application instance');
 
 export class Application {
     private _application = express();
+    private staticDirectory = path.join(process.cwd(), 'src', 'public');
+    private uploadDirectory = path.join(process.cwd(), 'uploads');
     constructor() {
         this.configure();
         this.allowCors();
-        stage.test(EnvirnomentStages.DEV, () => {
-            this.set('host', envirnoment.get('HOST') || 'localhost');
-        });
-        this.set('port', envirnoment.get('PORT') || 8080);
     }
 
     get application() {
@@ -53,7 +49,9 @@ export class Application {
             .use(express.urlencoded({ extended: true }))
             .use(morgan('dev'))
             .use(helmet())
-            .use(compression());
+            .use(compression())
+            .use(express.static(this.staticDirectory))
+            .use(express.static(this.uploadDirectory));
 
         production(() => {
             this.application
@@ -66,10 +64,11 @@ export class Application {
         return new Promise((resolve) => {
             // SECTION routes resolving event
             Wrapper.routerList.forEach(({ router, uri }) => {
-                this.application.use(`/api${uri}`, router);
+                this.application.use(path.join('/api', uri), router);
             });
             this.application.get('/api', (req, res) => res.status(200).json({ work: '/API hitted' }));
-            this.application.get('/', (req, res) => res.sendFile(path.join(process.cwd(), 'public', 'index.html')));
+            this.application.get('/', (req, res) => res.sendFile('index.html'));
+
             // * catch favIcon request
             this.application.use(ErrorHandling.favIcon);
 
@@ -93,3 +92,4 @@ export class Application {
 }
 
 // TODO add lusca lib
+
