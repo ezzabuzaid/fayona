@@ -6,6 +6,6 @@ const pwd = process.cwd();
 const NAME = 'copy';
 exports.name = NAME;
 exports.func = gulp.task(NAME, () => {
-    gulp.src(path.join(pwd, `src/environment/.env.${env}`))
+    return gulp.src(path.join(pwd, `src/environment/.env.${env}`))
         .pipe(gulp.dest(path.join(pwd, './dist/environment')));
 });
