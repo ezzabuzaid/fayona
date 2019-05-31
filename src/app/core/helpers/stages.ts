@@ -1,4 +1,8 @@
-import { EnvirnomentStages } from '@environment/env';
+export enum StageLevel {
+    DEV = 'dev',
+    TEST = 'test',
+    PROD = 'prod'
+}
 
 class Stage {
     private _level = null;
@@ -12,18 +16,18 @@ class Stage {
     }
 
     get development() {
-        return EnvirnomentStages.DEV === this.LEVEL;
+        return StageLevel.DEV === this.LEVEL;
     }
 
     get production() {
-        return EnvirnomentStages.PROD === this.LEVEL;
+        return StageLevel.PROD === this.LEVEL;
     }
 
     get testing() {
-        return EnvirnomentStages.TEST === this.LEVEL;
+        return StageLevel.TEST === this.LEVEL;
     }
 
-    test(stage: EnvirnomentStages, cb: Function) {
+    test(stage: StageLevel, cb: Function) {
         if (stage === this.LEVEL) {
             cb();
         }

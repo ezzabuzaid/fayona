@@ -1,6 +1,6 @@
 import { Local } from './local';
 import { LocalizationService } from './localization.service';
-import { development } from '@core/helpers';
+import { StageLevel, stage } from '@core/helpers';
 
 import { Logger } from '@core/utils';
 const log = new Logger('Localization Class');
@@ -23,13 +23,11 @@ class Localization extends LocalizationService {
     add(name: string, local: object): Local {
         // if there's already throw an error in dev mode
 
-        development(
-            () => {
-                if (this.get(name)) {
-                    throw new Error(`Local ${name} is already exist`);
-                }
+        stage.test(StageLevel.DEV, () => {
+            if (this.get(name)) {
+                throw new Error(`Local ${name} is already exist`);
             }
-        )
+        });
 
         // create a new local
         const newLocal = new Local(name, local);

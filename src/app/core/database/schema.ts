@@ -4,6 +4,7 @@ export class BaseSchema<T> extends MongooseSchema<T> {
         super(def, {
             timestamps: true,
             skipVersioning: true,
+            versionKey: false,
             useNestedStrict: true,
             strict: true,
             id: true,

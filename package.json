@@ -5,7 +5,8 @@
   "main": "main.ts",
   "scripts": {
     "snyk": "snyk test",
-    "test": "jest",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch --runInBand",
     "build": "gulp --env=prod",
     "dev": "ts-node -r tsconfig-paths/register ./src/main.ts",
     "watch:dev": "nodemon -e ts -w ./src -x npm run dev",
@@ -17,6 +18,12 @@
   "engines": {
     "node": "10.15.1"
   },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "licenses": [
+    {}
+  ],
   "license": "ISC",
   "dependencies": {
     "@decorators/di": "^1.0.2",
@@ -43,6 +50,7 @@
     "compression": "^1.7.4",
     "del": "^3.0.0",
     "dotenv": "^6.2.0",
+    "etl": "^0.5.23",
     "eventemitter3": "^3.1.0",
     "express": "^4.16.4",
     "express-validator": "^5.3.1",

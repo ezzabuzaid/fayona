@@ -1,10 +1,11 @@
 import { config as envConfig } from "dotenv";
 import { join, posix } from 'path';
 import { Logger } from '@core/utils';
+import { StageLevel } from '@core/helpers';
 const log = new Logger('Envirnoment Class');
 
 class Envirnoment {
-    load(state = EnvirnomentStages.DEV) {
+    load(state = StageLevel.DEV) {
         const { error, parsed } = envConfig({ path: join(__dirname, `.env.${state}`) });
         if (error) {
             log.debug(error);
@@ -31,9 +32,5 @@ class Envirnoment {
     }
 
 }
-export enum EnvirnomentStages {
-    DEV = 'dev',
-    TEST = 'test',
-    PROD = 'prod'
-}
+
 export const envirnoment = new Envirnoment;

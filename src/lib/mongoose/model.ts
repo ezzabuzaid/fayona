@@ -1,5 +1,8 @@
 import { model, Document } from 'mongoose';
 
-export const BaseModel = (function BaseModel() {
-    return model<Document>('', {} as any);
-})();
+export function BaseModel<T>(schemaClass) {
+    const { wrapper }: any = schemaClass;
+    return model<T & Document>(wrapper.name, wrapper.schema);
+}
+
+

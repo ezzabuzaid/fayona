@@ -13,8 +13,7 @@ export enum Errors {
     ErrorResponse = 'ErrorResponse',
     SuccessResponse = 'SuccessResponse',
     JsonWebTokenError = 'JsonWebTokenError',
-    ValidationError = 'ValidationError',
-    ENOENT = ''
+    ValidationError = 'ValidationError'
 }
 
 export class ErrorHandling {

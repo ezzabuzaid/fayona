@@ -2,6 +2,8 @@ import { Router as expressRouter } from 'express';
 import { AppUtils, Logger } from '@core/utils';
 import { ErrorHandling } from '@core/helpers';
 import { RouterDecorationOption, RouterProperties, IExpressInternal } from './method-types';
+import 'reflect-metadata'
+
 const log = new Logger('Router Decorator');
 import path = require('path');
 
@@ -11,7 +13,6 @@ export function Router(uri: string, options: RouterDecorationOption = {}) {
         const { prototype } = constructor;
         const router = expressRouter(options);
         const _uri = path.normalize(path.join('/', uri, '/'));
-
         // NOTE  extend router        
         const routerPrototype = AppUtils.getPrototypeOf(router);
         for (const i in routerPrototype) {
@@ -33,6 +34,7 @@ export function Router(uri: string, options: RouterDecorationOption = {}) {
         //* mark a class with id
         const id = AppUtils.generateHash();
         AppUtils.defineProperty(prototype, RouterProperties.ID, { get() { return id } })
+        Reflect.defineMetadata('id', id, constructor);
 
         //* construct the Router class
         //! #issue {one}, the developer must have the ability to construct their own objects

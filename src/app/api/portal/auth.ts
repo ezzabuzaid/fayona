@@ -29,10 +29,6 @@ export class Auth {
      */
     static generateToken(data) {
         return jwt.sign(data, process.env.JWT_SECRET_KEY);
-        // try {
-        // } catch {
-        //     throw new ErrorResponse('Cannot generate token', NetworkStatus.INTERNAL_SERVER_ERROR);
-        // }
     }
 }
 

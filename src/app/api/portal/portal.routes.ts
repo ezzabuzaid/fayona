@@ -18,7 +18,7 @@ export class AuthRoutes {
     @Post('login')
     async login(req: Request, res: Response) {
         const { username, password } = req.body;
-        const user = await UsersRepo.fetchEntity({ username });
+        const user = await UsersRepo.fetchEntity({ username }, {}, { lean: true });
         log.debug('Check if user exist');
         if (!!user) {
             const isPasswordEqual = await user.comparePassword(password);

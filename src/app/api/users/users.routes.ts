@@ -17,16 +17,22 @@ export class UsersRouter {
 
         // TODO Validate the input
         const { username, password, email } = req.body;
-        const userExist = await UsersRepo.entityExist({ username });
-        if (userExist) {
+        const checkUsername = await UsersRepo.entityExist({ username });
+        if (checkUsername) {
             log.debug(`User with username ${username} is exist`);
             throw new ErrorResponse(translate('username_exist'), NetworkStatus.BAD_REQUEST);
+        }
+
+        const checkEmail = await UsersRepo.entityExist({ email });
+        if (checkEmail) {
+            log.debug(`User with Email ${email} is exist`);
+            throw new ErrorResponse(translate('email_exist'), NetworkStatus.BAD_REQUEST);
         }
 
         const user = await UsersRepo.createEntity({ username, password, email });
         log.warn(`New user created with username ${user.username}`);
 
-        const response = new SuccessResponse<{}>(user, translate('user_register_success'), NetworkStatus.CREATED);
+        const response = new SuccessResponse(user, translate('user_register_success'), NetworkStatus.CREATED);
         res.status(response.code).json(response);
     }
 
@@ -60,7 +66,7 @@ export class UsersRouter {
             throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE)
         }
 
-        const response = new SuccessResponse(null, translate('delete_user'), NetworkStatus.OK);
+        const response = new SuccessResponse(null, translate('success'), NetworkStatus.OK);
         res.status(response.code).json(response);
     }
 
@@ -69,13 +75,13 @@ export class UsersRouter {
         log.info('start fetchUser');
 
         const { id } = req.params;
-        const user = await UsersRepo.fetchEntity({ _id: id }, { password: 0 }, { lean: true });
+        const user = await UsersRepo.fetchEntity({ _id: id }).lean();
 
         if (!user) {
             throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
         }
 
-        const response = new SuccessResponse(user, translate('fetch_user'));
+        const response = new SuccessResponse(user, translate('success'));
         res.status(response.code).json(response);
     }
 

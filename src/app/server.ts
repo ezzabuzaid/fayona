@@ -4,11 +4,14 @@ import { Server as httpServer } from 'http';
 import { Logger } from "./core/utils/logger.service";
 import { URL } from 'url';
 import { Database } from '@core/database/database';
-import { envirnoment, EnvirnomentStages } from '@environment/env';
+import { envirnoment } from '@environment/env';
 import en from "@assets/languages/en.json";
 import http = require('http');
-import { stage } from '@core/helpers';
+import { stage, StageLevel } from '@core/helpers';
 const log = new Logger('Server init');
+import "reflect-metadata";
+
+// Reflect.getOwnMetadata('id', );
 export class Server extends Application {
         public static LEVEL = null;
         private port = +envirnoment.get('PORT') || 8080;
@@ -19,20 +22,24 @@ export class Server extends Application {
          * Invoke this method to start the server
          * @param port server port
          */
-        static bootstrap(level: EnvirnomentStages): Server {
+        static bootstrap(level: StageLevel): Server {
                 // SECTION server init event
                 log.debug('Start boostrapping server');
                 envirnoment.load(level);
                 stage.LEVEL = level;
+                // FIXME remove server level
                 Server.LEVEL = level;
-                return new Server();
+                const server = new Server();
+                server.populateServer();
+                return server;
         }
 
         static test() {
-                log.debug('Start Testing');
-                const level = EnvirnomentStages.TEST;
+                log.info('Start Testing');
+                const level = StageLevel.TEST;
                 envirnoment.load(level);
                 stage.LEVEL = level;
+                // FIXME remove server level
                 Server.LEVEL = level;
                 return new Server();
         }
@@ -41,9 +48,9 @@ export class Server extends Application {
         private constructor() {
                 super();
                 this.path = new URL(`http://${this.host}:${this.port}`)
+                log.info('SERVER LEVEL => ', stage.LEVEL);
                 try {
                         this.init();
-                        !stage.testing && this.populateServer();
                 } catch (error) {
                         throw new Error('Faild to init the server');
                 }
@@ -55,7 +62,6 @@ export class Server extends Application {
          * @returns {Promise<httpServer>} 
          */
         private populateServer(): Promise<httpServer> {
-                log.warn('stage.LEVEL => ', stage.LEVEL);
                 return Promise.resolve<httpServer>(this.startServer(this.createServer()));
         }
 

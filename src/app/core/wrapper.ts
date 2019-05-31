@@ -1,9 +1,10 @@
-import { CountriesRoutes } from '@api/countries';
+// import { CountriesRoutes } from '@api/countries';
 import { AuthRoutes } from '@api/portal';
-import { AuthorsRoutes } from '@api/authors/authors.routes';
+// import { AuthorsRoutes } from '@api/authors/authors.routes';
 // import { BooksRoutes } from '@api/books';
 import 'reflect-metadata';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
+import { UsersRouter } from '@api/users';
 export class Wrapper {
     private static list = [];
     //! #issue fix type any, the router should defined in RouterClass
@@ -59,8 +60,8 @@ export class Wrapper {
 
 }
 
-// Wrapper.registerRouter(UsersRouter);
+Wrapper.registerRouter(UsersRouter);
 Wrapper.registerRouter(AuthRoutes);
-Wrapper.registerRouter(CountriesRoutes);
-Wrapper.registerRouter(AuthorsRoutes);
+// Wrapper.registerRouter(CountriesRoutes);
+// Wrapper.registerRouter(AuthorsRoutes);
 // Wrapper.registerRouter(BooksRoutes);

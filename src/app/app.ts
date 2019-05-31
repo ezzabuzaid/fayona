@@ -69,6 +69,14 @@ export class Application {
             this.application.get('/api', (req, res) => res.status(200).json({ work: '/API hitted' }));
             this.application.get('/', (req, res) => res.sendFile('index.html'));
 
+            this.application.use((req, res, next) => {
+                const acceptLanguage = req.acceptsLanguages();
+                log.warn(acceptLanguage);
+                if (acceptLanguage) {
+                    // use localization here
+                }
+            });
+
             // * catch favIcon request
             this.application.use(ErrorHandling.favIcon);
 

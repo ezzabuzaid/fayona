@@ -24,6 +24,11 @@ SECTION DONE
 3_ http status codes
 4_ wrap router and register it in app instance
 
+SECTION mongoose model
+1_ add hook decorator
+2_ virtuals
+3_ query helper
+
 https://www.npmjs.com/package/injection-js
 web socket class
 
