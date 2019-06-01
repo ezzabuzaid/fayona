@@ -79,25 +79,25 @@ export class Application {
 
 
 
-            const sequelize = mysql.load();
-            orders.init(sequelize)
-            let index = 0;
+            // const sequelize = mysql.load();
+            // orders.init(sequelize)
+            // let index = 0;
             // this.application.get('/data', (req, res) => {
-            setInterval(() => {
-                log.warn(index);
-                orders.Orders
-                    .findAll({
-                        where: {
-                            request_time: {
-                                [Op.between]: ['2019-04-02T21:00:00.000Z', `2019-04-02T21:00:0${++index}.000Z`]
-                            }
+            // setInterval(() => {
+            //     log.warn(index);
+            //     orders.Orders
+            //         .findAll({
+            //             where: {
+            //                 request_time: {
+            //                     [Op.between]: ['2019-04-02T21:00:00.000Z', `2019-04-02T21:00:0${++index}.000Z`]
+            //                 }
 
-                        }
-                    }).then(e => {
-                        console.log(JSON.stringify(e, undefined, 8))
-                    });
-                // res.json(json);
-            }, 5000);
+            //             }
+            //         }).then(e => {
+            //             console.log(JSON.stringify(e, undefined, 8))
+            //         });
+            //     // res.json(json);
+            // }, 5000);
             // });
 
 
