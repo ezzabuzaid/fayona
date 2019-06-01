@@ -3,9 +3,8 @@ const { env } = argv;
 const gulp = require('gulp');
 const path = require('path');
 const pwd = process.cwd();
-const NAME = 'copy';
-exports.name = NAME;
-exports.func = gulp.task(NAME, () => {
+exports.name = 'copy';
+exports.func = gulp.task(exports.name, () => {
     return gulp.src(path.join(pwd, `src/environment/.env.${env}`))
         .pipe(gulp.dest(path.join(pwd, './dist/environment')));
 });

@@ -1,11 +1,11 @@
 import { Local } from './local';
-import { LocalizationService } from './localization.service';
+import { TranslationService } from './translation.service';
 import { StageLevel, stage } from '@core/helpers';
 
 import { Logger } from '@core/utils';
 const log = new Logger('Localization Class');
 
-class Localization extends LocalizationService {
+class Translation extends TranslationService {
     /**
      * list of observed locals
      */
@@ -102,9 +102,9 @@ class Localization extends LocalizationService {
 
 }
 
-const localization = new Localization();
+const translation = new Translation();
 // export the created instance, it must be a singelton 
-export { localization };
+export { translation };
 
 
 // scoping not allowed until i18n service resolved in api module
@@ -115,7 +115,7 @@ export { localization };
  * @returns the value of the key from the active local
  */
 export function translate(key: string, params: object = {}) {
-    let value = localization.local.get(key);
+    let value = translation.local.get(key);
     const rawParams = value.match(/\{(.*?)\}/ig);
     if (rawParams) {
         value = rawParams.reduce((acc, el) => {

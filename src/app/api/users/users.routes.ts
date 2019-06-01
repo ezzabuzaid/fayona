@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { Post, Get, Put, Delete, Router } from '@lib/methods';
-import { translate } from '@lib/localization';
+import { translate } from '@lib/translation';
 import { ErrorResponse, SuccessResponse, NetworkStatus } from '@core/helpers';
 import { UsersRepo } from './users.repo';
 import { Auth } from '@api/portal/auth';
-import { Logger, AppUtils } from '@core/utils';
+import { Logger } from '@core/utils';
 const log = new Logger('User Router');
 @Router('users', {
     middleware: []

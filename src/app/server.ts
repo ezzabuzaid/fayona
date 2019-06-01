@@ -1,20 +1,17 @@
 import { Application } from "./app";
-import { localization } from '@lib/localization';
+import { translation } from '@lib/translation';
 import { Server as httpServer } from 'http';
-import { Logger } from "./core/utils/logger.service";
 import { URL } from 'url';
 import { Database } from '@core/database/database';
 import { envirnoment } from '@environment/env';
 import en from "@assets/languages/en.json";
 import http = require('http');
 import { stage, StageLevel } from '@core/helpers';
+import { Logger } from '@core/utils';
 const log = new Logger('Server init');
-import "reflect-metadata";
 
-// Reflect.getOwnMetadata('id', );
 export class Server extends Application {
-        public static LEVEL = null;
-        private port = +envirnoment.get('PORT') || 8080;
+        private port = +envirnoment.get('PORT') || 8081;
         private host = envirnoment.get('HOST') || 'localhost';
         public path: URL = null;
 
@@ -22,13 +19,13 @@ export class Server extends Application {
          * Invoke this method to start the server
          * @param port server port
          */
-        static bootstrap(level: StageLevel): Server {
+        static bootstrap(): Server {
+                // use env depends on it's flag otherwise use dev
                 // SECTION server init event
                 log.debug('Start boostrapping server');
-                envirnoment.load(level);
-                stage.LEVEL = level;
-                // FIXME remove server level
-                Server.LEVEL = level;
+                envirnoment.load();
+                // TODO call load function implicitly in envirnoment load method
+                stage.load();
                 const server = new Server();
                 server.populateServer();
                 return server;
@@ -38,21 +35,19 @@ export class Server extends Application {
                 log.info('Start Testing');
                 const level = StageLevel.TEST;
                 envirnoment.load(level);
-                stage.LEVEL = level;
-                // FIXME remove server level
-                Server.LEVEL = level;
+                // TODO call load function implicitly in envirnoment load method
+                stage.load();
                 return new Server();
         }
-
 
         private constructor() {
                 super();
                 this.path = new URL(`http://${this.host}:${this.port}`)
-                log.info('SERVER LEVEL => ', stage.LEVEL);
+                log.info(`The env => ${stage.LEVEL}`);
                 try {
                         this.init();
                 } catch (error) {
-                        throw new Error('Faild to init the server');
+                        throw new Error(`Faild to init the server ${error}`);
                 }
         }
 
@@ -80,22 +75,30 @@ export class Server extends Application {
         }
 
         private setupLocalization() {
-                localization.add('en', en);
+                translation.add('en', en);
                 // localization.add('ar', ar);
-                localization.use('en');
+                translation.use('en');
         }
 
         /**
          * 
          */
         private init() {
-                const { MONGO_USER: user, MONGO_PASSWORD: password, MONGO_PATH: path, MONGO_HOST: host } = envirnoment.env;
-                Database.load({ user, password, path, host, atlas: false })
+                // const { MONGO_USER: user, MONGO_PASSWORD: password, MONGO_PATH: path, MONGO_HOST: host } = envirnoment.env;
+                // Database.load({ user, password, path, host, atlas: false })
                 this.populateRoutes()
                 this.setupLocalization();
-
         }
 }
+
+
+// const createDatabaseStatement = 'CREATE DATABASE testDB';
+// const createTableStatement = `
+// CREATE TABLE testTable (
+//         id int UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+//         title VARCHAR(255) NOT NULL,
+//         body VARCHAR(255) NOT NULL
+// )`;
 
 
 
@@ -152,3 +155,33 @@ export class Server extends Application {
 //     console.log('and this matches too');
 //     res.end();
 // });
+const schema = {
+        id: {
+                type: 'int UNSIGNED',
+                value: 'AUTO_INCREMENT',
+                key: 'PRIMARY KEY'
+        },
+        title: {
+                type: 'VARCHAR(255)',
+                value: 'NOT NULL'
+        },
+        body: {
+                type: 'VARCHAR(255)',
+                value: 'NOT NULL'
+        }
+};
+function creataTable(tableName, columns) {
+        const columnsNames = Object.keys(columns);
+        const statement = columnsNames.reduce((statment, column, index) => {
+                const { type, value, key = '' } = columns[column];
+                let _statment = `${column} ${type} ${value} ${key}`
+                _statment = _statment.trim();
+                if ((index + 1) !== columnsNames.length) {
+                        _statment += ', ';
+                }
+                return statment += _statment;
+        }, '');
+        return `CREATE TABLE ${tableName} (${statement})`
+}
+const table = creataTable('FuckTableFromString', schema);
+

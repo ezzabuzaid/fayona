@@ -28,31 +28,32 @@
                 }
             }
             const wss = new socket();
-            var chart = new CanvasJS.Chart("chartContainer", {
-                animationEnabled: true,
-                title: {
-                    text: "Desktop Search Engine Market Share - 2016"
-                },
-                data: [{
-                    type: "pie",
-                    startAngle: 240,
-                    yValueFormatString: "##0.00\"%\"",
-                    indexLabel: "{label} {y}",
-                    dataPoints: []
-                }]
-            });
-            chart.render();
+            // var chart = new CanvasJS.Chart("chartContainer", {
+            //     animationEnabled: true,
+            //     title: {
+            //         text: "Desktop Search Engine Market Share - 2016"
+            //     },
+            //     data: [{
+            //         type: "pie",
+            //         startAngle: 240,
+            //         yValueFormatString: "##0.00\"%\"",
+            //         indexLabel: "{label} {y}",
+            //         dataPoints: []
+            //     }]
+            // });
+            // chart.render();
             wss.onmessage = ((message) => {
-                console.log(message);
-                const data = JSON.parse(message.data);
-                const dataPoints = chart.options.data[0].dataPoints = [];
-                Object.keys(data).forEach(el => {
-                    const value = data[el];
-                    if (typeof value === 'number') {
-                        dataPoints.push({ y: value, label: el });
-                    }
-                });
-                chart.render();
+                document.write(message);
+                // console.log(message);
+                // const data = JSON.parse(message.data);
+                // const dataPoints = chart.options.data[0].dataPoints = [];
+                // Object.keys(data).forEach(el => {
+                //     const value = data[el];
+                //     if (typeof value === 'number') {
+                //         dataPoints.push({ y: value, label: el });
+                //     }
+                // });
+                // chart.render();
             });
         }
     </script>

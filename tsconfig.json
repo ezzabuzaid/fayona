@@ -1,4 +1,5 @@
 {
+  "extends": "gts/tsconfig-google.json",
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
@@ -54,5 +55,7 @@
       "jest"
     ]
   },
-  "files": ["./src/main.ts"]
+  "files": [
+    "./src/main.ts"
+  ]
 }

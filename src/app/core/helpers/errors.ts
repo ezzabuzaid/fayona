@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response, ErrorRequestHandler } from 'express';
 import { ErrorResponse } from '@core/helpers';
-import { translate } from '@lib/localization';
+import { translate } from '@lib/translation';
 import { Logger } from '@core/utils';
 import { NetworkStatus } from './network-status';
 

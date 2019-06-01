@@ -3,7 +3,7 @@ import { Reactor } from '@core/config';
 import { Logger } from '@core/utils';
 const log = new Logger('LocalizationService Class');
 
-export class LocalizationService {
+export class TranslationService {
     private eventName = 'localization';
     private _localAdd = new Reactor(`${this.eventName}_add`);
     private _localChange = new Reactor(`${this.eventName}_change`);

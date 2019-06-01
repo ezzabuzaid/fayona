@@ -1,11 +1,19 @@
+import { envirnoment } from '@environment/env';
+import { throws } from 'assert';
+
 export enum StageLevel {
-    DEV = 'dev',
-    TEST = 'test',
-    PROD = 'prod'
+    LOCAL = 0,
+    DEV,
+    TEST,
+    PROD
 }
 
 class Stage {
     private _level = null;
+
+    load() {
+        this.LEVEL = Object.values(StageLevel).find(stage => stage === +envirnoment.get('NODE_ENV')) || StageLevel.LOCAL;
+    }
 
     get LEVEL() {
         return this._level

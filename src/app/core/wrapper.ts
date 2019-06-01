@@ -1,10 +1,10 @@
 // import { CountriesRoutes } from '@api/countries';
 import { AuthRoutes } from '@api/portal';
+import { UsersRouter } from '@api/users';
 // import { AuthorsRoutes } from '@api/authors/authors.routes';
 // import { BooksRoutes } from '@api/books';
 import 'reflect-metadata';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
-import { UsersRouter } from '@api/users';
 export class Wrapper {
     private static list = [];
     //! #issue fix type any, the router should defined in RouterClass

@@ -34,8 +34,7 @@ export function Router(uri: string, options: RouterDecorationOption = {}) {
         //* mark a class with id
         const id = AppUtils.generateHash();
         AppUtils.defineProperty(prototype, RouterProperties.ID, { get() { return id } })
-        Reflect.defineMetadata('id', id, constructor);
-
+        // Reflect.defineMetadata(id, constructor, Router);
         //* construct the Router class
         //! #issue {one}, the developer must have the ability to construct their own objects
         // const routerClassinstance = new constructor;

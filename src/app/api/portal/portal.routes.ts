@@ -2,7 +2,7 @@ import { Router } from '@lib/methods';
 import { Request, Response } from 'express';
 import { Post } from '@lib/methods';
 import { SuccessResponse, ErrorResponse, NetworkStatus } from '@core/helpers';
-import { translate } from '@lib/localization';
+import { translate } from '@lib/translation';
 
 
 import { Logger } from '@core/utils';
