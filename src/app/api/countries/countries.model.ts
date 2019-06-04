@@ -7,7 +7,6 @@
 //     @Field() name_ar: string;
 // }
 
-
 // // type ExcludeTypeKey<K, T> = typeof K extends T ? never : K
 // // type ExcludeTypeField<A, T> = { [K in ExcludeTypeKey<A, T>]: A[K] }
 

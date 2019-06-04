@@ -1,5 +1,5 @@
 import { writeFileSync } from 'fs';
-import { Collection, RequestBody, Variable, Header, Url, Response, Request, Item, ItemGroup } from 'postman-collection';
+import { Collection, Header, Item, ItemGroup, Request, RequestBody, Response, Url, Variable } from 'postman-collection';
 
 /*
 
@@ -17,9 +17,9 @@ import { Collection, RequestBody, Variable, Header, Url, Response, Request, Item
 */
 
 const myCollection = new Collection({
-    description: "Test description",
+    description: 'Test description',
     info: {
-        name: "Test collection"
+        name: 'Test collection'
     },
     item: [
         new ItemGroup({
@@ -27,15 +27,15 @@ const myCollection = new Collection({
             description: 'This collection to utilize users api',
             item: [
                 {
-                    name: "Register",
-                    description: "Create a new user",
+                    name: 'Register',
+                    description: 'Create a new user',
                     request: new Request({
-                        url: new Url({ host: "{{api}}", path: "users" }),
-                        method: "POST",
+                        url: new Url({ host: '{{api}}', path: 'users' }),
+                        method: 'POST',
                         header: new Header({
-                            key: "Auth",
-                            value: "Auth value",
-                            name: "Authenticaion",
+                            key: 'Auth',
+                            value: 'Auth value',
+                            name: 'Authenticaion',
                         }),
                         body: new RequestBody({ raw: '', mode: 'raw' })
                     }),
@@ -55,8 +55,8 @@ const myCollection = new Collection({
         })
     ],
     variable: new Variable({
-        variableOne: new Variable({ key: "", value: "", type: "" }),
-        variableTwo: new Variable({ key: "", value: "", type: "" })
+        variableOne: new Variable({ key: '', value: '', type: '' }),
+        variableTwo: new Variable({ key: '', value: '', type: '' })
     })
 });
 

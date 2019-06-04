@@ -1,5 +1,5 @@
 import { Logger } from '@core/utils';
-import bcrypt = require('bcryptjs')
+import bcrypt = require('bcryptjs');
 
 // extends the bcrypt
 const log = new Logger('Hash service');
@@ -13,7 +13,7 @@ export class HashService {
         return bcrypt.hash(text, 10);
     }
 
-    static hashPassword(text) {
+    public static hashPassword(text) {
         // try {
         // } catch (error) {
         //     log.error('an error accured while hashing the password');
@@ -24,7 +24,7 @@ export class HashService {
         return this.hashText(text);
     }
 
-    static comparePassword(candidatePassword, actualPassword) {
+    public static comparePassword(candidatePassword, actualPassword) {
         log.info('Start comparePassword');
         return bcrypt.compare(candidatePassword, actualPassword);
 

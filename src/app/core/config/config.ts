@@ -1,6 +1,6 @@
 ['NODE_ENV', 'PORT'].forEach((name) => {
     if (!process.env[name]) {
-        throw new Error(`Environment variable ${name} is missing`)
+        throw new Error(`Environment variable ${name} is missing`);
     }
 });
 
@@ -9,7 +9,7 @@
 // 	const execOptions = { encoding: 'utf-8', windowsHide: true };
 // 	let key = './certs/key.pem';
 // 	let certificate = './certs/certificate.pem';
-	
+
 // 	if ( ! fs.existsSync( key ) || ! fs.existsSync( certificate ) ) {
 // 		try {
 // 			execSync( 'openssl version', execOptions );
@@ -29,12 +29,11 @@
 // 	     cert: fs.readFileSync( certificate ),
 // 	     passphrase : 'password'
 //         };
-    
+
 // 	server = require( 'https' ).createServer( options, app );
-    
+
 // } else {
 //     server = require( 'http' ).createServer( app );
 // }
-
 
 // Not yet

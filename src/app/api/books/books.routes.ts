@@ -7,13 +7,11 @@
 // import { AuthorsRepo } from '@api/authors';
 // const log = new Logger('CountriesRoutes');
 
-
 // @Router('books')
 // export class BooksRoutes {
 //     @Post('/')
 //     async createBook(req: Request, res: Response) {
 //         const { name_ar, name_en, rate, image, author_id } = req.body;
-
 
 //         const entityExist = await BooksRepo.entityExist({ name_en });
 //         if (entityExist) {
@@ -94,5 +92,3 @@
 
 //     authorBooks() { }
 // }
-
-

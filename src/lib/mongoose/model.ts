@@ -1,4 +1,4 @@
-import { Document, model, Model } from "mongoose";
+import { Document, model, Model } from 'mongoose';
 
 export function BaseModel<T>(_schema) {
     const { wrapper }: any = _schema;

@@ -51,11 +51,11 @@ export class Logger {
    * Current logging level.
    * Set it to LogLevel.Off to disable logs completely.
    */
-  static level = LogLevel.Debug;
+  public static level = LogLevel.Debug;
 
-  static outputs: LogOutput[] = [];
+  public static outputs: LogOutput[] = [];
 
-  static enableProductionMode() {
+  public static enableProductionMode() {
     Logger.level = LogLevel.Warning;
   }
 
@@ -63,22 +63,22 @@ export class Logger {
     this.log(console.log, LogLevel.Info, [colors.bold(source)]);
   }
 
-  debug(...objects: any[]) {
+  public debug(...objects: any[]) {
     this.colorizeText(objects, 'cyan');
     this.log(console.log, LogLevel.Debug, objects);
   }
 
-  info(...objects: any[]) {
+  public info(...objects: any[]) {
     this.colorizeText(objects, 'green');
     this.log(console.info, LogLevel.Info, objects);
   }
 
-  warn(...objects: any[]) {
+  public warn(...objects: any[]) {
     this.colorizeText(objects, 'yellow');
     this.log(console.warn, LogLevel.Warning, objects);
   }
 
-  error(...objects: any[]) {
+  public error(...objects: any[]) {
     this.colorizeText(objects, 'red');
     this.log(console.error, LogLevel.Error, objects);
   }
@@ -87,7 +87,7 @@ export class Logger {
     if (level <= Logger.level) {
       const log = this.source ? ['[' + colors.bgBlack(colors.bold(this.source)) + ']'].concat(objects) : objects;
       func.apply(console, log);
-      Logger.outputs.forEach(output => output.apply(output, [this.source, level].concat(objects)));
+      Logger.outputs.forEach((output) => output.apply(output, [this.source, level].concat(objects)));
     }
   }
 

@@ -1,9 +1,8 @@
-import { RequestHandler, RouterOptions, Router } from "express";
+import { RequestHandler, Router, RouterOptions } from 'express';
 import { RequestHandlerParams } from 'express-serve-static-core';
 
-
-export interface RouterDecorationOption extends RouterOptions {
-    middleware?: RequestHandler[] | RequestHandlerParams[]
+export interface IRouterDecorationOption extends RouterOptions {
+    middleware?: RequestHandler[] | RequestHandlerParams[];
 }
 
 export enum RouterProperties {

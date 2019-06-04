@@ -12,14 +12,7 @@
     "watch:dev": "nodemon -e ts -w ./src -x npm run dev",
     "watch:prod": "node -r ./tsconfig-paths-bootstrap.js ./dist/main.js",
     "start": "npm run watch:prod",
-    "lint": "tslint -c tslint.json 'src/**/*.ts'",
-    "check": "gts check",
-    "clean": "gts clean",
-    "compile": "tsc -p .",
-    "fix": "gts fix",
-    "prepare": "npm run compile",
-    "pretest": "npm run compile",
-    "posttest": "npm run check"
+    "lint": "tslint -c tslint.json 'src/**/*.ts' --fix"
   },
   "author": "ezzabuzaid",
   "engines": {

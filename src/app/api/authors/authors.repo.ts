@@ -22,4 +22,3 @@
 //         return this.findOneAndDelete(obj);
 //     }
 // }
-

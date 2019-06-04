@@ -2,12 +2,12 @@ import { ErrorHandling } from '@core/helpers';
 import { AppUtils, Logger } from '@core/utils';
 import { Router as expressRouter } from 'express';
 import 'reflect-metadata';
-import { IExpressInternal, RouterDecorationOption, RouterProperties } from './method-types';
+import { IExpressInternal, IRouterDecorationOption, RouterProperties } from './method-types';
 
 const log = new Logger('Router Decorator');
 import path = require('path');
 
-export function Router(uri: string, options: RouterDecorationOption = {}) {
+export function Router(uri: string, options: IRouterDecorationOption = {}) {
     return function <T extends new (...args: any[]) => any>(constructor: T) {
         // NOTE  a way to fix path to router slashes
         const { prototype } = constructor;
@@ -24,7 +24,7 @@ export function Router(uri: string, options: RouterDecorationOption = {}) {
             .forEach((key) => {
                 const { httpMethod, instanceMethod, config } = Reflect.getMetadata(key, constructor);
                 const normalizedURI = path.normalize(path.join('/', config.uri));
-                router[httpMethod](normalizedURI, ErrorHandling.wrapRoute(...config.middlewares, function () {
+                router[httpMethod](normalizedURI, ErrorHandling.wrapRoute(...config.middlewares, function() {
                     return instanceMethod(...arguments);
                 }));
             });

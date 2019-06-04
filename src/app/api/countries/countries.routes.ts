@@ -12,7 +12,7 @@
 // export class CountriesRoutes {
 
 //     constructor() { }
-// 
+//
 //     @Post('/')
 //     async createCountry(req: Request, res: Response) {
 //         const { name_ar, name_en, placeId } = req.body;

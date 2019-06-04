@@ -6,14 +6,14 @@ import { Logger } from '@core/utils';
 const log = new Logger('CitiesModel');
 
 export namespace CitiesType {
-    export interface Model extends Document {
+    export interface IModel extends Document {
         name_ar: string;
         name_en: string;
         placeId: string;
         countryId: string;
     }
-    export class Schema extends BaseSchema<Model>{
-        static schemaName = 'cities'
+    export class Schema extends BaseSchema<IModel> {
+        public static schemaName = 'cities';
         constructor() {
             super({
                 name_ar: {
@@ -39,9 +39,9 @@ export namespace CitiesType {
                     type: BaseSchema.Types.ObjectId,
                     required: true
                 },
-            })
+            });
         }
     }
 }
 
-export const CitiesModel = model<CitiesType.Model>(CitiesType.Schema.schemaName, new CitiesType.Schema());
+export const CitiesModel = model<CitiesType.IModel>(CitiesType.Schema.schemaName, new CitiesType.Schema());

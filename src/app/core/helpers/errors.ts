@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response, ErrorRequestHandler } from 'express';
 import { ErrorResponse } from '@core/helpers';
-import { translate } from '@lib/translation';
 import { Logger } from '@core/utils';
+import { translate } from '@lib/translation';
+import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { NetworkStatus } from './network-status';
 
 const log = new Logger('Errors');
@@ -17,7 +17,7 @@ export enum Errors {
 }
 
 export class ErrorHandling {
-    static catchError(error: any, req: Request, res: Response, next: NextFunction): ErrorRequestHandler {
+    public static catchError(error: any, req: Request, res: Response, next: NextFunction): ErrorRequestHandler {
         const response = new ErrorResponse(error.message, isNaN(error.code) ? NetworkStatus.INTERNAL_SERVER_ERROR : error.code);
         switch (error.name) {
             case Errors.CastError:
@@ -39,27 +39,26 @@ export class ErrorHandling {
         return;
     }
 
-    static throwError(message, code = NetworkStatus.INTERNAL_SERVER_ERROR) {
+    public static throwError(message, code = NetworkStatus.INTERNAL_SERVER_ERROR) {
         throw new ErrorResponse(message, code);
     }
 
-    static notFound(req: Request, res: Response, next: NextFunction) {
+    public static notFound(req: Request, res: Response, next: NextFunction) {
         const error = new ErrorResponse(`${req.originalUrl} => ${translate('endpoint_not_found')}`, NetworkStatus.NOT_FOUND);
         return res.status(error.code).json(error);
     }
 
-    static favIcon(req: Request, res: Response, next: NextFunction) {
-        if (req.originalUrl && req.originalUrl.split("/").pop() === 'favicon.ico') {
+    public static favIcon(req: Request, res: Response, next: NextFunction) {
+        if (req.originalUrl && req.originalUrl.split('/').pop() === 'favicon.ico') {
             return res.sendStatus(204);
         }
         return next();
     }
 
-    static wrapRoute(...func) {
-        return func.map(fn => (...args) => fn(...args).catch(args[2]));
+    public static wrapRoute(...func) {
+        return func.map((fn) => (...args) => fn(...args).catch(args[2]));
     }
 
 }
-
 
 // see also https://airbrake.io/blog/nodejs-error-handling/nodejs-error-class-hierarchy

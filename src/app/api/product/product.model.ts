@@ -7,7 +7,7 @@ const log = new Logger('ProudctModel');
 
 export namespace ProudctType {
     export interface Model extends Document {
-        for: string
+        for: string;
     }
     export enum FOR {
         MEN = 'men',
@@ -20,8 +20,8 @@ export namespace ProudctType {
         SWEET_SHIRT = 'sweetShirt',
         PULLOVER = 'pullover'
     }
-    export class Schema extends BaseSchema<Model>{
-        static schemaName = 'proudct'
+    export class Schema extends BaseSchema<Model> {
+        public static schemaName = 'proudct';
         constructor() {
             super({
                 name: {
@@ -32,7 +32,7 @@ export namespace ProudctType {
                 },
                 for: {
                     required: true,
-                    // maybe for mens and womens 
+                    // maybe for mens and womens
                     enum: [FOR.MEN, FOR.WOMEN, FOR.KIDS]
                 },
                 type: {
@@ -55,7 +55,7 @@ export namespace ProudctType {
                 image: {
                     required: true,
                 }
-            })
+            });
         }
     }
 }

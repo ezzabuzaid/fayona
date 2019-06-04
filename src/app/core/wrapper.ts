@@ -1,14 +1,14 @@
 // import { CountriesRoutes } from '@api/countries';
 import { AuthRoutes } from '@api/portal';
 import { UsersRouter } from '@api/users';
+import { IExpressInternal, IExpressRouter } from '@lib/methods';
 // import { AuthorsRoutes } from '@api/authors/authors.routes';
 // import { BooksRoutes } from '@api/books';
 import 'reflect-metadata';
-import { IExpressInternal, IExpressRouter } from '@lib/methods';
 export class Wrapper {
     private static list = [];
-    //! #issue fix type any, the router should defined in RouterClass
-    static registerRouter(router, subRouter?) {
+    // ! #issue fix type any, the router should defined in RouterClass
+    public static registerRouter(router, subRouter?) {
         // ...routerList: any[]
         // for (const { router } of routerList) {
         //     this.wrapRouter(router)
@@ -35,7 +35,7 @@ export class Wrapper {
     }
 
     private static assignRouterTo(subRouter, superRouter) {
-        //* To check if the router is alredy registerd
+        // * To check if the router is alredy registerd
         const parentRouter = this.getRouter(superRouter);
         if (!parentRouter) {
             throw new Error('Please register the parent router first, then try');
@@ -48,14 +48,14 @@ export class Wrapper {
         return this.list;
     }
 
-    static getRouter({ id }) {
-        const { router } = this.list.find(({ router }) => router.id === id);
+    public static getRouter({ id }) {
+        const { router } = this.list.find(({ _router }) => _router.id === id);
         return router;
     }
 
     private static dispatchRouter({ router }: any) {
-        this.list.splice(router)
-        //? This is not done, we need to re init all the router again, or just remove this router from both router list and router bootstrap list
+        this.list.splice(router);
+        // ? This is not done, we need to re init all the router again, or just remove this router from both router list and router bootstrap list
     }
 
 }

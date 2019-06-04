@@ -24,9 +24,7 @@
 // // ask about this type of defining routes path and it's children or by injection style or by calling it
 // // explicity Wrapper.assginTo(superRouter, router) | Wrapper.assginTo(superRouter, subSuperRouter, router)
 
-
 // // # resolve all route like urlSegment angular
-
 
 // // Both style must be implemented the angular style, and Wrapper style
 

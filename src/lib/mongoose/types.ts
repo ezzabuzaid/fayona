@@ -1,10 +1,10 @@
-import { SchemaTypeOpts, Schema, SchemaType } from "mongoose";
+import { Schema, SchemaType, SchemaTypeOpts } from 'mongoose';
 
 export namespace MongooseTypes {
 
     export type FieldOptions = SchemaTypeOpts<any> | Schema | SchemaType;
-    export interface FieldAttr {
-        fields: { [keys: string]: FieldOptions }
+    export interface IFieldAttr {
+        fields: { [keys: string]: FieldOptions };
     }
 
 }

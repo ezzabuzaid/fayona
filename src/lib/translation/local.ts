@@ -12,10 +12,10 @@ export class Local {
     /**
      * name of the local
      */
-    name: string;
+    public name: string;
 
     /**
-     * 
+     *
      * @param name name of the local
      * @param language local object
      */
@@ -31,27 +31,26 @@ export class Local {
         return this._language;
     }
 
-
     /**
-     * 
-     * @param key 
-     * @param value 
+     *
+     * @param key
+     * @param value
      */
-    set(key: string, value: any) {
+    public set(key: string, value: any) {
         development(
             () => {
                 log.warn(`a key with name ${key} is already hold a value`);
             }
-        )
+        );
         this.language[key] = value;
     }
 
     /**
-     * 
+     *
      * @param key get the value by it's key for this local
      */
 
-    get(key: string): string {
+    public get(key: string): string {
         const value = this.language[key];
         if (!value) {
             throw new Error(`the key { ${key} } is not found in local { ${this.name} }`);
