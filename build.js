@@ -1,4 +1,4 @@
-const { spawnSync } = require('child_process');
+const child_process = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const pwd = process.cwd();
@@ -27,8 +27,10 @@ const { env } = argv;
 
 // TODO setup delete folder functions
 // make sure that all of them pass in pipeline
-spawnSync('tsc', { shell: true })
-fs.copyFileSync(path.join(pwd, `src/environment/.env.${env}`), './dist/environment/.env', (err) => {
-    // TODO use pipline to move files instead of sync way
-    console.log('Succesfully copied');
-});
+const DIST = path.join(pwd, 'dist');
+const ENV = 'environment/.env';
+const ENV_DIST = path.join(DIST, ENV);
+const ENV_SRC = path.join(pwd, 'src', `${ENV}.${env}`);
+del.sync(DIST);
+child_process.spawnSync('tsc', { shell: true });
+fs.copyFileSync(ENV_SRC, ENV_DIST);

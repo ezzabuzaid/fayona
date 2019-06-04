@@ -3,8 +3,8 @@ import 'reflect-metadata';
 import { MongooseTypes } from './types';
 
 export function Field<T = any>(options: Exclude<MongooseTypes.FieldOptions, 'type'> = {}) {
-    return (instance: MongooseTypes.FieldAttr & T, propertyKey: string) => {
-        if (instance && !instance.fiIFieldAttr
+    return (instance: MongooseTypes.IFieldAttr & T, propertyKey: string) => {
+        if (instance && !instance.fields) {
             AppUtils.defineProperty(instance, 'fields', { value: {} });
         }
         const fields = instance.fields;

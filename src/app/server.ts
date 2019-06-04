@@ -43,11 +43,6 @@ export class Server extends Application {
                 super();
                 this.path = new URL(`http://${this.host}:${this.port}`);
                 log.info(`The env => ${stage.LEVEL}`);
-                // try {
-                //         this.init();
-                // } catch (error) {
-                //         throw new Error(`Faild to init the server ${error}`);
-                // }
         }
 
         /**
@@ -78,9 +73,20 @@ export class Server extends Application {
                         MONGO_PASSWORD: password,
                         MONGO_PATH: path,
                         MONGO_HOST: host } = envirnoment.env;
-                return Promise.all([
-                        Database.load({ user, password, path, host, atlas: false }),
-                        this.populateRoutes()]);
+
+                let atlas = false;
+                if (stage.production) {
+                        atlas = true;
+                }
+
+                try {
+                        return Promise.all([
+                                Database.load({ user, password, path, host, atlas }),
+                                this.populateRoutes()]);
+                } catch (error) {
+                        throw new Error(`Faild to init the server ${error}`);
+                }
+
 
         }
 }

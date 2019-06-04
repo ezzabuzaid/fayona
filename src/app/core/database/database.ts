@@ -51,6 +51,7 @@ export class Database {
 
     public static load(option: IMongooseURI, options: ConnectionOptions = {}) {
         const { URI } = new MongooseURI(option);
+        log.info(URI);
         return connect(URI, {
             useNewUrlParser: true,
             autoIndex: false,
