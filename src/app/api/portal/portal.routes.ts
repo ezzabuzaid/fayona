@@ -1,22 +1,18 @@
-import { Router } from '@lib/methods';
-import { Request, Response } from 'express';
-import { Post } from '@lib/methods';
-import { SuccessResponse, ErrorResponse, NetworkStatus } from '@core/helpers';
+import { ErrorResponse, NetworkStatus, SuccessResponse } from '@core/helpers';
+import { Post, Router } from '@lib/methods';
 import { translate } from '@lib/translation';
+import { Request, Response } from 'express';
 
-
-import { Logger } from '@core/utils';
 import { UsersRepo } from '@api/users';
+import { Logger } from '@core/utils';
 import { Auth } from './auth';
 const log = new Logger('Auth Router');
 
 @Router('portal')
 export class AuthRoutes {
 
-    constructor() { }
-
     @Post('login')
-    async login(req: Request, res: Response) {
+    public async login(req: Request, res: Response) {
         const { username, password } = req.body;
         const user = await UsersRepo.fetchEntity({ username }, {}, { lean: true });
         log.debug('Check if user exist');

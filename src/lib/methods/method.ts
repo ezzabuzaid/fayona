@@ -1,9 +1,12 @@
-import { ErrorHandling } from '@core/helpers';
-import path = require('path');
 import { RequestHandler } from 'express';
 
-export function method(method, target, uri: string, middlewares: RequestHandler[], propertyKey: string) {
-    target[method](path.normalize(path.join('/', uri)), ErrorHandling.wrapRoute(...middlewares, function () {
-        return target[propertyKey](...arguments);
-    }));
+export function method(httpMethod: string, uri: string, middlewares: RequestHandler[], target, propertyKey: string) {
+    // target[method](path.normalize(path.join('/', uri)), ErrorHandling.wrapRoute(...middlewares, function() {
+    //     return target[propertyKey](...arguments);
+    // }));
+    return {
+        config: { middlewares, uri },
+        httpMethod,
+        instanceMethod: target[propertyKey]
+    };
 }

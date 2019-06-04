@@ -1,9 +1,14 @@
+REVIEW Features
 2_ use dependency injection to resolve mongoose models
 32_ Mongoose Query Helpers
-33_ use mongoose plugin to retrive name depend on user language
+33_ use mongoose plugin to retrive name attribute depend on user language
 
-REVIEW Features
-1_ eleminate register mutiple router to the same app or router instance
+
+SECTION ALERTS
+1_ if a certin environment not available such as a "NODE_ENV" ..etc, and throw an error before building
+2_ eleminate register mutiple router to the same app or router instance by checking if the id of the router is registred before
+3_ make sure that two router doesn't have the same path, check it in the router decorator
+4_ attached router method (http method) shouldn't have the same paths, consider make a checker function
 
 TODO
 1_ implement deferent auth strategies
@@ -28,12 +33,10 @@ SECTION mongoose model
 1_ add hook decorator
 2_ virtuals
 3_ query helper
+4_ find way to seperate properties from methods in EntitySchema
 
 https://www.npmjs.com/package/injection-js
 web socket class
-
-
-in model class use constructor to execute the default options for all field constructor(){super({ required: true })}
 
 use http://www.hygen.io/create style for documention section
 

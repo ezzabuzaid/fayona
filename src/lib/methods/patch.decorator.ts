@@ -1,15 +1,13 @@
 import { RequestHandler } from 'express';
+import 'reflect-metadata';
 import { method } from './method';
 export function Patch(uri: string, ...middlewares: RequestHandler[]): any {
-    return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
+    return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
         const _method = descriptor.value;
-        descriptor.value = function () {
-            //* any code here will be executed when the marked method get called 
+        descriptor.value = function() {
             return _method.apply(target, arguments);
-        }
-        setTimeout(() => {
-            method('patch', target, uri, middlewares, propertyKey);
-        }, 0);
-    }
+        };
+        const meta = method('patch', uri, middlewares, target, propertyKey);
+        Reflect.defineMetadata(`${uri}patch`, meta, target.constructor);
+    };
 }
-

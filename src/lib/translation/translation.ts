@@ -1,6 +1,6 @@
+import { stage, StageLevel } from '@core/helpers';
 import { Local } from './local';
 import { TranslationService } from './translation.service';
-import { StageLevel, stage } from '@core/helpers';
 
 import { Logger } from '@core/utils';
 const log = new Logger('Localization Class');
@@ -12,15 +12,15 @@ class Translation extends TranslationService {
     private locals: Local[] = [];
 
     constructor() {
-        super()
+        super();
     }
 
     /**
-     * 
+     *
      * @param name name of the local
      * @param local the local to add
      */
-    add(name: string, local: object): Local {
+    public add(name: string, local: object): Local {
         // if there's already throw an error in dev mode
 
         stage.test(StageLevel.DEV, () => {
@@ -40,16 +40,15 @@ class Translation extends TranslationService {
 
         log.info(`local with name ${name} is added, consider using set(local) to use it`);
 
-
         return newLocal;
     }
 
     /**
-     * 
+     *
      * @param name name of the local you wanna use
      * @returns local
      */
-    use(name: string): Local {
+    public use(name: string): Local {
 
         // get the local from the list
         const local = this.get(name);
@@ -60,7 +59,7 @@ class Translation extends TranslationService {
         }
 
         // set the local is active local
-        this.local = local
+        this.local = local;
 
         // emit a value to changeLocal event
         this.localChange.emit(local);
@@ -70,13 +69,13 @@ class Translation extends TranslationService {
         return local;
     }
     /**
-     * 
+     *
      * @param name get the local by it's name from the register locals
      */
-    get(name: string) {
+    public get(name: string) {
 
         // find the local
-        const local = this.locals.find(loc => loc.name === name);
+        const local = this.locals.find((loc) => loc.name === name);
 
         return local || null;
     }
@@ -103,14 +102,13 @@ class Translation extends TranslationService {
 }
 
 const translation = new Translation();
-// export the created instance, it must be a singelton 
+// export the created instance, it must be a singelton
 export { translation };
-
 
 // scoping not allowed until i18n service resolved in api module
 
 /**
- * 
+ *
  * @param key the key that hold the value
  * @returns the value of the key from the active local
  */
@@ -120,9 +118,8 @@ export function translate(key: string, params: object = {}) {
     if (rawParams) {
         value = rawParams.reduce((acc, el) => {
             const param = el.substring(1, el.length - 1);
-            return acc += value.replace(/\{(.*?)\}/, params[param]);
+            return `${acc}${value.replace(/\{(.*?)\}/, params[param])}`;
         }, '');
     }
     return value;
 }
-

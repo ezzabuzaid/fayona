@@ -1,5 +1,5 @@
-import { ConnectionOptions, connect } from 'mongoose';
 import { Logger } from '@core/utils';
+import { connect, ConnectionOptions } from 'mongoose';
 
 const log = new Logger('Database');
 
@@ -8,7 +8,7 @@ interface IMongooseURI {
     password: string;
     path: string;
     atlas: boolean;
-    host: string
+    host: string;
 }
 
 class MongooseURI {
@@ -49,14 +49,15 @@ class MongooseURI {
 
 export class Database {
 
-    static load(option: IMongooseURI, options: ConnectionOptions = {}) {
-        return connect(new MongooseURI(option).URI, {
+    public static load(option: IMongooseURI, options: ConnectionOptions = {}) {
+        const { URI } = new MongooseURI(option);
+        return connect(URI, {
             useNewUrlParser: true,
             autoIndex: false,
             ...options
         })
             .then(() => log.info('Database Connected'))
-            .catch((error) => log.error("Database Not Connected", error))
+            .catch((error) => log.error('Database Not Connected', error));
     }
 
 }

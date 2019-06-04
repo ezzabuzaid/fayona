@@ -1,13 +1,13 @@
-import { config as envConfig } from "dotenv";
-import { join, posix } from 'path';
-import { Logger } from '@core/utils';
 import { StageLevel } from '@core/helpers';
+import { AppUtils, Logger } from '@core/utils';
+import { config as envConfig } from 'dotenv';
+import { join, posix } from 'path';
 const log = new Logger('Envirnoment Class');
 
 class Envirnoment {
-    load(stage?: StageLevel) {
+    public load(stage?: StageLevel) {
         let envPath = '.env';
-        if (!!stage) {
+        if (!AppUtils.isNull(stage)) {
             envPath = `${envPath}.${stage}`;
         }
         log.warn(envPath);
@@ -19,7 +19,7 @@ class Envirnoment {
         return parsed;
     }
 
-    set(envKey: string, value: string) {
+    public set(envKey: string, value: string) {
         const key = this.env[envKey];
         if (!key) {
             log.warn(`you're about adding a new key to the environment ${envKey}`);
@@ -28,7 +28,7 @@ class Envirnoment {
         return value;
     }
 
-    get(envKey: string): string {
+    public get(envKey: string): string {
         return this.env[envKey];
     }
 
@@ -38,4 +38,4 @@ class Envirnoment {
 
 }
 
-export const envirnoment = new Envirnoment;
+export const envirnoment = new Envirnoment();

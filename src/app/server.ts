@@ -1,17 +1,15 @@
-import { Application } from "./app";
-import { translation } from '@lib/translation';
-import { Server as httpServer } from 'http';
-import { URL } from 'url';
 import { Database } from '@core/database/database';
-import { envirnoment } from '@environment/env';
-import en from "@assets/languages/en.json";
-import http = require('http');
 import { stage, StageLevel } from '@core/helpers';
 import { Logger } from '@core/utils';
+import { envirnoment } from '@environment/env';
+import { Server as httpServer } from 'http';
+import http = require('http');
+import { URL } from 'url';
+import { Application } from './app';
 const log = new Logger('Server init');
 
 export class Server extends Application {
-        private port = +envirnoment.get('PORT') || 8081;
+        private port = +envirnoment.get('PORT') || 8080;
         private host = envirnoment.get('HOST') || 'localhost';
         public path: URL = null;
 
@@ -19,42 +17,43 @@ export class Server extends Application {
          * Invoke this method to start the server
          * @param port server port
          */
-        static bootstrap(): Server {
-                // use env depends on it's flag otherwise use dev
+        public static async bootstrap() {
                 // SECTION server init event
                 log.debug('Start boostrapping server');
-                envirnoment.load();
                 // TODO call load function implicitly in envirnoment load method
+                envirnoment.load();
                 stage.load();
                 const server = new Server();
                 server.populateServer();
+                await server.init();
                 return server;
         }
 
-        static test() {
+        public static async test() {
                 log.info('Start Testing');
-                const level = StageLevel.TEST;
-                envirnoment.load(level);
                 // TODO call load function implicitly in envirnoment load method
+                envirnoment.load(StageLevel.TEST);
                 stage.load();
-                return new Server();
+                const server = new Server();
+                await server.init();
+                return server;
         }
 
         private constructor() {
                 super();
-                this.path = new URL(`http://${this.host}:${this.port}`)
+                this.path = new URL(`http://${this.host}:${this.port}`);
                 log.info(`The env => ${stage.LEVEL}`);
-                try {
-                        this.init();
-                } catch (error) {
-                        throw new Error(`Faild to init the server ${error}`);
-                }
+                // try {
+                //         this.init();
+                // } catch (error) {
+                //         throw new Error(`Faild to init the server ${error}`);
+                // }
         }
 
         /**
-         * 
+         *
          * Start the server and return an instance of it.
-         * @returns {Promise<httpServer>} 
+         * @returns {Promise<httpServer>}
          */
         private populateServer(): Promise<httpServer> {
                 return Promise.resolve<httpServer>(this.startServer(this.createServer()));
@@ -69,28 +68,22 @@ export class Server extends Application {
 
         private startServer(server: httpServer) {
                 return server.listen(this.path.port, +this.path.hostname, () => {
-                        log.info(`${new Date()} Server running at ${this.path.href}`)
+                        log.info(`${new Date()} Server running at ${this.path.href}`);
                         // SECTION server start event
                 });
         }
 
-        private setupLocalization() {
-                translation.add('en', en);
-                // localization.add('ar', ar);
-                translation.use('en');
-        }
-
-        /**
-         * 
-         */
         private init() {
-                // const { MONGO_USER: user, MONGO_PASSWORD: password, MONGO_PATH: path, MONGO_HOST: host } = envirnoment.env;
-                // Database.load({ user, password, path, host, atlas: false })
-                this.populateRoutes()
-                this.setupLocalization();
+                const { MONGO_USER: user,
+                        MONGO_PASSWORD: password,
+                        MONGO_PATH: path,
+                        MONGO_HOST: host } = envirnoment.env;
+                return Promise.all([
+                        Database.load({ user, password, path, host, atlas: false }),
+                        this.populateRoutes()]);
+
         }
 }
-
 
 // const createDatabaseStatement = 'CREATE DATABASE testDB';
 // const createTableStatement = `
@@ -99,8 +92,6 @@ export class Server extends Application {
 //         title VARCHAR(255) NOT NULL,
 //         body VARCHAR(255) NOT NULL
 // )`;
-
-
 
 // router.use('/user', function (req, res, next) {
 //     console.log('Request URL:', req.originalUrl)
@@ -125,11 +116,10 @@ export class Server extends Application {
 // Show the request info for any type of http method that call user
 // (app here is application instance)
 
-
 // to escape the next middleware call next('route')
 // will escape the all middleware but next() will continue to next middleware at specific point
 
-// This matching all route middleware under route instance and prefixed with api 
+// This matching all route middleware under route instance and prefixed with api
 // router.all('/api/*', requireAuthentication);
 
 // this will only be invoked if the path starts with /bar from the mount point
@@ -137,7 +127,6 @@ export class Server extends Application {
 // ... maybe some additional /bar logging ...
 //     next();
 // });
-
 
 // Intercept id param under route instance and called once at a time (intercept id param)
 
@@ -174,14 +163,13 @@ function creataTable(tableName, columns) {
         const columnsNames = Object.keys(columns);
         const statement = columnsNames.reduce((statment, column, index) => {
                 const { type, value, key = '' } = columns[column];
-                let _statment = `${column} ${type} ${value} ${key}`
+                let _statment = `${column} ${type} ${value} ${key}`;
                 _statment = _statment.trim();
                 if ((index + 1) !== columnsNames.length) {
                         _statment += ', ';
                 }
-                return statment += _statment;
+                return `${statment}${_statment}`;
         }, '');
-        return `CREATE TABLE ${tableName} (${statement})`
+        return `CREATE TABLE ${tableName} (${statement})`;
 }
 const table = creataTable('FuckTableFromString', schema);
-

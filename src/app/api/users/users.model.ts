@@ -1,28 +1,30 @@
 // REVIEW  consider using validation library for string
-import { ValidationPatterns } from '@shared/common';
-import { Logger } from '@core/utils';
-import { Field, Entity } from '@lib/mongoose';
 import { HashService } from '@core/helpers';
-const log = new Logger('Users Model');
-@Entity('users')
-export class UsersModel {
-    @Field({ select: false }) password: string;
-    @Field({
-        unique: true,
-        match: [ValidationPatterns.NoSpecialChar, 'Value contain special char']
-    }) username: string;
-    @Field({
-        unique: true,
-        match: [ValidationPatterns.EmailValidation, 'Please provide a valid email address']
-    }) email: string;
+import { Logger } from '@core/utils';
+import { BaseModel, Entity, Field } from '@lib/mongoose';
+import { ValidationPatterns } from '@shared/common';
+const log = new Logger('UsersSchema');
 
-    async hashUserPassword() {
+@Entity('users')
+export class UsersSchema {
+    @Field({ select: false }) public password: string;
+    @Field({
+        match: [ValidationPatterns.NoSpecialChar, 'Value contain special char'],
+        unique: true,
+    }) public username: string;
+    @Field({
+        match: [ValidationPatterns.EmailValidation, 'Please provide a valid email address'],
+        unique: true,
+    }) public email: string;
+
+    public async hashUserPassword() {
         this.password = await HashService.hashPassword(this.password);
         return this;
     }
 
-    async comparePassword(candidatePassword: string) {
+    public async comparePassword(candidatePassword: string) {
         return HashService.comparePassword(candidatePassword, this.password);
     }
-
 }
+
+export const UsersModel = BaseModel<UsersSchema>(UsersSchema);

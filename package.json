@@ -5,7 +5,7 @@
   "main": "main.ts",
   "scripts": {
     "snyk": "snyk test",
-    "test": "jest --runInBand",
+    "test": "jest",
     "test:watch": "jest --watch --runInBand --detectOpenHandles",
     "build": "node build --env=prod",
     "dev": "ts-node -r tsconfig-paths/register ./src/main.ts",
@@ -24,9 +24,6 @@
   "author": "ezzabuzaid",
   "engines": {
     "node": "10.15.1"
-  },
-  "jest": {
-    "testEnvironment": "node"
   },
   "licenses": [
     {}
@@ -63,6 +60,7 @@
     "etl": "^0.5.23",
     "eventemitter3": "^3.1.0",
     "express": "^4.16.4",
+    "express-status-monitor": "^1.2.5",
     "express-validator": "^5.3.1",
     "firebase-admin": "~7.0.0",
     "firebase-functions": "^2.2.0",
@@ -82,6 +80,7 @@
     "setprototypeof": "^1.1.1",
     "tsconfig-paths": "^3.8.0",
     "tsconfig-paths-jest": "0.0.1",
+    "jest-environment-node": "^24.8.0",
     "typescript": "^3.4.4",
     "ws": "^6.2.1"
   },
@@ -116,7 +115,7 @@
     "gulp-uglify-es": "^1.0.4",
     "gulp-util": "^3.0.8",
     "gulp-webmake": "0.0.41",
-    "jest": "^24.5.0",
+    "jest": "^24.8.0",
     "logger": "0.0.1",
     "ndb": "^1.0.45",
     "nodemon": "^1.18.10",

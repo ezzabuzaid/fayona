@@ -2,7 +2,7 @@
     if (!process.env[name]) {
         throw new Error(`Environment variable ${name} is missing`)
     }
-})
+});
 
 // if ( protocol === 'https' ) {
 // 	const { execSync } = require( 'child_process' );

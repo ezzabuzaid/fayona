@@ -1,18 +1,18 @@
-import { Request, Response } from 'express';
-import { Post, Get, Put, Delete, Router } from '@lib/methods';
-import { translate } from '@lib/translation';
-import { ErrorResponse, SuccessResponse, NetworkStatus } from '@core/helpers';
-import { UsersRepo } from './users.repo';
 import { Auth } from '@api/portal/auth';
+import { ErrorResponse, NetworkStatus, SuccessResponse } from '@core/helpers';
 import { Logger } from '@core/utils';
+import { Delete, Get, Post, Put, Router } from '@lib/methods';
+import { translate } from '@lib/translation';
+import { Request, Response } from 'express';
+import { UsersRepo } from './users.repo';
 const log = new Logger('User Router');
 @Router('users', {
     middleware: []
 })
 export class UsersRouter {
 
-    @Post('')
-    async register(req: Request, res: Response) {
+    @Post()
+    public async register(req: Request, res: Response) {
         log.info('start register');
 
         // TODO Validate the input
@@ -30,6 +30,7 @@ export class UsersRouter {
         }
 
         const user = await UsersRepo.createEntity({ username, password, email });
+        log.warn(user);
         log.warn(`New user created with username ${user.username}`);
 
         const response = new SuccessResponse(user, translate('user_register_success'), NetworkStatus.CREATED);
@@ -37,11 +38,11 @@ export class UsersRouter {
     }
 
     @Put(':id', Auth.isAuthenticated)
-    async updateUser(req: Request, res: Response) {
+    public async updateUser(req: Request, res: Response) {
         log.info('start updateUser');
         // Validate the input
         const { id } = req.params;
-        const user = await UsersRepo.fetchEntity({ _id: id }, {}, { lean: true });
+        const user = await UsersRepo.fetchEntityById(id).lean();
 
         if (!user) {
             throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
@@ -56,14 +57,14 @@ export class UsersRouter {
     }
 
     @Delete(':id', Auth.isAuthenticated)
-    async deleteUser(req: Request, res: Response) {
+    public async deleteUser(req: Request, res: Response) {
         log.info('start deleteUser');
 
         const { id } = req.params;
-        const user = await UsersRepo.deleteEntity({ _id: id });
+        const user = await UsersRepo.deleteEntity(id);
 
         if (!user) {
-            throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE)
+            throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
         }
 
         const response = new SuccessResponse(null, translate('success'), NetworkStatus.OK);
@@ -71,11 +72,11 @@ export class UsersRouter {
     }
 
     @Get(':id', Auth.isAuthenticated)
-    async fetchUser(req: Request, res: Response) {
+    public async fetchUser(req: Request, res: Response) {
         log.info('start fetchUser');
 
         const { id } = req.params;
-        const user = await UsersRepo.fetchEntity({ _id: id }).lean();
+        const user = await UsersRepo.fetchEntityById(id).lean();
 
         if (!user) {
             throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
@@ -86,7 +87,7 @@ export class UsersRouter {
     }
 
     @Get('', Auth.isAuthenticated)
-    async fetchUsers(req: Request, res: Response) {
+    public async fetchUsers(req: Request, res: Response) {
         log.info('start fetchUsers');
 
         const users = await UsersRepo.fetchEntities();

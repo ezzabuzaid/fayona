@@ -1,7 +1,8 @@
-import { SchemaOptions } from 'mongoose';
 import { BaseSchema } from '@core/database';
+import { Document, model, SchemaOptions } from 'mongoose';
+
 export function Entity(name: string, options: SchemaOptions = {}) {
-    return function (constructor: new (...args: any) => any) {
+    return function(constructor: new (...args: any) => any) {
         const schema = new BaseSchema(constructor.prototype.fields, options);
         // const { prototype } = constructor;
         // const schemaPrototype = AppUtils.getPrototypeOf<typeof schema>(schema);
@@ -10,13 +11,13 @@ export function Entity(name: string, options: SchemaOptions = {}) {
         //     prototype[i] = schemaPrototype[i]
         // }
         // constructor.prototype.constructor = model.prototype.constructor;
-        // return class extends model(name, schema) { } as unknown as T;
         schema.loadClass(constructor);
         constructor['wrapper'] = { schema, name };
+        // return class extends model<& Document>(name, schema) { } as unknown as T;
         // return class extends constructor {
-        //     constructor(...args) {
-        //         super(args);
-        //     }
-        // };
-    }
+        //     // constructor(...args) {
+        //     //     super(args);
+        //     // }
+        // }
+    };
 }

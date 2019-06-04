@@ -14,5 +14,6 @@
     "created_success": "Created",
     "entity_exist": "Entity is exist",
     "not_exist": "Entity not exist",
-    "success": "Sucesss"
+    "success": "Sucesss",
+    "email_exist": "email_exist"
 }

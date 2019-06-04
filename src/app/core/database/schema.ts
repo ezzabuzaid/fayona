@@ -2,20 +2,17 @@ import { Schema as MongooseSchema, SchemaDefinition, SchemaOptions } from 'mongo
 export class BaseSchema<T> extends MongooseSchema<T> {
     constructor(def: SchemaDefinition, opt?: SchemaOptions, model?: Partial<T>) {
         super(def, {
+            id: true,
             timestamps: true,
             skipVersioning: true,
+            strict: true,
             versionKey: false,
             useNestedStrict: true,
-            strict: true,
-            id: true,
             ...opt
         });
     }
 }
 // https://typeorm.io
-
-// Collections
-// ‘Collections’ in Mongo are equivalent to tables in relational databases.They can hold multiple JSON documents.
 
 //     Documents
 // ‘Documents’ are equivalent to records or rows of data in SQL.While a SQL row can reference data in other tables, Mongo documents usually combine that in a document.
