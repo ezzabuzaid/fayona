@@ -64,7 +64,10 @@ export class Application {
             .use(compression())
             .use(express.static(this.staticDirectory))
             .use(express.static(this.uploadDirectory));
-
+            // TODO Security
+            // 1_ sql injection
+            // 2_ csrf
+            // 3_ xss
     }
 
     protected populateRoutes() {

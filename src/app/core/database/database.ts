@@ -36,7 +36,7 @@ class MongooseURI {
         return this._path || '';
     }
     get host() {
-        return this._host ? `@${this.host}` : '';
+        return this._host ? `@${this._host}` : '';
     }
     get atlas() {
         return this._atlas;
