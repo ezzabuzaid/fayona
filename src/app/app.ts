@@ -13,6 +13,11 @@ import morgan = require('morgan');
 import path from 'path';
 const log = new Logger('Application instance');
 
+// FIXME for NAHED ONLY
+import { Op } from 'sequelize';
+import mysql from './playground/mysql';
+import * as orders from './playground/orders';
+
 // Stage.tests(StageLevel.DEV, () => {
 //     Sentry.init({ dsn: 'https://57572231908b4ef0bde6a7328e71cfcf@sentry.io/1462257' });
 // });
@@ -64,27 +69,54 @@ export class Application {
             .use(compression())
             .use(express.static(this.staticDirectory))
             .use(express.static(this.uploadDirectory));
-            // TODO Security
-            // 1_ sql injection
-            // 2_ csrf
-            // 3_ xss
+
+        // TODO setup html view engine for angular
+
+        const sequelize = mysql.load();
+        orders.init(sequelize);
+        let index = 0;
+        this.application.get('/data', (req, res) => {
+            setInterval(() => {
+                log.warn(`2019-04-02T21:00:0${++index}.000Z`);
+                orders.Orders
+                    .findAll({
+                        where: {
+                            request_time: {
+                                [Op.between]: ['2019-04-02T21:00:00.000Z', `2019-04-02T21:00:0${++index}.000Z`]
+                            }
+                        }
+                    }).then((list) => {
+                        console.log(JSON.stringify(list, undefined, 8));
+                    });
+                // res.json(json);
+            }, 5000);
+        });
+
+        // TODO Security
+        // 1_ sql injection
+        // 2_ csrf
+        // 3_ xss
     }
 
     protected populateRoutes() {
         return new Promise((resolve) => {
             // SECTION routes resolving event
-            Wrapper.routerList.forEach(({ router, uri }) => {
-                this.application.use(path.join('/api', uri), router);
-            });
-            this.application.get('/api', (req, res) => res.status(200).json({ work: '/API hitted' }));
-            this.application.get('/', (req, res) => res.sendFile('index.html'));
             this.application.use((req, res, next) => {
                 const acceptLanguage = req.acceptsLanguages();
                 log.warn(acceptLanguage);
                 if (acceptLanguage) {
                     // use localization here
                 }
+                next();
             });
+
+            Wrapper.routerList.forEach(({ router, uri }) => {
+                log.debug(uri);
+                this.application.use(path.join('/api', uri), router);
+            });
+            this.application.get('/api', (req, res) => res.status(200).json({ work: '/API hitted' }));
+            // this.application.get('/', (req, res) => res.sendFile('index.html'));
+
             // * catch favIcon request
             this.application.use(ErrorHandling.favIcon);
 

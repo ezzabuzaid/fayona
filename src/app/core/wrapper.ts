@@ -1,4 +1,5 @@
 // import { CountriesRoutes } from '@api/countries';
+import { AdminRouter } from '@api/admin';
 import { AuthRoutes } from '@api/portal';
 import { UsersRouter } from '@api/users';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
@@ -23,14 +24,14 @@ export class Wrapper {
 
     private static wrapRouter(Router: new () => IExpressInternal) {
         try {
-            const router = new Router;
+            const router = new Router();
             const instance = router.__router();
             if (!instance.id) {
-                new Error('please consider add @Router to the top of class');
+                throw new Error('please consider add @Router to the top of class');
             }
             this.list.push(instance);
         } catch (error) {
-            new Error('The provided router is not constructor');
+            throw new Error('The provided router is not constructor');
         }
     }
 
@@ -55,12 +56,14 @@ export class Wrapper {
 
     private static dispatchRouter({ router }: any) {
         this.list.splice(router);
+        // tslint:disable-next-line: max-line-length
         // ? This is not done, we need to re init all the router again, or just remove this router from both router list and router bootstrap list
     }
 
 }
 
 Wrapper.registerRouter(UsersRouter);
+Wrapper.registerRouter(AdminRouter);
 Wrapper.registerRouter(AuthRoutes);
 // Wrapper.registerRouter(CountriesRoutes);
 // Wrapper.registerRouter(AuthorsRoutes);

@@ -1,10 +1,11 @@
 import { RequestHandler } from 'express';
 import 'reflect-metadata';
 import { method } from './method';
-export function Get(uri: string, ...middlewares: RequestHandler[]): any {
-    return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
+
+export function Get(uri = '/', ...middlewares: RequestHandler[]): any {
+    return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
         const _method = descriptor.value;
-        descriptor.value = function() {
+        descriptor.value = function () {
             return _method.apply(target, arguments);
         };
         const meta = method('get', uri, middlewares, target, propertyKey);
