@@ -15,6 +15,7 @@ export class BaseSchema<T> extends MongooseSchema<T> {
 // https://typeorm.io
 
 //     Documents
+// tslint:disable: max-line-length
 // ‘Documents’ are equivalent to records or rows of data in SQL.While a SQL row can reference data in other tables, Mongo documents usually combine that in a document.
 
 //     Fields

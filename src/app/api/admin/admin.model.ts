@@ -14,7 +14,8 @@ export class AdminSchema {
     @Field({
         match: [ValidationPatterns.NoSpecialChar, 'Value contain special char'],
         unique: true,
-        minlength: 8
+        minlength: 8,
+        maxlength: 16
     }) public username: string;
     // @Field({
     //     match: [ValidationPatterns.EmailValidation, 'Please provide a valid email address'],

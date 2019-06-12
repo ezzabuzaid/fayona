@@ -1,8 +1,10 @@
-// import { CountriesRoutes } from '@api/countries';
 import { AdminRouter } from '@api/admin';
+import { ArtworksRouter } from '@api/artwork';
 import { AuthRoutes } from '@api/portal';
+import { ProductsRouter } from '@api/products';
 import { UsersRouter } from '@api/users';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
+// import { CountriesRoutes } from '@api/countries';
 // import { AuthorsRoutes } from '@api/authors/authors.routes';
 // import { BooksRoutes } from '@api/books';
 import 'reflect-metadata';
@@ -64,7 +66,9 @@ export class Wrapper {
 
 Wrapper.registerRouter(UsersRouter);
 Wrapper.registerRouter(AdminRouter);
+Wrapper.registerRouter(ProductsRouter);
 Wrapper.registerRouter(AuthRoutes);
+Wrapper.registerRouter(ArtworksRouter);
 // Wrapper.registerRouter(CountriesRoutes);
 // Wrapper.registerRouter(AuthorsRoutes);
 // Wrapper.registerRouter(BooksRoutes);
