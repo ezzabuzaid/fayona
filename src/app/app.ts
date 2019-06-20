@@ -8,7 +8,9 @@ import compression = require('compression');
 import express = require('express');
 import monitor = require('express-status-monitor');
 import helmet = require('helmet');
+import Kafka = require('no-kafka');
 import morgan = require('morgan');
+
 // https://github.com/RafalWilinski/express-status-monitor
 import path from 'path';
 const log = new Logger('Application instance');
@@ -17,6 +19,7 @@ const log = new Logger('Application instance');
 import { Op } from 'sequelize';
 import mysql from './playground/mysql';
 import * as orders from './playground/orders';
+import { Message } from 'no-kafka';
 
 // Stage.tests(StageLevel.DEV, () => {
 //     Sentry.init({ dsn: 'https://57572231908b4ef0bde6a7328e71cfcf@sentry.io/1462257' });
@@ -72,25 +75,92 @@ export class Application {
 
         // TODO setup html view engine for angular
 
-        const sequelize = mysql.load();
-        orders.init(sequelize);
-        let index = 0;
-        this.application.get('/data', (req, res) => {
-            setInterval(() => {
-                log.warn(`2019-04-02T21:00:0${++index}.000Z`);
-                orders.Orders
-                    .findAll({
-                        where: {
-                            request_time: {
-                                [Op.between]: ['2019-04-02T21:00:00.000Z', `2019-04-02T21:00:0${++index}.000Z`]
-                            }
-                        }
-                    }).then((list) => {
-                        console.log(JSON.stringify(list, undefined, 8));
-                    });
-                // res.json(json);
-            }, 5000);
-        });
+        // const sequelize = mysql.load();
+        // orders.init(sequelize);
+
+        // this.application.get('/data', (req, res) => {
+        // tslint:disable-next-line: max-line-length
+        // REVIEW  check for data each seconds {https://technology.amis.nl/2017/02/13/kafka-streams-and-nodejs-consuming-and-periodically-reporting-in-node-js-on-the-results-from-a-kafka-streams-streaming-analytics-application/}
+        // NOTE cache the recent result and append them to the newest one since the result should be cumulative
+        // _O_().then((list) => {
+        // res.json(list.map((_) => _.get('request_time')));
+        // });
+        // });
+
+        // const time = {
+        //     second: 0,
+        //     minute: 0,
+        //     hour: 21
+        // };
+        // function _O_() {
+        //     const formatDate = (() => {
+        //         ++time.second;
+        //         if (time.second > 59) {
+        //             ++time.minute;
+        //             time.second = 0;
+        //         }
+        //         if (time.minute > 59) {
+        //             ++time.hour;
+        //             time.minute = 0;
+        //         }
+        //         if (time.hour > 23) {
+        //             time.hour = 0;
+        //             // increase the Day.
+        //         }
+        //         return { ...time };
+        //     })();
+        //     const offset = (new Date()).getTimezoneOffset() / -60;
+        //     const atMust = new Date(2019, 4 - 1, 2, formatDate.hour + offset, formatDate.minute, formatDate.second, 0);
+        //     log.warn(atMust);
+        //     return orders.Orders
+        //         .findAll({
+        //             where: {
+        //                 request_time: {
+        //                     [Op.between]: ['2019-04-02T21:00:00.000Z', atMust]
+        //                 }
+        //             }
+        //         });
+        // }
+        // setInterval(() => {
+        // _O_()
+        //     .then((list) => list.map((_) => _.get('request_time')))
+        //     .then(console.log);
+        // }, 5000);
+        // const producer = new Kafka.Producer({
+        //     connectionString: process.env.KAFKA_URL
+        //   });
+        // const kafka = new Kafka.HighLevelProducer({
+        //     clientId: 'my-app',
+        //     brokers: ['kafka:9092']
+        // });
+        // const producer = new Kafka.Producer({
+        //     connectionString: 'kafka:9092'
+        // });
+        // producer.init()
+        //     .then(_O_)
+        //     .then((list) => list.map((_) => _.get('request_time')))
+        //     .then((value) => {
+        //         return producer.send({
+        //             topic: 'sales-topic',
+        //             partition: 0,
+        //             message: {
+        //                 value: (value as any)
+        //             }
+        //         });
+        //     }).catch(console.log);
+
+        // const consumer = kafka.consumer({ groupId: 'test-group' })
+
+        // await consumer.connect()
+        // await consumer.subscribe({ topic: 'test-topic' })
+
+        // await consumer.run({
+        //     eachMessage: async ({ topic, partition, message }) => {
+        //         console.log({
+        //             value: message.value.toString(),
+        //         })
+        //     },
+        // })
 
         // TODO Security
         // 1_ sql injection
@@ -111,11 +181,11 @@ export class Application {
             });
 
             Wrapper.routerList.forEach(({ router, uri }) => {
-                log.debug(uri);
                 this.application.use(path.join('/api', uri), router);
             });
+
             this.application.get('/api', (req, res) => res.status(200).json({ work: '/API hitted' }));
-            // this.application.get('/', (req, res) => res.sendFile('index.html'));
+            this.application.get('/', (req, res) => res.sendFile('index.html'));
 
             // * catch favIcon request
             this.application.use(ErrorHandling.favIcon);

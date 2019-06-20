@@ -17,12 +17,43 @@ export enum Errors {
 }
 
 export class ErrorHandling {
+
+    constructor() {
+        // TODO Handle applications errors and implement them with refactor event class
+        // const errorTypes = ['unhandledRejection', 'uncaughtException', 'rejectionHandled'];
+        // const signalTraps = ['SIGTERM', 'SIGINT', 'SIGUSR2']
+
+        // errorTypes.map((type: any) => {
+        //     process.on(type, async () => {
+        //         try {
+        //             console.log(`process.on ${type}`);
+        //             process.exit(0);
+        //         } catch (_) {
+        //             process.exit(1);
+        //         }
+        //     });
+        // });
+
+        // signalTraps.map((type: any) => {
+        //     process.once(type, async () => {
+        //         try {
+        //             // 
+        //         } finally {
+        //             process.kill(process.pid, type)
+        //         }
+        //     });
+        // });
+    }
+
     public static catchError(error: any, req: Request, res: Response, next: NextFunction): ErrorRequestHandler {
-        const response = new ErrorResponse(error.message, isNaN(error.code) ? NetworkStatus.INTERNAL_SERVER_ERROR : error.code);
+        const response = new ErrorResponse(error.message,
+            isNaN(error.code)
+                ? NetworkStatus.INTERNAL_SERVER_ERROR
+                : error.code
+        );
+
         switch (error.name) {
             case Errors.CastError:
-                // FIXME  error accoured when try to use with id mongoose method and the id is undefined usually when you get the id from the req.params.id
-                // message = 'some usefulEntityNotFound message';
                 response.message = translate('invalid_syntax');
                 response.code = NetworkStatus.BAD_REQUEST;
                 break;
@@ -31,6 +62,7 @@ export class ErrorHandling {
                 response.code = NetworkStatus.BAD_REQUEST;
                 break;
         }
+
         // production(() => {
         //     response.message = translate('internal_server_error');
         // });

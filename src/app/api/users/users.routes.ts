@@ -86,7 +86,7 @@ export class UsersRouter {
         res.status(response.code).json(response);
     }
 
-    @Get('', Auth.isAuthenticated)
+    @Get()
     public async fetchUsers(req: Request, res: Response) {
         log.info('start fetchUsers');
 

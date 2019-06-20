@@ -6,6 +6,7 @@ const log = new Logger('MySql');
 export class MySql {
     public load() {
         const sequelize = new Sequelize('learn', 'root', '123456789', {
+            port: 3306,
             host: 'localhost',
             dialect: 'mysql',
             pool: {

@@ -25,7 +25,7 @@ export class Server extends Application {
                 stage.load();
                 const server = new Server();
                 server.populateServer();
-                await server.init();
+                // await server.init();
                 return server;
         }
 
