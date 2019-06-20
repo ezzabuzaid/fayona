@@ -25,7 +25,7 @@ export class Server extends Application {
                 stage.load();
                 const server = new Server();
                 server.populateServer();
-                // await server.init();
+                await server.init();
                 return server;
         }
 
@@ -81,8 +81,9 @@ export class Server extends Application {
 
                 try {
                         return Promise.all([
-                                Database.load({ user, password, path, host, atlas }),
-                                this.populateRoutes()]);
+                                // Database.load({ user, password, path, host, atlas }),
+                                this.populateRoutes()
+                        ]);
                 } catch (error) {
                         throw new Error(`Faild to init the server ${error}`);
                 }

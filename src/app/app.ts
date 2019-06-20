@@ -186,7 +186,7 @@ export class Application {
 
             this.application.get('/api', (req, res) => res.status(200).json({ work: '/API hitted' }));
             this.application.post('/api', (req, res) => {
-                console.log(req.body);
+                console.log(JSON.stringify(req.body, undefined, 4));
                 res.status(201).json({ status: 'ok' });
             });
             this.application.get('/', (req, res) => res.sendFile('index.html'));
