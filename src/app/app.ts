@@ -175,7 +175,7 @@ export class Application {
                 const acceptLanguage = req.acceptsLanguages();
                 log.warn(acceptLanguage);
                 if (acceptLanguage) {
-                    // use localization here
+                    // TODO use localization here
                 }
                 next();
             });
@@ -189,15 +189,11 @@ export class Application {
                 console.log(JSON.stringify(req.body, undefined, 4));
                 res.status(201).json({ status: 'ok' });
             });
+
+            this.application.get('/email', (req, res) => res.sendFile('email/index.html'));
             this.application.get('/', (req, res) => res.sendFile('index.html'));
-
-            // * catch favIcon request
             this.application.use(ErrorHandling.favIcon);
-
-            // * catch not found error
             this.application.use(ErrorHandling.notFound);
-
-            // * Globally catch error
             this.application.use(ErrorHandling.catchError);
             resolve(this.application);
         });

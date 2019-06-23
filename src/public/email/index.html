@@ -1,0 +1,138 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+
+</head>
+
+<body>
+    <section class="banner">
+        <div class="container">
+            <img class="banner__logo" src="./logo.svg" alt="Logo">
+            <p class="banner__title">Technical Insight</p>
+            <span>Stay Up to date with daily price movements and gain relevant market insights.</span>
+        </div>
+    </section>
+    <iframe src="https://dev.tradehub.com/en/embed/smart-reports" id="iframe" frameborder="0"></iframe>
+    <div class="benfits">
+        <h2>Forex and CFDs are high risk and losses can exceed your initial deposit</h2>
+        <div class="container">
+            <div class="benfits__wrapper text-center row">
+                <div class="benfits__box col-xs-12 col-sm-4">
+                    <img src="./benfits-3.svg" alt="benfit-1">
+                    <p>www.equiti.com</p>
+                </div>
+                <div class="benfits__box col-xs-12 col-sm-4">
+                    <img src="./benfits-4.svg" alt="benfit-2">
+                    <p>Demo Account</p>
+                </div>
+                <div class="benfits__box col-xs-12 col-sm-4">
+                    <img src="./benfits-5.svg" alt="benfit-2">
+                    <p>Spreads & Margin</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="benfits">
+        <h2>Benefits of trading with Equiti</h2>
+        <div class="container">
+            <div class="benfits__wrapper row">
+                <div class="benfits__box col-xs-12 col-sm-6">
+                    <img src="./benfits-1.svg" alt="benfit-1">
+                    <p>Authorised and Regulated by the Jordan Securities Commission</p>
+                </div>
+                <div class="benfits__box col-xs-12 col-sm-6">
+                    <img src="./benfits-2.svg" alt="benfit-2">
+                    <p>Liquidity from the World’s largest banks and liquidity providers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="footer">
+        <div class="footer__headline text-center text-white">
+            <p>Forex & CFDs are high-risk investments and losses can exceed your initial deposit</p>
+        </div>
+        <div class="footer__info">
+            <div class="container">
+                <div class="footer__content">
+                    <img class="banner__logo" src="./logo.svg" alt="Logo">
+                    <div class="footer__content__nav">
+                        <a href=""><span>Regulations</span></a>
+                        <a href=""><span>Terms Of Use</span></a>
+                        <a href=""><span>Risk Warning</span></a>
+                        <a href=""><span>Contact Us</span></a>
+                    </div>
+
+                </div>
+                <hr>
+                <div class="footer__body">
+                    <!-- Replace with your content -->
+                    <p>
+                        Equiti Group Limited Jordan is a registered trading name in Jordan (Registration Number.
+                        50248),
+                        which is authorized and regulated by the Jordan Securities Commission with its company
+                        registered
+                        address at Al-Abdali Boulevard, Suleiman Al-Nabulsi St 32, Jouba Complex, Second Floor,
+                        Amman,
+                        Jordan.
+
+                        Equiti Capital UK Limited (Company No. 07216039) is authorised and regulated by the
+                        Financial
+                        Conduct Authority, with its company registered address at 69 Wilson Street, London, EC2A
+                        2BB, UK.
+
+                        Card transactions are processed by Equiti Capital UK Limited.
+
+                        The information contained in this e-mail message is intended only for the recipient and may
+                        include
+                        privileged confidential data protected by law. If you are not the named recipient of this
+                        e-mail
+                        message, you are hereby notified that any dissemination, distribution, copying or use of or
+                        reliance
+                        on the information contained in and transmitted with this e-mail message is strictly
+                        prohibited.
+                        Please notify the sender and delete the message from your system. This e-mail message is not
+                        a
+                        solicitation for trading. The contents of this e-mail message express the views of the
+                        sender and
+                        cannot be considered as the view of Equiti.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="footer__bottom">
+            <div class="container">
+                <p class="footer__bottom__title">Powered by</p>
+                <img class="footer__bottom__logo" src="./tradehub-logo.png" alt="Tradehub">
+                <div class="footer__bottom__footer__unsubscribe">
+                    <div>
+                        <a href="">Unsubscribe</a>
+                    </div>
+                    <p>
+                        Al-Abdali Boulevard, Suleiman Al-Nabulsi St 32, Jouba Complex, Second Floor, Amman, Jordan.
+                        © Equiti. All rights reserved
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const { style } = document.getElementById('iframe');
+        window.addEventListener('message', ({ data }) => {
+            console.log(data);
+            if (data && data.height) {
+                style.setProperty('height', data.height);
+            }
+        });
+    </script>
+</body>
+
+</html>
