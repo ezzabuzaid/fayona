@@ -23,12 +23,6 @@ SECTION IMPORTANT
 3_ user model should not be used explicty
 4_ model, repo and routes used as component 
 
-SECTION DONE
-1_ endpoint not found 
-2_ internal server error
-3_ http status codes
-4_ wrap router and register it in app instance
-
 SECTION mongoose model
 1_ add hook decorator
 2_ virtuals
