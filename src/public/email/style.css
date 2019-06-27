@@ -1,22 +1,5 @@
 body {
-  background-color: #f6f6f6;
-}
-
-.banner {
-  background-image: url("./banner.jpg");
-  height: 110px;
-  background-size: cover;
-  color: white;
-  margin-bottom: 1rem;
-}
-
-.banner__title {
-  margin-bottom: 0;
-  font-weight: bold;
-}
-
-.banner__logo {
-  margin: 1rem 0;
+  background-color: #f6f6f6 !important;
 }
 
 iframe {
