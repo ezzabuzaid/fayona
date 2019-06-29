@@ -1,14 +1,15 @@
 import { RequestHandler } from 'express';
-import 'reflect-metadata';
-import { method } from './method';
+import { define, METHODS } from '.';
 
 export function Post(uri = '/', ...middlewares: RequestHandler[]): any {
     return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
-        const _method = descriptor.value;
-        descriptor.value = function() {
-            return _method.apply(target, arguments);
+        const originalMethod = descriptor.value;
+        descriptor.value = function(...args: any[]) {
+            console.log('wrapped function: before invoking ' + propertyKey);
+            const result = originalMethod.apply(this, args);
+            console.log('wrapped function: after invoking ' + propertyKey);
+            return result;
         };
-        const meta = method('post', uri, middlewares, target, propertyKey);
-        Reflect.defineMetadata(`${uri}post`, meta, target.constructor);
+        define({ method: METHODS.POST, uri, middlewares, target, propertyKey });
     };
 }

@@ -1,9 +1,6 @@
-// REVIEW  consider using validation library for string
 import { HashService } from '@core/helpers';
-import { Logger } from '@core/utils';
 import { BaseModel, Entity, Field } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
-const log = new Logger('AdminSchema');
 
 @Entity('admins')
 export class AdminSchema {

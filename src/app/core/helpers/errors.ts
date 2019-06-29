@@ -20,29 +20,29 @@ export class ErrorHandling {
 
     constructor() {
         // TODO Handle applications errors and implement them with refactor event class
-        // const errorTypes = ['unhandledRejection', 'uncaughtException', 'rejectionHandled'];
-        // const signalTraps = ['SIGTERM', 'SIGINT', 'SIGUSR2']
+        const errorTypes = ['unhandledRejection', 'uncaughtException', 'rejectionHandled'];
+        const signalTraps = ['SIGTERM', 'SIGINT', 'SIGUSR2'];
 
-        // errorTypes.map((type: any) => {
-        //     process.on(type, async () => {
-        //         try {
-        //             console.log(`process.on ${type}`);
-        //             process.exit(0);
-        //         } catch (_) {
-        //             process.exit(1);
-        //         }
-        //     });
-        // });
+        errorTypes.map((type: any) => {
+            process.on(type, async () => {
+                try {
+                    log.info(`process.on ${type}`);
+                    process.exit(0);
+                } catch (_) {
+                    process.exit(1);
+                }
+            });
+        });
 
-        // signalTraps.map((type: any) => {
-        //     process.once(type, async () => {
-        //         try {
-        //             // 
-        //         } finally {
-        //             process.kill(process.pid, type)
-        //         }
-        //     });
-        // });
+        signalTraps.map((type: any) => {
+            process.once(type, async () => {
+                try {
+                    log.info(`process.on ${type}`);
+                } finally {
+                    process.kill(process.pid, type);
+                }
+            });
+        });
     }
 
     public static catchError(error: any, req: Request, res: Response, next: NextFunction): ErrorRequestHandler {

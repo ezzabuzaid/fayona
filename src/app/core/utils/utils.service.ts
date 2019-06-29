@@ -8,8 +8,7 @@ export type Parameter<T extends (args: any) => any> = T extends (args: infer P) 
 
 export class AppUtils {
     public static setPrototypeOf(constructor: object, superConstructor: object) {
-        const fn = Object.setPrototypeOf || setPrototypeOf;
-        fn(constructor, superConstructor);
+        Object.setPrototypeOf(constructor, superConstructor);
     }
 
     public static getPrototypeOf<T>(constructor): Type<T> {

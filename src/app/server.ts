@@ -81,13 +81,12 @@ export class Server extends Application {
 
                 try {
                         return Promise.all([
-                                // Database.load({ user, password, path, host, atlas }),
-                                this.populateRoutes()
+                                this.populateRoutes(),
+                                Database.load({ user, password, path, host, atlas }),
                         ]);
                 } catch (error) {
                         throw new Error(`Faild to init the server ${error}`);
                 }
-
 
         }
 }
@@ -151,32 +150,32 @@ export class Server extends Application {
 //     console.log('and this matches too');
 //     res.end();
 // });
-const schema = {
-        id: {
-                type: 'int UNSIGNED',
-                value: 'AUTO_INCREMENT',
-                key: 'PRIMARY KEY'
-        },
-        title: {
-                type: 'VARCHAR(255)',
-                value: 'NOT NULL'
-        },
-        body: {
-                type: 'VARCHAR(255)',
-                value: 'NOT NULL'
-        }
-};
-function creataTable(tableName, columns) {
-        const columnsNames = Object.keys(columns);
-        const statement = columnsNames.reduce((statment, column, index) => {
-                const { type, value, key = '' } = columns[column];
-                let _statment = `${column} ${type} ${value} ${key}`;
-                _statment = _statment.trim();
-                if ((index + 1) !== columnsNames.length) {
-                        _statment += ', ';
-                }
-                return `${statment}${_statment}`;
-        }, '');
-        return `CREATE TABLE ${tableName} (${statement})`;
-}
-const table = creataTable('FuckTableFromString', schema);
+// const schema = {
+//         id: {
+//                 type: 'int UNSIGNED',
+//                 value: 'AUTO_INCREMENT',
+//                 key: 'PRIMARY KEY'
+//         },
+//         title: {
+//                 type: 'VARCHAR(255)',
+//                 value: 'NOT NULL'
+//         },
+//         body: {
+//                 type: 'VARCHAR(255)',
+//                 value: 'NOT NULL'
+//         }
+// };
+// function creataTable(tableName, columns) {
+//         const columnsNames = Object.keys(columns);
+//         const statement = columnsNames.reduce((statment, column, index) => {
+//                 const { type, value, key = '' } = columns[column];
+//                 let _statment = `${column} ${type} ${value} ${key}`;
+//                 _statment = _statment.trim();
+//                 if ((index + 1) !== columnsNames.length) {
+//                         _statment += ', ';
+//                 }
+//                 return `${statment}${_statment}`;
+//         }, '');
+//         return `CREATE TABLE ${tableName} (${statement})`;
+// }
+// const table = creataTable('FuckTableFromString', schema);

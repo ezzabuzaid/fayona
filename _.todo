@@ -36,3 +36,18 @@ use http://www.hygen.io/create style for documention section
 
 
 Refactor the "Reactor" class to work with event
+Modify the request interface to be generic in order to give the body type
+Get the type of the decorated attr only
+
+
+
+
+/* EXAMPLE USAGE - limiting a decorator to Ultra typings */
+function ultra<TKey extends string, TTarget extends { [K in TKey]: Ultra<unknown> }>(target: TTarget, propertyName: TKey) {
+    // decorator implementation here
+}
+
+class DecoratedModel {
+    @ultra public someProperty: number; // ❌ Error, property has to have Ultra type
+    @ultra public anotherOne: Ultra<number>; // ✅ compiles
+}

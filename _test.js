@@ -1,7 +1,7 @@
 require("ts-node/register");
 require('tsconfig-paths/register');
 
-const { Server } = require('../src/app/server');
+const { Server } = require('./src/app/server');
 // import { Server } from '../src/app/server';
 const NodeEnvironment = require('jest-environment-node');
 const request = require('supertest');

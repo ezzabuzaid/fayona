@@ -1,15 +1,15 @@
 import en from '@assets/languages/en.json';
 import { ErrorHandling, stage, StageLevel } from '@core/helpers';
 import { Logger } from '@core/utils';
-import { Wrapper } from '@core/wrapper';
 import { translation } from '@lib/translation';
 import Sentry = require('@sentry/node');
 import compression = require('compression');
 import express = require('express');
-import monitor = require('express-status-monitor');
 import helmet = require('helmet');
 import morgan = require('morgan');
+import { Wrapper } from './wrapper';
 
+// import monitor = require('express-status-monitor');
 // https://github.com/RafalWilinski/express-status-monitor
 import path from 'path';
 const log = new Logger('Application instance');
@@ -57,7 +57,7 @@ export class Application {
         });
 
         this.application
-            .use(monitor())
+            // .use(monitor())
             .use(express.json())
             .use(express.urlencoded({ extended: true }))
             .use(morgan('dev'))
@@ -79,7 +79,7 @@ export class Application {
             // SECTION routes resolving event
             this.application.use((req, res, next) => {
                 const acceptLanguage = req.acceptsLanguages();
-                log.warn(acceptLanguage);
+                // log.warn(acceptLanguage);
                 if (acceptLanguage) {
                     // TODO use localization here
                 }
@@ -106,13 +106,12 @@ export class Application {
         translation.use('en');
     }
 
-    public get(key: string): string {
+    public get<T>(key: string): T {
         return this.application.get(key);
     }
 
-    public set<T>(key: string, value: T): T {
+    public set(key: string, value: any) {
         this.application.set(key, value);
-        return value;
     }
 }
 

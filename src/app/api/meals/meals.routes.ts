@@ -4,28 +4,17 @@ import { Logger } from '@core/utils';
 import { Delete, Get, Post, Put, Router } from '@lib/methods';
 import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
-import { UsersRepo } from './users.repo';
-const log = new Logger('UsersRouter');
+import { MealsRepo } from './meals.repo';
+const log = new Logger('MealsRouter');
 
-@Router('users')
-export class UsersRouter {
-    private repo = UsersRepo;
+@Router('meals')
+export class MealsRouter {
+    private repo = MealsRepo;
 
-    @Post()
+    @Post('', Auth.isAuthenticated)
     public async create(req: Request, res: Response) {
-        const { username, password, email, mobile } = req.body;
-
-        const checkUsername = await this.repo.entityExist({ username });
-        if (checkUsername) {
-            throw new ErrorResponse(translate('username_exist'), NetworkStatus.BAD_REQUEST);
-        }
-
-        const checkEmail = await this.repo.entityExist({ email });
-        if (checkEmail) {
-            throw new ErrorResponse(translate('email_exist'), NetworkStatus.BAD_REQUEST);
-        }
-
-        const entity = await this.repo.createEntity({ username, password, email, mobile });
+        const { price, image, recipe, name, menu_id } = req.body;
+        const entity = await this.repo.createEntity({ price, image, recipe, name, menu_id });
         const response = new SuccessResponse(entity, translate('success'), NetworkStatus.CREATED);
         res.status(response.code).json(response);
     }
@@ -37,8 +26,8 @@ export class UsersRouter {
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
         }
-        const { username } = req.body;
-        entity.set({ username });
+        const { price, status, image, description, size, style, color } = req.body;
+        entity.set({ price, status, image, description, size, style, color, for: req.body.for });
         await entity.save();
 
         const response = new SuccessResponse(entity, translate('success'), NetworkStatus.OK);
@@ -67,11 +56,10 @@ export class UsersRouter {
         res.status(response.code).json(response);
     }
 
-    @Get('/', Auth.isAuthenticated)
+    @Get()
     public async fetchEntities(req: Request, res: Response) {
         const entites = await this.repo.fetchEntities();
         const response = new SuccessResponse(entites, translate('success'), NetworkStatus.OK);
         res.status(response.code).json(response);
     }
-
 }

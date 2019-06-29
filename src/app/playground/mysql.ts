@@ -21,7 +21,6 @@
 
 // export default new MySql();
 
-
 //         // const sequelize = mysql.load();
 //         // orders.init(sequelize);
 

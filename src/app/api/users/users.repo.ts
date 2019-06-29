@@ -1,15 +1,14 @@
-import { Logger } from '@core/utils';
+import { Body } from '@lib/mongoose';
 import { UsersModel, UsersSchema } from './users.model';
-const log = new Logger('Users Repo');
 
 export class UsersRepo extends UsersModel {
-    public static async createEntity(doc: Partial<UsersSchema>) {
+    public static async createEntity(doc: Body<UsersSchema>) {
         const user = new UsersRepo(doc);
         await user.hashUserPassword();
         return user.save();
     }
 
-    public static fetchEntity(obj, ...args) {
+    public static fetchEntity(obj: Partial<Body<UsersSchema>>, ...args) {
         return this.findOne(obj, ...args);
     }
 
@@ -17,7 +16,7 @@ export class UsersRepo extends UsersModel {
         return this.findOneAndDelete({ _id: id });
     }
 
-    public static entityExist(obj) {
+    public static entityExist(obj: Partial<Body<UsersSchema>>) {
         return this.fetchEntity(obj).lean();
     }
 
@@ -26,6 +25,6 @@ export class UsersRepo extends UsersModel {
     }
 
     public static fetchEntityById(id: string) {
-        return this.fetchEntity({ _id: id });
+        return this.findById(id);
     }
 }

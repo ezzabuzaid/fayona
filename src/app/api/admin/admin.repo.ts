@@ -1,6 +1,4 @@
-import { Logger } from '@core/utils';
 import { AdminModel, AdminSchema } from './admin.model';
-const log = new Logger('AdminRepo');
 
 export class AdminRepo extends AdminModel {
     public static async createEntity(doc: Partial<AdminSchema>) {

@@ -3,14 +3,14 @@ import { Post, Router } from '@lib/methods';
 import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
 
+import { AdminRepo } from '@api/admin';
 import { UsersRepo } from '@api/users';
 import { Logger } from '@core/utils';
 import { Auth } from './auth';
-import { AdminRepo } from '@api/admin';
-const log = new Logger('Auth Router');
+const log = new Logger('PortalRoutes');
 
 @Router('portal')
-export class AuthRoutes {
+export class PortalRoutes {
 
     @Post('login/user')
     public async loginUser(req: Request, res: Response) {

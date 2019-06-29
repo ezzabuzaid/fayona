@@ -1,6 +1,6 @@
 import { AppUtils } from '@core/utils';
 import 'reflect-metadata';
-import { MongooseTypes } from './types';
+import { MongooseTypes } from '.';
 
 export function Field<T = any>(options: Exclude<MongooseTypes.FieldOptions, 'type'> = {}) {
     return (instance: MongooseTypes.IFieldAttr & T, propertyKey: string) => {

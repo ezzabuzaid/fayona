@@ -5,15 +5,16 @@ import { JestRequest } from '../../../../test';
 let id = null;
 let token = null;
 let client: supertest.SuperTest<supertest.Test> = null;
-const ENDPOINT = '/api/users';
+const ENDPOINT = '/api/meals';
 beforeAll(async () => {
     client = await JestRequest();
-    const req = client.post(`${ENDPOINT}/`);
+    const req = client.post(`${ENDPOINT}`);
     req.send({
-        email: 'test@test.com',
-        password: '123456789',
-        username: 'test',
-        mobile: '+962792807794'
+        recipe: 'Test recipe',
+        name: 'Test male',
+        image: 'Test image',
+        price: 10,
+        menu_id: 10
     });
     const res = await req;
     console.log(res.body);
@@ -48,7 +49,6 @@ describe('GET BY ${id}/', () => {
     });
 
     test('should fail if requested with id not of type ObjectId', async () => {
-        // this will rise cast error
         const req = client.get(`${ENDPOINT}/${undefined}`);
         const res = await req.set('Authorization', token);
         expect(res.status).toBe(400);
@@ -64,13 +64,13 @@ describe('GET BY ${id}/', () => {
         const req = client.get(`${ENDPOINT}/${id}`);
         const res = await req.set('Authorization', token);
         const { data } = res.body;
-        expect(data).toHaveProperty('username');
-        expect(data).toHaveProperty('mobile');
-        expect(data).toHaveProperty('email');
+        expect(data).toHaveProperty('image');
+        expect(data).toHaveProperty('price');
+        expect(data).toHaveProperty('recipe');
+        expect(data).toHaveProperty('name');
         expect(data).toHaveProperty('createdAt');
         expect(data).toHaveProperty('updatedAt');
         expect(data).toHaveProperty('_id');
-        expect(data).not.toHaveProperty('password');
     });
 });
 
@@ -79,4 +79,3 @@ describe('GET BY ${id}/', () => {
 // and in delete you must check that the entity no longer in database
 // in update and create you must test the validation by insert Wrong data
 // in login check login test cases
-// try to send wrong mobile, email

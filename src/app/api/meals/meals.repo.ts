@@ -1,8 +1,9 @@
-import { ArtworksModel, ArtworksSchema } from './artwork.model';
+import { Body } from '@lib/mongoose';
+import { MealsModel, MealsSchema } from './meals.model';
 
-export class ArtworksRepo extends ArtworksModel {
-    public static async createEntity(doc: Partial<ArtworksSchema>) {
-        const user = new ArtworksRepo(doc);
+export class MealsRepo extends MealsModel {
+    public static async createEntity(doc: Body<MealsSchema>) {
+        const user = new MealsRepo(doc);
         return user.save();
     }
 
