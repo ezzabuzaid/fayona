@@ -82,7 +82,7 @@ export class Server extends Application {
                 try {
                         return Promise.all([
                                 this.populateRoutes(),
-                                Database.load({ user, password, path, host, atlas }),
+                                // Database.load({ user, password, path, host, atlas }),
                         ]);
                 } catch (error) {
                         throw new Error(`Faild to init the server ${error}`);
