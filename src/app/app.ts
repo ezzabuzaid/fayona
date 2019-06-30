@@ -90,7 +90,8 @@ export class Application {
                 this.application.use(path.join('/api', uri), router);
             });
 
-            this.application.get('/email', (req, res) => res.sendFile('email/index.html'));
+            this.application.get('/email/en', (req, res) => res.sendFile('email/ar.html'));
+            this.application.get('/email/ar', (req, res) => res.sendFile('email/en.html'));
             this.application.get('/api', (req, res) => res.status(200).json({ work: '/API hitted' }));
             this.application.get('/', (req, res) => res.sendFile('index.html'));
             this.application.use(ErrorHandling.favIcon);
