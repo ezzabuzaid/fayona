@@ -20,9 +20,7 @@ export class Server extends Application {
         public static async bootstrap() {
                 // SECTION server init event
                 log.debug('Start boostrapping server');
-                // TODO call load function implicitly in envirnoment load method
                 envirnoment.load();
-                stage.load();
                 const server = new Server();
                 server.populateServer();
                 await server.init();
@@ -31,9 +29,7 @@ export class Server extends Application {
 
         public static async test() {
                 log.info('Start Testing');
-                // TODO call load function implicitly in envirnoment load method
                 envirnoment.load(StageLevel.TEST);
-                stage.load();
                 const server = new Server();
                 await server.init();
                 return server;
@@ -73,16 +69,11 @@ export class Server extends Application {
                         MONGO_PASSWORD: password,
                         MONGO_PATH: path,
                         MONGO_HOST: host } = envirnoment.env;
-
-                let atlas = false;
-                if (stage.production) {
-                        atlas = true;
-                }
-
+                log.debug(stage.LEVEL);
                 try {
                         return Promise.all([
                                 this.populateRoutes(),
-                                Database.load({ user, password, path, host, atlas }),
+                                Database.load({ user, password, path, host, atlas: stage.production }),
                         ]);
                 } catch (error) {
                         throw new Error(`Faild to init the server ${error}`);

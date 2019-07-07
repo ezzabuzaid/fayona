@@ -1,14 +1,14 @@
-import { StageLevel } from '@core/helpers';
+import { stage, StageLevel } from '@core/helpers';
 import { AppUtils, Logger } from '@core/utils';
 import { config as envConfig } from 'dotenv';
-import { join, posix } from 'path';
+import { join } from 'path';
 const log = new Logger('Envirnoment Class');
 
 class Envirnoment {
-    public load(stage?: StageLevel) {
+    public load(env?: StageLevel) {
         let envPath = '.env';
-        if (!AppUtils.isNull(stage)) {
-            envPath = `${envPath}.${stage}`;
+        if (!AppUtils.isNull(env)) {
+            envPath = `${envPath}.${env}`;
         }
         log.warn(envPath);
         const { error, parsed } = envConfig({ path: join(__dirname, envPath) });
@@ -16,6 +16,7 @@ class Envirnoment {
             log.debug(error);
             throw new Error('an error accourd while loading the env file');
         }
+        stage.load(this.get('NODE_ENV'));
         return parsed;
     }
 

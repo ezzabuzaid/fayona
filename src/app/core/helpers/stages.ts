@@ -11,9 +11,8 @@ export enum StageLevel {
 class Stage {
     private _level = null;
 
-    public load() {
-        const envLevel = Object.values(StageLevel).find((_stage) => _stage === +envirnoment.get('NODE_ENV'));
-        this.LEVEL = envLevel || StageLevel.LOCAL;
+    public load(env) {
+        this.LEVEL = env || StageLevel.LOCAL;
     }
 
     public get LEVEL() {

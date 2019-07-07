@@ -55,6 +55,7 @@ export class Database {
         return connect(URI, {
             useNewUrlParser: true,
             autoIndex: false,
+            w: 'majority',
             ...options
         })
             .then(() => log.info('Database Connected'))
