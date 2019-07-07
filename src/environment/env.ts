@@ -1,4 +1,4 @@
-import { stage, StageLevel } from '@core/helpers';
+import { NODE_STAGE, stage, StageLevel } from '@core/helpers';
 import { AppUtils, Logger } from '@core/utils';
 import { config as envConfig } from 'dotenv';
 import { join } from 'path';
@@ -16,7 +16,7 @@ class Envirnoment {
             log.debug(error);
             throw new Error('an error accourd while loading the env file');
         }
-        stage.load(this.get('NODE_ENV'));
+        stage.load(this.get(NODE_STAGE) as StageLevel);
         return parsed;
     }
 

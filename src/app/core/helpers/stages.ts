@@ -1,6 +1,3 @@
-import { envirnoment } from '@environment/env';
-import { throws } from 'assert';
-
 export enum StageLevel {
     LOCAL = 'local',
     DEV = 'dev',
@@ -8,10 +5,15 @@ export enum StageLevel {
     PROD = 'prod'
 }
 
+/**
+ * this string must be the same as the name in env files
+ */
+export const NODE_STAGE = 'NODE_STAGE';
+
 class Stage {
     private _level = null;
 
-    public load(env) {
+    public load(env: StageLevel) {
         this.LEVEL = env || StageLevel.LOCAL;
     }
 

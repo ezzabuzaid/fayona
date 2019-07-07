@@ -75,7 +75,7 @@ export class Application {
     }
 
     protected populateRoutes() {
-        return new Promise((resolve) => {
+        return new Promise<ReturnType<typeof express>>((resolve) => {
             // SECTION routes resolving event
             this.application.use((req, res, next) => {
                 const acceptLanguage = req.acceptsLanguages();

@@ -30,9 +30,7 @@ export class Server extends Application {
         public static async test() {
                 log.info('Start Testing');
                 envirnoment.load(StageLevel.TEST);
-                const server = new Server();
-                await server.init();
-                return server;
+                return (new Server()).init();
         }
 
         private constructor() {
