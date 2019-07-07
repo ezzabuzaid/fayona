@@ -1,17 +1,17 @@
 import { Body } from '@lib/mongoose';
-import { MealsModel, MealsSchema } from './meals.model';
+import { MenusModel, MenusSchema } from './menus.model';
 
-export class MealsRepo extends MealsModel {
-    public static async updateEntity(id: string, body: Body<MealsSchema>) {
-        const entity = await this.fetchEntityById(id);
+export class MenusRepo extends MenusModel {
+    public static async updateEntity(id: string, body: Body<MenusSchema>) {
+        const entity = await this.fetchEntityById(id).lean();
         if (!entity) {
             return null;
         }
         entity.set(body);
         return entity.save();
     }
-    public static createEntity(doc: Body<MealsSchema>) {
-        const user = new MealsRepo(doc);
+    public static createEntity(doc: Body<MenusSchema>) {
+        const user = new MenusRepo(doc);
         return user.save();
     }
 

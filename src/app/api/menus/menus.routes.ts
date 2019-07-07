@@ -4,17 +4,17 @@ import { Logger } from '@core/utils';
 import { Delete, Get, Post, Put, Router } from '@lib/methods';
 import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
-import { MealsRepo } from './meals.repo';
-const log = new Logger('MealsRouter');
+import { MenusRepo } from './menus.repo';
+const log = new Logger('MenusRouter');
 
-@Router('meals')
-export class MealsRouter {
-    private repo = MealsRepo;
+@Router('menus')
+export class MenusRouter {
+    private repo = MenusRepo;
 
     @Post('', Auth.isAuthenticated)
     public async create(req: Request, res: Response) {
-        const { price, image, recipe, name, menu_id } = req.body;
-        const entity = await this.repo.createEntity({ price, image, recipe, name, menu_id });
+        const { image, name, description } = req.body;
+        const entity = await this.repo.createEntity({ image, name, description });
         const response = new SuccessResponse(entity, translate('success'), NetworkStatus.CREATED);
         res.status(response.code).json(response);
     }
@@ -22,8 +22,8 @@ export class MealsRouter {
     @Put(':id', Auth.isAuthenticated)
     public async update(req: Request, res: Response) {
         const { id } = req.params;
-        const { price, image, recipe, name, menu_id } = req.body;
-        const entity = await this.repo.updateEntity(id, { price, image, recipe, name, menu_id });
+        const { image, name, description } = req.body;
+        const entity = await this.repo.updateEntity(id, { image, description, name });
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
         }

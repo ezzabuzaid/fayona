@@ -35,6 +35,3 @@ export class UsersSchema {
 }
 
 export const UsersModel = BaseModel<UsersSchema>(UsersSchema);
-
-// export type OmitProperties<T, P> = Pick<T, { [K in keyof T]: T[K] extends P ? never : K }[keyof T]>;
-// export type Body<T> = OmitProperties<T, () => Promise<any>>;

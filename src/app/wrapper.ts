@@ -1,9 +1,10 @@
+import { AdminRouter } from '@api/admin';
 import { MealsRouter } from '@api/meals';
+import { MenusRouter } from '@api/menus';
 import { PortalRoutes } from '@api/portal';
 import { UsersRouter } from '@api/users';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
 import 'reflect-metadata';
-import { AdminRouter } from '@api/admin';
 export class Wrapper {
     private static list = [];
     public static registerRouter(router, subRouter?) {
@@ -54,10 +55,11 @@ export class Wrapper {
 
 }
 
-Wrapper.registerRouter(UsersRouter);
-Wrapper.registerRouter(MealsRouter);
 Wrapper.registerRouter(PortalRoutes);
+Wrapper.registerRouter(UsersRouter);
 Wrapper.registerRouter(AdminRouter);
+Wrapper.registerRouter(MealsRouter);
+Wrapper.registerRouter(MenusRouter);
 // Wrapper.registerRouter(ProductsRouter);
 // Wrapper.registerRouter(ArtworksRouter);
 // Wrapper.registerRouter(CountriesRoutes);

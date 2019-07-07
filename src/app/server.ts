@@ -10,7 +10,7 @@ const log = new Logger('Server init');
 
 export class Server extends Application {
         private port = +envirnoment.get('PORT') || 8080;
-        private host = envirnoment.get('HOST') || 'localhost';
+        private host = envirnoment.get('HOST') || '127.0.0.1';
         public path: URL = null;
 
         /**
@@ -82,7 +82,7 @@ export class Server extends Application {
                 try {
                         return Promise.all([
                                 this.populateRoutes(),
-                                // Database.load({ user, password, path, host, atlas }),
+                                Database.load({ user, password, path, host, atlas }),
                         ]);
                 } catch (error) {
                         throw new Error(`Faild to init the server ${error}`);
