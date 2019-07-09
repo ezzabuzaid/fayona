@@ -55,8 +55,21 @@ export class MealsRouter {
 
     @Get()
     public async fetchEntities(req: Request, res: Response) {
-        const entites = await this.repo.fetchEntities();
-        const response = new SuccessResponse(entites, translate('success'), NetworkStatus.OK);
+        const response = await this.emitValue();
         res.status(response.code).json(response);
     }
+
+    @Get(':menu/menu_id')
+    public async fetchEntitiesByMealID(req: Request, res: Response) {
+        const { menu_id } = req.params;
+        const response = await this.emitValue({ menu_id });
+        res.status(response.code).json(response);
+
+    }
+
+    async emitValue(query = {}) {
+        const entites = await this.repo.fetchEntities(query);
+        return new SuccessResponse(entites, translate('success'), NetworkStatus.OK);
+    }
+
 }

@@ -27,7 +27,7 @@ export class MealsRepo extends MealsModel {
         return this.fetchEntity(obj).lean();
     }
 
-    public static fetchEntities(obj?, ...args) {
+    public static fetchEntities(obj?: Partial<Body<MealsSchema>>, ...args) {
         return this.find(obj, ...args);
     }
 
