@@ -14,18 +14,10 @@ export class UsersRouter {
     @Post()
     public async create(req: Request, res: Response) {
         const { username, password, email, mobile } = req.body;
-
-        const checkUsername = await this.repo.entityExist({ username });
-        if (checkUsername) {
-            throw new ErrorResponse(translate('username_exist'), NetworkStatus.BAD_REQUEST);
-        }
-
-        const checkEmail = await this.repo.entityExist({ email });
-        if (checkEmail) {
-            throw new ErrorResponse(translate('email_exist'), NetworkStatus.BAD_REQUEST);
-        }
-
         const entity = await this.repo.createEntity({ username, password, email, mobile });
+        if (!entity) {
+            throw new ErrorResponse(translate('error'), NetworkStatus.BAD_REQUEST);
+        }
         const response = new SuccessResponse(entity, translate('success'), NetworkStatus.CREATED);
         res.status(response.code).json(response);
     }
@@ -33,14 +25,10 @@ export class UsersRouter {
     @Put(':id', Auth.isAuthenticated)
     public async update(req: Request, res: Response) {
         const { id } = req.params;
-        const entity = await this.repo.fetchEntityById(id).lean();
+        const entity = await this.repo.updateEntity(id, req.body);
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
         }
-        const { username } = req.body;
-        entity.set({ username });
-        await entity.save();
-
         const response = new SuccessResponse(entity, translate('success'), NetworkStatus.OK);
         res.status(response.code).json(response);
     }

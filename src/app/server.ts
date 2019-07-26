@@ -20,7 +20,7 @@ export class Server extends Application {
         public static async bootstrap() {
                 // SECTION server init event
                 log.debug('Start boostrapping server');
-                envirnoment.load();
+                envirnoment.load(StageLevel.PROD);
                 const server = new Server();
                 server.populateServer();
                 await server.init();

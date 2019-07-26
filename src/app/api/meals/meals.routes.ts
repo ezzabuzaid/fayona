@@ -59,7 +59,7 @@ export class MealsRouter {
         res.status(response.code).json(response);
     }
 
-    @Get(':menu/menu_id')
+    @Get('menu/:menu_id')
     public async fetchEntitiesByMealID(req: Request, res: Response) {
         const { menu_id } = req.params;
         const response = await this.emitValue({ menu_id });
@@ -67,9 +67,12 @@ export class MealsRouter {
 
     }
 
-    async emitValue(query = {}) {
+    public async emitValue(query = {}) {
+        log.debug(query);
         const entites = await this.repo.fetchEntities(query);
-        return new SuccessResponse(entites, translate('success'), NetworkStatus.OK);
+        const response = new SuccessResponse(entites, translate('success'), NetworkStatus.OK);
+        response['count'] = entites.length;
+        return response;
     }
 
 }
