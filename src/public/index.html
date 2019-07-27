@@ -15,7 +15,7 @@
         window.onload = function () {
             class socket extends WebSocket {
                 constructor() {
-                    super(`ws://${location.href.split('//')[1]}`);
+                    super(`ws://${location.href.split('//')[1]}olhc`);
                 }
 
                 onOpen(evt) {
@@ -43,7 +43,7 @@
             // });
             // chart.render();
             wss.onmessage = ((message) => {
-                document.write(message);
+                console.log(message);
                 // console.log(message);
                 // const data = JSON.parse(message.data);
                 // const dataPoints = chart.options.data[0].dataPoints = [];

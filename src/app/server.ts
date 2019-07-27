@@ -2,13 +2,12 @@ import { Database } from '@core/database/database';
 import { stage, StageLevel } from '@core/helpers';
 import { Logger } from '@core/utils';
 import { envirnoment } from '@environment/env';
-import { Server as httpServer } from 'http';
 import http = require('http');
 import { URL } from 'url';
 import { Application } from './app';
 const log = new Logger('Server init');
-
-export class Server extends Application {
+import { OLHC, loadOHLCcsv } from './playground/olhc';
+export class NodeServer extends Application {
         private port = +envirnoment.get('PORT') || 8080;
         private host = envirnoment.get('HOST') || '127.0.0.1';
         public path: URL = null;
@@ -20,17 +19,27 @@ export class Server extends Application {
         public static async bootstrap() {
                 // SECTION server init event
                 log.debug('Start boostrapping server');
-                envirnoment.load();
-                const server = new Server();
-                server.populateServer();
+                envirnoment.load(StageLevel.PROD);
+                const server = new NodeServer();
+                const httpServer = await server.populateServer();
                 await server.init();
+                const socket = new OLHC(httpServer);
+                socket
+                        .onConnection()
+                        .then(() => {
+                                loadOHLCcsv()
+                                        .on('data', (data) => {
+                                                socket.send(data);
+                                        });
+                                console.log('onConnections fired');
+                        });
                 return server;
         }
 
         public static async test() {
                 log.info('Start Testing');
                 envirnoment.load(StageLevel.TEST);
-                return (new Server()).init();
+                return (new NodeServer()).init();
         }
 
         private constructor() {
@@ -44,8 +53,8 @@ export class Server extends Application {
          * Start the server and return an instance of it.
          * @returns {Promise<httpServer>}
          */
-        private populateServer(): Promise<httpServer> {
-                return Promise.resolve<httpServer>(this.startServer(this.createServer()));
+        private populateServer(): Promise<http.Server> {
+                return Promise.resolve<http.Server>(this.startServer(this.createServer()));
         }
 
         private createServer() {
@@ -55,7 +64,7 @@ export class Server extends Application {
                 return http.createServer(this.application);
         }
 
-        private startServer(server: httpServer) {
+        private startServer(server: http.Server) {
                 return server.listen(this.path.port, +this.path.hostname, () => {
                         log.info(`${new Date()} Server running at ${this.path.href}`);
                         // SECTION server start event

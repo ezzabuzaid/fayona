@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { randomBytes } from 'crypto';
-import setPrototypeOf = require('setprototypeof');
 
 export type Type<T> = new (...args: any) => T;
 

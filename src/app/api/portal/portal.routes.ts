@@ -16,7 +16,7 @@ export class PortalRoutes {
     public async loginUser(req: Request, res: Response) {
         const { username, password } = req.body;
         const entity = await UsersRepo.fetchEntity({ username });
-        log.debug('Check if user exist');
+        log.debug(JSON.stringify(entity, undefined, 8), 'Check if user exist');
         if (!!entity) {
             const isPasswordEqual = await entity.comparePassword(password);
             if (isPasswordEqual) {

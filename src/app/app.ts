@@ -2,16 +2,16 @@ import en from '@assets/languages/en.json';
 import { ErrorHandling, stage, StageLevel } from '@core/helpers';
 import { Logger } from '@core/utils';
 import { translation } from '@lib/translation';
-import Sentry = require('@sentry/node');
+// import Sentry = require('@sentry/node');
 import compression = require('compression');
 import express = require('express');
 import helmet = require('helmet');
 import morgan = require('morgan');
 import { Wrapper } from './wrapper';
+import path from 'path';
 
 // import monitor = require('express-status-monitor');
 // https://github.com/RafalWilinski/express-status-monitor
-import path from 'path';
 const log = new Logger('Application instance');
 
 // Stage.tests(StageLevel.DEV, () => {
@@ -51,9 +51,9 @@ export class Application {
      */
     private configure() {
         stage.test(StageLevel.PROD, () => {
-            this.application
-                .use(Sentry.Handlers.requestHandler())
-                .use(Sentry.Handlers.errorHandler());
+            // this.application
+            //     .use(Sentry.Handlers.requestHandler())
+            //     .use(Sentry.Handlers.errorHandler());
         });
 
         this.application

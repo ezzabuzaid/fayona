@@ -1,12 +1,11 @@
 import { HashService } from '@core/helpers';
 import { BaseModel, Entity, Field } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
-
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 @Entity('users')
 export class UsersSchema {
-    @Field({ select: false }) public password: string;
+    @Field() public password: string;
     @Field({
         match: [ValidationPatterns.NoSpecialChar, 'Value contain special char'],
         unique: true,
@@ -17,10 +16,13 @@ export class UsersSchema {
     }) public email: string;
 
     @Field({
-        validate: [(value) => {
-            const phonenumber = parsePhoneNumberFromString(value);
-            return phonenumber && phonenumber.isValid();
-        }, 'Please enter correct phonenumber'],
+        validate: [
+            (value) => {
+                const phonenumber = parsePhoneNumberFromString(value);
+                return !!phonenumber && phonenumber.isValid();
+            },
+            'Please enter correct phonenumber'
+        ],
         unique: true,
     }) public mobile: string;
 
@@ -29,7 +31,7 @@ export class UsersSchema {
         return this;
     }
 
-    public async comparePassword(candidatePassword: string) {
+    public comparePassword(candidatePassword: string) {
         return HashService.comparePassword(candidatePassword, this.password);
     }
 }

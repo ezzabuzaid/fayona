@@ -1,7 +1,6 @@
 import { Logger } from '@core/utils';
 import bcrypt = require('bcryptjs');
 
-// extends the bcrypt
 const log = new Logger('Hash service');
 export class HashService {
 
@@ -9,32 +8,18 @@ export class HashService {
         log.info('Hash service constructor !');
     }
 
-    private static hashText(text) {
-        return bcrypt.hash(text, 10);
+    private static hashText(password: string) {
+        return bcrypt.hash(password, 12);
     }
 
-    public static hashPassword(text) {
-        // try {
-        // } catch (error) {
-        //     log.error('an error accured while hashing the password');
-        //     throw new ErrorResponse(error);
-        // }
-
+    public static hashPassword(passowrd: string) {
         log.info('Start hashing password');
-        return this.hashText(text);
+        return this.hashText(passowrd);
     }
 
-    public static comparePassword(candidatePassword, actualPassword) {
-        log.info('Start comparePassword');
+    public static comparePassword(candidatePassword: string, actualPassword: string) {
+        log.debug(bcrypt.compareSync(candidatePassword, actualPassword));
         return bcrypt.compare(candidatePassword, actualPassword);
-
-        // try {
-        //     log.info('Start comparePassword');
-        //     return bcrypt.compare(candidatePassword, actualPassword);
-        // } catch (error) {
-        //     log.error('an error accured while hashing the password');
-        //     throw new ErrorResponse(error);
-        // }
     }
 
 }
