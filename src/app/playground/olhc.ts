@@ -6,7 +6,7 @@ import { WSocket } from './socket';
 import { join } from 'path';
 
 export function loadOHLCcsv() {
-    const stream = fs.createReadStream(join(__dirname, 'olhc.csv'))
+    const stream = fs.createReadStream(join(process.cwd(), 'assets/data', 'olhc.csv'))
         .pipe(csv())
         .on('data', (data) => {
             stream.pause();
