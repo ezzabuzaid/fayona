@@ -6,7 +6,7 @@ import { WSocket } from './socket';
 import { join } from 'path';
 
 export function loadOHLCcsv() {
-    const stream = fs.createReadStream(join(__dirname, 'grm_orders.csv'))
+    const stream = fs.createReadStream(join(__dirname, 'olhc.csv'))
         .pipe(csv())
         .on('data', (data) => {
             stream.pause();
@@ -30,10 +30,11 @@ export class OLHC {
     }
 
     public onConnection() {
-        return new Promise((resolve) => {
+        return new Promise<WebSocket>((resolve) => {
             this.socket.on('connection', (ws) => {
                 ws.on('error', console.log);
                 ws.on('close', console.log);
+                ws.on('unexpected-response', console.log);
                 this.ws = ws;
                 resolve(ws);
             });

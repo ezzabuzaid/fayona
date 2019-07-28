@@ -19,17 +19,22 @@ export class NodeServer extends Application {
         public static async bootstrap() {
                 // SECTION server init event
                 log.debug('Start boostrapping server');
-                envirnoment.load(StageLevel.PROD);
+                envirnoment.load();
                 const server = new NodeServer();
                 const httpServer = await server.populateServer();
                 await server.init();
                 const socket = new OLHC(httpServer);
                 socket
                         .onConnection()
-                        .then(() => {
-                                loadOHLCcsv()
+                        .then((ws) => {
+                                const stream = loadOHLCcsv()
                                         .on('data', (data) => {
-                                                socket.send(data);
+                                                if (ws.readyState === ws.OPEN) {
+                                                        // stream.resume();
+                                                        socket.send(data);
+                                                } else {
+                                                        stream.destroy();
+                                                }
                                         });
                                 console.log('onConnections fired');
                         });
