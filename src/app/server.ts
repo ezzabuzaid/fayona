@@ -7,6 +7,7 @@ import { URL } from 'url';
 import { Application } from './app';
 const log = new Logger('Server init');
 import { OLHC, loadOHLCcsv } from './playground/olhc';
+
 export class NodeServer extends Application {
         private port = +envirnoment.get('PORT') || 8080;
         private host = envirnoment.get('HOST') || '127.0.0.1';
