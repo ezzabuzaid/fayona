@@ -15,7 +15,7 @@
         window.onload = function () {
             class socket extends WebSocket {
                 constructor() {
-                    super(`ws://${location.href.split('//')[1]}olhc`);
+                    super(`wss://${location.href.split('//')[1]}olhc`);
                 }
 
                 onOpen(evt) {
