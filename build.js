@@ -37,7 +37,7 @@ const ENV_DIST = path.join(DIST, ENV);
 const ENV_SRC = path.join(pwd, 'src', `${ENV}.${env}`);
 fs.copyFileSync(ENV_SRC, ENV_DIST);
 
-const DATA_FOLDER_PATH = 'assets/data';
-const DATA_FOLDER_PATH_DIST = path.join(DIST, DATA_FOLDER_PATH);
-fs.mkdirSync(DATA_FOLDER_PATH_DIST);
-fs.copyFileSync(path.join(pwd, 'src/assets/data/olhc.csv'), path.join(DATA_FOLDER_PATH_DIST, 'olhc.csv'));
+// const DATA_FOLDER_PATH = 'assets/data';
+// const DATA_FOLDER_PATH_DIST = path.join(DIST, DATA_FOLDER_PATH);
+// fs.mkdirSync(DATA_FOLDER_PATH_DIST);
+// fs.copyFileSync(path.join(pwd, 'src/assets/data/olhc.csv'), path.join(DATA_FOLDER_PATH_DIST, 'olhc.csv'));

@@ -7,7 +7,8 @@ import { URL } from 'url';
 import { Application } from './app';
 const log = new Logger('Server init');
 import { OLHC, loadOHLCcsv } from './playground/olhc';
-
+import ohlcJson from '@assets/data/olhc.json';
+import socketio = require('socket.io');
 export class NodeServer extends Application {
         private port = +envirnoment.get('PORT') || 8080;
         private host = envirnoment.get('HOST') || '127.0.0.1';
@@ -24,22 +25,34 @@ export class NodeServer extends Application {
                 const server = new NodeServer();
                 const httpServer = await server.populateServer();
                 await server.init();
-                const socket = new OLHC(httpServer);
-                socket
-                        .onConnection()
-                        .then((ws) => {
-                                const stream = loadOHLCcsv()
-                                        .on('data', (data) => {
-                                                if (ws.readyState === ws.OPEN) {
-                                                        // stream.resume();
-                                                        socket.send(data);
-                                                } else {
-                                                        socket.socket.close();
-                                                        stream.destroy();
-                                                }
-                                        });
-                                console.log('onConnections fired');
-                        });
+                // const socket = new OLHC(httpServer);
+                // socket
+                //         .onConnection()
+                //         .then((ws) => {
+                //                 let index = 0;
+                //                 let interval = null;
+                //                 if (ws.readyState === ws.OPEN) {
+                //                         interval = setInterval(() => {
+                //                                 if (ws.readyState === ws.OPEN) {
+                //                                         socket.send(ohlcJson[index++]);
+                //                                 }
+                //                         }, 1000);
+                //                 } else {
+                //                         for (const client of socket.socket.clients) {
+                //                                 console.log(client);
+                //                                 client.close();
+                //                         }
+                //                         // interval && clearInterval(interval);
+                //                 }
+                //                 console.log('onConnections fired');
+                //         });
+                const io = socketio(httpServer, { path: '/ohlc' });
+                io.on('connection', (socket) => {
+                        let index = 0;
+                        setInterval(() => {
+                                socket.send(JSON.stringify(ohlcJson[index++]));
+                        }, 1000);
+                });
                 return server;
         }
 

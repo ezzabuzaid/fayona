@@ -1,36 +1,42 @@
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>WebSocket Test</title>
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>WebSocket Test</title>
+    </head>
 
-<body>
-    <script>
-        window.onload = function () {
-            class Socket extends WebSocket {
-                constructor() {
-                    super(`wss://${location.href.split('//')[1]}olhc`);
-                }
+    <body>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+        <script>
+            const socket = io(location.href, { path: '/ohlc' });
+            socket.on('message', console.log);
+        </script>
 
-                onOpen(evt) {
-                }
+        <!-- <script>
+            window.onload = function () {
+                class Socket extends WebSocket {
+                    constructor() {
+                        super(`ws://${location.href.split('//')[1]}olhc`);
+                    }
 
-                onClose(evt) {
-                }
+                    onOpen(evt) {
+                    }
 
-                onError(evt) {
+                    onClose(evt) {
+                    }
+
+                    onError(evt) {
+                    }
                 }
+                const wss = new Socket();
+                wss.onmessage = ((message) => {
+                    console.log(message);
+                });
             }
-            const wss = new Socket();
-            wss.onmessage = ((message) => {
-                console.log(message);
-            });
-        }
-    </script>
+        </script> -->
 
-</body>
+    </body>
 
 </html>

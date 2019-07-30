@@ -36,6 +36,7 @@
     "@types/phone": "^1.0.3",
     "@types/reflect-metadata": "^0.1.0",
     "@types/sequelize": "^4.28.4",
+    "@types/socket.io": "^2.1.2",
     "@types/ws": "^6.0.1",
     "ansi-colors": "^3.2.4",
     "bcryptjs": "^2.4.3",
@@ -63,6 +64,8 @@
     "phone": "^2.3.18",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^5.8.7",
+    "socket.io": "^2.2.0",
+    "socketio": "^1.0.0",
     "tsconfig-paths": "^3.8.0",
     "ws": "^6.2.1"
   },
