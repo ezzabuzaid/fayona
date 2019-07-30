@@ -8,12 +8,9 @@
 </head>
 
 <body>
-    <div id="output"></div>
-    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
-    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
     <script>
         window.onload = function () {
-            class socket extends WebSocket {
+            class Socket extends WebSocket {
                 constructor() {
                     super(`wss://${location.href.split('//')[1]}olhc`);
                 }
@@ -27,33 +24,9 @@
                 onError(evt) {
                 }
             }
-            const wss = new socket();
-            // var chart = new CanvasJS.Chart("chartContainer", {
-            //     animationEnabled: true,
-            //     title: {
-            //         text: "Desktop Search Engine Market Share - 2016"
-            //     },
-            //     data: [{
-            //         type: "pie",
-            //         startAngle: 240,
-            //         yValueFormatString: "##0.00\"%\"",
-            //         indexLabel: "{label} {y}",
-            //         dataPoints: []
-            //     }]
-            // });
-            // chart.render();
+            const wss = new Socket();
             wss.onmessage = ((message) => {
                 console.log(message);
-                // console.log(message);
-                // const data = JSON.parse(message.data);
-                // const dataPoints = chart.options.data[0].dataPoints = [];
-                // Object.keys(data).forEach(el => {
-                //     const value = data[el];
-                //     if (typeof value === 'number') {
-                //         dataPoints.push({ y: value, label: el });
-                //     }
-                // });
-                // chart.render();
             });
         }
     </script>
