@@ -34,6 +34,7 @@ export class NodeServer extends Application {
                                                         // stream.resume();
                                                         socket.send(data);
                                                 } else {
+                                                        socket.socket.close();
                                                         stream.destroy();
                                                 }
                                         });
