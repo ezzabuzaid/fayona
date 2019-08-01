@@ -8,17 +8,17 @@
     </head>
 
     <body>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
         <script>
             const socket = io(location.href, { path: '/ohlc' });
             socket.on('message', console.log);
-        </script>
+        </script> -->
 
-        <!-- <script>
+        <script>
             window.onload = function () {
                 class Socket extends WebSocket {
                     constructor() {
-                        super(`ws://${location.href.split('//')[1]}olhc`);
+                        super(`wss://${location.href.split('//')[1]}olhc`);
                     }
 
                     onOpen(evt) {
@@ -30,12 +30,15 @@
                     onError(evt) {
                     }
                 }
-                const wss = new Socket();
-                wss.onmessage = ((message) => {
-                    console.log(message);
-                });
+                fetch(location.href + 'ohlc')
+                    .then(() => {
+                        const wss = new Socket();
+                        wss.onmessage = ((message) => {
+                            console.log(message);
+                        });
+                    });
             }
-        </script> -->
+        </script>
 
     </body>
 

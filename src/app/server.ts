@@ -24,36 +24,31 @@ export class NodeServer extends Application {
                 envirnoment.load();
                 const server = new NodeServer();
                 const httpServer = await server.populateServer();
-                await server.init();
-                // const socket = new OLHC(httpServer);
-                // socket
-                //         .onConnection()
-                //         .then((ws) => {
-                //                 let index = 0;
-                //                 let interval = null;
-                //                 if (ws.readyState === ws.OPEN) {
-                //                         interval = setInterval(() => {
-                //                                 if (ws.readyState === ws.OPEN) {
-                //                                         socket.send(ohlcJson[index++]);
-                //                                 }
-                //                         }, 1000);
-                //                 } else {
-                //                         for (const client of socket.socket.clients) {
-                //                                 console.log(client);
-                //                                 client.close();
-                //                         }
-                //                         // interval && clearInterval(interval);
-                //                 }
-                //                 console.log('onConnections fired');
-                //         });
-                const io = socketio(httpServer, { path: '/ohlc' });
-                io.on('connection', (socket) => {
+                const socket = new OLHC(httpServer);
+                server.application.get('/ohlc', (res, req) => {
                         let index = 0;
-                        setInterval(() => {
-                                socket.send(JSON.stringify(ohlcJson[index++]));
-                        }, 1000);
+                        socket.onConnection()
+                                .then((ws) => {
+                                        let interval = null;
+                                        if (ws.readyState === ws.OPEN) {
+                                                interval = setInterval(() => {
+                                                        if (ws.readyState === ws.OPEN) {
+                                                                socket.send(ohlcJson[index++]);
+                                                        }
+                                                }, 1000);
+                                        } else {
+                                                for (const client of socket.socket.clients) {
+                                                        console.log(client);
+                                                        client.close();
+                                                }
+                                                // interval && clearInterval(interval);
+                                        }
+                                        console.log('onConnections fired');
+                                });
+                        req.status(200).send({ success: true });
+                        return;
                 });
-                return server;
+                await server.init();
         }
 
         public static async test() {
