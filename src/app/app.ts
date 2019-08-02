@@ -77,6 +77,7 @@ export class Application {
 
     protected populateRoutes() {
         return new Promise<ReturnType<typeof express>>((resolve) => {
+            this.application.use(ErrorHandling.favIcon);
             // SECTION routes resolving event
             this.application.use((req, res, next) => {
                 const acceptLanguage = req.acceptsLanguages();
@@ -93,7 +94,6 @@ export class Application {
 
             this.application.get('/api', (req, res) => res.status(200).json({ work: '/API hitted' }));
             this.application.get('/', (req, res) => res.sendFile('index.html'));
-            this.application.use(ErrorHandling.favIcon);
             this.application.use(ErrorHandling.notFound);
             this.application.use(ErrorHandling.catchError);
             resolve(this.application);

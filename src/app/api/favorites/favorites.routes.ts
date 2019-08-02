@@ -39,7 +39,7 @@ export class FavoritesRouter {
         res.status(response.code).json(response);
     }
 
-    @Get(':type')
+    @Get(':type', Auth.isAuthenticated)
     public async fetchFavMeals(req: Request, res: Response) {
         const decodedToken = await tokenService.decodeToken<any>(req.headers.authorization);
         const entites = await this.repo.fetchEntities({ user_id: decodedToken.id, type: req.params.type }).populate('items');
