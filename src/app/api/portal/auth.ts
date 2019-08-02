@@ -1,7 +1,7 @@
 import { ErrorResponse, NetworkStatus } from '@core/helpers';
 import { Logger } from '@core/utils';
+import { tokenService } from '@core/helpers';
 import { NextFunction, Request, Response } from 'express';
-import jwt = require('jsonwebtoken');
 
 const log = new Logger('Auth Module');
 
@@ -11,7 +11,7 @@ export class Auth {
         const unauth = new ErrorResponse('Not authorized', NetworkStatus.UNAUTHORIZED);
         try {
             const token = req.headers.authorization;
-            const decodedToken = await verify(token);
+            const decodedToken = await tokenService.decodeToken(token);
             log.info('Start checking JWT');
             if (!decodedToken) {
                 throw unauth;
@@ -22,21 +22,4 @@ export class Auth {
 
         next();
     }
-    /**
-     *
-     * @param data token payload
-     * @returns the encrypted token
-     */
-    public static generateToken(data) {
-        return jwt.sign(data, process.env.JWT_SECRET_KEY);
-    }
-}
-
-function verify(token: string) {
-    return new Promise((resolve, reject) => {
-        jwt.verify(token, process.env.JWT_SECRET_KEY, function(err, decodedToken) {
-            if (err) { reject(err); }
-            resolve(decodedToken);
-        });
-    });
 }

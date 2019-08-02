@@ -1,5 +1,5 @@
 import { Logger } from '@core/utils';
-import bcrypt = require('bcryptjs');
+import bcrypt = require('bcrypt');
 
 const log = new Logger('Hash service');
 export class HashService {
@@ -13,12 +13,12 @@ export class HashService {
     }
 
     public static hashPassword(passowrd: string) {
-        log.info('Start hashing password');
+        log.info('Start hashing password', typeof passowrd);
         return this.hashText(passowrd);
     }
 
     public static comparePassword(candidatePassword: string, actualPassword: string) {
-        log.debug(bcrypt.compareSync(candidatePassword, actualPassword));
+        log.debug(typeof candidatePassword, typeof actualPassword);
         return bcrypt.compare(candidatePassword, actualPassword);
     }
 

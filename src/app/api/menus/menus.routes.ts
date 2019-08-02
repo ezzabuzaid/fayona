@@ -6,8 +6,9 @@ import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
 import { MenusRepo } from './menus.repo';
 const log = new Logger('MenusRouter');
+import { Constants } from '@core/helpers';
 
-@Router('menus')
+@Router(Constants.Endpoints.menus)
 export class MenusRouter {
     private repo = MenusRepo;
 

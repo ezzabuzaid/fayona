@@ -1,7 +1,8 @@
 import { BaseModel, Entity, Field } from '@lib/mongoose';
 import { Types } from 'mongoose';
+import { Constants } from '@core/helpers';
 
-@Entity('meals')
+@Entity(Constants.Schemas.meals)
 export class MealsSchema {
     @Field() public name: string;
     @Field() public recipe: string;

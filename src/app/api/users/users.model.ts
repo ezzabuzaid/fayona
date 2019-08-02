@@ -5,7 +5,7 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 @Entity('users')
 export class UsersSchema {
-    @Field() public password: string;
+    @Field({ lowercase: false }) public password: string;
     @Field({
         match: [ValidationPatterns.NoSpecialChar, 'Value contain special char'],
         unique: true,

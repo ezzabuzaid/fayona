@@ -2,7 +2,6 @@ import en from '@assets/languages/en.json';
 import { ErrorHandling, stage, StageLevel } from '@core/helpers';
 import { Logger } from '@core/utils';
 import { translation } from '@lib/translation';
-// import Sentry = require('@sentry/node');
 import compression = require('compression');
 import express = require('express');
 import helmet = require('helmet');
@@ -10,8 +9,10 @@ import morgan = require('morgan');
 import { Wrapper } from './wrapper';
 import path from 'path';
 
+// import Sentry = require('@sentry/node');
 // import monitor = require('express-status-monitor');
 // https://github.com/RafalWilinski/express-status-monitor
+
 const log = new Logger('Application instance');
 
 // Stage.tests(StageLevel.DEV, () => {

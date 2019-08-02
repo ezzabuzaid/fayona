@@ -5,10 +5,9 @@ import { envirnoment } from '@environment/env';
 import http = require('http');
 import { URL } from 'url';
 import { Application } from './app';
-const log = new Logger('Server init');
-import { OLHC, loadOHLCcsv } from './playground/olhc';
+import { OLHC } from './playground/olhc';
 import ohlcJson from '@assets/data/olhc.json';
-import socketio = require('socket.io');
+const log = new Logger('Server init');
 export class NodeServer extends Application {
         private port = +envirnoment.get('PORT') || 8080;
         private host = envirnoment.get('HOST') || '127.0.0.1';

@@ -1,13 +1,14 @@
 import { Auth } from '@api/portal';
 import { ErrorResponse, NetworkStatus, SuccessResponse } from '@core/helpers';
 import { Logger } from '@core/utils';
+import { Constants } from '@core/helpers';
 import { Delete, Get, Post, Put, Router } from '@lib/methods';
 import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
 import { MealsRepo } from './meals.repo';
 const log = new Logger('MealsRouter');
 
-@Router('meals')
+@Router(Constants.Endpoints.meals)
 export class MealsRouter {
     private repo = MealsRepo;
 
@@ -55,20 +56,19 @@ export class MealsRouter {
 
     @Get()
     public async fetchEntities(req: Request, res: Response) {
-        const response = await this.emitValue();
+        const response = await this.populateAllEntityQuery();
         res.status(response.code).json(response);
     }
 
     @Get('menu/:menu_id')
     public async fetchEntitiesByMealID(req: Request, res: Response) {
         const { menu_id } = req.params;
-        const response = await this.emitValue({ menu_id });
+        const response = await this.populateAllEntityQuery({ menu_id });
         res.status(response.code).json(response);
 
     }
 
-    public async emitValue(query = {}) {
-        log.debug(query);
+    public async populateAllEntityQuery(query = {}) {
         const entites = await this.repo.fetchEntities(query);
         const response = new SuccessResponse(entites, translate('success'), NetworkStatus.OK);
         response['count'] = entites.length;

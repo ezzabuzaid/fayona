@@ -1,4 +1,4 @@
-import { ErrorResponse, NetworkStatus, SuccessResponse } from '@core/helpers';
+import { ErrorResponse, NetworkStatus, SuccessResponse, tokenService } from '@core/helpers';
 import { Post, Router } from '@lib/methods';
 import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
@@ -22,7 +22,7 @@ export class PortalRoutes {
             if (isPasswordEqual) {
                 const response = new SuccessResponse(entity, translate('success'), NetworkStatus.OK);
                 log.debug('Start generateToken');
-                response['token'] = Auth.generateToken({ id: entity.id });
+                response['token'] = tokenService.generateToken({ id: entity.id });
                 return res.status(response.code).json(response);
             }
         }
@@ -40,7 +40,7 @@ export class PortalRoutes {
             if (isPasswordEqual) {
                 const response = new SuccessResponse(entity, translate('success'), NetworkStatus.OK);
                 log.debug('Start generateToken');
-                response['token'] = Auth.generateToken({ id: entity.id });
+                response['token'] = tokenService.generateToken({ id: entity.id });
                 return res.status(response.code).json(response);
             }
         }
