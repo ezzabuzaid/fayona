@@ -18,7 +18,7 @@
             window.onload = function () {
                 class Socket extends WebSocket {
                     constructor() {
-                        super(`wss://${location.href.split('//')[1]}olhc`);
+                        super(`wss://${location.href.split('//')[1]}`);
                     }
 
                     onOpen(evt) {
@@ -30,7 +30,7 @@
                     onError(evt) {
                     }
                 }
-                fetch(location.href + 'ohlc')
+                fetch(location.href + 'socket/cad')
                     .then(() => {
                         const wss = new Socket();
                         wss.onmessage = ((message) => {

@@ -5,8 +5,7 @@ import { envirnoment } from '@environment/env';
 import http = require('http');
 import { URL } from 'url';
 import { Application } from './app';
-import { OLHC } from './playground/olhc';
-import ohlcJson from '@assets/data/olhc.json';
+import { OLHC, loadOHLCcsv } from './playground/olhc';
 const log = new Logger('Server init');
 export class NodeServer extends Application {
         private port = +envirnoment.get('PORT') || 8080;
@@ -24,27 +23,26 @@ export class NodeServer extends Application {
                 const server = new NodeServer();
                 const httpServer = await server.populateServer();
                 const socket = new OLHC(httpServer);
-                server.application.get('/ohlc', (res, req) => {
-                        let index = 0;
+                let check = 0;
+                server.application.get('/socket/:name', (req, res) => {
+                        const { name } = req.params;
+                        const stream = loadOHLCcsv(name);
                         socket.onConnection()
                                 .then((ws) => {
-                                        let interval = null;
-                                        if (ws.readyState === ws.OPEN) {
-                                                interval = setInterval(() => {
-                                                        if (ws.readyState === ws.OPEN) {
-                                                                socket.send(ohlcJson[index++]);
-                                                        }
-                                                }, 1000);
-                                        } else {
-                                                for (const client of socket.socket.clients) {
-                                                        console.log(client);
-                                                        client.close();
+                                        function handler(data) {
+                                                if (ws.readyState === ws.OPEN) {
+                                                        socket.send({ data, name });
                                                 }
-                                                // interval && clearInterval(interval);
                                         }
-                                        console.log('onConnections fired');
+                                        const streamListner = stream.on('data', handler);
+                                        ws.on('close', () => {
+                                                streamListner.removeListener('data', handler);
+                                        });
                                 });
-                        req.status(200).send({ success: true });
+                        socket.socket.on('error', () => {
+                                stream.destroy();
+                        });
+                        res.status(200).send({ success: true });
                         return;
                 });
                 await server.init();

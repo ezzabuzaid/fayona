@@ -4,15 +4,16 @@ import { Server } from 'http';
 import WebSocket from 'ws';
 import { WSocket } from './socket';
 import { join } from 'path';
+import { Stream } from 'stream';
 
-export function loadOHLCcsv() {
-    const stream = fs.createReadStream(join(process.cwd(), 'assets/data', 'olhc.csv'))
+export function loadOHLCcsv(name: string) {
+    const stream = fs.createReadStream(join(process.cwd(), 'assets/data', `${name}.csv`))
         .pipe(csv())
         .on('data', (data) => {
             stream.pause();
             setTimeout(() => {
                 stream.resume();
-            }, 1000);
+            }, 500);
         })
         .on('error', console.log)
         .on('end', () => {
@@ -25,7 +26,7 @@ export class OLHC {
     public socket: WSocket = null;
     public ws: WebSocket = null;
     constructor(server: Server) {
-        this.socket = new WSocket(server);
+        this.socket = new WSocket({ server });
 
     }
 
