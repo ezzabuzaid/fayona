@@ -7,17 +7,23 @@ type FavoritesModelBody = Body<FavoritesSchema>;
 export class FavoritesRepo extends FavoritesModel {
 
     public static async createEntity(doc: FavoritesModelBody) {
-        const entity = new FavoritesRepo(doc);
-        const type = doc.type;
-        if (!models[type]) {
-            return { passed: false, msg: 'is not one of the supported type' }
+        const oldEntity = await this.findOne({ item_id: doc.item_id }).lean();
+        console.log(oldEntity);
+        if (!oldEntity) {
+            const entity = new FavoritesRepo(doc);
+            const type = doc.type;
+            if (!models[type]) {
+                return { passed: false, msg: 'is not one of the supported type' }
+            }
+            const isThere = await models[type].findById(doc.item_id).lean();
+            if (!isThere) {
+                return { passed: false, msg: 'type is not associated with the item_id' }
+            }
+            console.warn('passed');
+            return { passed: true, entity: entity.save() };
+        } else {
+            return { passed: false, msg: 'entity is there' };
         }
-        const isThere = await models[type].findById(doc.item_id).lean();
-        if (!isThere) {
-            return { passed: false, msg: 'type is not associated with the item_id' }
-        }
-        console.warn('passed');
-        return { passed: true, entity: entity.save() };
     }
 
     public static deleteEntity(id: string) {

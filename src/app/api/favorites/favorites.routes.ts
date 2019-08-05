@@ -13,9 +13,11 @@ import { Types } from 'mongoose';
 export class FavoritesRouter {
     private repo = FavoritesRepo;
 
-    @Post('', Auth.isAuthenticated)
+    @Post(':type', Auth.isAuthenticated)
     public async create(req: Request, res: Response) {
-        const { item_id, type } = req.body;
+        const { item_id } = req.body;
+        const { type } = req.params;
+        
         // TODO: make an interface for user token
         const decodedToken = await tokenService.decodeToken<any>(req.headers.authorization);
         const result = await this.repo.createEntity({ type, user_id: decodedToken.id, item_id });
