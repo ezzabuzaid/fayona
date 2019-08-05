@@ -30,13 +30,17 @@
                     onError(evt) {
                     }
                 }
-                fetch(location.href + 'socket/cad')
-                    .then(() => {
-                        const wss = new Socket();
-                        wss.onmessage = ((message) => {
-                            console.log(message);
+                const socketList = ['cad'];
+                socketList.forEach(name => {
+                    fetch(location.href + `socket/${name}`)
+                        .then(() => {
+                            const wss = new Socket();
+                            wss.onmessage = ((message) => {
+                                console.log(JSON.parse(message.data).name);
+                            });
                         });
-                    });
+
+                })
             }
         </script>
 

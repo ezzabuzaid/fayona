@@ -22,27 +22,42 @@ export class NodeServer extends Application {
                 envirnoment.load();
                 const server = new NodeServer();
                 const httpServer = await server.populateServer();
-                const socket = new OLHC(httpServer);
-                let check = 0;
+                const socketList = ['cad', 'gbp', 'eurusd', 'jpy'];
+                const sockets: { [index: string]: OLHC } = socketList.reduce((acc, current) => {
+                        acc[current] = new OLHC({ noServer: true });
+                        return acc;
+                }, {});
+
                 server.application.get('/socket/:name', (req, res) => {
                         const { name } = req.params;
                         const stream = loadOHLCcsv(name);
+                        const socket = sockets[name];
                         socket.onConnection()
                                 .then((ws) => {
                                         function handler(data) {
                                                 if (ws.readyState === ws.OPEN) {
-                                                        socket.send({ data, name });
+                                                        socket.socket.clients.forEach(client => {
+                                                                client.send(JSON.stringify({ data, name }));
+                                                        });
                                                 }
                                         }
                                         const streamListner = stream.on('data', handler);
                                         ws.on('close', () => {
+                                                log.warn('CLOSE');
                                                 streamListner.removeListener('data', handler);
                                         });
                                 });
                         socket.socket.on('error', () => {
+                                log.warn('ERROR');
                                 stream.destroy();
                         });
+                        httpServer.once('upgrade', (request, _socket, head) => {
+                                socket.socket.handleUpgrade(request, _socket, head, (ws) => {
+                                        socket.socket.emit('connection', ws, request)
+                                })
+                        });
                         res.status(200).send({ success: true });
+
                         return;
                 });
                 await server.init();

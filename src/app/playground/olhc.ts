@@ -1,7 +1,7 @@
 import csv = require('csv-parser');
 import fs = require('fs');
 import { Server } from 'http';
-import WebSocket from 'ws';
+import WebSocket, { ServerOptions } from 'ws';
 import { WSocket } from './socket';
 import { join } from 'path';
 import { Stream } from 'stream';
@@ -25,8 +25,8 @@ export function loadOHLCcsv(name: string) {
 export class OLHC {
     public socket: WSocket = null;
     public ws: WebSocket = null;
-    constructor(server: Server) {
-        this.socket = new WSocket({ server });
+    constructor(options: ServerOptions) {
+        this.socket = new WSocket(options);
 
     }
 
