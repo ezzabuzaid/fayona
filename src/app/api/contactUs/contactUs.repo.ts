@@ -1,8 +1,8 @@
 import { Body } from '@lib/mongoose';
-import { MenusModel, MenusSchema } from './menus.model';
+import { ContactUsModel, ContactUsSchema } from './contactUs.model';
 
-export class MenusRepo extends MenusModel {
-    public static async updateEntity(id: string, body: Body<MenusSchema>) {
+export class ContactUsRepo extends ContactUsModel {
+    public static async updateEntity(id: string, body: Body<ContactUsSchema>) {
         const entity = await this.fetchEntityById(id).lean();
         if (!entity) {
             return null;
@@ -10,10 +10,13 @@ export class MenusRepo extends MenusModel {
         entity.set(body);
         return entity.save();
     }
-
-    public static createEntity(doc: Body<MenusSchema>) {
-        const user = new MenusRepo(doc);
+    public static createEntity(doc: Body<ContactUsSchema>) {
+        const user = new ContactUsRepo(doc);
         return user.save();
+    }
+
+    public static fetchEntity(obj, ...args) {
+        return this.findOne(obj, ...args);
     }
 
     public static deleteEntity(id: string) {
@@ -21,7 +24,7 @@ export class MenusRepo extends MenusModel {
     }
 
     public static entityExist(obj) {
-        return this.findOne(obj).lean();
+        return this.fetchEntity(obj).lean();
     }
 
     public static fetchEntities(obj?, ...args) {
@@ -29,6 +32,6 @@ export class MenusRepo extends MenusModel {
     }
 
     public static fetchEntityById(id: string) {
-        return this.findOne({ _id: id });
+        return this.fetchEntity({ _id: id });
     }
 }

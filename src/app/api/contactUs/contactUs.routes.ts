@@ -1,21 +1,21 @@
 import { Auth } from '@api/portal';
-import { ErrorResponse, NetworkStatus, SuccessResponse, tokenService } from '@core/helpers';
+import { ErrorResponse, NetworkStatus, SuccessResponse } from '@core/helpers';
 import { Logger } from '@core/utils';
-import { Constants } from '@core/helpers';
 import { Delete, Get, Post, Put, Router } from '@lib/methods';
 import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
-import { MealsRepo } from './meals.repo';
-const log = new Logger('MealsRouter');
+import { ContactUsRepo } from './contactUs.repo';
+import { Constants } from '@core/helpers';
+const log = new Logger('ContactUsRouter');
 
-@Router(Constants.Endpoints.meals)
-export class MealsRouter {
-    private repo = MealsRepo;
+@Router(Constants.Endpoints.ContactUs)
+export class ContactUsRouter {
+    private repo = ContactUsRepo;
 
     @Post('', Auth.isAuthenticated)
     public async create(req: Request, res: Response) {
-        const { price, image, recipe, name, menu_id } = req.body;
-        const entity = await this.repo.createEntity({ price, image, recipe, name, menu_id });
+        const { email, name, enquiry, message } = req.body;
+        const entity = await this.repo.createEntity({ email, name, enquiry, message });
         const response = new SuccessResponse(entity, translate('success'), NetworkStatus.CREATED);
         res.status(response.code).json(response);
     }
@@ -23,8 +23,8 @@ export class MealsRouter {
     @Put(':id', Auth.isAuthenticated)
     public async update(req: Request, res: Response) {
         const { id } = req.params;
-        const { price, image, recipe, name, menu_id } = req.body;
-        const entity = await this.repo.updateEntity(id, { price, image, recipe, name, menu_id });
+        const { email, name, enquiry, message } = req.body;
+        const entity = await this.repo.updateEntity(id, { email, name, enquiry, message });
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
         }
@@ -56,23 +56,8 @@ export class MealsRouter {
 
     @Get()
     public async fetchEntities(req: Request, res: Response) {
-        const response = await this.populateAllEntityQuery();
-        res.status(response.code).json(response);
-    }
-
-    @Get('menu/:menu_id')
-    public async fetchEntitiesByMealID(req: Request, res: Response) {
-      await  tokenService.decodeToken(req.headers.authorization);
-        const { menu_id } = req.params;
-        const response = await this.populateAllEntityQuery({ menu_id });
-        res.status(response.code).json(response);
-    }
-
-    public async populateAllEntityQuery(query = {}) {
-        const entites = await this.repo.fetchEntities(query);
+        const entites = await this.repo.fetchEntities();
         const response = new SuccessResponse(entites, translate('success'), NetworkStatus.OK);
-        response['count'] = entites.length;
-        return response;
+        res.status(response.code).json(response);
     }
-
 }

@@ -5,9 +5,7 @@ import { Delete, Get, Post, Router } from '@lib/methods';
 import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
 import { FavoritesRepo } from './favorites.repo';
-const log = new Logger('FavoritesRouter');
 import { Constants } from '@core/helpers';
-import { Types } from 'mongoose';
 
 @Router(Constants.Endpoints.favorites)
 export class FavoritesRouter {

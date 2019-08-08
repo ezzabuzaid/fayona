@@ -4,6 +4,8 @@ import { MenusRouter } from '@api/menus';
 import { PortalRoutes } from '@api/portal';
 import { UsersRouter } from '@api/users';
 import { FavoritesRouter } from '@api/favorites';
+import { ContactUsRouter } from '@api/contactUs';
+import { FeedbackRouter } from '@api/feedback';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
 import 'reflect-metadata';
 export class Wrapper {
@@ -62,7 +64,7 @@ Wrapper.registerRouter(AdminRouter);
 Wrapper.registerRouter(MealsRouter);
 Wrapper.registerRouter(MenusRouter);
 Wrapper.registerRouter(FavoritesRouter);
-// Wrapper.registerRouter(ArtworksRouter);
-// Wrapper.registerRouter(CountriesRoutes);
+Wrapper.registerRouter(ContactUsRouter);
+Wrapper.registerRouter(FeedbackRouter);
 // Wrapper.registerRouter(AuthorsRoutes);
 // Wrapper.registerRouter(BooksRoutes);
