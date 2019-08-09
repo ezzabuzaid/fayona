@@ -5,7 +5,7 @@ export namespace Constants {
         static readonly favorites = 'favorites';
         static readonly menus = 'menus';
         static readonly Feedback = 'feedback';
-
+        static readonly Account = 'account';
     }
     export class Schemas {
         static readonly favorites = 'favorites';
@@ -13,5 +13,7 @@ export namespace Constants {
         static readonly menus = 'menus';
         static readonly ContactUs = 'contact';
         static readonly Feedback = 'feedback';
+        static readonly Account = 'account';
+        static readonly Users = 'users';
     }
 }

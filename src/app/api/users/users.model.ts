@@ -1,9 +1,9 @@
-import { HashService } from '@core/helpers';
+import { HashService, Constants } from '@core/helpers';
 import { BaseModel, Entity, Field } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
-@Entity('users')
+@Entity(Constants.Schemas.Users)
 export class UsersSchema {
     @Field({ lowercase: false }) public password: string;
     @Field({

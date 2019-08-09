@@ -1,5 +1,6 @@
 import { Body } from '@lib/mongoose';
 import { UsersModel, UsersSchema } from './users.model';
+import { AccountService } from '@api/accounts';
 
 export class UsersRepo extends UsersModel {
     public static async updateEntity(id, doc: Body<UsersSchema>) {

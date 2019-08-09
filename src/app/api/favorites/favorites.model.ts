@@ -5,7 +5,7 @@ import { Constants } from '@core/helpers';
 @Entity(Constants.Schemas.favorites)
 export class FavoritesSchema {
     @Field({ lowercase: false }) public user_id: Types.ObjectId;
-    @Field({ lowercase: false }) item_id: Types.ObjectId;
+    @Field({ lowercase: false }) public item_id: Types.ObjectId;
     @Field({
         enum: [Constants.Schemas.meals, Constants.Schemas.menus]
     }) public type: string;
@@ -20,10 +20,8 @@ export class FavoritesSchema {
 }
 export const FavoritesModel = BaseModel<FavoritesSchema>(FavoritesSchema);
 FavoritesModel.schema.virtual('items', {
-    ref: doc => doc.type,
+    ref: (doc) => doc.type,
     localField: 'item_id',
     foreignField: '_id',
     justOne: true
 });
-
-

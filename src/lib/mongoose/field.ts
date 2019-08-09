@@ -14,7 +14,7 @@ export function Field<T = any>(options: Exclude<MongooseTypes.FieldOptions, 'typ
             defaults = {
                 lowercase: true,
                 trim: true,
-                required: propertyType.required || true
+                required: propertyType.required === false ? propertyType.required : true
             };
         }
         fields[propertyKey] = {
