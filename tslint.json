@@ -55,7 +55,8 @@
         "no-empty-interface": {
             "severity": "warning"
         },
-        "forin":false,
+        "ordered-imports": false,
+        "forin": false,
         "no-import-side-effect": false,
         "no-var-keyword": {
             "severity": "warning"

@@ -28,12 +28,14 @@ export interface IMETA {
 
 export const METHOD_META = 'METHOD:';
 
-export function define({ method, uri, middlewares, target, propertyKey }: IMETA) {
+export function define({ method: httpMethod, uri, middlewares, target, propertyKey }: IMETA) {
+    // TODO Create meta interface
     const meta = {
-        config: { middlewares, uri },
-        httpMethod: method,
-        instanceMethod: target[propertyKey],
+        uri,
+        middlewares: middlewares || [],
+        httpMethod,
+        method: target[propertyKey],
     };
     // TODO Throw an error if two uri are the same
-    Reflect.defineMetadata(`${METHOD_META}${method}:${uri}`, meta, target.constructor);
+    Reflect.defineMetadata(`${METHOD_META}${httpMethod}:${uri}`, meta, target.constructor);
 }

@@ -15,7 +15,7 @@ export class FavoritesRouter {
     public async create(req: Request, res: Response) {
         const { item_id } = req.body;
         const { type } = req.params;
-        
+
         // TODO: make an interface for user token
         const decodedToken = await tokenService.decodeToken<any>(req.headers.authorization);
         const result = await this.repo.createEntity({ type, user_id: decodedToken.id, item_id });
@@ -42,7 +42,10 @@ export class FavoritesRouter {
     @Get(':type', Auth.isAuthenticated)
     public async fetchFavMeals(req: Request, res: Response) {
         const decodedToken = await tokenService.decodeToken<any>(req.headers.authorization);
-        const entites = await this.repo.fetchEntities({ user_id: decodedToken.id, type: req.params.type }).populate('items');
+        const entites = await this.repo.fetchEntities({
+            user_id: decodedToken.id,
+            type: req.params.type
+        }).populate('item');
         const response = new SuccessResponse(entites, translate('success'), NetworkStatus.OK);
         response['count'] = entites.length;
         res.status(response.code).json(response);

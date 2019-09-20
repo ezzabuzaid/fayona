@@ -18,10 +18,12 @@ export function Entity(
     };
 }
 
-export function Virtual(name: string, options: SchemaOptions = {}) {
-    // return function (constructor: new (...args: any) => any) {
-    //     const schema = new BaseSchema(constructor.prototype.fields, options);
-    //     schema.loadClass(constructor);
-    //     constructor['wrapper'] = { schema, name };
-    // };
-}
+// export function Virtual(name: string) {
+//     return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
+//         const originalMethod = descriptor.value;
+//         descriptor.value = function (...args: any[]) {
+//             const result = originalMethod.apply(this, args);
+//             console.log(result);
+//         };
+//     };
+// }

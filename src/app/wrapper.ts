@@ -59,13 +59,12 @@ export class Wrapper {
 
 }
 
+Wrapper.registerRouter(MealsRouter);
 Wrapper.registerRouter(PortalRoutes);
 Wrapper.registerRouter(UsersRouter);
 Wrapper.registerRouter(AdminRouter);
-Wrapper.registerRouter(MealsRouter);
 Wrapper.registerRouter(MenusRouter);
 Wrapper.registerRouter(FavoritesRouter);
 Wrapper.registerRouter(ContactUsRouter);
 Wrapper.registerRouter(FeedbackRouter);
 Wrapper.registerRouter(AccountRouter);
-// Wrapper.registerRouter(BooksRoutes);

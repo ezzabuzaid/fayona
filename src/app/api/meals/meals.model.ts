@@ -8,7 +8,8 @@ export class MealsSchema {
     @Field() public recipe: string;
     @Field() public image: string;
     @Field() public price: number;
-    @Field() public menu_id: Types.ObjectId;
+    @Field({ required: false, default: 0 }) public rate: number;
+    @Field({ ref: Constants.Schemas.MENUS }) public menu_id: Types.ObjectId;
 }
 
 export const MealsModel = BaseModel<MealsSchema>(MealsSchema);

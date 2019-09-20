@@ -5,34 +5,40 @@ import 'reflect-metadata';
 import { IExpressInternal, IRouterDecorationOption, RouterProperties } from './method-types';
 
 const log = new Logger('Router Decorator');
-import { HTTP_VERSION_NOT_SUPPORTED } from 'http-status-codes';
 import path = require('path');
 import { METHOD_META } from '.';
-
-export function Router(uri: string, options: IRouterDecorationOption = {}) {
+const routes = {};
+export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
     return function <T extends new (...args: any[]) => any>(constructor: T) {
+        log.info(constructor.name);
         const { prototype } = constructor;
         const router = expressRouter(options);
-        const _uri = path.normalize(path.join('/', uri, '/'));
-
+        const routerUri = path.normalize(path.join('/', baseUri, '/'));
         const instance = new constructor();
         Reflect.getMetadataKeys(constructor)
             .forEach((key: string) => {
                 log.debug(key);
                 if (key.startsWith(METHOD_META)) {
-                    const { httpMethod, instanceMethod, config } = Reflect.getOwnMetadata(key, constructor);
-                    const normalizedURI = path.normalize(path.join('/', config.uri));
-                    router[httpMethod](normalizedURI, ErrorHandling.wrapRoute(...config.middlewares, function () {
-                        return instanceMethod.apply(instance, arguments);
-                    }));
+                    // log.debug(constructor);
+                    routes[routerUri] = constructor;
+                    const metadata = Reflect.getOwnMetadata(key, constructor);
+                    if (metadata) {
+                        const { httpMethod, method, middlewares, uri } = metadata;
+                        const normalizedURI = path.normalize(path.join('/', uri));
+                        router[httpMethod](normalizedURI, ErrorHandling.wrapRoutes(...middlewares, function () {
+                            return method.apply(instance, arguments);
+                        }));
+
+                    }
                 }
             });
 
+        // console.log(routes);
         if (options.middleware && options.middleware.length) {
-            router.use(`${_uri}`, ErrorHandling.wrapRoute(...options.middleware));
+            router.use(`${routerUri}`, ErrorHandling.wrapRoutes(...options.middleware));
         }
 
-        AppUtils.defineProperty(prototype, RouterProperties.RoutesPath, { get() { return _uri; } });
+        AppUtils.defineProperty(prototype, RouterProperties.RoutesPath, { get() { return routerUri; } });
         const id = AppUtils.generateHash();
         AppUtils.defineProperty(prototype, RouterProperties.ID, { get() { return id; } });
         return class extends constructor implements IExpressInternal {
@@ -41,7 +47,7 @@ export function Router(uri: string, options: IRouterDecorationOption = {}) {
                 return this;
             }
             public __router() {
-                return { router, id, uri: _uri };
+                return { router, id, uri: routerUri };
             }
         };
     };

@@ -1,78 +1,14 @@
-import { Auth } from '@api/portal';
-import { ErrorResponse, NetworkStatus, SuccessResponse, tokenService } from '@core/helpers';
-import { Logger } from '@core/utils';
 import { Constants } from '@core/helpers';
-import { Delete, Get, Post, Put, Router } from '@lib/methods';
-import { translate } from '@lib/translation';
+import { Get, Router } from '@lib/methods';
 import { Request, Response } from 'express';
-import { MealsRepo } from './meals.repo';
-const log = new Logger('MealsRouter');
+import mealsService from './meals.service';
+import { CrudRouter } from '@shared/crud';
+import { MealsSchema } from './meals.model';
 
-@Router(Constants.Endpoints.meals)
-export class MealsRouter {
-    private repo = MealsRepo;
-
-    @Post('', Auth.isAuthenticated)
-    public async create(req: Request, res: Response) {
-        const { price, image, recipe, name, menu_id } = req.body;
-        const entity = await this.repo.createEntity({ price, image, recipe, name, menu_id });
-        const response = new SuccessResponse(entity, translate('success'), NetworkStatus.CREATED);
-        res.status(response.code).json(response);
-    }
-
-    @Put(':id', Auth.isAuthenticated)
-    public async update(req: Request, res: Response) {
-        const { id } = req.params;
-        const { price, image, recipe, name, menu_id } = req.body;
-        const entity = await this.repo.updateEntity(id, { price, image, recipe, name, menu_id });
-        if (!entity) {
-            throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
-        }
-        const response = new SuccessResponse(entity, translate('success'), NetworkStatus.OK);
-        res.status(response.code).json(response);
-    }
-
-    @Delete(':id', Auth.isAuthenticated)
-    public async delete(req: Request, res: Response) {
-        const { id } = req.params;
-        const entity = await this.repo.deleteEntity(id);
-        if (!entity) {
-            throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
-        }
-        const response = new SuccessResponse(null, translate('success'), NetworkStatus.OK);
-        res.status(response.code).json(response);
-    }
-
-    @Get(':id', Auth.isAuthenticated)
-    public async fetchEntity(req: Request, res: Response) {
-        const { id } = req.params;
-        const entity = await this.repo.fetchEntityById(id).lean();
-        if (!entity) {
-            throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
-        }
-        const response = new SuccessResponse(entity, translate('success'));
-        res.status(response.code).json(response);
-    }
-
-    @Get()
-    public async fetchEntities(req: Request, res: Response) {
-        const response = await this.populateAllEntityQuery();
-        res.status(response.code).json(response);
-    }
-
+@Router(Constants.Endpoints.MEALS)
+export class MealsRouter extends CrudRouter<MealsSchema> {
     @Get('menu/:menu_id')
     public async fetchEntitiesByMealID(req: Request, res: Response) {
-      await  tokenService.decodeToken(req.headers.authorization);
-        const { menu_id } = req.params;
-        const response = await this.populateAllEntityQuery({ menu_id });
-        res.status(response.code).json(response);
+        return mealsService.fetchAllByMenuId(req, res);
     }
-
-    public async populateAllEntityQuery(query = {}) {
-        const entites = await this.repo.fetchEntities(query);
-        const response = new SuccessResponse(entites, translate('success'), NetworkStatus.OK);
-        response['count'] = entites.length;
-        return response;
-    }
-
 }

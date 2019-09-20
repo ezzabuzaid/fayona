@@ -1,8 +1,11 @@
 import { AccountRepo } from './accounts.repo';
 
-export class AccountService {
-    public static async createAccountForUser(user_id) {
-        await AccountRepo.createEntity({ user_id });
+class AccountService {
+    public deleteAccount(user_id) {
+        return AccountRepo.delete(user_id);
+    }
+    public createAccount(user_id) {
+        return AccountRepo.create({user_id});
     }
 }
-
+export default new AccountService();

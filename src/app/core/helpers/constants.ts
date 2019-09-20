@@ -1,19 +1,20 @@
 export namespace Constants {
     export class Endpoints {
-        static readonly ContactUs = 'contact';
-        static readonly meals = 'meals';
-        static readonly favorites = 'favorites';
-        static readonly menus = 'menus';
-        static readonly Feedback = 'feedback';
-        static readonly Account = 'account';
+        public static readonly ContactUs = 'contact';
+        public static readonly MEALS = 'meals';
+        public static readonly favorites = 'favorites';
+        public static readonly menus = 'menus';
+        public static readonly Feedback = 'feedback';
+        public static readonly Account = 'account';
+        public static readonly USERS = 'users';
     }
     export class Schemas {
-        static readonly favorites = 'favorites';
-        static readonly meals = 'meals';
-        static readonly menus = 'menus';
-        static readonly ContactUs = 'contact';
-        static readonly Feedback = 'feedback';
-        static readonly Account = 'account';
-        static readonly Users = 'users';
+        public static readonly favorites = 'favorites';
+        public static readonly meals = 'meals';
+        public static readonly MENUS = 'menus';
+        public static readonly ContactUs = 'contact';
+        public static readonly Feedback = 'feedback';
+        public static readonly Account = 'account';
+        public static readonly USERS = 'users';
     }
 }

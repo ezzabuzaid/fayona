@@ -1,7 +1,7 @@
 import { IncomingMessage, Server } from 'http';
 import WebSocket, { ServerOptions } from 'ws';
 import { AppUtils } from '../core/utils/utils.service';
- interface ITest {
+interface ITest {
     Role: string;
     ws: WebSocket;
     id: string;

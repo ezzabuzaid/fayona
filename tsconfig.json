@@ -43,6 +43,9 @@
       ],
       "@assets/*": [
         "assets/*"
+      ],
+      "@test/*": [
+        "test/*"
       ]
     },
     "noStrictGenericChecks": false,
@@ -53,8 +56,5 @@
       "node",
       "jest"
     ]
-  },
-  "files": [
-    "./src/main.ts"
-  ]
+  }
 }

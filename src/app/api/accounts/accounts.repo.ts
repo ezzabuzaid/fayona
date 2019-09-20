@@ -1,5 +1,6 @@
 import { Body } from '@lib/mongoose';
 import { AccountModel, AccountSchema } from './accounts.model';
+import { Repo } from '@core/contracts/repo';
 
 export class AccountRepo {
     private static model = AccountModel;
@@ -11,7 +12,7 @@ export class AccountRepo {
         entity.set(body);
         return entity.save();
     }
-    public static createEntity(doc: Partial<Body<AccountSchema>>) {
+    public static create(doc: Partial<Body<AccountSchema>>) {
         const user = new this.model(doc);
         return user.save();
     }
@@ -20,8 +21,8 @@ export class AccountRepo {
         return this.model.findOne(obj, ...args);
     }
 
-    public static deleteEntity(id: string) {
-        return this.model.findOneAndDelete({ _id: id });
+    public static delete(user_id) {
+        return this.model.findOneAndDelete({ user_id });
     }
 
     public static entityExist(obj) {

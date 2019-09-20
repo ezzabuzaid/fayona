@@ -3,7 +3,7 @@ import { BaseModel, Entity, Field } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
-@Entity(Constants.Schemas.Users)
+@Entity(Constants.Schemas.USERS)
 export class UsersSchema {
     @Field({ lowercase: false }) public password: string;
     @Field({

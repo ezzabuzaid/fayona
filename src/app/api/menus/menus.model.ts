@@ -1,7 +1,7 @@
 import { BaseModel, Entity, Field } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
 
-@Entity(Constants.Schemas.menus)
+@Entity(Constants.Schemas.MENUS)
 export class MenusSchema {
     @Field() public name: string;
     @Field() public description: string;

@@ -62,11 +62,6 @@ export class ErrorHandling {
                 response.code = NetworkStatus.BAD_REQUEST;
                 break;
         }
-
-        // production(() => {
-        //     response.message = translate('internal_server_error');
-        // });
-
         res.status(response.code).json(response);
         return;
     }
@@ -76,7 +71,9 @@ export class ErrorHandling {
     }
 
     public static notFound(req: Request, res: Response, next: NextFunction) {
-        const error = new ErrorResponse(`${req.originalUrl} => ${translate('endpoint_not_found')}`, NetworkStatus.NOT_FOUND);
+        const error = new ErrorResponse(
+            `${req.originalUrl} => ${translate('endpoint_not_found')}`, NetworkStatus.NOT_FOUND
+        );
         return res.status(error.code).json(error);
     }
 
@@ -84,10 +81,11 @@ export class ErrorHandling {
         if (req.originalUrl && req.originalUrl.split('/').pop() === 'favicon.ico') {
             return res.sendStatus(204);
         }
-        return next();
+        next();
+        return;
     }
 
-    public static wrapRoute(...func) {
+    public static wrapRoutes(...func) {
         return func.map((fn) => (...args) => fn(...args).catch(args[2]));
     }
 

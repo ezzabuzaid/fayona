@@ -1,16 +1,13 @@
 import { NetworkStatus } from '@core/helpers/network-status';
-import { Request as ExpressRequest, Response as ExpressResponse } from 'express';
-import { Body } from '@lib/mongoose';
-// export interface Request<T> extends ExpressRequest {
-//     body: Body<T>
-// }
-// export interface Response extends ExpressResponse { }
+
+// tslint:disable-next-line: class-name
 abstract class _Response extends Error {
     public status: string;
     public code: number;
 }
 
 export class SuccessResponse<T> extends _Response {
+    [x: string]: any;
     public name = SuccessResponse.name;
     public data: T;
     constructor(data: T, message: string, code = NetworkStatus.OK, status?: string) {

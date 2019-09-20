@@ -2,12 +2,8 @@ import { ErrorResponse, NetworkStatus, SuccessResponse, tokenService } from '@co
 import { Post, Router } from '@lib/methods';
 import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
-
 import { AdminRepo } from '@api/admin';
-import { UsersRepo } from '@api/users';
-import { Logger } from '@core/utils';
-import { Auth } from './auth';
-const log = new Logger('PortalRoutes');
+import { usersRepo } from '@api/users';
 
 @Router('portal')
 export class PortalRoutes {
@@ -15,13 +11,11 @@ export class PortalRoutes {
     @Post('login/user')
     public async loginUser(req: Request, res: Response) {
         const { username, password } = req.body;
-        const entity = await UsersRepo.fetchEntity({ username });
-        log.debug(JSON.stringify(entity, undefined, 8), 'Check if user exist');
+        const entity = await usersRepo.fetchOne({ username });
         if (!!entity) {
             const isPasswordEqual = await entity.comparePassword(password);
             if (isPasswordEqual) {
                 const response = new SuccessResponse(entity, translate('success'), NetworkStatus.OK);
-                log.debug('Start generateToken');
                 response['token'] = tokenService.generateToken({ id: entity.id });
                 return res.status(response.code).json(response);
             }
@@ -34,12 +28,10 @@ export class PortalRoutes {
     public async loginAdmin(req: Request, res: Response) {
         const { username, password } = req.body;
         const entity = await AdminRepo.fetchEntity({ username }).lean();
-        log.debug('Check if user exist');
         if (!!entity) {
             const isPasswordEqual = await entity.comparePassword(password);
             if (isPasswordEqual) {
                 const response = new SuccessResponse(entity, translate('success'), NetworkStatus.OK);
-                log.debug('Start generateToken');
                 response['token'] = tokenService.generateToken({ id: entity.id });
                 return res.status(response.code).json(response);
             }

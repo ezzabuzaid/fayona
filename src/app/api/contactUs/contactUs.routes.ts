@@ -1,12 +1,9 @@
 import { Auth } from '@api/portal';
-import { ErrorResponse, NetworkStatus, SuccessResponse } from '@core/helpers';
-import { Logger } from '@core/utils';
+import { ErrorResponse, NetworkStatus, SuccessResponse, Constants } from '@core/helpers';
 import { Delete, Get, Post, Put, Router } from '@lib/methods';
 import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
 import { ContactUsRepo } from './contactUs.repo';
-import { Constants } from '@core/helpers';
-const log = new Logger('ContactUsRouter');
 
 @Router(Constants.Endpoints.ContactUs)
 export class ContactUsRouter {

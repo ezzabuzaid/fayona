@@ -1,25 +1,22 @@
 import { Auth } from '@api/portal';
-import { ErrorResponse, NetworkStatus, SuccessResponse, tokenService } from '@core/helpers';
-import { Logger } from '@core/utils';
-import { Delete, Get, Post, Put, Router } from '@lib/methods';
+import { ErrorResponse, NetworkStatus, SuccessResponse, tokenService, Constants } from '@core/helpers';
+import { Delete, Get, Put, Router } from '@lib/methods';
 import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
 import { AccountRepo } from './accounts.repo';
-import { Constants } from '@core/helpers';
-const log = new Logger('AccountRouter');
 
 @Router(Constants.Endpoints.Account)
 export class AccountRouter {
     private repo = AccountRepo;
-
-
 
     @Put(':id', Auth.isAuthenticated)
     public async update(req: Request, res: Response) {
         const { id } = req.params;
         const { address, firstName, image, lastName } = req.body;
         const decodedToken = await tokenService.decodeToken<any>(req.headers.authorization);
-        const entity = await this.repo.updateEntity(id, { address, firstName, image, lastName, user_id: decodedToken.id });
+        const entity = await this.repo.updateEntity(id, {
+            address, firstName, image, lastName, user_id: decodedToken.id
+        });
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
         }
@@ -30,7 +27,7 @@ export class AccountRouter {
     @Delete(':id', Auth.isAuthenticated)
     public async delete(req: Request, res: Response) {
         const { id } = req.params;
-        const entity = await this.repo.deleteEntity(id);
+        const entity = await this.repo.delete(id);
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
         }
@@ -58,4 +55,3 @@ export class AccountRouter {
         res.status(response.code).json(response);
     }
 }
-

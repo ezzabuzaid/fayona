@@ -2,7 +2,7 @@
   "main": "main.ts",
   "scripts": {
     "snyk": "snyk test",
-    "test": "jest",
+    "test": "jest --detectOpenHandles",
     "test:watch": "jest --watch --runInBand --detectOpenHandles",
     "build": "node build --env=prod",
     "dev": "ts-node -r tsconfig-paths/register ./src/main.ts",
@@ -15,10 +15,8 @@
     "node": "10.15.1"
   },
   "dependencies": {
-    "@sentry/node": "^5.5.0",
     "@types/ansi-colors": "^3.2.0",
     "@types/bcrypt": "^3.0.0",
-    "@types/bcryptjs": "^2.4.2",
     "@types/body-parser": "^1.17.0",
     "@types/cheerio": "^0.22.12",
     "@types/compression": "0.0.36",
@@ -37,7 +35,6 @@
     "@types/phone": "^1.0.3",
     "@types/reflect-metadata": "^0.1.0",
     "@types/sequelize": "^4.28.4",
-    "@types/socket.io": "^2.1.2",
     "@types/ws": "^6.0.1",
     "ansi-colors": "^3.2.4",
     "bcrypt": "^3.0.6",
@@ -65,21 +62,20 @@
     "mysql2": "^1.6.5",
     "phone": "^2.3.18",
     "reflect-metadata": "^0.1.13",
-    "sequelize": "^5.8.7",
-    "socket.io": "^2.2.0",
-    "socketio": "^1.0.0",
+    "sequelize": "^5.16.0",
     "tsconfig-paths": "^3.8.0",
+    "typescript": "^3.6.3",
     "ws": "^6.2.1"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.15",
-    "jest": "^24.8.0",
+    "@types/jest": "^24.0.18",
+    "@types/supertest": "^2.0.8",
+    "jest": "^24.9.0",
     "nodemon": "^1.18.10",
     "snyk": "^1.143.0",
     "supertest": "^4.0.2",
     "ts-jest": "^24.0.2",
     "ts-node": "^7.0.1",
-    "typescript": "~3.4.0",
     "yargs": "^13.2.4"
   },
   "bugs": {

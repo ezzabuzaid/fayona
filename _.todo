@@ -95,3 +95,14 @@ class DecoratedModel {
 // // try to make use of angular way by injecting it directly
 
 // // Take care of error handling
+
+
+// REVIEW  controller => handler(service => unitofwork(repo, model))
+/**
+ * unitofwork(repo, model) => first prepare your model then expose it using the repo class and facilitate the methods
+ * service => unitofwork(repo, model) => after composing the repo and model you need to leverage them
+ * controller => handler(service => unitofwork(repo, model)) the controller like a king will ask the service
+ * to do something, the service will be prepared to (validate | ask hassan) and check that everything is okay,
+ * to procced the operation then
+ * it asks the repo to hold the data in the model(database)
+ */

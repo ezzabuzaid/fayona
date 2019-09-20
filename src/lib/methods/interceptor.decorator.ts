@@ -14,7 +14,7 @@ export function Intercept() {
         // and setTimeout solved the problem
         setTimeout(() => {
             // * assign the router
-            target.use(ErrorHandling.wrapRoute(function() {
+            target.use(ErrorHandling.wrapRoutes(function() {
                 console.log('Test interceptor');
                 return target[propertyKey](...arguments);
             }));

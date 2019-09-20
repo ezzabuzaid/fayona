@@ -1,6 +1,6 @@
 import { Database } from '@core/database/database';
 import { stage, StageLevel } from '@core/helpers';
-import { Logger } from '@core/utils';
+import { Logger, LoggerLevel } from '@core/utils';
 import { envirnoment } from '@environment/env';
 import http = require('http');
 import { URL } from 'url';
@@ -28,42 +28,43 @@ export class NodeServer extends Application {
                         return acc;
                 }, {});
 
-                server.application.get('/socket/:name', (req, res) => {
-                        const { name } = req.params;
-                        const stream = loadOHLCcsv(name);
-                        const socket = sockets[name];
-                        socket.onConnection()
-                                .then((ws) => {
-                                        function handler(data) {
-                                                if (ws.readyState === ws.OPEN) {
-                                                        socket.socket.clients.forEach(client => {
-                                                                client.send(JSON.stringify({ data, name }));
-                                                        });
-                                                }
-                                        }
-                                        const streamListner = stream.on('data', handler);
-                                        ws.on('close', () => {
-                                                log.warn('CLOSE');
-                                                streamListner.removeListener('data', handler);
-                                        });
-                                });
-                        socket.socket.on('error', () => {
-                                log.warn('ERROR');
-                                stream.destroy();
-                        });
-                        httpServer.once('upgrade', (request, _socket, head) => {
-                                socket.socket.handleUpgrade(request, _socket, head, (ws) => {
-                                        socket.socket.emit('connection', ws, request)
-                                })
-                        });
-                        res.status(200).send({ success: true });
+                // server.application.get('/socket/:name', (req, res) => {
+                //         const { name } = req.params;
+                //         const stream = loadOHLCcsv(name);
+                //         const socket = sockets[name];
+                //         socket.onConnection()
+                //                 .then((ws) => {
+                //                         function handler(data) {
+                //                                 if (ws.readyState === ws.OPEN) {
+                //                                         socket.socket.clients.forEach((client) => {
+                //                                                 client.send(JSON.stringify({ data, name }));
+                //                                         });
+                //                                 }
+                //                         }
+                //                         const streamListner = stream.on('data', handler);
+                //                         ws.on('close', () => {
+                //                                 log.warn('CLOSE');
+                //                                 streamListner.removeListener('data', handler);
+                //                         });
+                //                 });
+                //         socket.socket.on('error', () => {
+                //                 log.warn('ERROR');
+                //                 stream.destroy();
+                //         });
+                //         httpServer.once('upgrade', (request, _socket, head) => {
+                //                 socket.socket.handleUpgrade(request, _socket, head, (ws) => {
+                //                         socket.socket.emit('connection', ws, request);
+                //                 });
+                //         });
+                //         res.status(200).send({ success: true });
 
-                        return;
-                });
+                //         return;
+                // });
                 await server.init();
         }
 
-        public static async test() {
+        public static  test() {
+                Logger.level = LoggerLevel.Off;
                 log.info('Start Testing');
                 envirnoment.load(StageLevel.TEST);
                 return (new NodeServer()).init();
@@ -175,32 +176,3 @@ export class NodeServer extends Application {
 //     console.log('and this matches too');
 //     res.end();
 // });
-// const schema = {
-//         id: {
-//                 type: 'int UNSIGNED',
-//                 value: 'AUTO_INCREMENT',
-//                 key: 'PRIMARY KEY'
-//         },
-//         title: {
-//                 type: 'VARCHAR(255)',
-//                 value: 'NOT NULL'
-//         },
-//         body: {
-//                 type: 'VARCHAR(255)',
-//                 value: 'NOT NULL'
-//         }
-// };
-// function creataTable(tableName, columns) {
-//         const columnsNames = Object.keys(columns);
-//         const statement = columnsNames.reduce((statment, column, index) => {
-//                 const { type, value, key = '' } = columns[column];
-//                 let _statment = `${column} ${type} ${value} ${key}`;
-//                 _statment = _statment.trim();
-//                 if ((index + 1) !== columnsNames.length) {
-//                         _statment += ', ';
-//                 }
-//                 return `${statment}${_statment}`;
-//         }, '');
-//         return `CREATE TABLE ${tableName} (${statement})`;
-// }
-// const table = creataTable('FuckTableFromString', schema);

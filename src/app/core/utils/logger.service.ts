@@ -33,7 +33,7 @@ import colors = require('ansi-colors');
  * The possible log levels.
  * LogLevel.Off is never emitted and only used with Logger.level property to disable logs.
  */
-export enum LogLevel {
+export enum LoggerLevel {
   Off = 0,
   Error,
   Warning,
@@ -44,46 +44,46 @@ export enum LogLevel {
 /**
  * Log output handler function.
  */
-export type LogOutput = (source: string, level: LogLevel, ...objects: any[]) => void;
+export type LogOutput = (source: string, level: LoggerLevel, ...objects: any[]) => void;
 
 export class Logger {
   /**
    * Current logging level.
    * Set it to LogLevel.Off to disable logs completely.
    */
-  public static level = LogLevel.Debug;
+  public static level = LoggerLevel.Debug;
 
   public static outputs: LogOutput[] = [];
 
   public static enableProductionMode() {
-    Logger.level = LogLevel.Warning;
+    Logger.level = LoggerLevel.Warning;
   }
 
   constructor(private source?: string) {
-    this.log(console.log, LogLevel.Info, [colors.bold(source)]);
+    this.log(console.log, LoggerLevel.Info, [colors.bold(source)]);
   }
 
   public debug(...objects: any[]) {
     this.colorizeText(objects, 'cyan');
-    this.log(console.log, LogLevel.Debug, objects);
+    this.log(console.log, LoggerLevel.Debug, objects);
   }
 
   public info(...objects: any[]) {
     this.colorizeText(objects, 'green');
-    this.log(console.info, LogLevel.Info, objects);
+    this.log(console.info, LoggerLevel.Info, objects);
   }
 
   public warn(...objects: any[]) {
     this.colorizeText(objects, 'yellow');
-    this.log(console.warn, LogLevel.Warning, objects);
+    this.log(console.warn, LoggerLevel.Warning, objects);
   }
 
   public error(...objects: any[]) {
     this.colorizeText(objects, 'red');
-    this.log(console.error, LogLevel.Error, objects);
+    this.log(console.error, LoggerLevel.Error, objects);
   }
 
-  private log(func: Function, level: LogLevel, objects: any[]) {
+  private log(func: (...args) => any, level: LoggerLevel, objects: any[]) {
     if (level <= Logger.level) {
       const log = this.source ? ['[' + colors.bgBlack(colors.bold(this.source)) + ']'].concat(objects) : objects;
       func.apply(console, log);

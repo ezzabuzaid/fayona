@@ -1,12 +1,9 @@
 import { Auth } from '@api/portal';
-import { ErrorResponse, NetworkStatus, SuccessResponse } from '@core/helpers';
-import { Logger } from '@core/utils';
+import { ErrorResponse, NetworkStatus, SuccessResponse, Constants } from '@core/helpers';
 import { Delete, Get, Post, Put, Router } from '@lib/methods';
 import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
 import { MenusRepo } from './menus.repo';
-const log = new Logger('MenusRouter');
-import { Constants } from '@core/helpers';
 
 @Router(Constants.Endpoints.menus)
 export class MenusRouter {

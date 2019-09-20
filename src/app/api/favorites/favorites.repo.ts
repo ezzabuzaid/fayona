@@ -2,15 +2,15 @@ import { Body } from '@lib/mongoose';
 import { FavoritesModel, FavoritesSchema } from './favorites.model';
 import { models } from 'mongoose';
 
-type FavoritesModelBody = Body<FavoritesSchema>;
+type FavoritesBody = Body<FavoritesSchema>;
 
-export class FavoritesRepo extends FavoritesModel {
+export class FavoritesRepo {
+    private static model = FavoritesModel;
 
-    public static async createEntity(doc: FavoritesModelBody) {
-        const oldEntity = await this.findOne({ item_id: doc.item_id }).lean();
-        console.log(oldEntity);
+    public static async createEntity(doc: FavoritesBody) {
+        const oldEntity = await this.model.findOne({ item_id: doc.item_id }).lean();
         if (!oldEntity) {
-            const entity = new FavoritesRepo(doc);
+            const entity = new this.model(doc);
             const type = doc.type;
             if (!models[type]) {
                 return { passed: false, msg: 'is not one of the supported type' }
@@ -19,19 +19,18 @@ export class FavoritesRepo extends FavoritesModel {
             if (!isThere) {
                 return { passed: false, msg: 'type is not associated with the item_id' }
             }
-            console.warn('passed');
-            return { passed: true, entity: entity.save() };
+            return { passed: true, entity: await entity.save() };
         } else {
-            return { passed: false, msg: 'entity is there' };
+            return { passed: false, msg: 'entity is already assigned as favorites' };
         }
     }
 
     public static deleteEntity(id: string) {
-        return this.findOneAndDelete({ _id: id });
+        return this.model.findOneAndDelete({ _id: id });
     }
 
-    public static fetchEntities(obj?: Partial<FavoritesModelBody>, ...args) {
-        return this.find(obj, ...args);
+    public static fetchEntities(obj?: Partial<FavoritesBody>, ...args) {
+        return this.model.find(obj, ...args);
     }
 
 }
