@@ -1,5 +1,5 @@
 import { ErrorHandling } from '@core/helpers';
-import { RouterMethodDecorator } from './method-types';
+import { RouterMethodDecorator } from './methods.types';
 
 export function Intercept() {
     return function(target: RouterMethodDecorator, propertyKey: string, descriptor: PropertyDescriptor) {

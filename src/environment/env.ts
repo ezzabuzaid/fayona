@@ -7,7 +7,7 @@ const log = new Logger('Envirnoment Class');
 class Envirnoment {
     public load(env?: StageLevel) {
         let envPath = '.env';
-        if (!AppUtils.isNull(env)) {
+        if (!AppUtils.isNullOrUndefined(env)) {
             envPath = `${envPath}.${env}`;
         }
         log.warn(envPath);

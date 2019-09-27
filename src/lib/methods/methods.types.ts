@@ -1,8 +1,14 @@
 import { RequestHandler, Router, RouterOptions } from 'express';
 import { RequestHandlerParams } from 'express-serve-static-core';
+import { ICrudOptions } from '@shared/crud';
+import { PickAttr } from '@core/utils';
 
+type CrudOperation = keyof ICrudOptions<any>;
 export interface IRouterDecorationOption extends RouterOptions {
     middleware?: RequestHandler[] | RequestHandlerParams[];
+    crud?: Partial<{
+        [key in CrudOperation]: PickAttr<IRouterDecorationOption, 'middleware'>
+    }>;
 }
 
 export enum RouterProperties {

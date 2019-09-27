@@ -1,6 +1,5 @@
 import { BaseModel, Entity, Field } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
-import { ValidationPatterns } from '@shared/common';
 
 @Entity(Constants.Schemas.Feedback)
 export class FeedbackSchema {

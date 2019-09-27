@@ -1,6 +1,6 @@
 import { Body } from '@lib/mongoose';
 import { AccountModel, AccountSchema } from './accounts.model';
-import { Repo } from '@core/contracts/repo';
+import { Repo } from '@shared/crud/crud.repo';
 
 export class AccountRepo {
     private static model = AccountModel;

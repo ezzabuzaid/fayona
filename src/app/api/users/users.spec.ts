@@ -1,6 +1,6 @@
+import '@test/index';
 import { Types } from 'mongoose';
 import { superAgent } from '@test/supertest';
-import '@test/index';
 import { createUser, deleteUser, UserFixture } from '@test/fixture';
 import { Constants, NetworkStatus } from '@core/helpers';
 
@@ -11,7 +11,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-    deleteUser();
+    await deleteUser();
 });
 
 // NOTE test the fail, don't test the success

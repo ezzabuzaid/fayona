@@ -3,7 +3,7 @@ import { connect, ConnectionOptions } from 'mongoose';
 
 const log = new Logger('Database');
 
-interface IMongooseURI {
+interface IMongooseOptions {
     user: string;
     password: string;
     path: string;
@@ -18,7 +18,7 @@ class MongooseURI {
     private _host: string = null;
     private _atlas: boolean = false;
 
-    constructor(option: IMongooseURI) {
+    constructor(option: IMongooseOptions) {
         this._atlas = option.atlas;
         this._user = option.user;
         this._password = option.password;
@@ -49,14 +49,14 @@ class MongooseURI {
 
 export class Database {
 
-    public static load(option: IMongooseURI, options: ConnectionOptions = {}) {
-        const { URI } = new MongooseURI(option);
+    public static load(mongooseOption: IMongooseOptions, connectionOptions: ConnectionOptions = {}) {
+        const { URI } = new MongooseURI(mongooseOption);
         log.info(URI);
         return connect(URI, {
             useNewUrlParser: true,
             autoIndex: false,
             w: 'majority',
-            ...options
+            ...connectionOptions
         })
             .then(() => log.info('Database Connected'))
             .catch((error) => log.error('Database Not Connected', error));

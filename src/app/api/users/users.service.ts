@@ -1,5 +1,5 @@
 import accountsService from '@api/accounts/accounts.service';
-import { UsersSchema } from './users.model';
+import { UsersSchema, UsersModel } from './users.model';
 import { CrudService } from '@shared/crud/crud.service';
 import { usersRepo } from '.';
 
@@ -8,16 +8,16 @@ class UserService extends CrudService<UsersSchema> {
     constructor() {
         super(usersRepo, {
             unique: [{ attr: 'username' }, { attr: 'email' }],
-            pre: {
-                async create(entity) {
+            create: {
+                async pre(entity) {
                     await entity.hashUserPassword();
+                },
+                async post(entity) {
+                    await accountsService.createAccount(entity.id);
                 }
             },
-            post: {
-                async create(entity) {
-                    await accountsService.createAccount(entity.id);
-                },
-                async delete(entity) {
+            delete: {
+                async post(entity) {
                     await accountsService.deleteAccount(entity.id);
                 }
             },

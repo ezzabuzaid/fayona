@@ -3,7 +3,6 @@ REVIEW Features
 32_ Mongoose Query Helpers
 33_ use mongoose plugin to retrive name attribute depend on user language
 
-
 SECTION ALERTS
 1_ if a certin environment not available such as a "NODE_ENV" ..etc, and throw an error before building
 2_ eleminate register mutiple router to the same app or router instance by checking if the id of the router is registred before
@@ -12,10 +11,9 @@ SECTION ALERTS
 
 TODO
 1_ implement deferent auth strategies
-2_ Work in group logger | IGNORE
-7_ read all files to get the string in translate function and auto export it to json file
+7_ read all files to get the string in `translate` function and auto export it to json file
 8_ refresh token
-9_ curd generator
+9_ important (curd generator)
 
 SECTION IMPORTANT
 1_ an application instance not allowed to be accesses, just in server class
@@ -39,18 +37,6 @@ Refactor the "Reactor" class to work with event
 Modify the request interface to be generic in order to give the body type
 Get the type of the decorated attr only
 
-
-
-
-/* EXAMPLE USAGE - limiting a decorator to Ultra typings */
-function ultra<TKey extends string, TTarget extends { [K in TKey]: Ultra<unknown> }>(target: TTarget, propertyName: TKey) {
-    // decorator implementation here
-}
-
-class DecoratedModel {
-    @ultra public someProperty: number; // ❌ Error, property has to have Ultra type
-    @ultra public anotherOne: Ultra<number>; // ✅ compiles
-}
 
 
 // import { Schema, model } from "mongoose";

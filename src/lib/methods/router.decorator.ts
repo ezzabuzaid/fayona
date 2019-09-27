@@ -2,7 +2,7 @@ import { ErrorHandling } from '@core/helpers';
 import { AppUtils, Logger } from '@core/utils';
 import { Router as expressRouter } from 'express';
 import 'reflect-metadata';
-import { IExpressInternal, IRouterDecorationOption, RouterProperties } from './method-types';
+import { IExpressInternal, IRouterDecorationOption, RouterProperties } from './methods.types';
 
 const log = new Logger('Router Decorator');
 import path = require('path');
@@ -17,11 +17,10 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
         const instance = new constructor();
         Reflect.getMetadataKeys(constructor)
             .forEach((key: string) => {
-                log.debug(key);
                 if (key.startsWith(METHOD_META)) {
-                    // log.debug(constructor);
+                    log.debug(key);
                     routes[routerUri] = constructor;
-                    const metadata = Reflect.getOwnMetadata(key, constructor);
+                    const metadata = Reflect.getMetadata(key, constructor);
                     if (metadata) {
                         const { httpMethod, method, middlewares, uri } = metadata;
                         const normalizedURI = path.normalize(path.join('/', uri));

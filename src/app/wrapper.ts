@@ -1,14 +1,11 @@
-import { AdminRouter } from '@api/admin';
+import { UsersRouter } from '@api/users';
 import { MealsRouter } from '@api/meals';
 import { MenusRouter } from '@api/menus';
 import { PortalRoutes } from '@api/portal';
-import { UsersRouter } from '@api/users';
 import { FavoritesRouter } from '@api/favorites';
-import { ContactUsRouter } from '@api/contactUs';
 import { FeedbackRouter } from '@api/feedback';
 import { AccountRouter } from '@api/accounts';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
-import 'reflect-metadata';
 export class Wrapper {
     private static list = [];
     public static registerRouter(router, subRouter?) {
@@ -52,9 +49,8 @@ export class Wrapper {
     }
 
     private static dispatchRouter({ router }: any) {
+        this.getRouter(router);
         this.list.splice(router);
-        // tslint:disable-next-line: max-line-length
-        // ? This is not done, we need to re init all the router again, or just remove this router from both router list and router bootstrap list
     }
 
 }
@@ -62,9 +58,7 @@ export class Wrapper {
 Wrapper.registerRouter(MealsRouter);
 Wrapper.registerRouter(PortalRoutes);
 Wrapper.registerRouter(UsersRouter);
-Wrapper.registerRouter(AdminRouter);
 Wrapper.registerRouter(MenusRouter);
 Wrapper.registerRouter(FavoritesRouter);
-Wrapper.registerRouter(ContactUsRouter);
 Wrapper.registerRouter(FeedbackRouter);
 Wrapper.registerRouter(AccountRouter);

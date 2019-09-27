@@ -1,8 +1,11 @@
 import { ICrudOptions } from './crud.options';
-import { Repo } from '@core/contracts/repo';
+import { Repo } from '@shared/crud/crud.repo';
 import { ErrorResponse, NetworkStatus, SuccessResponse } from '@core/helpers';
 import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
+import { Body, Document } from '@lib/mongoose';
+import { DeepPartial } from 'mongoose';
+import { AppUtils } from '@core/utils';
 
 export class CrudService<T> {
     constructor(
@@ -10,19 +13,24 @@ export class CrudService<T> {
         private options: ICrudOptions<T> = {} as any
     ) { }
 
-    public async create(req: Request, res: Response) {
+    private async check(body) {
         if (this.options.unique) {
             const opertaions = this.options.unique.map(async ({ attr }) => {
-                return !!(await this.repo.fetchOne({ [attr]: req.body[attr] }));
+                return !!(await this.repo.fetchOne({ [attr]: body[attr] } as any));
             });
             const exist = (await Promise.all(opertaions)).every((operation) => !!operation);
             if (exist) {
                 throw new ErrorResponse(translate('entity_exist'), NetworkStatus.BAD_REQUEST);
             }
         }
-        const entity = await new this.repo.model(req.body);
-        const pre = this.options.pre.create;
-        const post = this.options.post.create;
+    }
+
+    public async create(body: Partial<Body<T>>) {
+        await this.check(body);
+        const entity = await new this.repo.model(body as DeepPartial<Document<T>>);
+        const options = this.options.create;
+        const pre = !AppUtils.isNullOrUndefined(options) && options.pre;
+        const post = AppUtils.isNullOrUndefined(options) && options.post;
         if (!!pre) {
             pre(entity);
         }
@@ -30,18 +38,17 @@ export class CrudService<T> {
         if (post) {
             post(entity);
         }
-        const response = new SuccessResponse(entity.toJSON(), translate('success'), NetworkStatus.CREATED);
-        res.status(response.code).json(response);
+        return entity;
     }
 
-    public async delete(req: Request, res: Response) {
-        const { id } = req.params;
-        const entity = await this.repo.fetchById(id);
+    public async delete(query: Partial<Body<T>>) {
+        const entity = await this.repo.fetchOne(query);
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
         }
-        const pre = this.options.pre.delete;
-        const post = this.options.post.delete;
+        const options = this.options.delete;
+        const pre = !AppUtils.isNullOrUndefined(options) && options.pre;
+        const post = AppUtils.isNullOrUndefined(options) && options.post;
         if (!!pre) {
             pre(entity);
         }
@@ -49,8 +56,7 @@ export class CrudService<T> {
         if (post) {
             post(entity);
         }
-        const response = new SuccessResponse(null, translate('success'), NetworkStatus.OK);
-        res.status(response.code).json(response);
+        return entity;
     }
 
     public async update(req: Request, res: Response) {
@@ -59,8 +65,10 @@ export class CrudService<T> {
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
         }
-        const pre = this.options.pre.update;
-        const post = this.options.post.update;
+        await this.check(req.body);
+        const options = this.options.update;
+        const pre = !AppUtils.isNullOrUndefined(options) && options.pre;
+        const post = AppUtils.isNullOrUndefined(options) && options.post;
         if (!!pre) {
             pre(entity);
         }
@@ -73,14 +81,12 @@ export class CrudService<T> {
         res.status(response.code).json(response);
     }
 
-    public async one(req: Request, res: Response) {
-        const { id } = req.params;
-        const entity = await this.repo.fetchById(id).lean();
+    public async one(query: Partial<Body<T>>) {
+        const entity = await this.repo.fetchOne(query);
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
         }
-        const response = new SuccessResponse(entity, translate('success'));
-        res.status(response.code).json(response);
+        return entity;
     }
 
     public async all(req: Request, res: Response) {

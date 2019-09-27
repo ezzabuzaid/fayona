@@ -1,5 +1,5 @@
 import { Model } from 'mongoose';
-import { Document } from '@lib/mongoose';
+import { Document, Body } from '@lib/mongoose';
 // TODO use repo and complete it
 export class Repo<T> {
     constructor(
@@ -7,8 +7,8 @@ export class Repo<T> {
     ) { }
 
     // TODO obj type should be Partial<Body<T>>
-    public fetchOne(obj: any, ...args) {
-        return this.model.findOne(obj, ...args).lean();
+    public fetchOne(obj: Partial<Body<T>>, ...args) {
+        return this.model.findOne(obj, ...args);
     }
 
     public fetchAll(obj?, ...args) {

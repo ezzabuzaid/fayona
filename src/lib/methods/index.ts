@@ -8,7 +8,7 @@ export * from './patch.decorator';
 export * from './router.decorator';
 export * from './interceptor.decorator';
 export * from './post.decorator';
-export * from './method-types';
+export * from './methods.types';
 
 export enum METHODS {
     PUT = 'put',

@@ -76,7 +76,7 @@ export class AppUtils {
         const { data } = await axios.get(uri);
         return data;
     }
-    public static isNull(value) {
+    public static isNullOrUndefined(value) {
         return value === undefined || value === null;
     }
 }
@@ -88,3 +88,5 @@ export class Singelton {
         return this.instance || (this.instance = new this());
     }
 }
+
+export type PickAttr<T, K extends keyof T> = T[K];
