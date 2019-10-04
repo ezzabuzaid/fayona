@@ -9,7 +9,6 @@ export function BaseModel<T>(_schema) {
     }
 }
 
-
 export type FilterModel<Base, Condition = Model<Base & Document>> = {
     [Key in keyof Base]:
     Base[Key] extends Condition ? Key : never

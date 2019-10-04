@@ -1,6 +1,5 @@
-import { ErrorResponse, NetworkStatus } from '@core/helpers';
+import { tokenService, ErrorResponse, NetworkStatus } from '@core/helpers';
 import { Logger } from '@core/utils';
-import { tokenService } from '@core/helpers';
 import { NextFunction, Request, Response } from 'express';
 
 const log = new Logger('Auth Module');

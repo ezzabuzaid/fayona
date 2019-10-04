@@ -18,7 +18,6 @@ export class Observer {
 
 export class Subject {
     public observers = [];
-    constructor() { }
 
     public countObservers() {
         return this.observers.length;
@@ -48,6 +47,6 @@ export class Subject {
 
 }
 
-// As problem this pattern allow one to one relationship, so the observer can only register in one subject
-// but you can to register it to another, but no sense to do sense the handler in mostly situion cannot work with both (As a logic)
+// This pattern allow one to one relationship, so the observer can only register in one subject
+// therefore it doesn't make any sense to do so because logic the handler in most situations won't do the same
 // publish / subscriber solved this.

@@ -26,8 +26,3 @@ export async function deleteUser() {
     const res = await req.set('Authorization', user.token);
     return res.body;
 }
-
-
-
-type ThenArg<T> = T extends Promise<infer U> ? U : T;
-export type UserFixture = ThenArg<ReturnType<typeof createUser>>;

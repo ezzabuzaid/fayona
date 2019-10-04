@@ -1,9 +1,9 @@
-interface Broadcasting {
+interface IBroadcasting {
     name: string;
-    callbacks: Function[];
+    callbacks: Array<() => void>;
     index?: number;
 }
-class Broadcast implements Broadcasting {
+class Broadcast implements IBroadcasting {
     public name: string;
     public callbacks = [];
     /**
@@ -43,12 +43,12 @@ export class Reactor {
     private static eventNumber = 0;
 
     private static getEvent(name: string) {
-        const event = this.events.find((event) => event.name === name);
+        const event = this.events.find((_event) => _event.name === name);
         if (!event) { throw new Error('Event cannot find!'); }
         return event;
     }
 
-    public static listen(name: string, func: Function) {
+    public static listen(name: string, func: () => void) {
         const event = this.getEvent(name);
         event.registerCallback(func);
     }

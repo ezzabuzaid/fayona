@@ -90,3 +90,4 @@ export class Singelton {
 }
 
 export type PickAttr<T, K extends keyof T> = T[K];
+export type ThenArg<T> = T extends Promise<infer U> ? U : T;

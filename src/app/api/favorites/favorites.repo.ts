@@ -13,11 +13,11 @@ export class FavoritesRepo {
             const entity = new this.model(doc);
             const type = doc.type;
             if (!models[type]) {
-                return { passed: false, msg: 'is not one of the supported type' }
+                return { passed: false, msg: 'is not one of the supported type' };
             }
             const isThere = await models[type].findById(doc.item_id).lean();
             if (!isThere) {
-                return { passed: false, msg: 'type is not associated with the item_id' }
+                return { passed: false, msg: 'type is not associated with the item_id' };
             }
             return { passed: true, entity: await entity.save() };
         } else {

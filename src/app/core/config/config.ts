@@ -14,6 +14,7 @@
 // 		try {
 // 			execSync( 'openssl version', execOptions );
 // 			execSync(
+// tslint:disable-next-line: max-line-length
 // 				`openssl req -x509 -newkey rsa:2048 -keyout ./certs/key.tmp.pem -out ${ certificate } -days 365 -nodes -subj "/C=US/ST=Foo/L=Bar/O=Baz/CN=localhost"`,
 // 				execOptions
 // 			);

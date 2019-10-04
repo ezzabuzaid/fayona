@@ -2,7 +2,6 @@ import jwt = require('jsonwebtoken');
 
 class TokenService {
 
-
     /**
      *
      * @param token
@@ -10,7 +9,7 @@ class TokenService {
      */
     public decodeToken<T>(token: string) {
         return new Promise<T>((resolve, reject) => {
-            jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decodedToken) {
+            jwt.verify(token, process.env.JWT_SECRET_KEY, function(err, decodedToken) {
                 if (err) { reject(err); }
                 resolve(decodedToken as unknown as T);
             });

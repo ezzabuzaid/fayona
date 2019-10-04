@@ -23,11 +23,10 @@
 const child_process = require('child_process');
 const path = require('path');
 const fs = require('fs');
-const pwd = process.cwd();
 const del = require('del');
-const { argv } = require('yargs');
-const { env } = argv;
+const { argv: { env } } = require('yargs');
 
+const pwd = process.cwd();
 const DIST = path.join(pwd, 'dist');
 del.sync(DIST);
 child_process.spawnSync('tsc', { shell: true });

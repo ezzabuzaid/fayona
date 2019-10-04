@@ -1,8 +1,6 @@
 {
     "defaultSeverity": "error",
-    "extends": [
-        "tslint:recommended"
-    ],
+    "extends": "tslint:recommended",
     "jsRules": {},
     "rules": {
         "no-namespaces": false,
@@ -43,10 +41,9 @@
         ],
         "no-floating-promises": false,
         "no-implicit-dependencies": false,
-        "no-invalid-this": true,
+        "no-invalid-this": false,
         "no-string-throw": true,
         "no-unsafe-finally": true,
-        "no-use-before-declare": true,
         "no-void-expression": [
             true,
             "ignore-arrow-function-shorthand"

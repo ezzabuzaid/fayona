@@ -32,7 +32,7 @@ export * from './supertest';
 // // const fromPairs = (pairs) => pairs.reduce((res, [key, value]) => ({ ...res, [key]: value }), {});
 // // // tslint:disable-next-line: max-line-length
 // // const moduleNameMapper = fromPairs(
-    // Object.entries(paths).map(([k, [v]]) => [k.replace(/\*/, '(.*)'), 
+    // Object.entries(paths).map(([k, [v]]) => [k.replace(/\*/, '(.*)'),
     // `<rootDir>/${baseUrl}/${v.replace(/\*/, '$1')}`,]));
 
 // // const projectRootPath = '/path/to/project/root';

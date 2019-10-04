@@ -7,7 +7,7 @@ export function Entity(
     options: SchemaOptions = {},
     globalFieldOptions: Exclude<MongooseTypes.FieldOptions, 'type'> = {}
 ) {
-    return function (constructor: new (...args: any) => any) {
+    return function(constructor: new (...args: any) => any) {
         const fields = constructor.prototype.fields;
         Object.keys(fields).forEach((key) => {
             fields[key] = { ...fields[key], ...globalFieldOptions };
