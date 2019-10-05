@@ -2,6 +2,7 @@ import { HashService, Constants } from '@core/helpers';
 import { BaseModel, Entity, Field } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
+import { Query } from 'mongoose';
 
 @Entity(Constants.Schemas.USERS)
 export class UsersSchema {
@@ -37,3 +38,10 @@ export class UsersSchema {
 }
 
 export const UsersModel = BaseModel<UsersSchema>(UsersSchema);
+UsersModel.schema.pre('find', () => {
+    (this as unknown as Query<any>).select({ password: 0 });
+});
+
+UsersModel.schema.pre('findOne', (query) => {
+    (this as unknown as Query<any>).select({ password: 0 });
+});

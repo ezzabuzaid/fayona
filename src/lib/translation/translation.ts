@@ -1,18 +1,17 @@
 import { stage, StageLevel } from '@core/helpers';
 import { Local } from './local';
-import { TranslationService } from './translation.service';
 
 import { Logger } from '@core/utils';
 const log = new Logger('Localization Class');
 
-class Translation extends TranslationService {
+class Translation {
     /**
      * list of observed locals
      */
     private locals: Local[] = [];
 
     constructor() {
-        super();
+        // super();
     }
 
     /**
@@ -36,7 +35,7 @@ class Translation extends TranslationService {
         this.locals.push(newLocal);
 
         // emit a value to localAdded event
-        this.localAdded.emit(local);
+        // this.localAdded.emit(local);
 
         log.info(`local with name ${name} is added, consider using set(local) to use it`);
 
@@ -62,7 +61,7 @@ class Translation extends TranslationService {
         this.local = local;
 
         // emit a value to changeLocal event
-        this.localChange.emit(local);
+        // this.localChange.emit(local);
 
         log.info(`local with name ${name} is active`);
 
@@ -101,10 +100,7 @@ class Translation extends TranslationService {
 
 }
 
-const translation = new Translation();
-// export the created instance, it must be a singelton
-export { translation };
-
+export const translation = new Translation();
 // scoping not allowed until i18n service resolved in api module
 
 /**

@@ -58,7 +58,7 @@ export class AppUtils {
         return Object.keys(object).filter((el) => typeof object[el].value === 'function');
     }
 
-    public static removeKey(key, obj) {
+    public static removeKey<T>(key: keyof T, obj: T) {
         const { [key]: foo, ...rest } = obj;
         return rest;
     }
@@ -74,6 +74,11 @@ export class AppUtils {
     public static isNullOrUndefined(value) {
         return value === undefined || value === null;
     }
+
+    public static hasItemWithin(list: any[]) {
+        return list.length > 0;
+    }
+
 }
 
 // NOTE  Utility class to be extended, so when you call build it will construct an instance from that class

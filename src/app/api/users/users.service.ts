@@ -20,7 +20,7 @@ class UserService extends CrudService<UsersSchema> {
                 async post(entity) {
                     await accountsService.deleteAccount(entity.id);
                 }
-            },
+            }
         });
     }
 }

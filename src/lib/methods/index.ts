@@ -18,24 +18,35 @@ export enum METHODS {
     POST = 'post'
 }
 
-export interface IMETA {
-    method: METHODS;
+export interface IMetadataDto {
     uri: string;
     middlewares: RequestHandler[];
-    target: any;
+    method: METHODS;
+    target: {
+        constructor: any,
+        [key: string]: any
+    };
     propertyKey: string;
 }
+export interface IMetadata {
+    uri: string;
+    middlewares: RequestHandler[];
+    method: METHODS;
+    handler: (...args) => any;
+}
 
-export const METHOD_META = 'METHOD:';
+export const metadata_key = 'METHOD';
 
-export function define({ method: httpMethod, uri, middlewares, target, propertyKey }: IMETA) {
-    // TODO Create meta interface
-    const meta = {
+export function generateMetadataKey(method: METHODS, uri: string) {
+    return `${metadata_key}:${method}:${uri}`;
+}
+
+export function define({ method, uri, middlewares, target, propertyKey }: IMetadataDto) {
+    const meta: IMetadata = {
         uri,
         middlewares: middlewares || [],
-        httpMethod,
-        method: target[propertyKey],
+        method,
+        handler: target[propertyKey],
     };
-    // TODO Throw an error if two uri are the same
-    Reflect.defineMetadata(`${METHOD_META}${httpMethod}:${uri}`, meta, target.constructor);
+    Reflect.defineMetadata(generateMetadataKey(method, uri), meta, target.constructor);
 }

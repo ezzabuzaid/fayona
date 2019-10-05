@@ -1,4 +1,4 @@
-import { ICrudOptions } from './crud.options';
+import { ICrudOptions, ICrudHooks } from './crud.options';
 import { Repo } from '@shared/crud/crud.repo';
 import { ErrorResponse, NetworkStatus, SuccessResponse } from '@core/helpers';
 import { translate } from '@lib/translation';
@@ -6,6 +6,13 @@ import { Request, Response } from 'express';
 import { Body, Document } from '@lib/mongoose';
 import { DeepPartial } from 'mongoose';
 import { AppUtils } from '@core/utils';
+
+function getHooks<T>(options: Partial<ICrudHooks<T>>) {
+    return {
+        pre: !AppUtils.isNullOrUndefined(options) ? options.pre : (...args: any) => null,
+        post: !AppUtils.isNullOrUndefined(options) ? options.pre : (...args: any) => null,
+    };
+}
 
 export class CrudService<T> {
     constructor(
@@ -28,16 +35,12 @@ export class CrudService<T> {
     public async create(body: Partial<Body<T>>) {
         await this.check(body);
         const entity = await new this.repo.model(body as DeepPartial<Document<T>>);
-        const options = this.options.create;
-        const pre = !AppUtils.isNullOrUndefined(options) && options.pre;
-        const post = AppUtils.isNullOrUndefined(options) && options.post;
-        if (!!pre) {
-            pre(entity);
-        }
-        entity.save();
-        if (post) {
-            post(entity);
-        }
+
+        const { pre, post } = getHooks(this.options.create);
+        pre(entity);
+        await entity.save();
+        post(entity);
+
         return entity;
     }
 
@@ -46,16 +49,12 @@ export class CrudService<T> {
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
         }
-        const options = this.options.delete;
-        const pre = !AppUtils.isNullOrUndefined(options) && options.pre;
-        const post = AppUtils.isNullOrUndefined(options) && options.post;
-        if (!!pre) {
-            pre(entity);
-        }
+
+        const { pre, post } = getHooks(this.options.delete);
+        pre(entity);
         await entity.remove();
-        if (post) {
-            post(entity);
-        }
+        post(entity);
+
         return entity;
     }
 
@@ -66,17 +65,13 @@ export class CrudService<T> {
             throw new ErrorResponse(translate('entity_not_found'), NetworkStatus.NOT_ACCEPTABLE);
         }
         await this.check(req.body);
-        const options = this.options.update;
-        const pre = !AppUtils.isNullOrUndefined(options) && options.pre;
-        const post = AppUtils.isNullOrUndefined(options) && options.post;
-        if (!!pre) {
-            pre(entity);
-        }
+
+        const { pre, post } = getHooks(this.options.update);
+        pre(entity);
         entity.set(req.body);
-        entity.save();
-        if (post) {
-            post(entity);
-        }
+        await entity.save();
+        post(entity);
+
         const response = new SuccessResponse(null, translate('success'), NetworkStatus.OK);
         res.status(response.code).json(response);
     }
@@ -91,6 +86,9 @@ export class CrudService<T> {
 
     public async all(req: Request, res: Response) {
         const entites = await this.repo.fetchAll();
+        const hook = this.options.all;
+        const post = !AppUtils.isNullOrUndefined(hook) && hook.post;
+        post(entites);
         const response = new SuccessResponse(entites, translate('success'), NetworkStatus.OK);
         response.count = entites.length;
         res.status(response.code).json(response);

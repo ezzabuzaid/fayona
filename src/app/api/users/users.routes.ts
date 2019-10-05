@@ -1,18 +1,20 @@
 import { CrudRouter } from '@shared/crud';
 import usersService from './users.service';
-import { Constants } from '@core/helpers';
-import { Logger } from '@core/utils';
-import { Router } from '@lib/methods';
+import { Constants, SuccessResponse, NetworkStatus } from '@core/helpers';
+import { Router, Post } from '@lib/methods';
 import { UsersSchema } from './users.model';
+import { Request, Response } from 'express';
+import { translate } from '@lib/translation';
 
-const log = new Logger('UsersRouter');
-@Router(Constants.Endpoints.USERS, {
-    crud: {
-        create: []
-    }
-})
+@Router(Constants.Endpoints.USERS)
 export class UsersRouter extends CrudRouter<UsersSchema> {
     constructor() {
         super(usersService);
     }
+
+    @Post('')
+    public async create(req: Request, res: Response) {
+        return super.create(req, res);
+    }
+
 }
