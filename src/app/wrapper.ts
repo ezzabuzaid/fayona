@@ -35,11 +35,10 @@ export class Wrapper {
         if (!parentRouter) {
             throw new Error('Please register the parent router first, then try');
         }
-
         parentRouter.use(superRouter.routesPath, subRouter.router);
     }
 
-    static get routerList(): IExpressRouter[] {
+    static get routers(): IExpressRouter[] {
         return this.list;
     }
 

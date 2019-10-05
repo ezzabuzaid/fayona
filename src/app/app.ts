@@ -9,13 +9,10 @@ import morgan = require('morgan');
 import { Wrapper } from './wrapper';
 import path from 'path';
 
-// import Sentry = require('@sentry/node');
-// import monitor = require('express-status-monitor');
-// https://github.com/RafalWilinski/express-status-monitor
-
 const log = new Logger('Application instance');
 
-// Stage.tests(StageLevel.DEV, () => {
+// import Sentry = require('@sentry/node');
+// Stage.test(StageLevel.DEV, () => {
 //     Sentry.init({ dsn: 'https://57572231908b4ef0bde6a7328e71cfcf@sentry.io/1462257' });
 // });
 
@@ -58,7 +55,6 @@ export class Application {
         });
 
         this.application
-            // .use(monitor())
             .use(express.json())
             .use(express.urlencoded({ extended: true }))
             .use(morgan('dev'))
@@ -88,7 +84,7 @@ export class Application {
                 next();
             });
 
-            Wrapper.routerList.forEach(({ router, uri }) => {
+            Wrapper.routers.forEach(({ router, uri }) => {
                 this.application.use(path.join('/api', uri), router);
             });
 

@@ -5,7 +5,8 @@ import { envirnoment } from '@environment/env';
 import http = require('http');
 import { URL } from 'url';
 import { Application } from './app';
-import { OLHC, loadOHLCcsv } from './playground/olhc';
+import { OLHC, loadOHLCcsv, handleSocket } from './playground/olhc';
+import { deploy } from './playground/deploy';
 const log = new Logger('Server init');
 export class NodeServer extends Application {
         private port = +envirnoment.get('PORT') || 8080;
@@ -22,48 +23,12 @@ export class NodeServer extends Application {
                 envirnoment.load();
                 const server = new NodeServer();
                 const httpServer = await server.populateServer();
-                const socketList = ['cad', 'gbp', 'eurusd', 'jpy'];
-                const sockets: { [index: string]: OLHC } = socketList.reduce((acc, current) => {
-                        acc[current] = new OLHC({ noServer: true });
-                        return acc;
-                }, {});
-
-                // server.application.get('/socket/:name', (req, res) => {
-                //         const { name } = req.params;
-                //         const stream = loadOHLCcsv(name);
-                //         const socket = sockets[name];
-                //         socket.onConnection()
-                //                 .then((ws) => {
-                //                         function handler(data) {
-                //                                 if (ws.readyState === ws.OPEN) {
-                //                                         socket.socket.clients.forEach((client) => {
-                //                                                 client.send(JSON.stringify({ data, name }));
-                //                                         });
-                //                                 }
-                //                         }
-                //                         const streamListner = stream.on('data', handler);
-                //                         ws.on('close', () => {
-                //                                 log.warn('CLOSE');
-                //                                 streamListner.removeListener('data', handler);
-                //                         });
-                //                 });
-                //         socket.socket.on('error', () => {
-                //                 log.warn('ERROR');
-                //                 stream.destroy();
-                //         });
-                //         httpServer.once('upgrade', (request, _socket, head) => {
-                //                 socket.socket.handleUpgrade(request, _socket, head, (ws) => {
-                //                         socket.socket.emit('connection', ws, request);
-                //                 });
-                //         });
-                //         res.status(200).send({ success: true });
-
-                //         return;
-                // });
+                // server.application.get('/socket/:name', handleSocket);
+                server.application.get('/webhooks/github/deploy', deploy);
                 await server.init();
         }
 
-        public static  test() {
+        public static test() {
                 Logger.level = LoggerLevel.Off;
                 log.info('Start Testing');
                 envirnoment.load(StageLevel.TEST);
@@ -116,63 +81,3 @@ export class NodeServer extends Application {
 
         }
 }
-
-// const createDatabaseStatement = 'CREATE DATABASE testDB';
-// const createTableStatement = `
-// CREATE TABLE testTable (
-//         id int UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-//         title VARCHAR(255) NOT NULL,
-//         body VARCHAR(255) NOT NULL
-// )`;
-
-// router.use('/user', function (req, res, next) {
-//     console.log('Request URL:', req.originalUrl)
-//     next()
-//   }, function (req, res, next) {
-//     console.log('Request Type:', req.method)
-//     next()
-//   })
-// Show the request info for any type of http method that call user
-// ex:: cound how many user middleware called
-
-// app.use(function (req, res, next) {
-//     console.log('Time:', Date.now())
-//     next()
-// })
-// Called every time (app here is application instance)
-
-// app.use('/user/:id', function (req, res, next) {
-//     console.log('Request Type:', req.method)
-//     next()
-// })
-// Show the request info for any type of http method that call user
-// (app here is application instance)
-
-// to escape the next middleware call next('route')
-// will escape the all middleware but next() will continue to next middleware at specific point
-
-// This matching all route middleware under route instance and prefixed with api
-// router.all('/api/*', requireAuthentication);
-
-// this will only be invoked if the path starts with /bar from the mount point
-// router.use('/bar', function (req, res, next) {
-// ... maybe some additional /bar logging ...
-//     next();
-// });
-
-// Intercept id param under route instance and called once at a time (intercept id param)
-
-// router.param('id', function (req, res, next, id) {
-//     console.log('CALLED ONLY ONCE');
-//     next();
-// });
-
-// router.get('/user/:id', function (req, res, next) {
-//     console.log('although this matches');
-//     next();
-// });
-
-// router.get('/user/:id', function (req, res) {
-//     console.log('and this matches too');
-//     res.end();
-// });

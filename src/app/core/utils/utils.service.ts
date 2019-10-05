@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { randomBytes } from 'crypto';
 
 export type Type<T> = new (...args: any) => T;
@@ -72,10 +71,6 @@ export class AppUtils {
         return Object.assign({}, ...Object.keys(obj).filter((k) => !keys.includes(k)).map((k) => ({ [k]: obj[k] })));
     }
 
-    public static async getHtml(uri) {
-        const { data } = await axios.get(uri);
-        return data;
-    }
     public static isNullOrUndefined(value) {
         return value === undefined || value === null;
     }

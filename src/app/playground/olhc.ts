@@ -27,7 +27,6 @@ export class OLHC {
     public ws: WebSocket = null;
     constructor(options: ServerOptions) {
         this.socket = new WSocket(options);
-
     }
 
     public onConnection() {
@@ -46,4 +45,50 @@ export class OLHC {
         this.ws.send(JSON.stringify(data));
     }
 
+    public onError() {
+        return new Promise((resolve) => {
+            this.socket.on('error', () => {
+                resolve(void 0);
+            });
+        });
+    }
+
+}
+
+const socketList = ['cad', 'gbp', 'eurusd', 'jpy'];
+const sockets: { [index: string]: OLHC } = socketList.reduce((acc, current) => {
+    acc[current] = new OLHC({ noServer: true });
+    return acc;
+}, {});
+
+export function handleSocket(req, res) {
+    const { name } = req.params;
+    const stream = loadOHLCcsv(name);
+    const socket = sockets[name];
+    socket.onConnection()
+        .then((ws) => {
+            function handler(data) {
+                if (ws.readyState === ws.OPEN) {
+                    // socket.socket.clients.forEach((client) => {
+                    //         client.send(JSON.stringify({ data, name }));
+                    // });
+                }
+            }
+            // const streamListener = stream.on('data', handler);
+            ws.on('close', () => {
+                console.log('CLOSE');
+                // streamListener.removeListener('data', handler);
+            });
+        });
+    socket.onError()
+        .then(() => {
+            console.log('ERROR');
+            stream.destroy();
+        });
+    // httpServer.once('upgrade', (request, _socket, head) => {
+    //         socket.socket.handleUpgrade(request, _socket, head, (ws) => {
+    //                 socket.socket.emit('connection', ws, request);
+    //         });
+    // });
+    res.status(200).send({ success: true });
 }
