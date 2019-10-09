@@ -1,4 +1,4 @@
-import { development } from '@core/helpers';
+import { stage, StageLevel } from '@core/helpers';
 
 import { Logger } from '@core/utils';
 const log = new Logger('Local Class');
@@ -19,7 +19,7 @@ export class Local {
      * @param name name of the local
      * @param language local object
      */
-    constructor(name, language: object) {
+    constructor(name: string, language: object) {
         this.name = name;
         this._language = language;
     }
@@ -37,11 +37,9 @@ export class Local {
      * @param value
      */
     public set(key: string, value: any) {
-        development(
-            () => {
-                log.warn(`a key with name ${key} is already hold a value`);
-            }
-        );
+        stage.test(StageLevel.DEV, () => {
+            log.warn(`a key with name ${key} is already hold a value`);
+        });
         this.language[key] = value;
     }
 
@@ -55,7 +53,6 @@ export class Local {
         if (!value) {
             throw new Error(`the key { ${key} } is not found in local { ${this.name} }`);
         }
-
         return value;
     }
 }

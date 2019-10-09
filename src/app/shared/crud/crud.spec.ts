@@ -39,3 +39,7 @@ describe('Add router to wrapper', () => {
 // in update and create you must test the validation by insert Wrong data
 // in login check login test cases
 // try to send wrong mobile, email
+
+// REVIEW  in create and update you should check and verify if the data was update or created successfully
+// other that the failur test
+// and in delete you must check that the entity no longer in database

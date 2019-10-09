@@ -16,5 +16,8 @@
     "not_exist": "Entity not exist",
     "success": "Sucesss",
     "error": "Error",
-    "email_exist": "email_exist"
+    "email_exist": "email_exist",
+    "no_speical_char": "Value contains special char",
+    "wrong_email": "Please provide a valid email address",
+    "wrong_mobile_number": "Please enter correct phonenumber"
 }

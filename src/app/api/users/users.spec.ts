@@ -33,21 +33,35 @@ describe('CREATE USER', () => {
         const deleteReq = await (await superAgent).delete(`${ENDPOINT}/${res1.body.id}`);
         expect(res2.status).toBe(NetworkStatus.BAD_REQUEST);
     });
+    test('Special Char is not allowed', async () => {
+        const body = {
+            email: 'test@create2.com',
+            mobile: '0792807794',
+            password: '123456789',
+            username: 'testCreate2#$'
+        } as Body<UsersSchema>;
+        const req = (await superAgent).post(ENDPOINT);
+        const res = await req.send(body);
+        const deleteReq = await (await superAgent).delete(`${ENDPOINT}/${res.body.id}`);
+        expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
+    });
+    test('Mobile number shouldn"t be wrong', async () => {
+        const body = {
+            email: 'test@create3.com',
+            mobile: '079280779',
+            password: '123456789',
+            username: 'testCreate3'
+        } as Body<UsersSchema>;
+        const req = (await superAgent).post(ENDPOINT);
+        const res = await req.send(body);
+        const deleteReq = await (await superAgent).delete(`${ENDPOINT}/${res.body.id}`);
+        expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
+    });
 });
 
-// describe('GET ALL', () => {
-//     test('Reject request without token', async () => {
-//         const res = (await (await superAgent).get(`${ENDPOINT}`));
-//         expect(res.status).toBe(NetworkStatus.UNAUTHORIZED);
-//     });
-
-//     test('Should return list', async () => {
-//         const req = (await superAgent).get(`${ENDPOINT}`);
-//         const res = await req.set('Authorization', user.token);
-//         expect(res.status).toBe(NetworkStatus.OK);
-//         expect(res.body.data).toBeInstanceOf(Array);
-//     });
-// });
+// STUB CREATE: user password should be hashed
+// STUB CREATE: user should have an account
+// STUB DELETE: remove associated account
 
 // describe('GET BY ${id}/', () => {
 //     test('Reject request without token', async () => {
@@ -110,8 +124,3 @@ describe('CREATE USER', () => {
 // });
 
 // tslint:disable-next-line: max-line-length
-// REVIEW  in create and update you should check and verify if the data was update or created successfully other that the failur test
-// and in delete you must check that the entity no longer in database
-// in update and create you must test the validation by insert Wrong data
-// in login check login test cases
-// try to send wrong mobile, email

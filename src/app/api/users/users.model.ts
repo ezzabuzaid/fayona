@@ -3,26 +3,26 @@ import { BaseModel, Entity, Field } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { Query } from 'mongoose';
+import { translate } from '@lib/translation';
 
 @Entity(Constants.Schemas.USERS)
 export class UsersSchema {
-    @Field({ lowercase: false }) public password: string;
+    @Field({ pure: true,  }) public password: string;
     @Field({
-        match: [ValidationPatterns.NoSpecialChar, 'Value contain special char'],
+        match: [ValidationPatterns.NoSpecialChar, translate('no_speical_char')],
         unique: true,
     }) public username: string;
     @Field({
-        match: [ValidationPatterns.EmailValidation, 'Please provide a valid email address'],
+        match: [ValidationPatterns.EmailValidation, translate('wrong_email')],
         unique: true,
     }) public email: string;
-
     @Field({
         validate: [
             (value) => {
                 const phonenumber = parsePhoneNumberFromString(value);
                 return !!phonenumber && phonenumber.isValid();
             },
-            'Please enter correct phonenumber'
+            translate('wrong_mobile_number')
         ],
         unique: true,
     }) public mobile: string;
@@ -38,6 +38,7 @@ export class UsersSchema {
 }
 
 export const UsersModel = BaseModel<UsersSchema>(UsersSchema);
+
 UsersModel.schema.pre('find', () => {
     (this as unknown as Query<any>).select({ password: 0 });
 });

@@ -2,7 +2,9 @@ import { AppUtils } from '@core/utils';
 import 'reflect-metadata';
 import { MongooseTypes } from '.';
 
-export function Field<T = any>(options: Exclude<MongooseTypes.FieldOptions, 'type'> = {}) {
+// TODO: the `type` property should be in the `options` type
+
+export function Field<T = any>(options: MongooseTypes.FieldOptions) {
     return (instance: MongooseTypes.IFieldAttr & T, propertyKey: string) => {
         if (instance && !instance.fields) {
             AppUtils.defineProperty(instance, 'fields', { value: {} });
@@ -10,7 +12,7 @@ export function Field<T = any>(options: Exclude<MongooseTypes.FieldOptions, 'typ
         const fields = instance.fields;
         const propertyType = Reflect.getMetadata('design:type', instance, propertyKey);
         let defaults: typeof options = {};
-        if (propertyType.name === String.name) {
+        if (!!options.pure && propertyType.name === String.name) {
             defaults = {
                 lowercase: true,
                 trim: true,

@@ -1,4 +1,8 @@
 import { NodeServer } from './app/server';
-NodeServer.bootstrap();
 process.chdir('./src/');
-console.log('Node verions is => ', process.version);
+
+NodeServer.bootstrap()
+    .then(() => {
+        console.log('Node verions is => ', process.version);
+        console.log('Node title is => ', process.title);
+    });

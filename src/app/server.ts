@@ -24,8 +24,8 @@ export class NodeServer extends Application {
                 const server = new NodeServer();
                 const httpServer = await server.populateServer();
                 // server.application.get('/socket/:name', handleSocket);
-                server.application.get('/webhooks/github/deploy', deploy);
-                await server.init();
+                // server.application.get('/webhooks/github/deploy', deploy);
+                return server.init();
         }
 
         public static test() {
@@ -65,10 +65,12 @@ export class NodeServer extends Application {
         }
 
         private init() {
-                const { MONGO_USER: user,
+                const {
+                         MONGO_USER: user,
                         MONGO_PASSWORD: password,
                         MONGO_PATH: path,
-                        MONGO_HOST: host } = envirnoment.env;
+                        MONGO_HOST: host
+                } = envirnoment.env;
                 log.debug(stage.LEVEL);
                 try {
                         return Promise.all([

@@ -15,9 +15,9 @@ export function getUri(value: string) {
 export async function createUser() {
     const req = (await superAgent).post(usersUri);
     const res = await req.send({
-        email: 'test@test.com',
+        email: `test@test.com`,
         password: '123456789',
-        username: 'test',
+        username: `test`,
         mobile: '+962792807794'
     });
     user.id = res.body.data._id;
