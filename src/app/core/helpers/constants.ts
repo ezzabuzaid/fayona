@@ -7,6 +7,7 @@ export namespace Constants {
         public static readonly Feedback = 'feedback';
         public static readonly Account = 'account';
         public static readonly USERS = 'users';
+        public static readonly PORTAL = 'portal';
     }
     export class Schemas {
         public static readonly favorites = 'favorites';

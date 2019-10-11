@@ -7,7 +7,7 @@ import { IExpressInternal, IRouterDecorationOption, RouterProperties } from './m
 const log = new Logger('Router Decorator');
 import path = require('path');
 import { IMetadata, metadata_key } from '.';
-const routes = {};
+
 export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
     return function <T extends new (...args: any[]) => any>(constructor: T) {
         log.info(constructor.name);
@@ -18,8 +18,6 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
         Reflect.getMetadataKeys(constructor)
             .forEach((key: string) => {
                 if (key.startsWith(metadata_key)) {
-                    log.debug(key);
-                    routes[routerUri] = constructor;
                     const metadata = Reflect.getMetadata(key, constructor) as IMetadata;
                     if (metadata) {
                         const { handler, method, middlewares, uri } = metadata;
@@ -27,12 +25,10 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
                         router[method](normalizedURI, ErrorHandling.wrapRoutes(...middlewares, function() {
                             return handler.apply(instance, arguments);
                         }));
-
                     }
                 }
             });
 
-        // console.log(routes);
         if (options.middleware && options.middleware.length) {
             router.use(`${routerUri}`, ErrorHandling.wrapRoutes(...options.middleware));
         }
@@ -46,7 +42,11 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
                 return this;
             }
             public __router() {
-                return { router, id, uri: routerUri };
+                return {
+                    router,
+                    id,
+                    uri: routerUri
+                };
             }
         };
     };

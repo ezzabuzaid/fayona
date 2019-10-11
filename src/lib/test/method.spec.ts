@@ -9,6 +9,7 @@ import {
     Patch,
     Get,
     define,
+    Router,
 } from '@lib/methods';
 import 'reflect-metadata';
 
@@ -47,24 +48,6 @@ describe('Define route', () => {
     });
 
 });
-
-function getMetadata({ method, middlewares, uri }: IMetadataDto): IMetadata {
-    return {
-        handler: undefined,
-        method,
-        middlewares,
-        uri
-    };
-}
-function generateMeta({ method, uri }: Partial<IMetadataDto>): IMetadataDto {
-    return {
-        uri,
-        method,
-        target: { constructor: {} },
-        middlewares: [],
-        propertyKey: 'testOperation'
-    };
-}
 
 describe('Decoration', () => {
     it('POST', () => {
@@ -123,3 +106,34 @@ describe('Decoration', () => {
         expect(metadata).toEqual(getMetadata(metaDto));
     });
 });
+
+describe('Router Decorator', () => {
+    it('Test', () => {
+        const router = Router('router');
+        router(class {
+
+        });
+        expect(true).toBeTruthy();
+    });
+});
+
+function getMetadata({ method, middlewares, uri }: IMetadataDto): IMetadata {
+    return {
+        handler: undefined,
+        method,
+        middlewares,
+        uri
+    };
+}
+function generateMeta({ method, uri }: Partial<IMetadataDto>): IMetadataDto {
+    return {
+        uri,
+        method,
+        target: { constructor: {} },
+        middlewares: [],
+        propertyKey: 'testOperation'
+    };
+}
+
+// STUB TEST interceptor
+// STUB Add more test cases to http method decorators

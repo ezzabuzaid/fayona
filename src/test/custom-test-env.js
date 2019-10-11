@@ -8,7 +8,8 @@ class CustomEnvironment extends NodeEnvironment {
   }
 
   async setup() {
-    const [app] = await NodeServer.test();
+    const [app, dbConnection] = await NodeServer.test();
+    await dbConnection.db.dropDatabase()
     this.global.client = request(app);
     await super.setup();
   }

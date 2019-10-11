@@ -30,7 +30,6 @@ describe('CREATE USER', () => {
         const req2 = (await superAgent).post(ENDPOINT);
         const res2 = await req2.send(body);
 
-        const deleteReq = await (await superAgent).delete(`${ENDPOINT}/${res1.body.id}`);
         expect(res2.status).toBe(NetworkStatus.BAD_REQUEST);
     });
     test('Special Char is not allowed', async () => {
@@ -42,7 +41,6 @@ describe('CREATE USER', () => {
         } as Body<UsersSchema>;
         const req = (await superAgent).post(ENDPOINT);
         const res = await req.send(body);
-        const deleteReq = await (await superAgent).delete(`${ENDPOINT}/${res.body.id}`);
         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
     });
     test('Mobile number shouldn"t be wrong', async () => {
@@ -54,12 +52,12 @@ describe('CREATE USER', () => {
         } as Body<UsersSchema>;
         const req = (await superAgent).post(ENDPOINT);
         const res = await req.send(body);
-        const deleteReq = await (await superAgent).delete(`${ENDPOINT}/${res.body.id}`);
         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
     });
 });
 
 // STUB CREATE: user password should be hashed
+// STUB READ: user body shouldn't have a password
 // STUB CREATE: user should have an account
 // STUB DELETE: remove associated account
 
@@ -122,5 +120,3 @@ describe('CREATE USER', () => {
 //         expect(data).toBeNull();
 //     });
 // });
-
-// tslint:disable-next-line: max-line-length

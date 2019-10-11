@@ -66,7 +66,7 @@ export class NodeServer extends Application {
 
         private init() {
                 const {
-                         MONGO_USER: user,
+                        MONGO_USER: user,
                         MONGO_PASSWORD: password,
                         MONGO_PATH: path,
                         MONGO_HOST: host

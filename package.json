@@ -1,8 +1,8 @@
 {
   "scripts": {
     "snyk": "snyk test",
-    "test": "jest --detectOpenHandles",
-    "test:watch": "jest --watch --runInBand --detectOpenHandles",
+    "test": "jest --detectOpenHandles --passWithNoTests --silent --verbose",
+    "test:watch": "npm test --watch --runInBand",
     "build": "node build --env=prod",
     "dev": "ts-node -r tsconfig-paths/register ./src/main.ts",
     "watch:dev": "nodemon -e ts -w ./src -x npm run dev",
