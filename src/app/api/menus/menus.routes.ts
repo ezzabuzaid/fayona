@@ -5,7 +5,7 @@ import { Repo } from '@shared/crud/crud.repo';
 import { Constants } from '@core/helpers';
 import { Request, Response } from 'express';
 
-@Router(Constants.Endpoints.menus)
+@Router(Constants.Endpoints.MENUS)
 export class MenusRouter extends CrudRouter<MenusSchema> {
     constructor() {
         super(new CrudService(new Repo<MenusSchema>(MenusModel)));
