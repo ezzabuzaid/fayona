@@ -7,7 +7,7 @@ import { translate } from '@lib/translation';
 
 @Entity(Constants.Schemas.USERS)
 export class UsersSchema {
-    @Field({ pure: true,  }) public password: string;
+    @Field({ pure: true, required: true }) public password: string;
     @Field({
         match: [ValidationPatterns.NoSpecialChar, translate('no_speical_char')],
         unique: true,

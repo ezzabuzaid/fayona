@@ -71,7 +71,7 @@ export class AppUtils {
         return Object.assign({}, ...Object.keys(obj).filter((k) => !keys.includes(k)).map((k) => ({ [k]: obj[k] })));
     }
 
-    public static isNullOrUndefined(value) {
+    public static isNullOrUndefined(value: any) {
         return value === undefined || value === null;
     }
 

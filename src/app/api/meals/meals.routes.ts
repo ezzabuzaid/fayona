@@ -14,4 +14,9 @@ export class MealsRouter extends CrudRouter<MealsSchema> {
     public async fetchEntitiesByMealID(req: Request, res: Response) {
         return mealsService.fetchAllByMenuId(req, res);
     }
+
+    @Get()
+    public fetchEntities(req: Request, res: Response) {
+        return super.fetchEntities(req, res);
+    }
 }

@@ -13,8 +13,11 @@ export class CrudRouter<T> {
     @Post('', Auth.isAuthenticated)
     public async create(req: Request, res: Response) {
         console.log('This method is overrided');
-        const entity = await this.service.create(req.body);
-        const response = new SuccessResponse(entity.toJSON(), translate('success'), NetworkStatus.CREATED);
+        const result = await this.service.create(req.body);
+        if (result.exist) {
+            throw new ErrorResponse(translate('entity_exist'));
+        }
+        const response = new SuccessResponse(result.entity, translate('success'), NetworkStatus.CREATED);
         res.status(response.code).json(response);
     }
 
@@ -50,7 +53,7 @@ export class CrudRouter<T> {
 
     @Get('', Auth.isAuthenticated)
     public async fetchEntities(req: Request, res: Response) {
-        const entites = await this.service.all(req, res);
+        const entites = await this.service.all();
         const response = new SuccessResponse(entites, translate('success'));
         response.count = entites.length;
         res.status(response.code).json(response);

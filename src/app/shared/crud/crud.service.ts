@@ -7,8 +7,8 @@ import { AppUtils } from '@core/utils';
 
 function getHooks<T>(options: Partial<ICrudHooks<T>>) {
     return {
-        pre: !AppUtils.isNullOrUndefined(options) ? options.pre : (...args: any) => null,
-        post: !AppUtils.isNullOrUndefined(options) ? options.pre : (...args: any) => null,
+        pre: !AppUtils.isNullOrUndefined(options && options.pre) ? options.pre : (...args: any) => null,
+        post: !AppUtils.isNullOrUndefined(options && options.post) ? options.post : (...args: any) => null,
     };
 }
 
@@ -30,21 +30,26 @@ export class CrudService<T> {
 
     public async create(body: Partial<Body<T>>) {
         // TODO: customize the return object to clarify what's exactly the error
-        // throw new ErrorResponse(translate('entity_exist'), NetworkStatus.BAD_REQUEST);
 
         const check = await this.check(body);
         if (check) {
-            return null;
+            return {
+                exist: true,
+                entity: null
+            };
         }
 
         const entity = await new this.repo.model(body as DeepPartial<Document<T>>);
 
         const { pre, post } = getHooks(this.options.create);
-        pre(entity);
+        await pre(entity);
         await entity.save();
-        post(entity);
+        await post(entity);
 
-        return entity;
+        return {
+            exist: false,
+            entity
+        };
     }
 
     public async delete(query: Partial<Body<T>>) {
@@ -53,9 +58,9 @@ export class CrudService<T> {
             return null;
         }
         const { pre, post } = getHooks(this.options.delete);
-        pre(entity);
+        await pre(entity);
         await entity.remove();
-        post(entity);
+        await post(entity);
 
         return entity;
     }
@@ -73,22 +78,25 @@ export class CrudService<T> {
         }
 
         const { pre, post } = getHooks(this.options.update);
-        pre(entity);
+        await pre(entity);
         entity.set(req.body);
         await entity.save();
-        post(entity);
+        await post(entity);
         return entity;
     }
 
     public async one(query: Partial<Body<T>>) {
-        return await this.repo.fetchOne(query);
+        const { post } = getHooks(this.options.one);
+        const entity = await this.repo.fetchOne(query);
+        await post(entity);
+        return entity;
     }
 
-    public async all(req: Request, res: Response) {
+    public async all() {
         const entites = await this.repo.fetchAll();
         const hook = this.options.all;
-        const post = !AppUtils.isNullOrUndefined(hook) && hook.post;
-        post(entites);
+        const post = !AppUtils.isNullOrUndefined(hook) ? hook.post : () => null;
+        await post(entites);
         return entites;
     }
 
