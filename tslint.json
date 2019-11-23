@@ -36,7 +36,7 @@
         "no-console": false,
         "no-string-literal": false,
         "no-empty": [
-            true,
+            false,
             "allow-empty-catch"
         ],
         "no-floating-promises": false,

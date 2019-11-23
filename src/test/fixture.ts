@@ -20,12 +20,14 @@ export async function createUser() {
         username: `test`,
         mobile: '+962792807794'
     });
+    console.log(res.body);
     user.id = res.body.data._id;
     user.token = sign({ id: user.id }, process.env.JWT_SECRET_KEY);
     return user;
 }
 
 export async function deleteUser() {
+    if (!user.id) { return; }
     const req = (await superAgent).delete(`${usersUri}/${user.id}`);
     const res = await req.set('Authorization', user.token);
     return res.body;

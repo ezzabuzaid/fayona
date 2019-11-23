@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Model, DeepPartial } from 'mongoose';
 import { Document, Body } from '@lib/mongoose';
 // TODO use repo and complete it
 export class Repo<T> {
@@ -17,5 +17,9 @@ export class Repo<T> {
 
     public fetchById(id: string) {
         return this.model.findById(id);
+    }
+
+    public create(body: Body<T>) {
+        return new this.model(body as any);
     }
 }

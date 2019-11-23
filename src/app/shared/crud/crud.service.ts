@@ -1,9 +1,7 @@
 import { ICrudOptions, ICrudHooks } from './crud.options';
-import { Repo } from '@shared/crud/crud.repo';
-import { Request, Response } from 'express';
 import { Body, Document } from '@lib/mongoose';
-import { DeepPartial } from 'mongoose';
 import { AppUtils } from '@core/utils';
+import { Repo } from './crud.repo';
 
 function getHooks<T>(options: Partial<ICrudHooks<T>>) {
     return {
@@ -14,21 +12,22 @@ function getHooks<T>(options: Partial<ICrudHooks<T>>) {
 
 export class CrudService<T> {
     constructor(
+        // TODO: Should be protected not public
         public repo: Repo<T>,
         private options: ICrudOptions<T> = {} as any
     ) { }
 
     private async check(body) {
         if (this.options.unique) {
-            const opertaions = this.options.unique.map(async ({ attr }) => {
-                return !!(await this.repo.fetchOne({ [attr]: body[attr] } as any));
+            const opertaions = this.options.unique.map(async (field) => {
+                return !!(await this.repo.fetchOne({ [field]: body[field] } as any));
             });
             return (await Promise.all(opertaions)).every((operation) => !!operation);
         }
         return false;
     }
 
-    public async create(body: Partial<Body<T>>) {
+    public async create(body: Body<T>) {
         // TODO: customize the return object to clarify what's exactly the error
 
         const check = await this.check(body);
@@ -39,7 +38,7 @@ export class CrudService<T> {
             };
         }
 
-        const entity = await new this.repo.model(body as DeepPartial<Document<T>>);
+        const entity = this.repo.create(body);
 
         const { pre, post } = getHooks(this.options.create);
         await pre(entity);
@@ -65,13 +64,12 @@ export class CrudService<T> {
         return entity;
     }
 
-    public async update(req: Request, res: Response) {
-        const { id } = req.params;
-        const entity = await this.repo.fetchById(id);
+    public async update(query: { body: Body<T>, id: string }) {
+        const entity = await this.repo.fetchById(query.id);
         if (!entity) {
             return null;
         }
-        const check = await this.check(req.body);
+        const check = await this.check(query.body);
 
         if (check) {
             return null;
@@ -79,7 +77,7 @@ export class CrudService<T> {
 
         const { pre, post } = getHooks(this.options.update);
         await pre(entity);
-        entity.set(req.body);
+        entity.set(query.body);
         await entity.save();
         await post(entity);
         return entity;

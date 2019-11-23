@@ -8,12 +8,12 @@ class AccountService extends CrudService<AccountSchema> {
         super(new Repo(AccountModel));
     }
 
-    public deleteAccount(user_id) {
-        return this.delete({ user_id });
-    }
-    public createAccount(user_id) {
-        return this.create({ user_id });
-    }
+    // public deleteAccount(user_id) {
+    //     return this.delete({ user_id });
+    // }
+    // public createAccount(user_id) {
+    //     return this.create({ user_id });
+    // }
 
     public async getEntityByUserId(user_id) {
         const entity = await this.one({ user_id });

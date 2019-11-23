@@ -4,9 +4,10 @@ import { Delete, Get, Post, Router } from '@lib/methods';
 import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
 import { FavoritesRepo } from './favorites.repo';
+import { CrudRouter } from '@shared/crud';
 
 @Router(Constants.Endpoints.favorites)
-export class FavoritesRouter {
+export class FavoritesRouter extends CrudRouter<any> {
     private repo = FavoritesRepo;
 
     @Post(':type', Auth.isAuthenticated)

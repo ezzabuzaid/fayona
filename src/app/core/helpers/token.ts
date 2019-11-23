@@ -1,4 +1,10 @@
 import jwt = require('jsonwebtoken');
+import { ERoles } from '@api/users';
+
+export interface ITokenClaim {
+    role: ERoles;
+    id: string;
+}
 
 class TokenService {
 
@@ -21,7 +27,7 @@ class TokenService {
      * @param data token payload
      * @returns the encrypted token
      */
-    public generateToken(data) {
+    public generateToken(data: ITokenClaim) {
         return jwt.sign(data, process.env.JWT_SECRET_KEY);
     }
 }

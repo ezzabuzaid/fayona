@@ -79,6 +79,10 @@ export class AppUtils {
         return list.length > 0;
     }
 
+    public static assignObject<T>(target, source1: T, source2?: Partial<T>): T {
+        return Object.assign(target, source1, source2);
+    }
+
 }
 
 // NOTE  Utility class to be extended, so when you call build it will construct an instance from that class

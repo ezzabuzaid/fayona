@@ -6,6 +6,7 @@ import { MongooseTypes } from '.';
 
 export function Field<T = any>(options: MongooseTypes.FieldOptions = {}) {
     return (instance: MongooseTypes.IFieldAttr & T, propertyKey: string) => {
+        // TODO: use reflect metadate instead of conditions
         if (instance && !instance.fields) {
             AppUtils.defineProperty(instance, 'fields', { value: {} });
         }

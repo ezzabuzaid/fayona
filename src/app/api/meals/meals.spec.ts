@@ -1,9 +1,14 @@
 import { superAgent } from '@test/index';
 import { Constants, NetworkStatus } from '@core/helpers';
-
+global.console = {
+    ...global.console,
+    log: jest.fn(),
+    info: jest.fn(),
+    error: jest.fn(),
+};
 describe('#Get All', () => {
     it('Should return data without token', async () => {
-        const res = await (await superAgent).post(`/api/${Constants.Endpoints.MEALS}`);
+        const res = await (await superAgent).get(`/api/${Constants.Endpoints.MEALS}`);
         expect(res.body.data).toBeInstanceOf(Array);
         expect(res.status).toBe(NetworkStatus.OK);
     });

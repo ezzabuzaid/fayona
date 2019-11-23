@@ -1,14 +1,23 @@
 import '@test/index';
 import { superAgent } from '@test/supertest';
-import { createUser, deleteUser, UserFixture } from '@test/fixture';
+import { createUser, deleteUser, getUri } from '@test/fixture';
 import { Constants, NetworkStatus } from '@core/helpers';
 import { Body } from '@lib/mongoose';
-import { UsersSchema } from './users.model';
+import { UsersSchema, ERoles } from './users.model';
 
-const ENDPOINT = `/api/${Constants.Endpoints.USERS}`;
-let user: UserFixture = null;
+const ENDPOINT = getUri(Constants.Endpoints.USERS);
+
+const user = {
+    email: `${Math.log2(Math.random())}test@create.com`,
+    mobile: `${Math.round(Math.random())}792807794`,
+    password: '123456789',
+    profile: null,
+    role: ERoles.ADMIN,
+    username: `${Math.log2(Math.random())}TestCreate`
+} as Body<UsersSchema>;
+
 beforeAll(async () => {
-    user = await createUser();
+    await createUser();
 });
 
 afterAll(async () => {
@@ -16,107 +25,42 @@ afterAll(async () => {
 });
 
 // NOTE test the fail, don't test the success
-describe('CREATE USER', () => {
+describe('#CREATE USER', () => {
     test('Fail if the user exist before', async () => {
-        const body = {
-            email: 'test@create1.com',
-            mobile: '0792807794',
-            password: '123456789',
-            username: 'testCreate1'
-        } as Body<UsersSchema>;
         const req1 = (await superAgent).post(ENDPOINT);
-        const res1 = await req1.send(body);
-
+        await req1.send(user);
         const req2 = (await superAgent).post(ENDPOINT);
-        const res2 = await req2.send(body);
-
+        const res2 = await req2.send(user);
         expect(res2.status).toBe(NetworkStatus.BAD_REQUEST);
     });
     test('Special Char is not allowed', async () => {
-        const body = {
-            email: 'test@create2.com',
-            mobile: '0792807794',
-            password: '123456789',
-            username: 'testCreate2#$'
-        } as Body<UsersSchema>;
         const req = (await superAgent).post(ENDPOINT);
-        const res = await req.send(body);
+        const res = await req.send(Object.assign({}, user, { username: 'testCreate2#$' }));
         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
     });
-    test('Mobile number shouldn"t be wrong', async () => {
-        const body = {
-            email: 'test@create3.com',
-            mobile: '079280779',
-            password: '123456789',
-            username: 'testCreate3'
-        } as Body<UsersSchema>;
+    test('Mobile number shouldnt be wrong', async () => {
         const req = (await superAgent).post(ENDPOINT);
-        const res = await req.send(body);
+        const res = await req.send(Object.assign({}, user, { mobile: '079280779' }));
         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
     });
+    test('Fail if user role is not one of supported roles', async () => {
+        const req = (await superAgent).post(ENDPOINT);
+        const res = await req.send(Object.assign({}, user, { role: 100000 }));
+        expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
+    });
+
+    test.todo('user should have a defualt profile equal to empty {}');
+    // test('Profile Should have an empty object when creating a new user', async () => {
+    //     const req = (await superAgent).post(ENDPOINT);
+    //     const res = await req.send(user);
+    //     expect(((res.body) as Body<UsersSchema>).profile).toBe(undefined);
+    //     // TODO: the profile object should has a default value in the service
+    //              and not in model, then uncomment the below code
+    //     // expect(((res.body) as Body<UsersSchema>).profile).toMatchObject({});
+    //     expect(res.status).toBe(NetworkStatus.CREATED);
+    // });
 });
 
-// STUB CREATE: user password should be hashed
-// STUB READ: user body shouldn't have a password
-// STUB CREATE: user should have an account
-// STUB DELETE: remove associated account
-
-// describe('GET BY ${id}/', () => {
-//     test('Reject request without token', async () => {
-//         const res = await (await superAgent).get(`${ENDPOINT}/${user.id}`);
-//         expect(res.status).toBe(NetworkStatus.UNAUTHORIZED);
-//     });
-
-//     test('should fail if requested with id not of type ObjectId', async () => {
-//         // this will rise cast error
-//         const req = (await superAgent).get(`${ENDPOINT}/${undefined}`);
-//         const res = await req.set('Authorization', user.token);
-//         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
-//     });
-
-//     test('should fail if requested to non exist entity', async () => {
-//         const req = (await superAgent).get(`${ENDPOINT}/${new Types.ObjectId()}`);
-//         const res = await req.set('Authorization', user.token);
-//         expect(res.status).toBe(NetworkStatus.NOT_ACCEPTABLE);
-//     });
-
-//     test('resposne body should equal to', async () => {
-//         const req = (await superAgent).get(`${ENDPOINT}/${user.id}`);
-//         const res = await req.set('Authorization', user.token);
-//         const { data } = res.body;
-//         expect(data).toHaveProperty('username');
-//         expect(data).toHaveProperty('email');
-//         expect(data).toHaveProperty('mobile');
-//         expect(data).toHaveProperty('createdAt');
-//         expect(data).toHaveProperty('updatedAt');
-//         expect(data).toHaveProperty('_id');
-//         // password return, even it returned without being hashing
-//         expect(data).not.toHaveProperty('password');
-//     });
-// });
-
-// describe('DELETE BY ${id}/', () => {
-//     test('Reject request without token', async () => {
-//         const res = await (await superAgent).delete(`${ENDPOINT}/${user.id}`);
-//         expect(res.status).toBe(NetworkStatus.UNAUTHORIZED);
-//     });
-
-//     test('should fail if requested with id not of type ObjectId', async () => {
-//         const req = (await superAgent).delete(`${ENDPOINT}/${undefined}`);
-//         const res = await req.set('Authorization', user.token);
-//         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
-//     });
-
-//     test('should fail if requested to non exist entity', async () => {
-//         const req = (await superAgent).delete(`${ENDPOINT}/${new Types.ObjectId()}`);
-//         const res = await req.set('Authorization', user.token);
-//         expect(res.status).toBe(NetworkStatus.NOT_ACCEPTABLE);
-//     });
-
-//     test('resposne body should equal to', async () => {
-//         const req = (await superAgent).delete(`${ENDPOINT}/${user.id}`);
-//         const res = await req.set('Authorization', user.token);
-//         const { data } = res.body;
-//         expect(data).toBeNull();
-//     });
-// });
+describe('#GET USER', () => {
+    test.todo(`user body shouldn't have a password`);
+});

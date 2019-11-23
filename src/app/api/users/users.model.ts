@@ -2,11 +2,27 @@ import { HashService, Constants } from '@core/helpers';
 import { BaseModel, Entity, Field } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
-import { Query } from 'mongoose';
+import { Query, Schema } from 'mongoose';
 import { translate } from '@lib/translation';
+import { AppUtils } from '@core/utils';
+
+export enum ERoles {
+    SUPERADMIN,
+    ADMIN,
+    CLIENT,
+    CUSTOMER,
+}
 
 @Entity(Constants.Schemas.USERS)
 export class UsersSchema {
+    @Field({ enum: Object.values(ERoles) }) public role: ERoles;
+    @Field({
+        default: {},
+        set: (value) => {
+            console.log(value);
+            return AppUtils.isNullOrUndefined(value) ? {} : value;
+        }
+    }) public profile: {}; // TODO: update this field to be ProfileSchema instead
     @Field({ pure: true, required: true }) public password: string;
     @Field({
         match: [ValidationPatterns.NoSpecialChar, translate('no_speical_char')],

@@ -12,7 +12,6 @@ export class CrudRouter<T> {
 
     @Post('', Auth.isAuthenticated)
     public async create(req: Request, res: Response) {
-        console.log('This method is overrided');
         const result = await this.service.create(req.body);
         if (result.exist) {
             throw new ErrorResponse(translate('entity_exist'));
@@ -23,7 +22,7 @@ export class CrudRouter<T> {
 
     @Put(':id', Auth.isAuthenticated)
     public async update(req: Request, res: Response) {
-        const entity = await this.service.update(req, res);
+        const entity = await this.service.update({ body: req.body, id: req.params.id });
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'));
         }

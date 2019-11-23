@@ -17,7 +17,5 @@ export interface ICrudOperation<T = any> {
 }
 export interface ICrudOptions<T> extends ICrudOperation<T> {
     // TODO: Move it to each crud operation without the [attr] key
-    unique: Array<{
-        attr: keyof Body<T>,
-    }>;
+    unique: Array<keyof Body<T>>;
 }

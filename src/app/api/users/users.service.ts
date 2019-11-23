@@ -7,19 +7,12 @@ import { usersRepo } from '.';
 class UserService extends CrudService<UsersSchema> {
     constructor() {
         super(usersRepo, {
-            unique: [{ attr: 'username' }, { attr: 'email' }],
+            unique: ['username', 'email', 'password'],
             create: {
                 async pre(entity) {
+                    // TODO: Instead of invoke this function in hook invoke it in password setter
                     await entity.hashUserPassword();
                 },
-                async post(entity) {
-                    await accountsService.createAccount(entity.id);
-                }
-            },
-            delete: {
-                async post(entity) {
-                    await accountsService.deleteAccount(entity.id);
-                }
             }
         });
     }
