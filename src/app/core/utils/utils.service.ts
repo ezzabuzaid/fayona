@@ -83,6 +83,13 @@ export class AppUtils {
         return Object.assign(target, source1, source2);
     }
 
+    public static getProps<T>(target: T, ...keys: Array<keyof T>): Partial<T> {
+        return keys.reduce((acc, key) => {
+            acc[key] = target[key];
+            return acc;
+        }, {} as any);
+    }
+
 }
 
 // NOTE  Utility class to be extended, so when you call build it will construct an instance from that class

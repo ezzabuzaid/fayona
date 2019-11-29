@@ -18,8 +18,6 @@
 // const stream = new Stream();
 // stream.pipe();
 
-// TODO setup delete folder functions
-// make sure that all of them pass in pipeline
 const child_process = require('child_process');
 const path = require('path');
 const fs = require('fs');
@@ -31,8 +29,8 @@ const DIST = path.join(pwd, 'dist');
 del.sync(DIST);
 child_process.spawnSync('tsc', { shell: true });
 
-const ENV = 'environment/.env';
-const ENV_DIST = path.join(DIST, ENV);
+const ENV = `environment/.env`;
+const ENV_DIST = path.join(DIST, `${ENV}.${env}`);
 const ENV_SRC = path.join(pwd, 'src', `${ENV}.${env}`);
 fs.copyFileSync(ENV_SRC, ENV_DIST);
 

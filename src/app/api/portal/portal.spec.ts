@@ -5,7 +5,10 @@ import { Constants, NetworkStatus } from '@core/helpers';
 import { UserFixture as userFixture, getUri } from '@test/fixture';
 import { AppUtils } from '@core/utils';
 
-const ENDPOINT = getUri(`${Constants.Endpoints.PORTAL}/login`);
+const ENDPOINT = (suffix: string) => getUri(`${Constants.Endpoints.PORTAL}/${suffix}`);
+const LOGIN_ENDPOINT = ENDPOINT(Constants.Endpoints.LOGIN);
+const RESET_ENDPOINT = ENDPOINT(Constants.Endpoints.RESET_PASSWORD);
+const FORGET_ENDPOINT = ENDPOINT(Constants.Endpoints.FORGET_PASSWORD);
 
 const mockUser = {
     password: '123456789',
@@ -15,32 +18,41 @@ const mockUser = {
     profile: null,
     role: ERoles.SUPERADMIN
 } as Body<UsersSchema>;
-let userFixture: userFixture = null;
+// let userFixture: userFixture = null;
 
 beforeAll(async () => {
-    const req = (await superAgent).post(ENDPOINT);
-    const res = await req.send(mockUser);
-    userFixture = res.body.data;
+    // const req = (await superAgent).post(ENDPOINT);
+    // const res = await req.send(mockUser);
+    // userFixture = res.body.data;
 });
 
 describe('Login should fail if..', () => {
-    it('`Request with non existing user`', async () => {
-        const req = (await superAgent).post(ENDPOINT);
-        const res = await req.send({ username: 'fakeUsername', password: 'fakePassword' });
+    it('Request with non existing user', async () => {
+        const req = (await superAgent).post(LOGIN_ENDPOINT);
+        const res = await req.send(AppUtils.assignObject({}, mockUser, {
+            username: 'fakeUsername',
+            password: 'fakePassword'
+        }));
         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
     });
     it('The Username was wrong', async () => {
-        const req = (await superAgent).post(ENDPOINT);
+        const req = (await superAgent).post(LOGIN_ENDPOINT);
         const res = await req.send(AppUtils.assignObject({}, mockUser, { username: 'fakeUsername' }));
         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
     });
     it('The password was wrong', async () => {
-        const req = (await superAgent).post(ENDPOINT);
+        const req = (await superAgent).post(LOGIN_ENDPOINT);
         const res = await req.send(AppUtils.assignObject({}, mockUser, { password: 'fakePassword' }));
         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
     });
-    it.todo('User trying to login with an old password');
     it.todo('User has more than three session');
+});
+
+describe('Forgot password ', () => {
+    it.todo('refactor');
+});
+describe('Reset password ', () => {
+    it.todo('refactor');
 });
 
 describe('Login should success when', () => {

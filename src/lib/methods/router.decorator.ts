@@ -19,6 +19,7 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
             .forEach((key: string) => {
                 if (key.startsWith(metadata_key)) {
                     const metadata = Reflect.getMetadata(key, constructor) as IMetadata;
+                    Reflect.deleteMetadata(key, constructor);
                     if (metadata) {
                         const { handler, method, middlewares, uri } = metadata;
                         const normalizedURI = path.normalize(path.join('/', uri));

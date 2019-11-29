@@ -26,7 +26,7 @@ export class CrudRouter<T> {
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'));
         }
-        const response = new SuccessResponse(null, translate('success'));
+        const response = new SuccessResponse(null);
         res.status(response.code).json(response);
     }
 
@@ -36,7 +36,7 @@ export class CrudRouter<T> {
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'));
         }
-        const response = new SuccessResponse(null, translate('success'));
+        const response = new SuccessResponse(null);
         res.status(response.code).json(response);
     }
 
@@ -46,14 +46,14 @@ export class CrudRouter<T> {
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'));
         }
-        const response = new SuccessResponse(entity, translate('success'));
+        const response = new SuccessResponse(entity);
         res.status(response.code).json(response);
     }
 
     @Get('', Auth.isAuthenticated)
     public async fetchEntities(req: Request, res: Response) {
         const entites = await this.service.all();
-        const response = new SuccessResponse(entites, translate('success'));
+        const response = new SuccessResponse(entites);
         response.count = entites.length;
         res.status(response.code).json(response);
     }

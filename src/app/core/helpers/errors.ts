@@ -13,7 +13,8 @@ export enum Errors {
     ErrorResponse = 'ErrorResponse',
     SuccessResponse = 'SuccessResponse',
     JsonWebTokenError = 'JsonWebTokenError',
-    ValidationError = 'ValidationError'
+    ValidationError = 'ValidationError',
+    TokenExpiredError = 'TokenExpiredError'
 }
 
 export class ErrorHandling {
@@ -59,6 +60,10 @@ export class ErrorHandling {
                 break;
             case Errors.ValidationError:
                 // Mongoose validation error
+                response.code = NetworkStatus.BAD_REQUEST;
+                break;
+            case Errors.TokenExpiredError:
+                response.message = translate('jwt_expired');
                 response.code = NetworkStatus.BAD_REQUEST;
                 break;
         }

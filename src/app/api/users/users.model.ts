@@ -19,11 +19,14 @@ export class UsersSchema {
     @Field({
         default: {},
         set: (value) => {
-            console.log(value);
             return AppUtils.isNullOrUndefined(value) ? {} : value;
         }
     }) public profile: {}; // TODO: update this field to be ProfileSchema instead
-    @Field({ pure: true, required: true }) public password: string;
+    @Field({
+        pure: true,
+        required: true,
+        set: (value: string) => HashService.hashSync(value)
+    }) public password: string;
     @Field({
         match: [ValidationPatterns.NoSpecialChar, translate('no_speical_char')],
         unique: true,
@@ -43,22 +46,9 @@ export class UsersSchema {
         unique: true,
     }) public mobile: string;
 
-    public async hashUserPassword() {
-        this.password = await HashService.hashPassword(this.password);
-        return this;
-    }
-
     public comparePassword(candidatePassword: string) {
         return HashService.comparePassword(candidatePassword, this.password);
     }
 }
 
 export const UsersModel = BaseModel<UsersSchema>(UsersSchema);
-
-UsersModel.schema.pre('find', () => {
-    (this as unknown as Query<any>).select({ password: 0 });
-});
-
-UsersModel.schema.pre('findOne', (query) => {
-    (this as unknown as Query<any>).select({ password: 0 });
-});

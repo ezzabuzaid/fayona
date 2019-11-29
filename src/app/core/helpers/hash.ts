@@ -8,17 +8,15 @@ export class HashService {
         log.info('Hash service constructor !');
     }
 
-    private static hashText(password: string) {
-        return bcrypt.hash(password, 12);
+    public static hashAsync(text: string) {
+        return bcrypt.hash(text, 12);
     }
 
-    public static hashPassword(passowrd: string) {
-        log.info('Start hashing password', typeof passowrd);
-        return this.hashText(passowrd);
+    public static hashSync(text: string) {
+        return bcrypt.hashSync(text, 12);
     }
 
     public static comparePassword(candidatePassword: string, actualPassword: string) {
-        log.debug(typeof candidatePassword, typeof actualPassword);
         return bcrypt.compare(candidatePassword, actualPassword);
     }
 

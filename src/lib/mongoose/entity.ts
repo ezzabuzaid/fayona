@@ -1,6 +1,7 @@
 import { BaseSchema } from '@core/database';
-import { SchemaOptions } from 'mongoose';
-import { MongooseTypes } from '.';
+import { SchemaOptions, model } from 'mongoose';
+import { MongooseTypes, generateModelMetadataKey } from '.';
+import 'reflect-metadata';
 
 export function Entity(
     name: string,
@@ -14,7 +15,7 @@ export function Entity(
         });
         const schema = new BaseSchema(fields, options);
         schema.loadClass(constructor);
-        constructor['wrapper'] = { schema, name };
+        Reflect.defineMetadata(generateModelMetadataKey(constructor), model(name, schema), constructor);
     };
 }
 

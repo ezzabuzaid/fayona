@@ -20,7 +20,7 @@ export class NodeServer extends Application {
         public static async bootstrap() {
                 // SECTION server init event
                 log.debug('Start boostrapping server');
-                envirnoment.load(StageLevel.DEV);
+                envirnoment.load(StageLevel.PROD);
                 const server = new NodeServer();
                 const httpServer = await server.populateServer();
                 // server.application.get('/socket/:name', handleSocket);

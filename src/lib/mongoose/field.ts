@@ -2,7 +2,7 @@ import { AppUtils } from '@core/utils';
 import 'reflect-metadata';
 import { MongooseTypes } from '.';
 
-// TODO: the `type` property should be in the `options` type
+// TODO: the `type` property shouldn't be in the `options` type
 
 export function Field<T = any>(options: MongooseTypes.FieldOptions = {}) {
     return (instance: MongooseTypes.IFieldAttr & T, propertyKey: string) => {

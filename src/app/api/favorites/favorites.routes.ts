@@ -15,9 +15,8 @@ export class FavoritesRouter extends CrudRouter<any> {
         const { item_id } = req.body;
         const { type } = req.params;
 
-        // TODO: make an interface for user token
-        const decodedToken = await tokenService.decodeToken<any>(req.headers.authorization);
-        const result = await this.repo.createEntity({ type, user_id: decodedToken.id, item_id });
+        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
+        const result = await this.repo.createEntity({ type, user_id: decodedToken.id as any, item_id });
         let response;
         if (result.passed) {
             response = new SuccessResponse(result.entity, translate('success'), NetworkStatus.CREATED);

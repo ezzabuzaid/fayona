@@ -20,7 +20,6 @@ export async function createUser() {
         username: `test`,
         mobile: '+962792807794'
     });
-    console.log(res.body);
     user.id = res.body.data._id;
     user.token = sign({ id: user.id }, process.env.JWT_SECRET_KEY);
     return user;

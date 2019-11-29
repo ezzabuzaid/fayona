@@ -58,6 +58,7 @@ export class Database {
         return connect(URI, {
             useNewUrlParser: true,
             autoIndex: false,
+            useUnifiedTopology: true,
             w: 'majority',
             ...connectionOptions
         })

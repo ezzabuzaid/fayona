@@ -14,7 +14,7 @@ class Envirnoment {
         const { error, parsed } = envConfig({ path: join(__dirname, envPath) });
         if (error) {
             log.debug(error);
-            throw new Error('an error accourd while loading the env file');
+            throw new Error('an error occured while loading the env file');
         }
         stage.load(this.get(NODE_STAGE) as StageLevel);
         return parsed;

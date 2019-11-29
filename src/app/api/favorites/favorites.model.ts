@@ -1,10 +1,9 @@
 import { Constants } from '@core/helpers';
 import { BaseModel, Entity, Field } from '@lib/mongoose';
-import { Types, Schema } from 'mongoose';
+import { Types } from 'mongoose';
 
 @Entity(Constants.Schemas.favorites)
 export class FavoritesSchema {
-    // TODO: constructor(schema: Schema) { }
     @Field() public user_id: Types.ObjectId;
     @Field() public item_id: Types.ObjectId;
     @Field({

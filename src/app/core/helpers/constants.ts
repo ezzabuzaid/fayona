@@ -8,6 +8,9 @@ export namespace Constants {
         public static readonly Account = 'account';
         public static readonly USERS = 'users';
         public static readonly PORTAL = 'portal';
+        public static readonly LOGIN = `login`;
+        public static readonly FORGET_PASSWORD = 'forgetpassword';
+        public static readonly RESET_PASSWORD = 'resetpassword';
     }
     export class Schemas {
         public static readonly favorites = 'favorites';

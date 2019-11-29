@@ -1,12 +1,14 @@
-import { Document, model, Model } from 'mongoose';
+import { Document, Model } from 'mongoose';
+import 'reflect-metadata';
+import { generateModelMetadataKey } from '.';
 
-// TODO after doing a base schema interface use it here _schema
-export function BaseModel<T>(_schema) {
-    const { wrapper }: any = _schema;
-    // TODO use enum to get the name of property
-    if (_schema) {
-        return model<T & Document>(wrapper.name, wrapper.schema);
+export function BaseModel<T>(schema: any) {
+    const model = Reflect.getMetadata(generateModelMetadataKey(schema), schema) as Model<T & Document>;
+    Reflect.deleteMetadata(generateModelMetadataKey(schema), schema);
+    if (model) {
+        return model;
     }
+    throw new Error('Please prvoide a class decorated with @Entity');
 }
 
 export type FilterModel<Base, Condition = Model<Base & Document>> = {

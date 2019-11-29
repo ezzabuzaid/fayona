@@ -13,7 +13,7 @@ function getHooks<T>(options: Partial<ICrudHooks<T>>) {
 export class CrudService<T> {
     constructor(
         // TODO: Should be protected not public
-        public repo: Repo<T>,
+        protected repo: Repo<T>,
         private options: ICrudOptions<T> = {} as any
     ) { }
 
@@ -64,7 +64,10 @@ export class CrudService<T> {
         return entity;
     }
 
-    public async update(query: { body: Body<T>, id: string }) {
+    // TODO: update is only for partials update, refactor it to agree with is
+    // TODO: do `put` is only for replace the whole document with new one
+
+    public async update(query: { body: Partial<Body<T>>, id: string }) {
         const entity = await this.repo.fetchById(query.id);
         if (!entity) {
             return null;

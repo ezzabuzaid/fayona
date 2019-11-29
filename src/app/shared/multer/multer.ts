@@ -38,9 +38,9 @@ export class Multer extends _Multer {
                 // REVIEW e.g books/id
                 // the file will be saved under the books folder into id folder
                 // this mean each entity will have it's own file
-                // so when you delete an entity you'll find that easy to delete it's file
+                // so when you delete an entity you'll find that easy to delete it's folder
                 // be aware to read about atomic transaction to make sure not to delete the
-                // enitiy images or the enity itself without the completion of the proccess
+                // entity images or the enity itself without the completion of the proccess
                 cb(null, path.join(process.cwd(), `uploads`, type));
             },
             filename(req: Express.Request, file, cb) {
@@ -64,4 +64,5 @@ export class Multer extends _Multer {
 
 }
 
-// REVIEW  From this class you can create an instance for pdf upload, word, pictures ...etx
+// TODO: create class for generic upload
+// FOLDERS, ATTACHMENTS
