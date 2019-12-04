@@ -63,6 +63,7 @@
     "sequelize": "^5.16.0",
     "simple-git": "^1.126.0",
     "tsconfig-paths": "^3.8.0",
+    "tslint": "^5.20.1",
     "typescript": "^3.6.3",
     "ws": "^6.2.1"
   },

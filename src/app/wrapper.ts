@@ -4,7 +4,6 @@ import { MenusRouter } from '@api/menus';
 import { PortalRoutes } from '@api/portal';
 import { FavoritesRouter } from '@api/favorites';
 import { FeedbackRouter } from '@api/feedback';
-import { AccountRouter } from '@api/accounts';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
 export class Wrapper {
     private static list = [];
@@ -60,4 +59,3 @@ Wrapper.registerRouter(UsersRouter);
 Wrapper.registerRouter(MenusRouter);
 Wrapper.registerRouter(FavoritesRouter);
 Wrapper.registerRouter(FeedbackRouter);
-Wrapper.registerRouter(AccountRouter);
