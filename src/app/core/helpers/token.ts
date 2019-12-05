@@ -2,8 +2,10 @@ import jwt = require('jsonwebtoken');
 import { ERoles } from '@api/users';
 
 export interface ITokenClaim {
-    role: ERoles;
+    role?: ERoles;
     id: string;
+    readonly iat?: number;
+    readonly exp?: number;
 }
 
 class TokenService {
@@ -29,6 +31,10 @@ class TokenService {
      */
     public generateToken(data: ITokenClaim, options?: jwt.SignOptions) {
         return jwt.sign(data, process.env.JWT_SECRET_KEY, options);
+    }
+
+    public isTokenExpired(token: ITokenClaim) {
+        return Date.now() <= token.exp * 1000;
     }
 }
 

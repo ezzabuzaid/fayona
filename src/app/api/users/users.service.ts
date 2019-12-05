@@ -1,9 +1,10 @@
-import accountsService from '@api/accounts/accounts.service';
-import { UsersSchema, UsersModel } from './users.model';
+import { UsersSchema } from './users.model';
 import { CrudService } from '@shared/crud/crud.service';
 import { usersRepo } from '.';
 
-// Validate the body to meet the schema exactly using reflect metadata
+// TODO: provide an option for strict schema checking to not allowed
+// an additional attribute to come, morever check the types
+// TODO: Validate the body to meet the schema exactly using reflect metadata
 class UserService extends CrudService<UsersSchema> {
     constructor() {
         super(usersRepo, {

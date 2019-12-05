@@ -1,5 +1,3 @@
-import { AuthorsRepo } from '@api/authors/authors.repo';
-import { BooksRepo } from '@api/books/books.repo';
 import { ErrorResponse } from '@core/helpers/response.model';
 import { AppUtils, Parameter } from '@core/utils';
 import { Request } from 'express';
@@ -12,7 +10,7 @@ const _Multer = AppUtils.getTypeOf<typeof upload>(multer);
 
 type MulterParams = Parameter<typeof multer>;
 export class Multer extends _Multer {
-    private allowedTypes = [BooksRepo.modelName, AuthorsRepo.modelName];
+    private allowedTypes = [];
     constructor(options: MulterParams = {}) {
         super((() => this.options(options))());
     }

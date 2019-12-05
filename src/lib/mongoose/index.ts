@@ -16,7 +16,7 @@ export namespace MongooseTypes {
 }
 
 export type OmitProperties<T, P> = Pick<T, { [K in keyof T]: T[K] extends P ? never : K }[keyof T]>;
-export type Body<T> = OmitProperties<T, (...args: any) => any>;
+export type Body<T> = OmitProperties<T, (...args: any) => any> & {id?: string};
 
 export function generateModelMetadataKey(target: any) {
     return `model:${target.name}`;

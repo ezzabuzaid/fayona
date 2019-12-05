@@ -1,6 +1,6 @@
 import '@test/index';
 import { superAgent } from '@test/supertest';
-import { createUser, deleteUser, getUri } from '@test/fixture';
+import { getUri, UserUtilityFixture } from '@test/fixture';
 import { Constants, NetworkStatus } from '@core/helpers';
 import { Body } from '@lib/mongoose';
 import { UsersSchema, ERoles } from './users.model';
@@ -16,12 +16,14 @@ const user = {
     username: `${Math.log2(Math.random())}TestCreate`
 } as Body<UsersSchema>;
 
+const userUtility = new UserUtilityFixture();
+
 beforeAll(async () => {
-    await createUser();
+    await userUtility.createUser();
 });
 
 afterAll(async () => {
-    await deleteUser();
+    await userUtility.deleteUser();
 });
 
 // NOTE test the fail, don't test the success

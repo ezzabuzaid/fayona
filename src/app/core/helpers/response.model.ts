@@ -9,12 +9,10 @@ abstract class Response extends Error {
 export class SuccessResponse<T> extends Response {
     [x: string]: any;
     public name = SuccessResponse.name;
-    public data: T;
-    constructor(data: T, message = translate('success'), code = NetworkStatus.OK, status?: string) {
+    constructor(public data: T, message = translate('success'), code = NetworkStatus.OK, status?: string) {
         super();
         this.message = message;
         this.code = code;
-        this.data = data;
         this.status = status || NetworkStatus.getStatusText(code);
     }
 
