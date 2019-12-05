@@ -13,8 +13,9 @@ export enum Errors {
     ErrorResponse = 'ErrorResponse',
     SuccessResponse = 'SuccessResponse',
     JsonWebTokenError = 'JsonWebTokenError',
+    TokenExpiredError = 'TokenExpiredError',
+    NotBeforeError = 'NotBeforeError',
     ValidationError = 'ValidationError',
-    TokenExpiredError = 'TokenExpiredError'
 }
 
 export class ErrorHandling {
@@ -66,6 +67,11 @@ export class ErrorHandling {
                 response.message = translate('jwt_expired');
                 response.code = NetworkStatus.BAD_REQUEST;
                 break;
+            case Errors.JsonWebTokenError:
+                response.message = translate('jwt_expired');
+                response.code = NetworkStatus.BAD_REQUEST;
+                break;
+
         }
         res.status(response.code).json(response);
         return;

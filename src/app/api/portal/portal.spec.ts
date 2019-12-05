@@ -55,11 +55,10 @@ describe('Reset password ', () => {
 describe('Refresh Token', () => {
     async function getResponse(invalidToken, token = null) {
         const req = (await superAgent).post(REFRESH_TOKEN);
-        return await req.send({ refreshToken: invalidToken, token } as IRefreshTokenBody);
+        return req.send({ refreshToken: invalidToken, token } as IRefreshTokenBody);
     }
     const INVALID_TOKEN = 'invalid.token.refuesed';
     it('should throw if the refresh token is expired', async () => {
-        // REVIEW find a way to generate invalid tokens
         const res = await getResponse(generateExpiredToken());
         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
     });
@@ -82,18 +81,18 @@ describe('Refresh Token', () => {
         expect(res.status).toBe(NetworkStatus.NOT_ACCEPTABLE);
     });
 
-    it.todo('should retrun with valid token and refresh token', async () => {
-        const userUtility = new UserUtilityFixture();
-        const user = await userUtility.createUser();
-        // TODO: Replace them with fixture function to check if it has a value
-        expect(user).toHaveProperty('token');
-        expect(user).toHaveProperty('refreshToken');
-        const res = await getResponse(
-            PortalHelper.generateRefreshToken(null),
-            PortalHelper.generateToken(null, null)
-        );
-        expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
-    });
+    // it.todo('should retrun with valid token and refresh token', async () => {
+    //     const userUtility = new UserUtilityFixture();
+    //     const user = await userUtility.createUser();
+    //     // TODO: Replace them with fixture function to check if it has a value
+    //     expect(user).toHaveProperty('token');
+    //     expect(user).toHaveProperty('refreshToken');
+    //     const res = await getResponse(
+    //         PortalHelper.generateRefreshToken(null),
+    //         PortalHelper.generateToken(null, null)
+    //     );
+    //     expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
+    // });
 });
 
 describe('Login should success when', () => {

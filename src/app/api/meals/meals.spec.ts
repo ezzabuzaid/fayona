@@ -5,7 +5,6 @@ import { getUri } from '@test/fixture';
 describe('#Get All', () => {
     it('Should return data without token', async () => {
         const res = await (await superAgent).get(getUri(Constants.Endpoints.MEALS));
-        console.log(res.body);
         expect(res.body.data).toBeInstanceOf(Array);
         expect(res.status).toBe(NetworkStatus.OK);
     });

@@ -1,9 +1,10 @@
 import '@test/index';
 import { superAgent } from '@test/supertest';
-import { getUri, UserUtilityFixture } from '@test/fixture';
+import { getUri, UserUtilityFixture, sendRequest } from '@test/fixture';
 import { Constants, NetworkStatus } from '@core/helpers';
 import { Body } from '@lib/mongoose';
 import { UsersSchema, ERoles } from './users.model';
+import { AppUtils } from '@core/utils';
 
 const ENDPOINT = getUri(Constants.Endpoints.USERS);
 
@@ -16,38 +17,23 @@ const user = {
     username: `${Math.log2(Math.random())}TestCreate`
 } as Body<UsersSchema>;
 
-const userUtility = new UserUtilityFixture();
-
-beforeAll(async () => {
-    await userUtility.createUser();
-});
-
-afterAll(async () => {
-    await userUtility.deleteUser();
-});
-
 // NOTE test the fail, don't test the success
 describe('#CREATE USER', () => {
     test('Fail if the user exist before', async () => {
-        const req1 = (await superAgent).post(ENDPOINT);
-        await req1.send(user);
-        const req2 = (await superAgent).post(ENDPOINT);
-        const res2 = await req2.send(user);
+        await sendRequest(ENDPOINT, user);
+        const res2 = await sendRequest(ENDPOINT, user);
         expect(res2.status).toBe(NetworkStatus.BAD_REQUEST);
     });
     test('Special Char is not allowed', async () => {
-        const req = (await superAgent).post(ENDPOINT);
-        const res = await req.send(Object.assign({}, user, { username: 'testCreate2#$' }));
+        const res = await sendRequest(ENDPOINT, AppUtils.assignObject({}, user, { username: 'testCreate2#$' }));
         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
     });
     test('Mobile number shouldnt be wrong', async () => {
-        const req = (await superAgent).post(ENDPOINT);
-        const res = await req.send(Object.assign({}, user, { mobile: '079280779' }));
+        const res = await sendRequest(ENDPOINT, AppUtils.assignObject({}, user, { mobile: '079280779' }));
         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
     });
     test('Fail if user role is not one of supported roles', async () => {
-        const req = (await superAgent).post(ENDPOINT);
-        const res = await req.send(Object.assign({}, user, { role: 100000 }));
+        const res = await sendRequest(ENDPOINT, AppUtils.assignObject({}, user, { role: 100000 }));
         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
     });
 

@@ -34,7 +34,7 @@ class TokenService {
     }
 
     public isTokenExpired(token: ITokenClaim) {
-        return Date.now() <= token.exp * 1000;
+        return Date.now() >= token.exp * 1000;
     }
 }
 
