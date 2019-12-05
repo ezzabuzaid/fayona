@@ -15,7 +15,7 @@ export class Repo<T> {
     }
 
     public fetchById(id: string) {
-        return this.model.findById(id);
+        return this.fetchOne({ _id: id } as any);
     }
 
     public create(body: Body<T>) {

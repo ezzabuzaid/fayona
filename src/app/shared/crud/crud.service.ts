@@ -11,8 +11,8 @@ function getHooks<T>(options: Partial<ICrudHooks<T>>) {
 }
 
 export class CrudService<T> {
+
     constructor(
-        // TODO: Should be protected not public
         protected repo: Repo<T>,
         private options: ICrudOptions<T> = {} as any
     ) { }
@@ -64,6 +64,11 @@ export class CrudService<T> {
         return entity;
     }
 
+    // NOTE: Not used, for the sake of hook in write operations
+    // public bulkDelete(ids: string[]) {
+    //     return this.repo.model.bulkWrite(ids.map((_id) => ({ deleteOne: { filter: { _id } } })));
+    // }
+
     // TODO: update is only for partials update, refactor it to agree with is
     // TODO: do `put` is only for replace the whole document with new one
 
@@ -75,7 +80,10 @@ export class CrudService<T> {
         const check = await this.check(query.body);
 
         if (check) {
-            return null;
+            return {
+                exist: true,
+                entity: null
+            };
         }
 
         const { pre, post } = getHooks(this.options.update);
@@ -84,6 +92,37 @@ export class CrudService<T> {
         await entity.save();
         await post(entity);
         return entity;
+    }
+
+    public async bulkUpdate(ids: Array<Body<T>>) {
+        const entites = await Promise.all(ids.map((record) => this.repo.fetchById(record.id)));
+        if (entites.every((item) => !!item)) {
+            return null;
+        }
+        for (let index = 0; !index; index++) {
+            const entity = entites[index];
+            const record = ids[index];
+            const { pre, post } = getHooks(this.options.update);
+            await pre(entity);
+            entity.set(record);
+            await entity.save();
+            await post(entity);
+        }
+        return true;
+    }
+
+    public async bulkDelete(ids: string[]) {
+        const entites = await Promise.all(ids.map((id) => this.repo.fetchById(id)));
+        if (entites.every((item) => !!item)) {
+            return null;
+        }
+        const { pre, post } = getHooks(this.options.delete);
+        for (const entity of entites) {
+            await pre(entity);
+            await entity.remove();
+            await post(entity);
+        }
+        return true;
     }
 
     public async one(query: Partial<Body<T>>) {

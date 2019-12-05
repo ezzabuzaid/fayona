@@ -1,5 +1,4 @@
 import { Body, Document } from '@lib/mongoose';
-import { PickAttr } from '@core/utils';
 
 export interface ICrudHooks<T> {
     pre?: (doc: Document<T>) => any;
@@ -7,6 +6,8 @@ export interface ICrudHooks<T> {
 }
 
 export interface ICrudOperation<T = any> {
+    // TODO: for each write operation should have a transaction option,
+    //  so if it's true the hooks should run within a transaction
     create?: ICrudHooks<T>;
     update?: ICrudHooks<T>;
     delete?: ICrudHooks<T>;
@@ -16,6 +17,8 @@ export interface ICrudOperation<T = any> {
     };
 }
 export interface ICrudOptions<T> extends ICrudOperation<T> {
-    // TODO: Move it to each crud operation without the [attr] key
+    /**
+     * indicate that the entity should be unique, and the check will be on the provided properties
+     */
     unique: Array<keyof Body<T>>;
 }

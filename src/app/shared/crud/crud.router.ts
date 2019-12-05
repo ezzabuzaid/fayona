@@ -4,6 +4,8 @@ import { Auth } from '@api/portal';
 import { Request, Response } from 'express';
 import { SuccessResponse, NetworkStatus, ErrorResponse } from '@core/helpers';
 import { translate } from '@lib/translation';
+import { AppUtils } from '@core/utils';
+import { Body } from '@lib/mongoose';
 
 export class CrudRouter<T> {
     constructor(
@@ -40,6 +42,33 @@ export class CrudRouter<T> {
         res.status(response.code).json(response);
     }
 
+    @Delete('', Auth.isAuthenticated)
+    public async bulkDelete(req: Request, res: Response) {
+        const { ids } = req.body as { ids: string[] };
+        this._checkIfIdsIsValid(ids);
+
+        const completion = await this.service.bulkDelete(ids);
+        if (AppUtils.not(completion)) {
+            throw new ErrorResponse(translate('one_of_entities_not_exist'));
+        }
+
+        const response = new SuccessResponse(null);
+        res.status(response.code).json(response);
+    }
+
+    @Post('', Auth.isAuthenticated)
+    public async bulkUpdate(req: Request, res: Response) {
+        const { ids } = req.body as { ids: Array<Body<T>> };
+        this._checkIfIdsIsValid(ids);
+
+        const completion = await this.service.bulkUpdate(ids);
+        if (AppUtils.not(completion)) {
+            throw new ErrorResponse(translate('one_of_entities_not_exist'));
+        }
+        const response = new SuccessResponse(null);
+        res.status(response.code).json(response);
+    }
+
     @Get(':id', Auth.isAuthenticated)
     public async fetchEntity(req: Request, res: Response) {
         const entity = await this.service.one({ _id: req.params.id } as any);
@@ -57,4 +86,20 @@ export class CrudRouter<T> {
         response.count = entites.length;
         res.status(response.code).json(response);
     }
+
+    private _checkIfIdsIsValid(ids: any[]) {
+        if (AppUtils.not(ids) || AppUtils.not(AppUtils.hasItemWithin(ids))) {
+            throw new ErrorResponse(translate('please_provide_valid_list_of_ids'));
+        }
+    }
+
+    private paginate() {
+        // limit: {page, size}
+        // sort: {[field]: ESortDirection}
+        // this.service['repo'].model.find({})
+        //     .sort(sort)
+        //     .skip(skip)
+        //     .limit(limit);
+    }
+
 }
