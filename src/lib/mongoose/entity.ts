@@ -9,6 +9,7 @@ export function Entity(
     globalFieldOptions: Exclude<MongooseTypes.FieldOptions, 'type'> = {}
 ) {
     return function(constructor: new (...args: any) => any) {
+        // TODO: use metadata instead of binding the fields to the prototype
         const fields = constructor.prototype.fields;
         Object.keys(fields).forEach((key) => {
             fields[key] = { ...fields[key], ...globalFieldOptions };
@@ -16,6 +17,12 @@ export function Entity(
         const schema = new BaseSchema(fields, options);
         schema.loadClass(constructor);
         Reflect.defineMetadata(generateModelMetadataKey(constructor), model(name, schema), constructor);
+        // return class extends constructor {
+        //     constructor(...args) {
+        //         super(...args);
+        //         return this;
+        //     }
+        // };
     };
 }
 

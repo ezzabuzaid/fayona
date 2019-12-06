@@ -37,9 +37,7 @@ export class CrudService<T> {
                 entity: null
             };
         }
-
         const entity = this.repo.create(body);
-
         const { pre, post } = getHooks(this.options.create);
         await pre(entity);
         await entity.save();
@@ -126,14 +124,13 @@ export class CrudService<T> {
     }
 
     public async one(query: Partial<Body<T>>) {
-        const { post } = getHooks(this.options.one);
         const entity = await this.repo.fetchOne(query);
-        await post(entity);
+        await getHooks(this.options.one).post(entity);
         return entity;
     }
 
-    public async all() {
-        const entites = await this.repo.fetchAll();
+    public async all(query = {}, projection: Projection<T> = {}, options = {}) {
+        const entites = await this.repo.fetchAll(query, projection, options);
         const hook = this.options.all;
         const post = !AppUtils.isNullOrUndefined(hook) ? hook.post : () => null;
         await post(entites);
@@ -141,3 +138,5 @@ export class CrudService<T> {
     }
 
 }
+
+type Projection<T> = Partial<{ [key in keyof Body<T>]: 1 | 0 }>;

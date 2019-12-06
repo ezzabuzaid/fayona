@@ -1,6 +1,5 @@
 import '@test/index';
-import { superAgent } from '@test/supertest';
-import { getUri, UserUtilityFixture, sendRequest } from '@test/fixture';
+import { getUri, sendRequest } from '@test/fixture';
 import { Constants, NetworkStatus } from '@core/helpers';
 import { Body } from '@lib/mongoose';
 import { UsersSchema, ERoles } from './users.model';
@@ -47,6 +46,7 @@ describe('#CREATE USER', () => {
     //     // expect(((res.body) as Body<UsersSchema>).profile).toMatchObject({});
     //     expect(res.status).toBe(NetworkStatus.CREATED);
     // });
+
 });
 
 describe('#GET USER', () => {

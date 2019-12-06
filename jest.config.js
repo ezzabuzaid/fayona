@@ -6,7 +6,7 @@ module.exports = {
   roots: ["./src"],
   transform: { "^.+\\.tsx?$": "ts-jest" },
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
-  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
+  moduleFileExtensions: ["ts", "js", "json", "node"],
   moduleNameMapper,
   testEnvironment: "<rootDir>/src/test/custom-test-env.js",
   // testEnvironment: 'node'

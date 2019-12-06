@@ -1,8 +1,7 @@
 import { HashService, Constants } from '@core/helpers';
-import { BaseModel, Entity, Field } from '@lib/mongoose';
+import { BaseModel, Entity, Field, Body } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
-import { Query, Schema } from 'mongoose';
 import { translate } from '@lib/translation';
 import { AppUtils } from '@core/utils';
 
@@ -15,7 +14,9 @@ export enum ERoles {
 
 @Entity(Constants.Schemas.USERS)
 export class UsersSchema {
-    @Field({ enum: Object.values(ERoles) }) public role: ERoles;
+    @Field({
+        enum: Object.values(ERoles)
+    }) public role: ERoles;
     @Field({
         default: {},
         set: (value) => {
@@ -49,6 +50,7 @@ export class UsersSchema {
     public comparePassword(candidatePassword: string) {
         return HashService.comparePassword(candidatePassword, this.password);
     }
+    constructor(obj: Body<UsersSchema>) { }
 }
 
 export const UsersModel = BaseModel<UsersSchema>(UsersSchema);

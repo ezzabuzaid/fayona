@@ -1,31 +1,100 @@
 import { CrudRouter } from './crud.router';
-import { Router } from '@lib/methods';
 import { CrudService } from './crud.service';
 import { Repo } from './crud.repo';
-import { BaseModel } from '@lib/mongoose';
-import { Schema } from 'mongoose';
-import { Wrapper } from 'app/wrapper';
+import { BaseModel, Document } from '@lib/mongoose';
+import { Schema, Model, model } from 'mongoose';
 import { superAgent } from '@test/index';
 import { NetworkStatus } from '@core/helpers';
+import expressRequestMock from 'express-request-mock';
+import mockingoose from 'mockingoose';
 
-interface ITest {
-    first_name: string;
-    last_name: string;
-}
+// const crud = new CrudRouter(null);
 
-describe('Add router to wrapper', () => {
-    it('Test', () => {
-        // @Router('test')
-        // class TestRouter extends CrudRouter<ITest> {
-        //     constructor() {
-        //         super(new CrudService(new Repo(BaseModel(new Schema()))));
-        //     }
-        // }
-        // Wrapper.registerRouter(TestRouter);
-        expect(true).toBeTruthy();
+const MockCrudService = jest.fn<Partial<CrudService<any>>, ConstructorParameters<typeof CrudService>>(() => ({
+    create: jest.fn(),
+    all: jest.fn()
+}));
+
+describe('#MockService', () => {
+    describe('[ALL]', () => {
+        test('verify that fetch all entites from repo method was called', () => {
+            const MockRepo = jest.fn<Partial<Repo<any>>, ConstructorParameters<typeof Repo>>(() => ({
+                fetchAll: jest.fn().mockImplementation(() => [])
+            }));
+            const repo = new MockRepo(null);
+            const crudService = new CrudService(repo as any);
+            crudService.all({}, {});
+            expect(repo.fetchAll).toHaveBeenCalledWith({}, {}, {});
+        });
+        test('verify that the method will not throw if no hook provided', () => {
+            const MockRepo = jest.fn<Partial<Repo<any>>, ConstructorParameters<typeof Repo>>(() => ({
+                fetchAll: jest.fn().mockImplementation(() => [])
+            }));
+            const crudService = new CrudService(new MockRepo(null) as any);
+            crudService.all();
+            expect(true).toBeTruthy();
+        });
+        test('should invoke the post hook', async () => {
+            const MockRepo = jest.fn<Partial<Repo<any>>, ConstructorParameters<typeof Repo>>(() => ({
+                fetchAll: jest.fn().mockImplementation(() => [])
+            }));
+            const options = {
+                all: {
+                    post: jest.fn()
+                }
+            };
+            const crudService = new CrudService(new MockRepo(null) as any, options);
+            await crudService.all();
+            expect(options.all.post).toHaveBeenCalledWith([]);
+        });
+        test('should return an instance of array (list)', async () => {
+            const MockRepo = jest.fn<Partial<Repo<any>>, ConstructorParameters<typeof Repo>>(() => ({
+                fetchAll: jest.fn().mockImplementation(() => [])
+            }));
+            const crudService = new CrudService(new MockRepo(null) as any);
+            expect(await crudService.all()).toBeInstanceOf(Array);
+        });
+
     });
 });
 
+// describe('#CrudRouter', () => {
+//     test('Test', () => {
+//         const options = { query: { species: 'dog' } }
+
+//         it('returns a 200 response', async () => {
+//             const { res } = await expressRequestMock(crud.createw, options)
+//             expect(res.statusCode).to.equal(200)
+//         });
+//         // @Router('test')
+//         // class TestRouter extends CrudRouter<ITest> {
+//         //     constructor() {
+//         //         super(new CrudService(new Repo(BaseModel(new Schema()))));
+//         //     }
+//         // }
+//         // Wrapper.registerRouter(TestRouter);
+//         expect(true).toBeTruthy();
+//     });
+// });
+
+// describe('#CrudService', () => {
+//     test('Test', () => {
+//         const options = { query: { species: 'dog' } }
+
+//         it('returns a 200 response', async () => {
+//             const { res } = await expressRequestMock(crud.createw, options)
+//             expect(res.statusCode).to.equal(200)
+//         });
+//         // @Router('test')
+//         // class TestRouter extends CrudRouter<ITest> {
+//         //     constructor() {
+//         //         super(new CrudService(new Repo(BaseModel(new Schema()))));
+//         //     }
+//         // }
+//         // Wrapper.registerRouter(TestRouter);
+//         expect(true).toBeTruthy();
+//     });
+// });
 // const ENDPOINT = `/api/${Constants.Endpoints.USERS}`;
 // let user: UserFixture = null;
 // beforeAll(async () => {

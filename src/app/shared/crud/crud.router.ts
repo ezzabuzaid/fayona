@@ -81,7 +81,19 @@ export class CrudRouter<T> {
 
     @Get('', Auth.isAuthenticated)
     public async fetchEntities(req: Request, res: Response) {
-        const entites = await this.service.all();
+        let { page, size, ...sort } = req.query;
+        page = +page;
+        size = +size;
+        // TODO: Check that the sort object has the same properties in <T>
+        if (size === 0) {
+            throw new ErrorResponse(translate('no_size_0'));
+        }
+        const entites = await this.service.all({}, {}, {
+            sort,
+            limit: size,
+            skip: page * size
+        });
+
         const response = new SuccessResponse(entites);
         response.count = entites.length;
         res.status(response.code).json(response);
@@ -91,15 +103,6 @@ export class CrudRouter<T> {
         if (AppUtils.not(ids) || AppUtils.not(AppUtils.hasItemWithin(ids))) {
             throw new ErrorResponse(translate('please_provide_valid_list_of_ids'));
         }
-    }
-
-    private paginate() {
-        // limit: {page, size}
-        // sort: {[field]: ESortDirection}
-        // this.service['repo'].model.find({})
-        //     .sort(sort)
-        //     .skip(skip)
-        //     .limit(limit);
     }
 
 }

@@ -2,7 +2,7 @@ export * from './model';
 export * from './field';
 export * from './entity';
 
-import { Schema, SchemaType, SchemaTypeOpts } from 'mongoose';
+import { Schema, SchemaType, SchemaTypeOpts, Types } from 'mongoose';
 
 export namespace MongooseTypes {
 
@@ -15,8 +15,10 @@ export namespace MongooseTypes {
 
 }
 
-export type OmitProperties<T, P> = Pick<T, { [K in keyof T]: T[K] extends P ? never : K }[keyof T]>;
-export type Body<T> = OmitProperties<T, (...args: any) => any> & {id?: string};
+export type OmitProperties<T, P> = Pick<T, { [key in keyof T]: T[key] extends P ? never : key }[keyof T]>;
+export type CastObjectIDToString<T> = { [key in keyof T]: T[key] extends Types.ObjectId ? string : T[key] };
+export type WithID<T> = { id?: string } & T;
+export type Body<T> = WithID<CastObjectIDToString<OmitProperties<T, (...args: any) => any>>>;
 
 export function generateModelMetadataKey(target: any) {
     return `model:${target.name}`;
