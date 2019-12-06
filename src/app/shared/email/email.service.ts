@@ -17,3 +17,13 @@ export class EmailService {
         return nodemailer.getTestMessageUrl(info);
     }
 }
+
+export function fakeEmail(): Mail.Options {
+    return {
+        from: 'ezzabuzaid@gmail.com',
+        to: 'ezzabuzaid@hotmail.com',
+        subject: 'Nodemailer is unicode friendly ✔',
+        text: 'Hello to myself!',
+        html: `Password rest successfully`
+    };
+}

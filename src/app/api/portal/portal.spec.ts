@@ -2,7 +2,7 @@ import { UsersSchema, ERoles } from '@api/users';
 import { Body } from '@lib/mongoose';
 import { superAgent } from '@test/index';
 import { Constants, NetworkStatus, tokenService } from '@core/helpers';
-import { getUri, generateExpiredToken, UserUtilityFixture } from '@test/fixture';
+import { getUri, generateExpiredToken, UserUtilityFixture, sendRequest } from '@test/fixture';
 import { AppUtils } from '@core/utils';
 import { IRefreshTokenBody } from './portal.routes';
 import { PortalHelper } from './portal.helper';
@@ -53,10 +53,10 @@ describe('Reset password ', () => {
 });
 
 describe('Refresh Token', () => {
-    async function getResponse(invalidToken, token = null) {
-        const req = (await superAgent).post(REFRESH_TOKEN);
-        return req.send({ refreshToken: invalidToken, token } as IRefreshTokenBody);
-    }
+    const getResponse = (invalidToken: string, token: string = null) => {
+        return sendRequest(REFRESH_TOKEN, { refreshToken: invalidToken, token } as IRefreshTokenBody);
+    };
+
     const INVALID_TOKEN = 'invalid.token.refuesed';
     it('should throw if the refresh token is expired', async () => {
         const res = await getResponse(generateExpiredToken());
@@ -66,7 +66,7 @@ describe('Refresh Token', () => {
         const res = await getResponse(INVALID_TOKEN);
         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
     });
-    it('should throw if the refresh token is invalid', async () => {
+    it('should throw if the token is invalid', async () => {
         const res = await getResponse(
             PortalHelper.generateRefreshToken(null),
             INVALID_TOKEN
@@ -80,7 +80,15 @@ describe('Refresh Token', () => {
         );
         expect(res.status).toBe(NetworkStatus.NOT_ACCEPTABLE);
     });
-
+    it('should not throw if the token is expired', async () => {
+        const userUtiltiy = new UserUtilityFixture();
+        await userUtiltiy.createUser();
+        const res = await getResponse(
+            PortalHelper.generateRefreshToken(userUtiltiy.user.id),
+            generateExpiredToken()
+        );
+        expect(res.status).toBe(NetworkStatus.OK);
+    });
     // it.todo('should retrun with valid token and refresh token', async () => {
     //     const userUtility = new UserUtilityFixture();
     //     const user = await userUtility.createUser();

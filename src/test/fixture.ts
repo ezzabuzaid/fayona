@@ -17,7 +17,7 @@ export function generateExpiredToken() {
 }
 
 export class UserUtilityFixture {
-    private user = {
+    public user = {
         id: null,
         token: null
     };

@@ -12,6 +12,7 @@ export namespace Constants {
         public static readonly FORGET_PASSWORD = 'forgetpassword';
         public static readonly RESET_PASSWORD = 'resetpassword';
         public static readonly REFRESH_TOKEN = 'refreshtoken';
+        public static readonly VERIFY_ACCOUNT = 'verifyaccount';
     }
     export class Schemas {
         public static readonly favorites = 'favorites';

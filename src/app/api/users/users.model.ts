@@ -46,11 +46,13 @@ export class UsersSchema {
         ],
         unique: true,
     }) public mobile: string;
-
+    @Field({
+        pure: true,
+        default: true
+    }) public verified: boolean;
     public comparePassword(candidatePassword: string) {
         return HashService.comparePassword(candidatePassword, this.password);
     }
-    constructor(obj: Body<UsersSchema>) { }
 }
 
 export const UsersModel = BaseModel<UsersSchema>(UsersSchema);
