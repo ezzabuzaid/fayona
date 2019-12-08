@@ -30,8 +30,8 @@ del.sync(DIST);
 child_process.spawnSync('tsc', { shell: true });
 
 const ENV = `environment/.env`;
-const ENV_DIST = path.join(DIST, `${ENV}.${env}`);
 const ENV_SRC = path.join(pwd, 'src', `${ENV}.${env}`);
+const ENV_DIST = path.join(DIST, `${ENV}`);
 fs.copyFileSync(ENV_SRC, ENV_DIST);
 
 // const DATA_FOLDER_PATH = 'assets/data';

@@ -70,8 +70,8 @@ export class PortalRoutes {
 
     @Post(Constants.Endpoints.FORGET_PASSWORD)
     public async forgotPassword(req: Request, res: Response) {
-        const { email } = req.body as Body<UsersSchema>;
-        const entity = await throwIfNotExist({ email });
+        const { username } = req.body as Body<UsersSchema>;
+        const entity = await throwIfNotExist({ username });
         const token = tokenService.generateToken({ id: entity.id, role: entity.role }, { expiresIn: '1h' });
         const url = await EmailService.sendEmail(fakeEmail());
         const response = new SuccessResponse({ url });
