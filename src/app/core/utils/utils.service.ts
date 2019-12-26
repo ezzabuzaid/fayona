@@ -104,5 +104,7 @@ export class Singelton {
     }
 }
 
+export type OmitProperties<T, P> = Pick<T, { [key in keyof T]: T[key] extends P ? never : key }[keyof T]>;
 export type PickAttr<T, K extends keyof T> = T[K];
 export type ThenArg<T> = T extends Promise<infer U> ? U : T;
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;

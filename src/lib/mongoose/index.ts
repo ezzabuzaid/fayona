@@ -3,6 +3,7 @@ export * from './field';
 export * from './entity';
 
 import { Schema, SchemaType, SchemaTypeOpts, Types } from 'mongoose';
+import { OmitProperties } from '@core/utils';
 
 export namespace MongooseTypes {
 
@@ -15,7 +16,6 @@ export namespace MongooseTypes {
 
 }
 
-export type OmitProperties<T, P> = Pick<T, { [key in keyof T]: T[key] extends P ? never : key }[keyof T]>;
 export type CastObjectIDToString<T> = { [key in keyof T]: T[key] extends Types.ObjectId ? string : T[key] };
 export type WithID<T> = { id?: string } & T;
 export type Body<T> = WithID<CastObjectIDToString<OmitProperties<T, (...args: any) => any>>>;

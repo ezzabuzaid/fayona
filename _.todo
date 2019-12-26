@@ -1,6 +1,5 @@
 REVIEW Features
 2_ use dependency injection to resolve mongoose models
-32_ Mongoose Query Helpers
 33_ use mongoose plugin to retrive name attribute depend on user language
 
 SECTION ALERTS
@@ -10,9 +9,7 @@ SECTION ALERTS
 4_ attached router method (http method) shouldn't have the same paths, consider make a checker function
 
 TODO
-1_ implement deferent auth strategies
 7_ read all files to get the string in `translate` function and auto export it to json file
-8_ refresh token
 9_ important (curd generator)
 
 SECTION IMPORTANT
@@ -25,18 +22,11 @@ SECTION mongoose model
 1_ add hook decorator
 2_ virtuals
 3_ query helper
-4_ find way to seperate properties from methods in EntitySchema
 
 https://www.npmjs.com/package/injection-js
 web socket class
 
 use http://www.hygen.io/create style for documention section
-
-
-Refactor the "Reactor" class to work with event
-Modify the request interface to be generic in order to give the body type
-Get the type of the decorated attr only
-
 
 
 // import { Schema, model } from "mongoose";
@@ -92,66 +82,3 @@ Get the type of the decorated attr only
  * to procced the operation then
  * it asks the repo to hold the data in the model(database)
  */
-
-
-
-
-// const createDatabaseStatement = 'CREATE DATABASE testDB';
-// const createTableStatement = `
-// CREATE TABLE testTable (
-//         id int UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-//         title VARCHAR(255) NOT NULL,
-//         body VARCHAR(255) NOT NULL
-// )`;
-
-// router.use('/user', function (req, res, next) {
-//     console.log('Request URL:', req.originalUrl)
-//     next()
-//   }, function (req, res, next) {
-//     console.log('Request Type:', req.method)
-//     next()
-//   })
-// Show the request info for any type of http method that call user
-// ex:: cound how many user middleware called
-
-// app.use(function (req, res, next) {
-//     console.log('Time:', Date.now())
-//     next()
-// })
-// Called every time (app here is application instance)
-
-// app.use('/user/:id', function (req, res, next) {
-//     console.log('Request Type:', req.method)
-//     next()
-// })
-// Show the request info for any type of http method that call user
-// (app here is application instance)
-
-// to escape the next middleware call next('route')
-// will escape the all middleware but next() will continue to next middleware at specific point
-
-// This matching all route middleware under route instance and prefixed with api
-// router.all('/api/*', requireAuthentication);
-
-// this will only be invoked if the path starts with /bar from the mount point
-// router.use('/bar', function (req, res, next) {
-// ... maybe some additional /bar logging ...
-//     next();
-// });
-
-// Intercept id param under route instance and called once at a time (intercept id param)
-
-// router.param('id', function (req, res, next, id) {
-//     console.log('CALLED ONLY ONCE');
-//     next();
-// });
-
-// router.get('/user/:id', function (req, res, next) {
-//     console.log('although this matches');
-//     next();
-// });
-
-// router.get('/user/:id', function (req, res) {
-//     console.log('and this matches too');
-//     res.end();
-// });
