@@ -8,6 +8,7 @@ import helmet = require('helmet');
 import morgan = require('morgan');
 import { Wrapper } from './wrapper';
 import path from 'path';
+import cors from 'cors';
 
 const log = new Logger('Application instance');
 
@@ -22,25 +23,11 @@ export class Application {
     private uploadDirectory = path.join(process.cwd(), 'uploads');
     constructor() {
         this.configure();
-        this.allowCors();
         this.setupLocalization();
     }
 
     get application() {
         return this._application;
-    }
-
-    /**
-     * allow cross origin restriction
-     * see the difference in cors package
-     */
-    private allowCors() {
-        this.application.use((req, res, next) => {
-            res.header('Access-Control-Allow-Origin', '*');
-            res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, PATCH, OPTIONS');
-            res.header('Access-Control-Allow-Headers', 'Origin, Authorization, X-Requested-With, Content-Type, Accept');
-            next();
-        });
     }
 
     /**
@@ -55,6 +42,7 @@ export class Application {
         });
 
         this.application
+            .use(cors())
             .use(express.json())
             .use(express.urlencoded({ extended: true }))
             .use(morgan('dev'))
