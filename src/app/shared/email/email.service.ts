@@ -18,11 +18,14 @@ export class EmailService {
     }
 }
 
-export function fakeEmail(): Mail.Options {
+export function fakeEmail(token = ''): Mail.Options {
     return {
         from: 'ezzabuzaid@gmail.com',
         to: 'ezzabuzaid@hotmail.com',
-        subject: 'Nodemailer is unicode friendly ✔',
+        subject: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
+        Please click on the following link, or paste this into your browser to complete the process:\n\n
+        http://website.com/reset/${token}\n\n
+        If you did not request this, please ignore this email and your password will remain unchanged.\n`,
         text: 'Hello to myself!',
         html: `Password rest successfully`
     };
