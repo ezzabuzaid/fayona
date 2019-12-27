@@ -82,7 +82,8 @@ describe('Refresh Token', () => {
     });
     it('should not throw if the token is expired', async () => {
         const userUtiltiy = new UserUtilityFixture();
-        await userUtiltiy.createUser();
+        const user = await userUtiltiy.createUser();
+        console.log(user);
         const res = await getResponse(
             PortalHelper.generateRefreshToken(userUtiltiy.user.id),
             generateExpiredToken()

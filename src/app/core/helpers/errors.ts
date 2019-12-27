@@ -3,6 +3,7 @@ import { Logger } from '@core/utils';
 import { translate } from '@lib/translation';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { NetworkStatus } from './network-status';
+import { sendResponse } from './response.model';
 
 const log = new Logger('Errors');
 
@@ -73,7 +74,7 @@ export class ErrorHandling {
                 break;
 
         }
-        res.status(response.code).json(response);
+        sendResponse(res, response)
         return;
     }
 

@@ -3,12 +3,21 @@ import { Body, Document } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 import { Repo } from './crud.repo';
 
-function getHooks<T>(options: Partial<ICrudHooks<T>>) {
+function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHooks<T>]: any } {
     return {
         pre: !AppUtils.isNullOrUndefined(options && options.pre) ? options.pre : (...args: any) => null,
         post: !AppUtils.isNullOrUndefined(options && options.post) ? options.post : (...args: any) => null,
+        onSuccess: !AppUtils.isNullOrUndefined(options && options.onSuccess) ? options.onSuccess : (...args: any) => null
     };
 }
+
+class Result {
+    constructor(
+        public hasError = false,
+        public data = null
+    ) { }
+}
+
 
 export class CrudService<T> {
 
@@ -19,10 +28,10 @@ export class CrudService<T> {
 
     private async check(body) {
         if (this.options.unique) {
-            const opertaions = this.options.unique.map(async (field) => {
-                return !!(await this.repo.fetchOne({ [field]: body[field] } as any));
-            });
-            return (await Promise.all(opertaions)).every((operation) => !!operation);
+            const opertaions = this.options.unique.map((field) => this.repo.fetchOne({ [field]: body[field] } as any));
+            const isExist = (await Promise.all(opertaions))
+                .every((operation) => AppUtils.isNullOrUndefined(operation));
+            return AppUtils.not(isExist);
         }
         return false;
     }
@@ -32,40 +41,31 @@ export class CrudService<T> {
 
         const check = await this.check(body);
         if (check) {
-            return {
-                exist: true,
-                entity: null
-            };
+            return new Result(true, 'entity_exist');
         }
+
         const entity = this.repo.create(body);
-        const { pre, post } = getHooks(this.options.create);
+        const { pre, post, onSuccess } = getHooks(this.options.create);
         await pre(entity);
         await entity.save();
         await post(entity);
 
-        return {
-            exist: false,
-            entity
-        };
+        return new Result(false, { id: entity.id });
     }
 
     public async delete(query: Partial<Body<T>>) {
         const entity = await this.repo.fetchOne(query);
         if (!entity) {
-            return null;
+            return new Result(true, 'entity_not_exist');
         }
+
         const { pre, post } = getHooks(this.options.delete);
         await pre(entity);
         await entity.remove();
         await post(entity);
 
-        return entity;
+        return new Result();
     }
-
-    // NOTE: Not used, for the sake of hook in write operations
-    // public bulkDelete(ids: string[]) {
-    //     return this.repo.model.bulkWrite(ids.map((_id) => ({ deleteOne: { filter: { _id } } })));
-    // }
 
     // TODO: update is only for partials update, refactor it to agree with is
     // TODO: do `put` is only for replace the whole document with new one
@@ -73,15 +73,12 @@ export class CrudService<T> {
     public async update(query: { body: Partial<Body<T>>, id: string }) {
         const entity = await this.repo.fetchById(query.id);
         if (!entity) {
-            return null;
+            return new Result(true, 'entity_not_exist');
         }
-        const check = await this.check(query.body);
 
+        const check = await this.check(query.body);
         if (check) {
-            return {
-                exist: true,
-                entity: null
-            };
+            return new Result(true, 'entity_exist');
         }
 
         const { pre, post } = getHooks(this.options.update);
@@ -89,7 +86,8 @@ export class CrudService<T> {
         entity.set(query.body);
         await entity.save();
         await post(entity);
-        return entity;
+
+        return new Result();
     }
 
     public async bulkUpdate(ids: Array<Body<T>>) {

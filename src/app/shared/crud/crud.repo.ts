@@ -1,6 +1,8 @@
 import { Model } from 'mongoose';
 import { Document, Body } from '@lib/mongoose';
 
+
+// TODO: Before any query or write check the body to met the model to avoid [injections] this should be done in the repo.
 export class Repo<T> {
     constructor(
         public model: Model<Document<T>>

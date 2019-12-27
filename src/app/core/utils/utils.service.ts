@@ -94,6 +94,26 @@ export class AppUtils {
         }, {} as any);
     }
 
+    static generateAlphabeticString(stringLength = 5) {
+        let randomString = '';
+        let randomAscii: number;
+        const asciiLow = 65;
+        const asciiHigh = 90;
+        for (let i = 0; i < stringLength; i++) {
+            randomAscii = Math.floor((Math.random() * (asciiHigh - asciiLow)) + asciiLow);
+            randomString += String.fromCharCode(randomAscii);
+        }
+        return randomString;
+    }
+
+    static generateRandomString(): any {
+        return Math.random().toString(36).substr(5, 5);
+    }
+
+    static flatArray(data: any[]) {
+        return data.reduce((a, b) => a.concat(b), []);
+    }
+
 }
 
 // NOTE  Utility class to be extended, so when you call build it will construct an instance from that class

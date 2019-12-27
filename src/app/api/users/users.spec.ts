@@ -1,5 +1,5 @@
 import '@test/index';
-import { getUri, sendRequest } from '@test/fixture';
+import { getUri, sendRequest, deleteRequest } from '@test/fixture';
 import { Constants, NetworkStatus } from '@core/helpers';
 import { Body } from '@lib/mongoose';
 import { UsersSchema, ERoles } from './users.model';
@@ -7,33 +7,44 @@ import { AppUtils } from '@core/utils';
 
 const ENDPOINT = getUri(Constants.Endpoints.USERS);
 
-const user = {
-    email: `${Math.log2(Math.random())}test@create.com`,
-    mobile: `${Math.round(Math.random())}792807794`,
+const user = (body: Partial<Body<UsersSchema>> = {}) => ({
+    email: `${AppUtils.generateAlphabeticString()}@create.com`,
+    mobile: `+962792${Math.floor(Math.random() * 899999 + 100000)}`,
     password: '123456789',
     profile: null,
     role: ERoles.ADMIN,
-    username: `${Math.log2(Math.random())}TestCreate`
-} as Body<UsersSchema>;
+    username: `${AppUtils.generateAlphabeticString()}TestCreate`,
+    ...body
+} as Body<UsersSchema>);
 
-// NOTE test the fail, don't test the success
+// NOTE test the fail then test the success
 describe('#CREATE USER', () => {
+
     test('Fail if the user exist before', async () => {
-        await sendRequest(ENDPOINT, user);
-        const res2 = await sendRequest(ENDPOINT, user);
+        const tempUser = await sendRequest(ENDPOINT, user());
+        const res2 = await sendRequest(ENDPOINT, user());
         expect(res2.status).toBe(NetworkStatus.BAD_REQUEST);
     });
-    test('Special Char is not allowed', async () => {
-        const res = await sendRequest(ENDPOINT, AppUtils.assignObject({}, user, { username: 'testCreate2#$' }));
+    test('should fail if username contains special char', async () => {
+        const res = await sendRequest(ENDPOINT, user({ username: 'testCreate2#$' }));
         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
     });
-    test('Mobile number shouldnt be wrong', async () => {
-        const res = await sendRequest(ENDPOINT, AppUtils.assignObject({}, user, { mobile: '079280779' }));
+    test('should fail if mobile number is wrong', async () => {
+        const res = await sendRequest(ENDPOINT, user({ mobile: '0792807794' }));
         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
     });
-    test('Fail if user role is not one of supported roles', async () => {
-        const res = await sendRequest(ENDPOINT, AppUtils.assignObject({}, user, { role: 100000 }));
+    test('should pass if mobile number is correct', async () => {
+        const res = await sendRequest(ENDPOINT, user({ mobile: '+962792807794' }));
+        expect(res.status).toBe(NetworkStatus.CREATED);
+    });
+    test('should fail if the role is not one of supported roles', async () => {
+        const res = await sendRequest(ENDPOINT, user({ role: 100000 }));
         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
+    });
+    test('should pass if the role is one of supported roles', async () => {
+        const res = await sendRequest(ENDPOINT, user({ role: ERoles.ADMIN }));
+        expect(res.status).toBe(NetworkStatus.CREATED);
+
     });
 
     test.todo('user should have a defualt profile equal to empty {}');
@@ -50,5 +61,6 @@ describe('#CREATE USER', () => {
 });
 
 describe('#GET USER', () => {
-    test.todo(`user body shouldn't have a password`);
+    test.todo(`user body should contain only id`);
+    test.todo(`make sure that the user is not created if the email is exist or username or mobile`);
 });

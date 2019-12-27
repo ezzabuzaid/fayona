@@ -19,7 +19,7 @@ export class UsersSchema {
     }) public role: ERoles;
     @Field({
         default: {},
-        set: (value) => {
+        set: (value: string) => {
             return AppUtils.isNullOrUndefined(value) ? {} : value;
         }
     }) public profile: {}; // TODO: update this field to be ProfileSchema instead
@@ -48,8 +48,9 @@ export class UsersSchema {
     }) public mobile: string;
     @Field({
         pure: true,
-        default: true
+        default: false
     }) public verified: boolean;
+
     public comparePassword(candidatePassword: string) {
         return HashService.comparePassword(candidatePassword, this.password);
     }

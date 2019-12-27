@@ -15,6 +15,7 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
         const router = expressRouter(options);
         const routerUri = path.normalize(path.join('/', baseUri, '/'));
         const instance = new constructor();
+
         Reflect.getMetadataKeys(constructor)
             .forEach((key: string) => {
                 if (key.startsWith(metadata_key)) {
@@ -23,7 +24,7 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
                     if (metadata) {
                         const { handler, method, middlewares, uri } = metadata;
                         const normalizedURI = path.normalize(path.join('/', uri));
-                        router[method](normalizedURI, ErrorHandling.wrapRoutes(...middlewares, function() {
+                        router[method](normalizedURI, ErrorHandling.wrapRoutes(...middlewares, function () {
                             return handler.apply(instance, arguments);
                         }));
                     }

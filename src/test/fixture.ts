@@ -11,6 +11,9 @@ export async function sendRequest<T>(endpoint: string, body: T) {
     const req = (await superAgent).post(endpoint);
     return await req.send(body as any);
 }
+export async function deleteRequest(endpoint: string, id: string) {
+    return (await superAgent).delete(endpoint);
+}
 
 export function generateExpiredToken() {
     return tokenService.generateToken({} as any, { expiresIn: '-10s' });
@@ -23,9 +26,7 @@ export class UserUtilityFixture {
     };
     private usersUri = getUri(Constants.Endpoints.USERS);
 
-    constructor(seed = {}) {
-
-    }
+    constructor(seed = {}) { }
 
     public async  createUser(body: Partial<Body<UsersSchema>> = {}) {
         const res = await sendRequest<Body<UsersSchema>>(this.usersUri, {
@@ -33,12 +34,13 @@ export class UserUtilityFixture {
             password: '123456789',
             username: `test`,
             mobile: '+962792807794',
-            profile: null,
             role: ERoles.SUPERADMIN,
+            profile: null,
+            verified: null,
             ...body
         });
         console.log(res.body);
-        this.user.id = res.body.data._id;
+        this.user.id = res.body.data.id;
         this.user.token = tokenService.generateToken(this.user.id);
         return res;
     }

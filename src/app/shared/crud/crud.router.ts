@@ -2,7 +2,7 @@ import { CrudService } from './crud.service';
 import { Post, Put, Delete, Get } from '@lib/methods';
 import { Auth } from '@api/portal';
 import { Request, Response } from 'express';
-import { SuccessResponse, NetworkStatus, ErrorResponse } from '@core/helpers';
+import { SuccessResponse, NetworkStatus, ErrorResponse, sendResponse } from '@core/helpers';
 import { translate } from '@lib/translation';
 import { AppUtils } from '@core/utils';
 import { Body } from '@lib/mongoose';
@@ -15,31 +15,29 @@ export class CrudRouter<T> {
     @Post('', Auth.isAuthenticated)
     public async create(req: Request, res: Response) {
         const result = await this.service.create(req.body);
-        if (result.exist) {
-            throw new ErrorResponse(translate('entity_exist'));
+        if (result.data) {
+            throw new ErrorResponse(result.data);
         }
-        const response = new SuccessResponse(result.entity, translate('success'), NetworkStatus.CREATED);
-        res.status(response.code).json(response);
+        const response = new SuccessResponse(result.data, translate('success'), NetworkStatus.CREATED);
+        sendResponse(res, response);
     }
 
     @Put(':id', Auth.isAuthenticated)
     public async update(req: Request, res: Response) {
-        const entity = await this.service.update({ body: req.body, id: req.params.id });
-        if (!entity) {
-            throw new ErrorResponse(translate('entity_not_found'));
+        const result = await this.service.update({ body: req.body, id: req.params.id });
+        if (!result.hasError) {
+            throw new ErrorResponse(result.data);
         }
-        const response = new SuccessResponse(null);
-        res.status(response.code).json(response);
+        sendResponse(res, new SuccessResponse(result.data));
     }
 
     @Delete(':id', Auth.isAuthenticated)
     public async delete(req: Request, res: Response) {
-        const entity = await this.service.delete({ _id: req.params.id } as any);
-        if (!entity) {
-            throw new ErrorResponse(translate('entity_not_found'));
+        const result = await this.service.delete({ _id: req.params.id } as any);
+        if (!result.hasError) {
+            throw new ErrorResponse(result.data);
         }
-        const response = new SuccessResponse(null);
-        res.status(response.code).json(response);
+        sendResponse(res, new SuccessResponse(result.data));
     }
 
     @Delete('', Auth.isAuthenticated)

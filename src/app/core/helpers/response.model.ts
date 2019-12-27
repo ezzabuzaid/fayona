@@ -1,12 +1,13 @@
 import { NetworkStatus } from '@core/helpers/network-status';
 import { translate } from '@lib/translation';
+import { Response } from 'express';
 
-abstract class Response extends Error {
+export abstract class HttpResponse extends Error {
     public status: string;
     public code: number;
 }
 
-export class SuccessResponse<T> extends Response {
+export class SuccessResponse<T> extends HttpResponse {
     [x: string]: any;
     public name = SuccessResponse.name;
     constructor(public data: T, message = translate('success'), code = NetworkStatus.OK, status?: string) {
@@ -18,12 +19,12 @@ export class SuccessResponse<T> extends Response {
 
 }
 
-export class ErrorResponse extends Response {
+export class ErrorResponse extends HttpResponse {
     public name = ErrorResponse.name;
     public error: string;
     constructor(message: string, code = NetworkStatus.BAD_REQUEST) {
         super();
-        this.message = message;
+        this.message = typeof message === 'string' ? translate(message) : message;
         this.code = code;
     }
 
@@ -31,4 +32,9 @@ export class ErrorResponse extends Response {
         return NetworkStatus.getStatusText(this.code);
     }
 
+}
+
+
+export function sendResponse(res: Response, response: HttpResponse) {
+    return res.status(response.code).json(response);
 }

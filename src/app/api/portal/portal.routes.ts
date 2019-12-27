@@ -26,10 +26,9 @@ export class PortalRoutes {
         const entity = await throwIfNotExist({ username }, 'wrong_credintals');
         const isPasswordEqual = await entity.comparePassword(password);
         if (isPasswordEqual) {
-            // TODO: replace the response with login response and not user info
             // TODO: save the device id in token so when the user request refresh token,
             // we can now that the request coming from the right user
-            const response = new SuccessResponse(entity);
+            const response = new SuccessResponse(null);
             response.refreshToken = PortalHelper.generateRefreshToken(entity.id);
             response.token = PortalHelper.generateToken(entity.id, entity.role);
             return res.status(response.code).json(response);
