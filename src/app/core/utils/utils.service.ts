@@ -94,7 +94,7 @@ export class AppUtils {
         }, {} as any);
     }
 
-    static generateAlphabeticString(stringLength = 5) {
+    public static generateAlphabeticString(stringLength = 5) {
         let randomString = '';
         let randomAscii: number;
         const asciiLow = 65;
@@ -106,11 +106,11 @@ export class AppUtils {
         return randomString;
     }
 
-    static generateRandomString(): any {
+    public static generateRandomString(): any {
         return Math.random().toString(36).substr(5, 5);
     }
 
-    static flatArray(data: any[]) {
+    public static flatArray(data: any[]) {
         return data.reduce((a, b) => a.concat(b), []);
     }
 

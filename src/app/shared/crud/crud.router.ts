@@ -15,17 +15,17 @@ export class CrudRouter<T> {
     @Post('', Auth.isAuthenticated)
     public async create(req: Request, res: Response) {
         const result = await this.service.create(req.body);
-        if (result.data) {
+        if (result.hasError) {
             throw new ErrorResponse(result.data);
         }
-        const response = new SuccessResponse(result.data, translate('success'), NetworkStatus.CREATED);
+        const response = new SuccessResponse(result.data, 'success', NetworkStatus.CREATED);
         sendResponse(res, response);
     }
 
     @Put(':id', Auth.isAuthenticated)
     public async update(req: Request, res: Response) {
         const result = await this.service.update({ body: req.body, id: req.params.id });
-        if (!result.hasError) {
+        if (result.hasError) {
             throw new ErrorResponse(result.data);
         }
         sendResponse(res, new SuccessResponse(result.data));
@@ -34,7 +34,7 @@ export class CrudRouter<T> {
     @Delete(':id', Auth.isAuthenticated)
     public async delete(req: Request, res: Response) {
         const result = await this.service.delete({ _id: req.params.id } as any);
-        if (!result.hasError) {
+        if (result.hasError) {
             throw new ErrorResponse(result.data);
         }
         sendResponse(res, new SuccessResponse(result.data));

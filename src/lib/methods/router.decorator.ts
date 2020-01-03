@@ -24,7 +24,7 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
                     if (metadata) {
                         const { handler, method, middlewares, uri } = metadata;
                         const normalizedURI = path.normalize(path.join('/', uri));
-                        router[method](normalizedURI, ErrorHandling.wrapRoutes(...middlewares, function () {
+                        router[method](normalizedURI, ErrorHandling.wrapRoutes(...middlewares, function() {
                             return handler.apply(instance, arguments);
                         }));
                     }

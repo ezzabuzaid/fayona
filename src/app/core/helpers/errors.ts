@@ -74,7 +74,7 @@ export class ErrorHandling {
                 break;
 
         }
-        sendResponse(res, response)
+        sendResponse(res, response);
         return;
     }
 
