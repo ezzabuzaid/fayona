@@ -1,7 +1,7 @@
 import { HashService, Constants } from '@core/helpers';
 import { BaseModel, Entity, Field, Body } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
+import { parsePhoneNumberFromString } from 'libphonenumber-js/max';
 import { translate } from '@lib/translation';
 import { AppUtils } from '@core/utils';
 
