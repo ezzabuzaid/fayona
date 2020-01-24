@@ -64,8 +64,7 @@ export class PortalRoutes {
 
     @Post(Constants.Endpoints.LOGOUT, Auth.isAuthenticated)
     public async logout(req: Request, res: Response) {
-        const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
-        await sessionsService.deActivate({ device_uuid });
+        await sessionsService.deActivate({ device_uuid: req.header(ApplicationConstants.deviceIdHeader) });
         const response = new SuccessResponse(null);
         res.status(response.code).json(response);
     }
@@ -80,9 +79,8 @@ export class PortalRoutes {
             await tokenService.decodeToken(token);
         } catch (error) {
             if (error instanceof TokenExpiredError) {
-                const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
                 const session = await sessionsService.getActiveSession({
-                    device_uuid,
+                    device_uuid: req.header(ApplicationConstants.deviceIdHeader),
                     user_id: decodedRefreshToken.id
                 });
                 if (AppUtils.not(session)) {

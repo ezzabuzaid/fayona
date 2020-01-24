@@ -2,6 +2,8 @@ import { superAgent } from './supertest';
 import { Constants, tokenService } from '@core/helpers';
 import { UsersSchema, ERoles } from '@api/users';
 import { Body } from '@lib/mongoose';
+import * as faker from 'faker';
+import { ValidationPatterns } from '@shared/common';
 
 export function getUri(value: string) {
     return `/api/${value}`;
@@ -11,8 +13,13 @@ export async function sendRequest<T>(endpoint: string, body: T) {
     const req = (await superAgent).post(endpoint);
     return req.send(body as any);
 }
+
 export async function deleteRequest(endpoint: string, id: string) {
     return (await superAgent).delete(endpoint);
+}
+
+export async function getRequest(endpoint: string) {
+    return (await superAgent).get(endpoint);
 }
 
 export function generateExpiredToken() {
@@ -55,4 +62,10 @@ export class UserUtilityFixture {
 
 export function generatePhoneNumber(dialCode = 962) {
     return `+${dialCode}792${Math.floor(Math.random() * 899999 + 100000)}`;
+}
+
+export function generateUsername() {
+    const username = faker.internet.userName();
+    const noSpecialChar = ValidationPatterns.NoSpecialChar.test(username);
+    return noSpecialChar ? username : generateUsername();
 }

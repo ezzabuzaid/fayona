@@ -5,6 +5,9 @@ export type Type<T> = new (...args: any) => T;
 export type Parameter<T extends (args: any) => any> = T extends (args: infer P) => any ? P : never;
 
 export class AppUtils {
+    public static isTrue(value: any) {
+        return !!value;
+    }
     public static not(value: any) {
         return !!!value;
     }

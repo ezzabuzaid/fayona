@@ -2,6 +2,7 @@ import { ICrudOptions, ICrudHooks } from './crud.options';
 import { Body, Document, WithID } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 import { Repo } from './crud.repo';
+import { translate } from '@lib/translation';
 
 function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHooks<T>]: any } {
     return {
@@ -29,18 +30,22 @@ export class CrudService<T> {
 
     private async isEntityExist(body) {
         if (AppUtils.hasItemWithin(this.options.unique)) {
-            const opertaions = this.options.unique.map((field) => this.repo.fetchOne({ [field]: body[field] } as any));
-            const isExist = (await Promise.all(opertaions))
-                .every((operation) => AppUtils.isNullOrUndefined(operation));
-            return AppUtils.not(isExist);
+            const fetchOne = (field) => this.repo.fetchOne({ [field]: body[field] } as any);
+            for (let index = 0; index < this.options.unique.length; index++) {
+                const field = this.options.unique[index];
+                const record = await fetchOne(field);
+                if (AppUtils.isTrue(record)) {
+                    return new Result(true, this.options.unique[index]);
+                }
+            }
         }
-        return false;
+        return new Result(false);
     }
 
     public async create(body: Body<T>) {
         const isExist = await this.isEntityExist(body);
-        if (isExist) {
-            return new Result(true, 'entity_exist');
+        if (isExist.hasError) {
+            return new Result(true, translate(`${isExist.data}_entity_exist`));
         }
 
         const entity = this.repo.create(body);
@@ -73,8 +78,8 @@ export class CrudService<T> {
         }
 
         const isExist = await this.isEntityExist(body);
-        if (isExist) {
-            return new Result(true, 'entity_exist');
+        if (isExist.hasError) {
+            return new Result(true, translate(`${isExist.data}_entity_exist`));
         }
 
         const { pre, post } = getHooks(this.options.update);
@@ -92,8 +97,8 @@ export class CrudService<T> {
         }
 
         const isExist = await this.isEntityExist(body);
-        if (isExist) {
-            return new Result(true, 'entity_exist');
+        if (isExist.hasError) {
+            return new Result(true, translate(`${isExist.data}_entity_exist`));
         }
 
         const { pre, post } = getHooks(this.options.update);

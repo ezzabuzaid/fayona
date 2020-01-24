@@ -1,5 +1,5 @@
-import { tokenService } from '@core/helpers';
-import { Logger } from '@core/utils';
+import { tokenService, ErrorResponse, NetworkStatus } from '@core/helpers';
+import { Logger, AppUtils } from '@core/utils';
 import { NextFunction, Request, Response } from 'express';
 import { sessionsService } from '@api/sessions';
 import { ApplicationConstants } from '@core/constants';
@@ -12,8 +12,14 @@ export class Auth {
         try {
             log.info('Start checking JWT');
             await tokenService.decodeToken(req.headers.authorization);
+            const session = await sessionsService.getActiveSession({
+                device_uuid: req.header(ApplicationConstants.deviceIdHeader)
+            });
+            if (AppUtils.isNullOrUndefined(session) || AppUtils.not(session.active)) {
+                throw new ErrorResponse('not_authorized', NetworkStatus.UNAUTHORIZED);
+            }
         } catch (error) {
-            await sessionsService.deActivate(req.header(ApplicationConstants.deviceIdHeader));
+            await sessionsService.deActivate({ device_uuid: req.header(ApplicationConstants.deviceIdHeader) });
             throw error;
         }
         next();

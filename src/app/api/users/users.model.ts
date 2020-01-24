@@ -14,7 +14,11 @@ export enum ERoles {
 @Entity(Constants.Schemas.USERS)
 export class UsersSchema {
     @Field({
-        enum: Object.values(ERoles)
+        enum: [1, 2, 3, 4, 5],
+        default: ERoles.ADMIN,
+        validate: (value: ERoles) => {
+            return AppUtils.isTrue(ERoles[value]);
+        }
     }) public role: ERoles;
     @Field({
         default: {},
@@ -28,7 +32,7 @@ export class UsersSchema {
         set: (value: string) => HashService.hashSync(value)
     }) public password: string;
     @Field({
-        match: [ValidationPatterns.NoSpecialChar, 'no_speical_char'],
+        match: [ValidationPatterns.NoSpecialChar, 'wrong_username'],
         unique: true,
     }) public username: string;
     @Field({
@@ -41,13 +45,18 @@ export class UsersSchema {
                 const phonenumber = parsePhoneNumberFromString(value);
                 return !!phonenumber && phonenumber.isValid();
             },
-            'wrong_mobile_number'
+            'wrong_mobile'
         ],
         unique: true,
     }) public mobile: string;
     @Field({
-        pure: true,
-        default: false
+        default: false,
+        set: (value: any) => {
+            if (typeof value !== 'boolean') {
+                return false;
+            }
+            return value;
+        }
     }) public verified: boolean;
 
     public comparePassword(candidatePassword: string) {

@@ -7,7 +7,10 @@ export class SessionService extends CrudService<SessionSchema> {
 
     public async deActivate(query: Partial<WithID<Body<SessionSchema>>>) {
         const record = await this.getActiveSession(query);
-        return this.setAsDeactive(record);
+        // TODO check if there's an active session
+        if (record) {
+            return this.setAsDeactive(record);
+        }
     }
 
     public getActiveSession(query: Partial<WithID<Body<SessionSchema>>>) {
