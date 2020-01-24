@@ -66,11 +66,11 @@ export class ErrorHandling {
                 break;
             case Errors.TokenExpiredError:
                 response.message = translate('jwt_expired');
-                response.code = NetworkStatus.BAD_REQUEST;
+                response.code = NetworkStatus.UNAUTHORIZED;
                 break;
             case Errors.JsonWebTokenError:
                 response.message = translate('jwt_expired');
-                response.code = NetworkStatus.BAD_REQUEST;
+                response.code = NetworkStatus.UNAUTHORIZED;
                 break;
 
         }

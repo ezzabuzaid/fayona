@@ -1,4 +1,4 @@
-import { ErrorResponse, SuccessResponse, tokenService, Constants, NetworkStatus } from '@core/helpers';
+import { ErrorResponse, SuccessResponse, tokenService, Constants, NetworkStatus, IRefreshTokenClaim } from '@core/helpers';
 import { Post, Router } from '@lib/methods';
 import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
@@ -10,6 +10,13 @@ import { AppUtils } from '@core/utils';
 import { PortalHelper } from './portal.helper';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { Auth } from './auth';
+import { sessionsService } from '@api/sessions';
+import { ApplicationConstants } from '@core/constants';
+
+export interface ILogin {
+    username: string;
+    password: string;
+}
 
 export interface IRefreshTokenBody {
     token: string;
@@ -21,42 +28,71 @@ export class PortalRoutes {
 
     @Post(Constants.Endpoints.LOGIN)
     public async login(req: Request, res: Response) {
-        // TODO: save the user device, so the next time when he logged from another time you'll notify him
-        const { username, password } = req.body as Body<UsersSchema>;
+        // TODO: send an email to user to notify him about login attempt.
+
+        const { username, password } = req.body as ILogin;
+        const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
+
+        // STUB: test device_uuid
+        if (AppUtils.not(device_uuid)) {
+            throw new ErrorResponse('not_allowed');
+        }
+
+        // STUB it should throw if username is falsy type or if it's not in database
         const entity = await throwIfNotExist({ username }, 'wrong_credintals');
+        // STUB it should pass if password is right
         const isPasswordEqual = await entity.comparePassword(password);
         if (isPasswordEqual) {
-            // TODO: save the device id in token so when the user request refresh token,
-            // we can now that the request coming from the right user
+
+            // STUB it should create a session entity
+            await sessionsService.create({
+                device_uuid,
+                active: true,
+                user_id: entity.id
+            });
+
             const response = new SuccessResponse(null);
+            // STUB test the refreshToken claims should have only entity id with expire time 12h
             response.refreshToken = PortalHelper.generateRefreshToken(entity.id);
+            // STUB test token claims must have only entity id and role with 30min expire time
             response.token = PortalHelper.generateToken(entity.id, entity.role);
             return res.status(response.code).json(response);
         }
+        // STUB it should throw if password was wrong
         await throwIfNotExist(null, 'wrong_credintals');
+    }
+
+    @Post(Constants.Endpoints.LOGOUT, Auth.isAuthenticated)
+    public async logout(req: Request, res: Response) {
+        const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
+        await sessionsService.deActivate({ device_uuid });
+        const response = new SuccessResponse(null);
+        res.status(response.code).json(response);
     }
 
     @Post(Constants.Endpoints.REFRESH_TOKEN)
     public async refreshToken(req: Request, res: Response) {
-        // REVIEW bad practice, anyone can get the tokens and request for another access
-        // token which is wrong in terms of authorization
-        // so the solution is to sessionize the user in the server in a way that all the
-        // other instances will now it, (new column in users collection)
         const { token, refreshToken } = req.body as IRefreshTokenBody;
-        // NOTE: if it's not valid it will implicity thrown an error
-        const decodedRefreshToken = await tokenService.decodeToken(refreshToken);
+        // NOTE: if it was invalid or expired it will implicity thrown an error
+        const decodedRefreshToken = await tokenService.decodeToken<IRefreshTokenClaim>(refreshToken);
 
         try {
             await tokenService.decodeToken(token);
         } catch (error) {
             if (error instanceof TokenExpiredError) {
-                // TODO: find a way to know that the token is really for this user (unique device id) generate one in
-                // login and save it in browser
+                const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
+                const session = await sessionsService.getActiveSession({
+                    device_uuid,
+                    user_id: decodedRefreshToken.id
+                });
+                if (AppUtils.not(session)) {
+                    throw new ErrorResponse(translate('not_authorized'), NetworkStatus.UNAUTHORIZED);
+                }
+
                 const user = await throwIfNotExist({ _id: decodedRefreshToken.id });
-                // TODO: invalidate the refresh token directly after new one is generated
                 const response = new SuccessResponse<IRefreshTokenBody>({
                     token: PortalHelper.generateToken(user.id, user.role),
-                    refreshToken: PortalHelper.generateRefreshToken(user.id)
+                    refreshToken
                 });
                 return res.status(response.code).json(response);
             } else {
@@ -85,7 +121,7 @@ export class PortalRoutes {
         // if the procces faild 3 times, the account should be locked, and he need to call the support for that
         const { password } = req.body as Body<UsersSchema>;
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        await usersService.update({ id: decodedToken.id, body: { password } });
+        await usersService.update(decodedToken.id, { password });
         const response = new SuccessResponse(null);
         await EmailService.sendEmail(fakeEmail());
         res.status(response.code).json(response);
@@ -96,7 +132,7 @@ export class PortalRoutes {
     public async verify(req: Request, res: Response) {
         const { token } = req.query;
         const decodedToken = await tokenService.decodeToken(token);
-        await usersService.update({ id: decodedToken.id, body: { verified: true } });
+        await usersService.update(decodedToken.id, { verified: true });
         const response = new SuccessResponse(null);
         res.status(response.code).json(response);
     }
@@ -105,7 +141,7 @@ export class PortalRoutes {
     public async sendVerificationEmail(req: Request, res: Response) {
         const { token } = req.query;
         const decodedToken = await tokenService.decodeToken(token);
-        await usersService.update({ id: decodedToken.id, body: { verified: true } });
+        await usersService.update(decodedToken.id, { verified: true });
         const response = new SuccessResponse(null);
         res.status(response.code).json(response);
     }
@@ -114,13 +150,13 @@ export class PortalRoutes {
 
 async function throwIfNotExist(query: Partial<Body<UsersSchema> & { _id: string }>, message = 'not_exist') {
     if (AppUtils.isNullOrUndefined(query)) {
-        throw new ErrorResponse(translate(message));
+        throw new ErrorResponse(message);
     }
     const entity = await usersService.one(query);
     if (!!entity) {
         return entity;
     }
-    throw new ErrorResponse(translate(message));
+    throw new ErrorResponse(message);
 }
 
 // TODO: Forget and reset password scenario
@@ -129,3 +165,10 @@ async function throwIfNotExist(query: Partial<Body<UsersSchema> & { _id: string 
 // send an email with generated number to be entered later on in page 3
 // Lock the account after 3 times of trying
 // send an email to notify the user that the email is changed
+
+// TODO: The admin should be able to end opened user session
+
+// TODO: use black listed jwt and make a function
+// to remove them when any expired (use redies),
+// or just fetch the sessions again on each request
+// to check if certin

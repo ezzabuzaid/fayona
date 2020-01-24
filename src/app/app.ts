@@ -42,7 +42,10 @@ export class Application {
         });
 
         this.application
-            .use(cors())
+            .use(cors({
+                origin: '*',
+                optionsSuccessStatus: 200,
+            }))
             .use(express.json())
             .use(express.urlencoded({ extended: true }))
             .use(morgan('dev'))
@@ -50,8 +53,6 @@ export class Application {
             .use(compression())
             .use(express.static(this.staticDirectory))
             .use(express.static(this.uploadDirectory));
-
-        // TODO setup html view engine for angular
 
         // TODO Security
         // 1_ sql injection

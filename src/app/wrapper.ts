@@ -1,3 +1,4 @@
+import { SessionRouter } from '@api/sessions';
 import { UsersRouter } from '@api/users';
 import { MealsRouter } from '@api/meals';
 import { MenusRouter } from '@api/menus';
@@ -53,8 +54,9 @@ export class Wrapper {
 
 }
 
-Wrapper.registerRouter(MealsRouter);
+Wrapper.registerRouter(SessionRouter);
 Wrapper.registerRouter(PortalRoutes);
+Wrapper.registerRouter(MealsRouter);
 Wrapper.registerRouter(UsersRouter);
 Wrapper.registerRouter(MenusRouter);
 Wrapper.registerRouter(FavoritesRouter);

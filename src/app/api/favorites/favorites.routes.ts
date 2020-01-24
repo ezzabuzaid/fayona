@@ -4,7 +4,7 @@ import { Delete, Get, Post, Router } from '@lib/methods';
 import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
 import { FavoritesRepo } from './favorites.repo';
-import { CrudRouter } from '@shared/crud';
+import { CrudRouter } from '@shared/crud/crud.router';
 
 @Router(Constants.Endpoints.favorites)
 export class FavoritesRouter extends CrudRouter<any> {

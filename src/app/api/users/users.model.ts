@@ -2,7 +2,6 @@ import { HashService, Constants } from '@core/helpers';
 import { BaseModel, Entity, Field, Body } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
 import { parsePhoneNumberFromString } from 'libphonenumber-js/max';
-import { translate } from '@lib/translation';
 import { AppUtils } from '@core/utils';
 
 export enum ERoles {
@@ -29,11 +28,11 @@ export class UsersSchema {
         set: (value: string) => HashService.hashSync(value)
     }) public password: string;
     @Field({
-        match: [ValidationPatterns.NoSpecialChar, translate('no_speical_char')],
+        match: [ValidationPatterns.NoSpecialChar, 'no_speical_char'],
         unique: true,
     }) public username: string;
     @Field({
-        match: [ValidationPatterns.EmailValidation, translate('wrong_email')],
+        match: [ValidationPatterns.EmailValidation, 'wrong_email'],
         unique: true,
     }) public email: string;
     @Field({
@@ -42,7 +41,7 @@ export class UsersSchema {
                 const phonenumber = parsePhoneNumberFromString(value);
                 return !!phonenumber && phonenumber.isValid();
             },
-            translate('wrong_mobile_number')
+            'wrong_mobile_number'
         ],
         unique: true,
     }) public mobile: string;

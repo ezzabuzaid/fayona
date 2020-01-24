@@ -18,7 +18,7 @@ export namespace MongooseTypes {
 
 export type CastObjectIDToString<T> = { [key in keyof T]: T[key] extends Types.ObjectId ? string : T[key] };
 export type WithID<T> = { id?: string } & T;
-export type Body<T> = WithID<CastObjectIDToString<OmitProperties<T, (...args: any) => any>>>;
+export type Body<T> = CastObjectIDToString<OmitProperties<T, (...args: any) => any>>;
 
 export function generateModelMetadataKey(target: any) {
     return `model:${target.name}`;

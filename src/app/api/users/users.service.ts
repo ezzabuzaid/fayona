@@ -1,7 +1,7 @@
-import { UsersSchema } from './users.model';
+import { UsersSchema, UsersModel } from './users.model';
 import { CrudService } from '@shared/crud/crud.service';
-import { usersRepo } from '.';
 import { EmailService, fakeEmail } from '@shared/email';
+import { Repo } from '@shared/crud';
 
 // TODO: provide an option for strict schema checking to not allowed
 // an additional attribute to come, moreover check the types to
@@ -11,7 +11,7 @@ import { EmailService, fakeEmail } from '@shared/email';
 
 class UserService extends CrudService<UsersSchema> {
     constructor() {
-        super(usersRepo, {
+        super(new Repo<UsersSchema>(UsersModel), {
             unique: ['username', 'email', 'mobile'],
             create: {
                 pre(entity) {

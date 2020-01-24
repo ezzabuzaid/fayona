@@ -1,4 +1,4 @@
-import { CrudRouter } from '@shared/crud';
+import { CrudRouter } from '@shared/crud/crud.router';
 import usersService from './users.service';
 import { Constants } from '@core/helpers';
 import { Router, Post, Delete } from '@lib/methods';

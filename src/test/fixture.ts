@@ -9,7 +9,7 @@ export function getUri(value: string) {
 
 export async function sendRequest<T>(endpoint: string, body: T) {
     const req = (await superAgent).post(endpoint);
-    return await req.send(body as any);
+    return req.send(body as any);
 }
 export async function deleteRequest(endpoint: string, id: string) {
     return (await superAgent).delete(endpoint);
@@ -51,4 +51,8 @@ export class UserUtilityFixture {
         return res;
     }
 
+}
+
+export function generatePhoneNumber(dialCode = 962) {
+    return `+${dialCode}792${Math.floor(Math.random() * 899999 + 100000)}`;
 }

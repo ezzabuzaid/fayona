@@ -80,7 +80,7 @@ export class AppUtils {
     }
 
     public static hasItemWithin(list: any[]) {
-        return list.length > 0;
+        return Array.isArray(list) && list.length > 0;
     }
 
     public static assignObject<T>(target, source1: T, source2?: Partial<T>): T {

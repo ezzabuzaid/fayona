@@ -2,7 +2,7 @@ import { Constants } from '@core/helpers';
 import { Get, Router } from '@lib/methods';
 import { Request, Response } from 'express';
 import mealsService from './meals.service';
-import { CrudRouter } from '@shared/crud';
+import { CrudRouter } from '@shared/crud/crud.router';
 import { MealsSchema } from './meals.model';
 
 @Router(Constants.Endpoints.MEALS)
