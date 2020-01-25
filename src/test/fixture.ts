@@ -9,9 +9,9 @@ export function getUri(value: string) {
     return `/api/${value}`;
 }
 
-export async function sendRequest<T>(endpoint: string, body: T) {
+export async function sendRequest<T>(endpoint: string, body: T, headers = {}) {
     const req = (await superAgent).post(endpoint);
-    return req.send(body as any);
+    return req.send(body as any).set(headers)
 }
 
 export async function deleteRequest(endpoint: string, id: string) {

@@ -8,7 +8,7 @@ class Translation<T> {
     /**
      * list of observed locals
      */
-    private locals: Local<T>[] = [];
+    private locals: Array<Local<T>> = [];
 
     constructor() {
         // super();

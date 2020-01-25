@@ -4,7 +4,7 @@
     "fetch_users": "Fetch all user",
     "fetch_entites": "all fetched",
     "register_success": "Register successfully",
-    "wrong_credintals": "username or password wrong",
+    "wrong_credintals": "Wrong credintals",
     "internal_server_error": "internal_server_error",
     "deleted_success": "delete_user",
     "invalid_syntax": "invalid path syntax, please make sure that the requested valid entity, the id is wrong, it's not mongoose like id",
@@ -17,6 +17,6 @@
     "error": "Error",
     "email_exist": "email_exist",
     "no_speical_char": "Value contains special char",
-    "wrong_email": "Please provide a valid email address",
-    "wrong_mobile_number": "Please enter correct phonenumber"
+    "wrong_email": "Please enter correct email address",
+    "wrong_mobile_number": "Please enter correct mobile number"
 }

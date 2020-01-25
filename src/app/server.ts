@@ -22,14 +22,17 @@ export class NodeServer extends Application {
                 envirnoment.load();
                 const server = new NodeServer();
                 await server.populateServer();
+                await server.init();
+                return server;
                 // server.application.get('/socket/:name', handleSocket);
                 // server.application.get('/webhooks/github/deploy', deploy);
-                return server.init();
         }
 
-        public static test() {
+        public static async test() {
                 envirnoment.load(StageLevel.TEST);
-                return (new NodeServer()).init();
+                const server = new NodeServer();
+                await server.init();
+                return server;
         }
 
         private constructor() {
@@ -68,12 +71,12 @@ export class NodeServer extends Application {
                         MONGO_HOST: host
                 } = envirnoment.env;
                 try {
-                        return Promise.all([
-                                Database.load({ user, password, path, host, atlas: stage.production }),
-                        ]);
+                        this.databaseConnection = Database.load({ user, password, path, host, atlas: stage.production });
                 } catch (error) {
                         throw new Error(`Faild to init the server ${error}`);
                 }
 
         }
+
+        databaseConnection = null;
 }
