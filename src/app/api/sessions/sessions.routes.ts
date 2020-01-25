@@ -1,10 +1,10 @@
-import { sessionsService, SessionService } from './sessions.service';
-import { CrudRouter } from '@shared/crud/crud.router';
 import { SessionSchema } from './sessions.model';
 import { Response, Request } from 'express';
 import { Auth } from '@api/portal';
 import { Get, Router, Patch } from '@lib/methods';
 import { tokenService, SuccessResponse, Constants } from '@core/helpers';
+import { CrudRouter } from '@shared/crud';
+import { sessionsService, SessionService } from './sessions.service';
 
 @Router(Constants.Endpoints.SESSIONS)
 export class SessionRouter extends CrudRouter<SessionSchema, SessionService> {

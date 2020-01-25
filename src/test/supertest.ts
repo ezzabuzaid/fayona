@@ -1,5 +1,5 @@
 import request = require('supertest');
-import { NodeServer } from '../app/server';
+import { NodeServer } from 'app/server';
 
 export const superAgent = (async () => {
     const server = await NodeServer.test();

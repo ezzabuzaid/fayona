@@ -1,12 +1,10 @@
-import { Database } from '@core/database/database';
+import { Database } from '@core/database';
 import { stage, StageLevel } from '@core/helpers';
-import { Logger } from '@core/utils';
+import { Logger, LoggerLevel } from '@core/utils';
 import { envirnoment } from '@environment/env';
 import http = require('http');
 import { URL } from 'url';
 import { Application } from './app';
-import { OLHC, loadOHLCcsv, handleSocket } from './playground/olhc';
-import { deploy } from './playground/deploy';
 const log = new Logger('Server init');
 export class NodeServer extends Application {
         private port = +envirnoment.get('PORT') || 8080;
@@ -18,7 +16,6 @@ export class NodeServer extends Application {
          * @param port server port
          */
         public static async bootstrap() {
-                // SECTION server init event
                 envirnoment.load();
                 const server = new NodeServer();
                 await server.populateServer();
@@ -29,6 +26,7 @@ export class NodeServer extends Application {
         }
 
         public static async test() {
+                Logger.level = LoggerLevel.Off;
                 envirnoment.load(StageLevel.TEST);
                 const server = new NodeServer();
                 await server.init();
@@ -63,7 +61,7 @@ export class NodeServer extends Application {
                 });
         }
 
-        private init() {
+        private async init() {
                 const {
                         MONGO_USER: user,
                         MONGO_PASSWORD: password,
@@ -71,7 +69,7 @@ export class NodeServer extends Application {
                         MONGO_HOST: host
                 } = envirnoment.env;
                 try {
-                        this.databaseConnection = Database.load({ user, password, path, host, atlas: stage.production });
+                        this.databaseConnection = await Database.load({ user, password, path, host, atlas: stage.production });
                 } catch (error) {
                         throw new Error(`Faild to init the server ${error}`);
                 }

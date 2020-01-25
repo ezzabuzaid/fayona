@@ -1,11 +1,11 @@
 import { UsersSchema, ERoles } from '@api/users';
 import { Body } from '@lib/mongoose';
-import { superAgent } from '@test/index';
-import { Constants, NetworkStatus, tokenService } from '@core/helpers';
-import { getUri, generateExpiredToken, UserUtilityFixture, sendRequest } from '@test/fixture';
-import { AppUtils } from '@core/utils';
-import { IRefreshTokenBody } from './portal.routes';
+import { Constants, NetworkStatus } from '@core/helpers';
+import { getUri, generateExpiredToken, UserFixture, sendRequest, generateUsername } from '@test/fixture';
+import { IRefreshTokenBody, ILogin } from './portal.routes';
 import { PortalHelper } from './portal.helper';
+import * as faker from 'faker';
+import { ApplicationConstants } from '@core/constants';
 
 const ENDPOINT = (suffix: string) => getUri(`${Constants.Endpoints.PORTAL}/${suffix}`);
 const LOGIN_ENDPOINT = ENDPOINT(Constants.Endpoints.LOGIN);
@@ -22,26 +22,41 @@ const mockUser = {
     role: ERoles.SUPERADMIN
 } as Body<UsersSchema>;
 
-describe('Login should fail if..', () => {
-    it('Request with non existing user', async () => {
-        const req = (await superAgent).post(LOGIN_ENDPOINT);
-        const res = await req.send(AppUtils.assignObject({}, mockUser, {
-            username: 'fakeUsername',
-            password: 'fakePassword'
-        }));
-        expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
-    });
-    it('The Username was wrong', async () => {
-        const req = (await superAgent).post(LOGIN_ENDPOINT);
-        const res = await req.send(AppUtils.assignObject({}, mockUser, { username: 'fakeUsername' }));
-        expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
-    });
-    it('The password was wrong', async () => {
-        const req = (await superAgent).post(LOGIN_ENDPOINT);
-        const res = await req.send(AppUtils.assignObject({}, mockUser, { password: 'fakePassword' }));
-        expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
-    });
-    it.todo('User has more than three session');
+const fakeLoginPaylod: ILogin = {
+    password: faker.internet.password(),
+    username: generateUsername(),
+}
+describe('[INTERGRATION]', () => {
+    describe('Login should', () => {
+        fdescribe('fail if..', () => {
+            it('the request does not contain device_uuid', async () => {
+                const response = await sendRequest(LOGIN_ENDPOINT, fakeLoginPaylod, {
+                    [ApplicationConstants.deviceIdHeader]: undefined
+                });
+                expect(response.status).toMatch('not_allowed');
+                expect(response.status).toBe(NetworkStatus.BAD_REQUEST);
+            });
+
+            it('Request with non existing user', async () => {
+                const response = await sendRequest(LOGIN_ENDPOINT, fakeLoginPaylod);
+                expect(response.status).toMatch('Wrong credintals');
+                expect(response.status).toBe(NetworkStatus.BAD_REQUEST);
+            });
+
+            it('password is wrong', async () => {
+                const userFixture = new UserFixture();
+                const user = await userFixture.createUser(fakeLoginPaylod);
+                console.log(user.body);
+                const response = await sendRequest(LOGIN_ENDPOINT, fakeLoginPaylod);
+                expect(response.status).toMatch('Wrong credintals');
+                expect(response.status).toBe(NetworkStatus.BAD_REQUEST);
+            });
+
+            it.todo('User has more than three session');
+        });
+
+    })
+
 });
 
 describe('Forgot password ', () => {
@@ -81,7 +96,7 @@ describe('Refresh Token', () => {
         expect(res.status).toBe(NetworkStatus.NOT_ACCEPTABLE);
     });
     it('should not throw if the token is expired', async () => {
-        const userUtiltiy = new UserUtilityFixture();
+        const userUtiltiy = new UserFixture();
         const user = await userUtiltiy.createUser();
         console.log(user);
         const res = await getResponse(

@@ -86,7 +86,7 @@ export class AppUtils {
         return Array.isArray(list) && list.length > 0;
     }
 
-    public static assignObject<T>(target, source1: T, source2?: Partial<T>): T {
+    public static assignObject<T>(target: T, source1: Partial<T>, source2?: Partial<T>): T {
         return Object.assign(target, source1, source2);
     }
 

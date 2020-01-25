@@ -4,6 +4,13 @@ import { UsersSchema, ERoles } from '@api/users';
 import { Body } from '@lib/mongoose';
 import * as faker from 'faker';
 import { ValidationPatterns } from '@shared/common';
+import { ApplicationConstants } from '@core/constants';
+import { AppUtils } from '@core/utils';
+
+export const defaultHeaders = {
+    [ApplicationConstants.deviceIdHeader]: faker.random.uuid(),
+    'Authorization': tokenService.generateToken({ id: '' })
+}
 
 export function getUri(value: string) {
     return `/api/${value}`;
@@ -11,11 +18,18 @@ export function getUri(value: string) {
 
 export async function sendRequest<T>(endpoint: string, body: T, headers = {}) {
     const req = (await superAgent).post(endpoint);
-    return req.send(body as any).set(headers)
+    return req.send(body as any).set({
+        ...defaultHeaders,
+        ...headers,
+    })
 }
 
-export async function deleteRequest(endpoint: string, id: string) {
-    return (await superAgent).delete(endpoint);
+export async function deleteRequest(endpoint: string, id: string, headers = {}) {
+    const request = (await superAgent).delete(`${endpoint}/${id}`)
+    return request.set({
+        ...defaultHeaders,
+        ...headers,
+    })
 }
 
 export async function getRequest(endpoint: string) {
@@ -26,36 +40,34 @@ export function generateExpiredToken() {
     return tokenService.generateToken({} as any, { expiresIn: '-10s' });
 }
 
-export class UserUtilityFixture {
+export class UserFixture {
     public user = {
         id: null,
         token: null
     };
     private usersUri = getUri(Constants.Endpoints.USERS);
 
-    constructor(seed = {}) { }
-
-    public async  createUser(body: Partial<Body<UsersSchema>> = {}) {
-        const res = await sendRequest<Body<UsersSchema>>(this.usersUri, {
-            email: `test@test.com`,
-            password: '123456789',
-            username: `test`,
-            mobile: '+962792807794',
-            role: ERoles.SUPERADMIN,
+    public async createUser(body: Partial<Body<UsersSchema>> = {}) {
+        const response = await sendRequest<Body<UsersSchema>>(this.usersUri, {
+            email: faker.internet.email(),
+            username: generateUsername(),
+            mobile: generatePhoneNumber(),
+            password: faker.internet.password(),
+            verified: false,
+            role: ERoles.ADMIN,
             profile: null,
-            verified: null,
             ...body
         });
-        console.log(res.body);
-        this.user.id = res.body.data.id;
-        this.user.token = tokenService.generateToken(this.user.id);
-        return res;
+        try {
+            this.user.id = response.body.data.id;
+        } catch (error) {
+
+        }
+        return response;
     }
     public async deleteUser(id = this.user.id) {
-        if (!this.user.id) { return; }
-        const req = (await superAgent).delete(`${this.usersUri}/${this.user.id}`);
-        const res = await req.set('Authorization', this.user.token);
-        return res;
+        if (AppUtils.not(id)) { return; }
+        return deleteRequest(this.usersUri, id);
     }
 
 }

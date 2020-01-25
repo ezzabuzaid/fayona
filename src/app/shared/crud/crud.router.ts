@@ -7,7 +7,7 @@ import { translate } from '@lib/translation';
 import { AppUtils } from '@core/utils';
 import { Body } from '@lib/mongoose';
 
-export class CrudRouter<M, S = any> {
+export class CrudRouter<M, S extends CrudService<M> = CrudService<M>> {
     constructor(
         protected service: S & CrudService<M>
     ) { }

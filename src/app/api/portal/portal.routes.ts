@@ -10,8 +10,8 @@ import { AppUtils } from '@core/utils';
 import { PortalHelper } from './portal.helper';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { Auth } from './auth';
-import { sessionsService } from '@api/sessions';
 import { ApplicationConstants } from '@core/constants';
+import { sessionsService } from '@api/sessions';
 
 export interface ILogin {
     username: string;
@@ -33,7 +33,6 @@ export class PortalRoutes {
         const { username, password } = req.body as ILogin;
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
 
-        // STUB: test device_uuid
         if (AppUtils.not(device_uuid)) {
             throw new ErrorResponse('not_allowed');
         }

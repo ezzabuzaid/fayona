@@ -1,5 +1,5 @@
-import { Repo } from '@shared/crud/crud.repo';
-import { CrudService } from '@shared/crud/crud.service';
+import { Repo } from '@shared/crud';
+import { CrudService } from '@shared/crud';
 import { SessionSchema, SessionModel } from './sessions.model';
 import { Document, Body, WithID } from '@lib/mongoose';
 
@@ -7,10 +7,7 @@ export class SessionService extends CrudService<SessionSchema> {
 
     public async deActivate(query: Partial<WithID<Body<SessionSchema>>>) {
         const record = await this.getActiveSession(query);
-        // TODO check if there's an active session
-        if (record) {
-            return this.setAsDeactive(record);
-        }
+        this.setAsDeactive(record);
     }
 
     public getActiveSession(query: Partial<WithID<Body<SessionSchema>>>) {

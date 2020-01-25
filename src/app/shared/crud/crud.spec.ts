@@ -174,3 +174,7 @@ describe('#MockService', () => {
 //         expect(data).not.toHaveProperty('password');
 //     });
 // });
+
+describe('#GET USER', () => {
+    test.todo(`user body should contain only id`);
+});
