@@ -4,11 +4,11 @@ import { Local } from './local';
 import { Logger } from '@core/utils';
 const log = new Logger('Localization Class');
 
-class Translation {
+class Translation<T> {
     /**
      * list of observed locals
      */
-    private locals: Local[] = [];
+    private locals: Local<T>[] = [];
 
     constructor() {
         // super();
@@ -19,7 +19,7 @@ class Translation {
      * @param name name of the local
      * @param local the local to add
      */
-    public add(name: string, local: object): Local {
+    public add(name: T, local: object): Local<T> {
         // if there's already throw an error in dev mode
 
         stage.test(StageLevel.DEV, () => {
@@ -47,7 +47,7 @@ class Translation {
      * @param name name of the local you wanna use
      * @returns local
      */
-    public use(name: string): Local {
+    public use(name: T): Local<T> {
 
         // get the local from the list
         const local = this.get(name);
@@ -71,7 +71,7 @@ class Translation {
      *
      * @param name get the local by it's name from the register locals
      */
-    public get(name: string) {
+    public get(name: T) {
 
         // find the local
         const local = this.locals.find((loc) => loc.name === name);
@@ -82,7 +82,7 @@ class Translation {
     /**
      * the active local
      */
-    private _local: Local;
+    private _local: Local<T>;
 
     /**
      * get the active local
@@ -100,8 +100,8 @@ class Translation {
 
 }
 
-export const translation = new Translation();
-// scoping not allowed until i18n service resolved in api module
+// TODO this should be explicty created by the developer
+export const translation = new Translation<'ar' | 'en'>();
 
 /**
  *

@@ -1,6 +1,6 @@
 import { Database } from '@core/database/database';
 import { stage, StageLevel } from '@core/helpers';
-import { Logger, LoggerLevel } from '@core/utils';
+import { Logger } from '@core/utils';
 import { envirnoment } from '@environment/env';
 import http = require('http');
 import { URL } from 'url';
@@ -19,18 +19,15 @@ export class NodeServer extends Application {
          */
         public static async bootstrap() {
                 // SECTION server init event
-                log.debug('Start boostrapping server');
                 envirnoment.load();
                 const server = new NodeServer();
-                const httpServer = await server.populateServer();
+                await server.populateServer();
                 // server.application.get('/socket/:name', handleSocket);
                 // server.application.get('/webhooks/github/deploy', deploy);
                 return server.init();
         }
 
         public static test() {
-                Logger.level = LoggerLevel.Off;
-                log.info('Start Testing');
                 envirnoment.load(StageLevel.TEST);
                 return (new NodeServer()).init();
         }
@@ -38,7 +35,6 @@ export class NodeServer extends Application {
         private constructor() {
                 super();
                 this.path = new URL(`http://${this.host}:${this.port}`);
-                log.info(`The env => ${stage.LEVEL}`);
         }
 
         /**
@@ -71,10 +67,8 @@ export class NodeServer extends Application {
                         MONGO_PATH: path,
                         MONGO_HOST: host
                 } = envirnoment.env;
-                log.debug(stage.LEVEL);
                 try {
                         return Promise.all([
-                                this.populateRoutes(),
                                 Database.load({ user, password, path, host, atlas: stage.production }),
                         ]);
                 } catch (error) {

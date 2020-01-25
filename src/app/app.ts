@@ -1,4 +1,5 @@
 import en from '@assets/languages/en.json';
+import ar from '@assets/languages/ar.json';
 import { ErrorHandling, stage, StageLevel } from '@core/helpers';
 import { Logger } from '@core/utils';
 import { translation } from '@lib/translation';
@@ -24,6 +25,7 @@ export class Application {
     constructor() {
         this.configure();
         this.setupLocalization();
+        this.populateRoutes();
     }
 
     get application() {
@@ -60,34 +62,27 @@ export class Application {
         // 3_ xss
     }
 
-    protected populateRoutes() {
-        return new Promise<ReturnType<typeof express>>((resolve) => {
-            this.application.use(ErrorHandling.favIcon);
-            // SECTION routes resolving event
-            this.application.use((req, res, next) => {
-                const acceptLanguage = req.acceptsLanguages();
-                // log.warn(acceptLanguage);
-                if (acceptLanguage) {
-                    // TODO use localization here
-                }
-                next();
-            });
-
-            Wrapper.routers.forEach(({ router, uri }) => {
-                this.application.use(path.join('/api', uri), router);
-            });
-
-            this.application.get('/api', (req, res) => res.status(200).json({ work: '/API hitted' }));
-            this.application.get('/', (req, res) => res.sendFile('index.html'));
-            this.application.use(ErrorHandling.notFound);
-            this.application.use(ErrorHandling.catchError);
-            resolve(this.application);
+    private populateRoutes() {
+        this.application.use(ErrorHandling.favIcon);
+        this.application.use((req, res, next) => {
+            const acceptLanguage = req.acceptsLanguages();
+            translation.use(acceptLanguage.includes('ar') ? 'ar' : 'en');
+            next();
         });
+
+        Wrapper.routers.forEach(({ router, uri }) => {
+            this.application.use(path.join('/api', uri), router);
+        });
+
+        this.application.get('/api', (req, res) => res.status(200).json({ work: '/API hitted' }));
+        this.application.get('/', (req, res) => res.sendFile('index.html'));
+        this.application.use(ErrorHandling.notFound);
+        this.application.use(ErrorHandling.catchError);
     }
 
     private setupLocalization() {
         translation.add('en', en);
-        // localization.add('ar', ar);
+        translation.add('ar', ar);
         translation.use('en');
     }
 
