@@ -1,7 +1,7 @@
 import { tokenService, ErrorResponse, NetworkStatus } from '@core/helpers';
 import { Logger, AppUtils } from '@core/utils';
 import { NextFunction, Request, Response } from 'express';
-import { sessionsService } from '@api/sessions';
+import { sessionsService } from '@api/sessions/sessions.service';
 import { ApplicationConstants } from '@core/constants';
 
 const log = new Logger('Auth Module');

@@ -1,9 +1,8 @@
-import { Repo } from '@shared/crud';
-import { CrudService } from '@shared/crud';
+import { Repo, CrudService } from '@shared/crud';
 import { SessionSchema, SessionModel } from './sessions.model';
 import { Document, Body, WithID } from '@lib/mongoose';
 
-export class SessionService extends CrudService<SessionSchema> {
+export class SessionsService extends CrudService<SessionSchema> {
 
     public async deActivate(query: Partial<WithID<Body<SessionSchema>>>) {
         const record = await this.getActiveSession(query);
@@ -28,4 +27,4 @@ export class SessionService extends CrudService<SessionSchema> {
 
 }
 
-export const sessionsService = new SessionService(new Repo<SessionSchema>(SessionModel));
+export const sessionsService = new SessionsService(new Repo<SessionSchema>(SessionModel));

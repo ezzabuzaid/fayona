@@ -11,7 +11,7 @@ import { PortalHelper } from './portal.helper';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { Auth } from './auth';
 import { ApplicationConstants } from '@core/constants';
-import { sessionsService } from '@api/sessions';
+import { sessionsService } from '@api/sessions/sessions.service';
 
 export interface ILogin {
     username: string;

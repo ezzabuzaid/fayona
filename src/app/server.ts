@@ -69,12 +69,14 @@ export class NodeServer extends Application {
                         MONGO_HOST: host
                 } = envirnoment.env;
                 try {
-                        this.databaseConnection = await Database.load({ user, password, path, host, atlas: stage.production });
+                        this.databaseConnection = await Database.load({
+                                user, password, path, host, atlas: stage.production
+                        });
                 } catch (error) {
                         throw new Error(`Faild to init the server ${error}`);
                 }
 
         }
 
-        databaseConnection = null;
+        public databaseConnection = null;
 }

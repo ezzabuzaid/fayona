@@ -25,7 +25,7 @@ const mockUser = {
 const fakeLoginPaylod: ILogin = {
     password: faker.internet.password(),
     username: generateUsername(),
-}
+};
 describe('[INTERGRATION]', () => {
     describe('Login should', () => {
         fdescribe('fail if..', () => {
@@ -55,7 +55,7 @@ describe('[INTERGRATION]', () => {
             it.todo('User has more than three session');
         });
 
-    })
+    });
 
 });
 

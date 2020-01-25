@@ -1,5 +1,5 @@
 import { Router, Get } from '@lib/methods';
-import { CrudRouter } from '@shared/crud/crud.router';
+import { CrudRouter } from '@shared/crud';
 import { MenusModel, MenusSchema } from './menus.model';
 import { Repo } from '@shared/crud/crud.repo';
 import { Constants } from '@core/helpers';

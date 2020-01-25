@@ -9,8 +9,8 @@ import { AppUtils } from '@core/utils';
 
 export const defaultHeaders = {
     [ApplicationConstants.deviceIdHeader]: faker.random.uuid(),
-    'Authorization': tokenService.generateToken({ id: '' })
-}
+    Authorization: tokenService.generateToken({ id: '' })
+};
 
 export function getUri(value: string) {
     return `/api/${value}`;
@@ -21,15 +21,15 @@ export async function sendRequest<T>(endpoint: string, body: T, headers = {}) {
     return req.send(body as any).set({
         ...defaultHeaders,
         ...headers,
-    })
+    });
 }
 
 export async function deleteRequest(endpoint: string, id: string, headers = {}) {
-    const request = (await superAgent).delete(`${endpoint}/${id}`)
+    const request = (await superAgent).delete(`${endpoint}/${id}`);
     return request.set({
         ...defaultHeaders,
         ...headers,
-    })
+    });
 }
 
 export async function getRequest(endpoint: string) {
