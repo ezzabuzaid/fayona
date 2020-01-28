@@ -11,31 +11,23 @@ export class NodeServer extends Application {
         private host = envirnoment.get('HOST') || '127.0.0.1';
         public path: URL = null;
 
-        /**
-         * Invoke this method to start the server
-         * @param port server port
-         */
+        private constructor() {
+                super();
+                this.path = new URL(`http://${this.host}:${this.port}`);
+        }
+
         public static async bootstrap() {
                 envirnoment.load();
                 const server = new NodeServer();
-                await server.populateServer();
-                await server.init();
+                await Promise.all([server.populateServer(), NodeServer.loadDatabase()]);
                 return server;
                 // server.application.get('/socket/:name', handleSocket);
                 // server.application.get('/webhooks/github/deploy', deploy);
         }
 
-        public static async test() {
-                Logger.level = LoggerLevel.Off;
+        public static test() {
                 envirnoment.load(StageLevel.TEST);
-                const server = new NodeServer();
-                await server.init();
-                return server;
-        }
-
-        private constructor() {
-                super();
-                this.path = new URL(`http://${this.host}:${this.port}`);
+                return NodeServer.loadDatabase();
         }
 
         /**
@@ -61,7 +53,7 @@ export class NodeServer extends Application {
                 });
         }
 
-        private async init() {
+        public static loadDatabase() {
                 const {
                         MONGO_USER: user,
                         MONGO_PASSWORD: password,
@@ -69,14 +61,10 @@ export class NodeServer extends Application {
                         MONGO_HOST: host
                 } = envirnoment.env;
                 try {
-                        this.databaseConnection = await Database.load({
-                                user, password, path, host, atlas: stage.production
-                        });
+                        return Database.load({ user, password, path, host, atlas: stage.production });
                 } catch (error) {
                         throw new Error(`Faild to init the server ${error}`);
                 }
-
         }
 
-        public databaseConnection = null;
 }

@@ -8,11 +8,11 @@ class CustomEnvironment extends NodeEnvironment {
   }
 
   async setup() {
-    const server = await NodeServer.test();
-    const collections = server.databaseConnection.collections;
+    const databaseConnection = await NodeServer.test();
+    const collections = databaseConnection.collections;
     for (const key in collections) {
-        const collection = collections[key];
-        await collection.deleteMany();
+      const collection = collections[key];
+      await collection.deleteMany();
     }
     await super.setup();
   }
