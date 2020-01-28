@@ -6,6 +6,7 @@ import { translation } from '@lib/translation';
 import compression = require('compression');
 import express = require('express');
 import helmet = require('helmet');
+import hpp = require('hpp');
 import morgan = require('morgan');
 import { Wrapper } from './wrapper';
 import path from 'path';
@@ -50,6 +51,7 @@ export class Application {
             }))
             .use(express.json())
             .use(express.urlencoded({ extended: true }))
+            .use(hpp())
             .use(morgan('dev'))
             .use(helmet())
             .use(compression())
