@@ -1,17 +1,12 @@
-import '@test/index';
-import { getUri, sendRequest, deleteRequest, generatePhoneNumber, generateUsername, getRequest, UserFixture } from '@test/fixture';
-import { Constants, NetworkStatus } from '@core/helpers';
-import { Body } from '@lib/mongoose';
-import { UsersSchema, ERoles } from './users.model';
-import { AppUtils } from '@core/utils';
+import { generatePhoneNumber, generateUsername, UserFixture } from '@test/fixture';
+import { NetworkStatus } from '@core/helpers';
+import { ERoles } from './users.model';
 import * as faker from 'faker';
-import usersService from './users.service';
 
-const ENDPOINT = getUri(Constants.Endpoints.USERS);
 describe('[INTERGRATION]', () => {
 
     // NOTE test the fail then test the success
-    fdescribe('#CREATE USER', () => {
+    describe('#CREATE USER', () => {
 
         let userFixture: UserFixture;
 
@@ -19,7 +14,7 @@ describe('[INTERGRATION]', () => {
             userFixture = new UserFixture();
         });
 
-        fdescribe('should fail if', () => {
+        describe('should fail if', () => {
 
             test('username exist before', async () => {
                 const username = generateUsername();
@@ -112,7 +107,7 @@ describe('[INTERGRATION]', () => {
 
         test.todo('user should have a defualt profile equal to empty {}');
         // test('Profile Should have an empty object when creating a new user', async () => {
-        //     const req = (await superAgent).post(ENDPOINT);
+        //     const req = superAgent.post(ENDPOINT);
         //     const res = await req.send(user);
         //     expect(((res.body) as Body<UsersSchema>)./api/users/undefinedprofile).toBe(undefined);
         //     // TODO: the profile object should has a default value in the service

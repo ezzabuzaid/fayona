@@ -26,6 +26,7 @@ export class NodeServer extends Application {
         }
 
         public static test() {
+                Logger.level = LoggerLevel.Off;
                 envirnoment.load(StageLevel.TEST);
                 return NodeServer.loadDatabase();
         }

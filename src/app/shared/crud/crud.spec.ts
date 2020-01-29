@@ -3,7 +3,7 @@ import { CrudService } from './crud.service';
 import { Repo } from './crud.repo';
 import { BaseModel, Document } from '@lib/mongoose';
 import { Schema, Model, model } from 'mongoose';
-import { superAgent } from '@test/index';
+import { superAgent } from '@test/fixture';
 import { NetworkStatus } from '@core/helpers';
 import expressRequestMock from 'express-request-mock';
 import mockingoose from 'mockingoose';
@@ -117,24 +117,24 @@ describe('#MockService', () => {
 
 // describe('DELETE BY ${id}/', () => {
 //     test('Reject request without token', async () => {
-//         const res = await (await superAgent).delete(`${ENDPOINT}/${user.id}`);
+//         const res = await superAgent.delete(`${ENDPOINT}/${user.id}`);
 //         expect(res.status).toBe(NetworkStatus.UNAUTHORIZED);
 //     });
 
 //     test('should fail if requested with id not of type ObjectId', async () => {
-//         const req = (await superAgent).delete(`${ENDPOINT}/${undefined}`);
+//         const req = superAgent.delete(`${ENDPOINT}/${undefined}`);
 //         const res = await req.set('Authorization', user.token);
 //         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
 //     });
 
 //     test('should fail if requested to non exist entity', async () => {
-//         const req = (await superAgent).delete(`${ENDPOINT}/${new Types.ObjectId()}`);
+//         const req = superAgent.delete(`${ENDPOINT}/${new Types.ObjectId()}`);
 //         const res = await req.set('Authorization', user.token);
 //         expect(res.status).toBe(NetworkStatus.NOT_ACCEPTABLE);
 //     });
 
 //     test('resposne body should equal to', async () => {
-//         const req = (await superAgent).delete(`${ENDPOINT}/${user.id}`);
+//         const req = superAgent.delete(`${ENDPOINT}/${user.id}`);
 //         const res = await req.set('Authorization', user.token);
 //         const { data } = res.body;
 //         expect(data).toBeNull();
@@ -143,25 +143,25 @@ describe('#MockService', () => {
 
 // describe('GET BY ${id}/', () => {
 //     test('Reject request without token', async () => {
-//         const res = await (await superAgent).get(`${ENDPOINT}/${user.id}`);
+//         const res = await superAgent.get(`${ENDPOINT}/${user.id}`);
 //         expect(res.status).toBe(NetworkStatus.UNAUTHORIZED);
 //     });
 
 //     test('should fail if requested with id not of type ObjectId', async () => {
 //         // this will rise cast error
-//         const req = (await superAgent).get(`${ENDPOINT}/${undefined}`);
+//         const req = superAgent.get(`${ENDPOINT}/${undefined}`);
 //         const res = await req.set('Authorization', user.token);
 //         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
 //     });
 
 //     test('should fail if requested to non exist entity', async () => {
-//         const req = (await superAgent).get(`${ENDPOINT}/${new Types.ObjectId()}`);
+//         const req = superAgent.get(`${ENDPOINT}/${new Types.ObjectId()}`);
 //         const res = await req.set('Authorization', user.token);
 //         expect(res.status).toBe(NetworkStatus.NOT_ACCEPTABLE);
 //     });
 
 //     test('resposne body should equal to', async () => {
-//         const req = (await superAgent).get(`${ENDPOINT}/${user.id}`);
+//         const req = superAgent.get(`${ENDPOINT}/${user.id}`);
 //         const res = await req.set('Authorization', user.token);
 //         const { data } = res.body;
 //         expect(data).toHaveProperty('username');

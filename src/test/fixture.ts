@@ -1,4 +1,3 @@
-import { superAgent } from './supertest';
 import { Constants, tokenService } from '@core/helpers';
 import { UsersSchema, ERoles } from '@api/users';
 import { Body } from '@lib/mongoose';
@@ -6,34 +5,40 @@ import * as faker from 'faker';
 import { ValidationPatterns } from '@shared/common';
 import { ApplicationConstants } from '@core/constants';
 import { AppUtils } from '@core/utils';
+import request = require('supertest');
+import { Application } from '../app/app';
 
-export const defaultHeaders = {
+export const superAgent = request((new Application()).application);
+
+export const defaultHeaders = () => ({
     [ApplicationConstants.deviceIdHeader]: faker.random.uuid(),
     Authorization: tokenService.generateToken({ id: '' })
-};
+});
 
 export function getUri(value: string) {
     return `/api/${value}`;
 }
 
-export async function sendRequest<T>(endpoint: string, body: T, headers = {}) {
-    const req = (await superAgent).post(endpoint);
-    return req.send(body as any).set({
-        ...defaultHeaders,
-        ...headers,
-    });
+export function sendRequest<T>(endpoint: string, body: T, headers = {}) {
+    return superAgent
+        .post(getUri(endpoint))
+        .send(body as any).set({
+            ...defaultHeaders(),
+            ...headers,
+        });
 }
 
-export async function deleteRequest(endpoint: string, id: string, headers = {}) {
-    const request = (await superAgent).delete(`${endpoint}/${id}`);
-    return request.set({
-        ...defaultHeaders,
-        ...headers,
-    });
+export function deleteRequest(endpoint: string, id: string, headers = {}) {
+    return superAgent
+        .delete(getUri(`${endpoint}/${id}`))
+        .set({
+            ...defaultHeaders(),
+            ...headers,
+        });
 }
 
-export async function getRequest(endpoint: string) {
-    return (await superAgent).get(endpoint);
+export function getRequest(endpoint: string) {
+    return superAgent.get(getUri(endpoint)).send(defaultHeaders());
 }
 
 export function generateExpiredToken() {
@@ -45,7 +50,7 @@ export class UserFixture {
         id: null,
         token: null
     };
-    private usersUri = getUri(Constants.Endpoints.USERS);
+    private usersUri = Constants.Endpoints.USERS;
 
     public async createUser(body: Partial<Body<UsersSchema>> = {}) {
         const response = await sendRequest<Body<UsersSchema>>(this.usersUri, {

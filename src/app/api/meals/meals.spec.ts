@@ -1,12 +1,11 @@
-import { superAgent } from '@test/index';
+import { getRequest } from '@test/fixture';
 import { Constants, NetworkStatus } from '@core/helpers';
-import { getUri } from '@test/fixture';
 
 describe('#Get All', () => {
     it('Should return data without token', async () => {
-        const res = await (await superAgent).get(getUri(Constants.Endpoints.MEALS));
-        expect(res.body.data).toBeInstanceOf(Array);
-        expect(res.status).toBe(NetworkStatus.OK);
+        const response = await getRequest(Constants.Endpoints.MEALS);
+        expect(response.body.data).toBeInstanceOf(Array);
+        expect(response.status).toBe(NetworkStatus.OK);
     });
 });
 
