@@ -1,6 +1,5 @@
-import { ErrorResponse, SuccessResponse, tokenService, Constants, NetworkStatus, IRefreshTokenClaim } from '@core/helpers';
+import { ErrorResponse, SuccessResponse, tokenService, Constants, IRefreshTokenClaim, UnauthorizedResponse } from '@core/helpers';
 import { Post, Router } from '@lib/methods';
-import { translate } from '@lib/translation';
 import { Request, Response } from 'express';
 import usersService from '@api/users/users.service';
 import { UsersSchema } from '@api/users';
@@ -30,6 +29,11 @@ export class PortalRoutes {
     public async login(req: Request, res: Response) {
         // TODO: send an email to user to notify him about login attempt.
 
+        // NOTE: verify JSON schema is very important to secure the app against the injections
+        // I think about creating class for each body inconjuction with joi or class-schema validator
+        // class LoginDto{ @required username: string;}
+        // this as well will increase the speed of throwing
+        //  an exception since we will not call any other layers like database
         const { username, password } = req.body as ILogin;
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
 
@@ -74,16 +78,25 @@ export class PortalRoutes {
         // NOTE: if it was invalid or expired it will implicity thrown an error
         const decodedRefreshToken = await tokenService.decodeToken<IRefreshTokenClaim>(refreshToken);
 
+        const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
+        if (AppUtils.isFalsy(device_uuid)) {
+            throw new UnauthorizedResponse();
+        }
         try {
             await tokenService.decodeToken(token);
         } catch (error) {
             if (error instanceof TokenExpiredError) {
+
                 const session = await sessionsService.getActiveSession({
-                    device_uuid: req.header(ApplicationConstants.deviceIdHeader),
+                    device_uuid,
                     user_id: decodedRefreshToken.id
                 });
-                if (AppUtils.not(session)) {
-                    throw new ErrorResponse(translate('not_authorized'), NetworkStatus.UNAUTHORIZED);
+                console.log({
+                    device_uuid,
+                    user_id: decodedRefreshToken.id
+                });
+                if (AppUtils.isFalsy(session)) {
+                    throw new UnauthorizedResponse();
                 }
 
                 const user = await throwIfNotExist({ _id: decodedRefreshToken.id });
@@ -96,8 +109,7 @@ export class PortalRoutes {
                 throw error;
             }
         }
-        throw new ErrorResponse(translate('not_allowed'), NetworkStatus.NOT_ACCEPTABLE);
-
+        throw new ErrorResponse('not_allowed');
     }
 
     @Post(Constants.Endpoints.FORGET_PASSWORD)

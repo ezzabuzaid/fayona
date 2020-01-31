@@ -5,7 +5,9 @@ import { envirnoment } from '@environment/env';
 import http = require('http');
 import { URL } from 'url';
 import { Application } from './app';
+
 const log = new Logger('Server init');
+
 export class NodeServer extends Application {
         private port = +envirnoment.get('PORT') || 8080;
         private host = envirnoment.get('HOST') || '127.0.0.1';
@@ -28,7 +30,8 @@ export class NodeServer extends Application {
         public static test() {
                 Logger.level = LoggerLevel.Off;
                 envirnoment.load(StageLevel.TEST);
-                return NodeServer.loadDatabase();
+                // FIXME new Application()).application shouldn't be created here
+                return Promise.all([NodeServer.loadDatabase(), (new Application()).application]);
         }
 
         /**

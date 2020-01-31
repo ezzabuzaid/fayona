@@ -2,7 +2,9 @@ require("ts-node/register");
 require('tsconfig-paths/register');
 const NodeEnvironment = require('jest-environment-node');
 const { NodeServer } = require('../app/server');
+const { Application } = require('../app/app');
 const mongoose = require('mongoose');
+const request = require('supertest');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
 class CustomEnvironment extends NodeEnvironment {
@@ -11,7 +13,8 @@ class CustomEnvironment extends NodeEnvironment {
   }
 
   async setup() {
-    const databaseConnection = await NodeServer.test();
+    const [databaseConnection, app] = await NodeServer.test();
+    this.global.superAgent = request(app);
     const collections = databaseConnection.collections;
     for (const key in collections) {
       const collection = collections[key];

@@ -1,12 +1,5 @@
-import { CrudRouter } from './crud.router';
 import { CrudService } from './crud.service';
 import { Repo } from './crud.repo';
-import { BaseModel, Document } from '@lib/mongoose';
-import { Schema, Model, model } from 'mongoose';
-import { superAgent } from '@test/fixture';
-import { NetworkStatus } from '@core/helpers';
-import expressRequestMock from 'express-request-mock';
-import mockingoose from 'mockingoose';
 
 // const crud = new CrudRouter(null);
 

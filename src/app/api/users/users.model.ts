@@ -16,9 +16,7 @@ export class UsersSchema {
     @Field({
         enum: [1, 2, 3, 4, 5],
         default: ERoles.ADMIN,
-        validate: (value: ERoles) => {
-            return AppUtils.isTrue(ERoles[value]);
-        }
+        validate: (value: ERoles) => AppUtils.isTruthy(ERoles[value])
     }) public role: ERoles;
     @Field({
         default: {},

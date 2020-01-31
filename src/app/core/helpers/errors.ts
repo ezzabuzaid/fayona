@@ -1,9 +1,10 @@
 import { ErrorResponse } from '@core/helpers';
-import { Logger } from '@core/utils';
+import { Logger, AppUtils } from '@core/utils';
 import { translate } from '@lib/translation';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { NetworkStatus } from './network-status';
-import { sendResponse } from './response.model';
+import { sendResponse, UnauthorizedResponse } from './response.model';
+import { stage } from './stages';
 
 const log = new Logger('Errors');
 
@@ -69,17 +70,13 @@ export class ErrorHandling {
                 response.code = NetworkStatus.UNAUTHORIZED;
                 break;
             case Errors.JsonWebTokenError:
-                response.message = translate('jwt_expired');
+                response.message = translate(stage.production ? 'jwt_expired' : error.message);
                 response.code = NetworkStatus.UNAUTHORIZED;
                 break;
 
         }
         sendResponse(res, response);
         return;
-    }
-
-    public static throwError(message, code = NetworkStatus.INTERNAL_SERVER_ERROR) {
-        throw new ErrorResponse(message, code);
     }
 
     public static notFound(req: Request, res: Response, next: NextFunction) {
@@ -99,6 +96,12 @@ export class ErrorHandling {
 
     public static wrapRoutes(...func) {
         return func.map((fn) => (...args) => fn(...args).catch(args[2]));
+    }
+
+    public static throwExceptionIfDeviceUUIDIsMissing(device_uuid: string) {
+        if (AppUtils.isFalsy(device_uuid)) {
+            throw new UnauthorizedResponse();
+        }
     }
 
 }

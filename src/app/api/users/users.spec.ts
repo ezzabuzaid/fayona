@@ -85,7 +85,7 @@ describe('[INTERGRATION]', () => {
                 expect(response.status).toBe(NetworkStatus.CREATED);
             });
             test('username has uppercase char', async () => {
-                const response = await userFixture.createUser({ username: 'testName' });
+                const response = await userFixture.createUser({ username: 'upperCASETestName' });
                 expect(response.status).toBe(NetworkStatus.CREATED);
             });
             test('username has dots', async () => {

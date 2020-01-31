@@ -14,11 +14,6 @@ import cors from 'cors';
 
 const log = new Logger('Application instance');
 
-// import Sentry = require('@sentry/node');
-// Stage.test(StageLevel.DEV, () => {
-//     Sentry.init({ dsn: 'https://57572231908b4ef0bde6a7328e71cfcf@sentry.io/1462257' });
-// });
-
 export class Application {
     private _application = express();
     private staticDirectory = path.join(process.cwd(), 'src', 'public');
@@ -58,10 +53,6 @@ export class Application {
             .use(express.static(this.staticDirectory))
             .use(express.static(this.uploadDirectory));
 
-        // TODO Security
-        // 1_ sql injection
-        // 2_ csrf
-        // 3_ xss
     }
 
     private populateRoutes() {

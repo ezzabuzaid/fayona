@@ -1,4 +1,4 @@
-import { superAgent, sendRequest, getRequest } from '@test/fixture';
+import { getRequest } from '@test/fixture';
 import { Constants, NetworkStatus } from '@core/helpers';
 
 describe('#Get All', () => {

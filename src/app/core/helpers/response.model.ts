@@ -31,6 +31,12 @@ export class ErrorResponse extends HttpResponse {
 
 }
 
+export class UnauthorizedResponse extends ErrorResponse {
+    constructor() {
+        super('not_authorized', NetworkStatus.UNAUTHORIZED);
+    }
+}
+
 export function sendResponse(res: Response, response: HttpResponse) {
     return res.status(response.code).json(response);
 }

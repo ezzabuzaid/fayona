@@ -34,7 +34,7 @@ export class CrudService<T> {
             for (let index = 0; index < this.options.unique.length; index++) {
                 const field = this.options.unique[index];
                 const record = await fetchOne(field);
-                if (AppUtils.isTrue(record)) {
+                if (AppUtils.isTruthy(record)) {
                     return new Result(true, this.options.unique[index]);
                 }
             }

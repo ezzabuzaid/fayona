@@ -1,5 +1,6 @@
 import jwt = require('jsonwebtoken');
 import { ERoles } from '@api/users';
+import { stage } from './stages';
 
 export interface ITokenClaim {
     id: string;
@@ -19,7 +20,7 @@ class TokenService {
      */
     public decodeToken<T = ITokenClaim>(token: string) {
         return new Promise<T>((resolve, reject) => {
-            jwt.verify(token, process.env.JWT_SECRET_KEY, (error, decodedToken) => {
+            jwt.verify(token, this.secretKey, (error, decodedToken) => {
                 if (error) {
                     reject(error);
                 }
@@ -34,11 +35,18 @@ class TokenService {
      * @returns the encrypted token
      */
     public generateToken<T extends ITokenClaim>(data: T, options?: jwt.SignOptions) {
-        return jwt.sign(data, process.env.JWT_SECRET_KEY, options);
+        return jwt.sign(data, this.secretKey, options);
     }
 
     public isTokenExpired<T extends ITokenClaim>(token: T) {
         return Date.now() >= token.exp * 1000;
+    }
+
+    private get secretKey() {
+        return stage.testing
+            ? 'fuckSecretForTestOnly'
+            : process.env.JWT_SECRET_KEY;
+        // FIXME idk what the issue with this when it comes to test
     }
 }
 

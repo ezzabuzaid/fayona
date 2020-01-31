@@ -6,6 +6,7 @@ import { FavoritesRouter } from '@api/favorites';
 import { FeedbackRouter } from '@api/feedback';
 import { SessionRouter } from '@api/sessions';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
+
 export class Wrapper {
     private static list = [];
     public static registerRouter(router, subRouter?) {
