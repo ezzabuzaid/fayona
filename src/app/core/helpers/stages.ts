@@ -37,29 +37,16 @@ class Stage {
         return StageLevel.TEST === this.LEVEL;
     }
 
-    public test(_stage: StageLevel, cb: () => void) {
+    public test(
+        _stage: StageLevel,
+        ifCallback: () => void,
+        elseCallback = () => { }
+    ) {
         if (_stage === this.LEVEL) {
-            cb();
+            ifCallback();
+        } else {
+            elseCallback();
         }
     }
 }
 export const stage = new Stage();
-
-// FIXME REMOVE
-export function development(cb: () => void) {
-    if (stage.development) {
-        cb();
-    }
-}
-// FIXME REMOVE
-export function production(cb: () => void) {
-    if (stage.production) {
-        cb();
-    }
-}
-// FIXME REMOVE
-export function testing(cb: () => void) {
-    if (stage.testing) {
-        cb();
-    }
-}

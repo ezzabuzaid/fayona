@@ -1,7 +1,6 @@
 import { Router } from '@lib/methods';
-import { CrudRouter, CrudService } from '@shared/crud';
 import { FeedbackSchema, FeedbackModel } from './feedback.model';
-import { Repo } from '@shared/crud/crud.repo';
+import { Repo, CrudRouter, CrudService } from '@shared/crud';
 import { Constants } from '@core/helpers';
 
 @Router(Constants.Endpoints.Feedback)

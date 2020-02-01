@@ -14,7 +14,7 @@ import {
 import 'reflect-metadata';
 
 describe('Define route', () => {
-    it('shoud have the same entry', () => {
+    it('should have the same entry', () => {
         const metainfo: IMetadataDto = {
             uri: '/',
             target: { constructor: {} },
@@ -33,7 +33,7 @@ describe('Define route', () => {
         } as IMetadata);
     });
 
-    it('Should fail if the refernce is different', () => {
+    it('should fail if the reference is different', () => {
         const metainfo = {
             method: METHODS.GET,
             middlewares: [],

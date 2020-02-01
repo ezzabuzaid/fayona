@@ -1,9 +1,8 @@
-import { ErrorResponse } from '@core/helpers/response.model';
-import { AppUtils, Parameter } from '@core/utils';
-import { Request } from 'express';
 import multer = require('multer');
 import path = require('path');
-import { NetworkStatus } from '../../core/helpers/network-status';
+import { AppUtils, Parameter } from '@core/utils';
+import { Request } from 'express';
+import { ErrorResponse, NetworkStatus } from '@core/helpers';
 
 const upload = multer();
 const _Multer = AppUtils.getTypeOf<typeof upload>(multer);

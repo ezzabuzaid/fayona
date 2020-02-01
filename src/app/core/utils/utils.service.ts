@@ -5,6 +5,15 @@ export type Type<T> = new (...args: any) => T;
 export type Parameter<T extends (args: any) => any> = T extends (args: infer P) => any ? P : never;
 
 export class AppUtils {
+
+    public static isTruthy(value: any) {
+        return !!value;
+    }
+
+    public static isFalsy(value: any) {
+        return this.not(value);
+    }
+
     public static not(value: any) {
         return !!!value;
     }
@@ -80,10 +89,10 @@ export class AppUtils {
     }
 
     public static hasItemWithin(list: any[]) {
-        return list.length > 0;
+        return Array.isArray(list) && list.length > 0;
     }
 
-    public static assignObject<T>(target, source1: T, source2?: Partial<T>): T {
+    public static assignObject<T>(target: T, source1: Partial<T>, source2?: Partial<T>): T {
         return Object.assign(target, source1, source2);
     }
 

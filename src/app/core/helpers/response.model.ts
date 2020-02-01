@@ -22,16 +22,19 @@ export class SuccessResponse<T> extends HttpResponse {
 export class ErrorResponse extends HttpResponse {
     public name = ErrorResponse.name;
     public error: string;
-    constructor(message: string, code = NetworkStatus.BAD_REQUEST) {
+    constructor(message: string, code = NetworkStatus.BAD_REQUEST, status?: string) {
         super();
         this.message = typeof message === 'string' ? translate(message) : message;
         this.code = code;
+        this.status = status || NetworkStatus.getStatusText(code);
     }
 
-    get status() {
-        return NetworkStatus.getStatusText(this.code);
-    }
+}
 
+export class UnauthorizedResponse extends ErrorResponse {
+    constructor() {
+        super('not_authorized', NetworkStatus.UNAUTHORIZED);
+    }
 }
 
 export function sendResponse(res: Response, response: HttpResponse) {

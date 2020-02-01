@@ -3,7 +3,7 @@ import { stage, StageLevel } from '@core/helpers';
 import { Logger } from '@core/utils';
 const log = new Logger('Local Class');
 
-export class Local {
+export class Local<T> {
     /**
      * the local object
      */
@@ -12,14 +12,14 @@ export class Local {
     /**
      * name of the local
      */
-    public name: string;
+    public name: T;
 
     /**
      *
      * @param name name of the local
      * @param language local object
      */
-    constructor(name: string, language: object) {
+    constructor(name: T, language: object) {
         this.name = name;
         this._language = language;
     }

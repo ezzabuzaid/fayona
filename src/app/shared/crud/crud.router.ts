@@ -1,5 +1,5 @@
 import { CrudService } from './crud.service';
-import { Post, Put, Delete, Get } from '@lib/methods';
+import { Post, Put, Delete, Get, Patch } from '@lib/methods';
 import { Auth } from '@api/portal';
 import { Request, Response } from 'express';
 import { SuccessResponse, NetworkStatus, ErrorResponse, sendResponse } from '@core/helpers';
@@ -7,9 +7,9 @@ import { translate } from '@lib/translation';
 import { AppUtils } from '@core/utils';
 import { Body } from '@lib/mongoose';
 
-export class CrudRouter<T> {
+export class CrudRouter<M, S extends CrudService<M> = CrudService<M>> {
     constructor(
-        protected service: CrudService<T>
+        protected service: S & CrudService<M>
     ) { }
 
     @Post('', Auth.isAuthenticated)
@@ -22,9 +22,20 @@ export class CrudRouter<T> {
         sendResponse(res, response);
     }
 
-    @Put(':id', Auth.isAuthenticated)
+    @Patch(':id', Auth.isAuthenticated)
     public async update(req: Request, res: Response) {
-        const result = await this.service.update({ body: req.body, id: req.params.id });
+        const { id } = req.params;
+        const result = await this.service.update(id, req.body);
+        if (result.hasError) {
+            throw new ErrorResponse(result.data);
+        }
+        sendResponse(res, new SuccessResponse(result.data));
+    }
+
+    @Put(':id', Auth.isAuthenticated)
+    public async set(req: Request, res: Response) {
+        const { id } = req.params;
+        const result = await this.service.set(id, req.body);
         if (result.hasError) {
             throw new ErrorResponse(result.data);
         }
@@ -56,10 +67,10 @@ export class CrudRouter<T> {
 
     @Post('', Auth.isAuthenticated)
     public async bulkUpdate(req: Request, res: Response) {
-        const { ids } = req.body as { ids: Array<Body<T>> };
-        this._checkIfIdsIsValid(ids);
+        const { entites } = req.body as { entites: Array<Body<M>> };
+        this._checkIfIdsIsValid(entites);
 
-        const completion = await this.service.bulkUpdate(ids);
+        const completion = await this.service.bulkUpdate(entites);
         if (AppUtils.not(completion)) {
             throw new ErrorResponse(translate('one_of_entities_not_exist'));
         }
@@ -79,6 +90,7 @@ export class CrudRouter<T> {
 
     @Get('', Auth.isAuthenticated)
     public async fetchEntities(req: Request, res: Response) {
+        // TODO: move pagination to service to allow it to be consumed by other services
         let { page, size, ...sort } = req.query;
         page = +page;
         size = +size;

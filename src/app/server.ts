@@ -1,44 +1,37 @@
-import { Database } from '@core/database/database';
+import { Database } from '@core/database';
 import { stage, StageLevel } from '@core/helpers';
 import { Logger, LoggerLevel } from '@core/utils';
 import { envirnoment } from '@environment/env';
 import http = require('http');
 import { URL } from 'url';
 import { Application } from './app';
-import { OLHC, loadOHLCcsv, handleSocket } from './playground/olhc';
-import { deploy } from './playground/deploy';
+
 const log = new Logger('Server init');
+
 export class NodeServer extends Application {
         private port = +envirnoment.get('PORT') || 8080;
         private host = envirnoment.get('HOST') || '127.0.0.1';
         public path: URL = null;
 
-        /**
-         * Invoke this method to start the server
-         * @param port server port
-         */
+        private constructor() {
+                super();
+                this.path = new URL(`http://${this.host}:${this.port}`);
+        }
+
         public static async bootstrap() {
-                // SECTION server init event
-                log.debug('Start boostrapping server');
                 envirnoment.load();
                 const server = new NodeServer();
-                const httpServer = await server.populateServer();
+                await Promise.all([server.populateServer(), NodeServer.loadDatabase()]);
+                return server;
                 // server.application.get('/socket/:name', handleSocket);
                 // server.application.get('/webhooks/github/deploy', deploy);
-                return server.init();
         }
 
         public static test() {
                 Logger.level = LoggerLevel.Off;
-                log.info('Start Testing');
                 envirnoment.load(StageLevel.TEST);
-                return (new NodeServer()).init();
-        }
-
-        private constructor() {
-                super();
-                this.path = new URL(`http://${this.host}:${this.port}`);
-                log.info(`The env => ${stage.LEVEL}`);
+                // FIXME new Application()).application shouldn't be created here
+                return Promise.all([NodeServer.loadDatabase(), (new Application()).application]);
         }
 
         /**
@@ -64,22 +57,18 @@ export class NodeServer extends Application {
                 });
         }
 
-        private init() {
+        public static loadDatabase() {
                 const {
                         MONGO_USER: user,
                         MONGO_PASSWORD: password,
                         MONGO_PATH: path,
                         MONGO_HOST: host
                 } = envirnoment.env;
-                log.debug(stage.LEVEL);
                 try {
-                        return Promise.all([
-                                this.populateRoutes(),
-                                Database.load({ user, password, path, host, atlas: stage.production }),
-                        ]);
+                        return Database.load({ user, password, path, host, atlas: stage.production });
                 } catch (error) {
                         throw new Error(`Faild to init the server ${error}`);
                 }
-
         }
+
 }

@@ -1,54 +1,104 @@
-import { superAgent } from './supertest';
 import { Constants, tokenService } from '@core/helpers';
 import { UsersSchema, ERoles } from '@api/users';
 import { Body } from '@lib/mongoose';
+import * as faker from 'faker';
+import { ValidationPatterns } from '@shared/common';
+import { ApplicationConstants } from '@core/constants';
+import { AppUtils } from '@core/utils';
+
+export function defaultHeaders() {
+    return {
+        [ApplicationConstants.deviceIdHeader]: faker.random.uuid()
+    };
+}
 
 export function getUri(value: string) {
     return `/api/${value}`;
 }
 
-export async function sendRequest<T>(endpoint: string, body: T) {
-    const req = (await superAgent).post(endpoint);
-    return await req.send(body as any);
+export function sendRequest<T>(endpoint: string, body: T, headers = {}) {
+    return global.superAgent
+        .post(getUri(endpoint))
+        .send(body as any)
+        .set({
+            ...defaultHeaders(),
+            ...headers,
+        });
 }
-export async function deleteRequest(endpoint: string, id: string) {
-    return (await superAgent).delete(endpoint);
+
+export function deleteRequest(endpoint: string, id: string, headers = {}) {
+    return global.superAgent
+        .delete(getUri(`${endpoint}/${id}`))
+        .set({
+            ...defaultHeaders(),
+            ...headers,
+        });
+}
+
+export function getRequest(endpoint: string) {
+    return global.superAgent.get(getUri(endpoint)).send(defaultHeaders());
+}
+
+export class UserFixture {
+    public user = {
+        id: null,
+        token: null
+    };
+    private usersEndpoint = Constants.Endpoints.USERS;
+
+    public async createUser(body: Partial<Body<UsersSchema>> = {}) {
+        const response = await sendRequest<Body<UsersSchema>>(this.usersEndpoint, {
+            email: faker.internet.email(),
+            username: generateUsername(),
+            mobile: generatePhoneNumber(),
+            password: faker.internet.password(),
+            verified: false,
+            role: ERoles.ADMIN,
+            profile: null,
+            ...body
+        });
+        try {
+            this.user.id = response.body.data.id;
+        } catch (error) { }
+        return response;
+    }
+
+    public async login() {
+        const payload = {
+            email: faker.internet.email(),
+            username: generateUsername(),
+            mobile: generatePhoneNumber(),
+            password: faker.internet.password(),
+        };
+        try {
+            await sendRequest<Body<Partial<UsersSchema>>>(this.usersEndpoint, payload);
+            return sendRequest(Constants.Endpoints.LOGIN, payload);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    public async deleteUser(id = this.user.id) {
+        if (AppUtils.not(id)) { return; }
+        return deleteRequest(this.usersEndpoint, id);
+    }
+
+}
+
+export function generatePhoneNumber(dialCode = 962) {
+    return `+${dialCode}792${Math.floor(Math.random() * 899999 + 100000)}`;
+}
+
+export function generateUsername() {
+    const username = faker.internet.userName();
+    const noSpecialChar = ValidationPatterns.NoSpecialChar.test(username);
+    return noSpecialChar ? username : generateUsername();
 }
 
 export function generateExpiredToken() {
     return tokenService.generateToken({} as any, { expiresIn: '-10s' });
 }
 
-export class UserUtilityFixture {
-    public user = {
-        id: null,
-        token: null
-    };
-    private usersUri = getUri(Constants.Endpoints.USERS);
-
-    constructor(seed = {}) { }
-
-    public async  createUser(body: Partial<Body<UsersSchema>> = {}) {
-        const res = await sendRequest<Body<UsersSchema>>(this.usersUri, {
-            email: `test@test.com`,
-            password: '123456789',
-            username: `test`,
-            mobile: '+962792807794',
-            role: ERoles.SUPERADMIN,
-            profile: null,
-            verified: null,
-            ...body
-        });
-        console.log(res.body);
-        this.user.id = res.body.data.id;
-        this.user.token = tokenService.generateToken(this.user.id);
-        return res;
-    }
-    public async deleteUser(id = this.user.id) {
-        if (!this.user.id) { return; }
-        const req = (await superAgent).delete(`${this.usersUri}/${this.user.id}`);
-        const res = await req.set('Authorization', this.user.token);
-        return res;
-    }
-
+export function generateToken() {
+    return tokenService.generateToken({ id: '' });
 }
