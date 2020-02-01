@@ -30,7 +30,7 @@ export class CrudService<T> {
 
     private async isEntityExist(body) {
         if (AppUtils.hasItemWithin(this.options.unique)) {
-            const fetchOne = (field) => this.repo.fetchOne({ [field]: body[field] } as any);
+            const fetchOne = (field: keyof Body<T>) => this.repo.fetchOne({ [field]: body[field] } as any);
             for (let index = 0; index < this.options.unique.length; index++) {
                 const field = this.options.unique[index];
                 const record = await fetchOne(field);

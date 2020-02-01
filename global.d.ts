@@ -8,7 +8,7 @@ declare global {
         }
         export interface ProcessEnv {
             MONGO_USER: string
-            MONGO_PASSWORD: number;
+            MONGO_PASSWORD: string;
             MONGO_PATH: string
             JWT_SECRET_KEY: string
             NODE_STAGE: string;
