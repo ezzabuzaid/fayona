@@ -57,6 +57,7 @@
     "postman-collection": "^3.5.5",
     "reflect-metadata": "^0.1.13",
     "simple-git": "^1.130.0",
+    "socket.io": "^2.3.0",
     "tsconfig-paths": "^3.8.0",
     "tslib": "^1.10.0",
     "tslint": "^5.20.1",
