@@ -15,17 +15,13 @@ import cors from 'cors';
 const log = new Logger('Application instance');
 
 export class Application {
-    private _application = express();
-    private staticDirectory = path.join(process.cwd(), 'src', 'public');
+    public application = express();
+    private staticDirectory = path.join(process.cwd(), 'public');
     private uploadDirectory = path.join(process.cwd(), 'uploads');
     constructor() {
         this.configure();
         this.setupLocalization();
         this.populateRoutes();
-    }
-
-    get application() {
-        return this._application;
     }
 
     /**

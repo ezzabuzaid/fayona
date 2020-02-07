@@ -17,7 +17,7 @@ export class HashService {
     }
 
     public static comparePassword(candidatePassword: string, actualPassword: string) {
-        return bcrypt.compare(candidatePassword, actualPassword);
+        return bcrypt.compareSync(candidatePassword, actualPassword);
     }
 
 }

@@ -14,7 +14,7 @@ export enum ERoles {
 @Entity(Constants.Schemas.USERS)
 export class UsersSchema {
     @Field({
-        enum: [1, 2, 3, 4, 5],
+        enum: [0, 1, 2, 3, 4],
         default: ERoles.ADMIN,
         validate: (value: ERoles) => AppUtils.isTruthy(ERoles[value])
     }) public role: ERoles;
