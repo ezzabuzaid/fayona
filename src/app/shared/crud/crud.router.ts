@@ -57,7 +57,7 @@ export class CrudRouter<M, S extends CrudService<M> = CrudService<M>> {
         this._checkIfIdsIsValid(ids);
 
         const completion = await this.service.bulkDelete(ids);
-        if (AppUtils.not(completion)) {
+        if (AppUtils.isFalsy(completion)) {
             throw new ErrorResponse(translate('one_of_entities_not_exist'));
         }
 
@@ -71,7 +71,7 @@ export class CrudRouter<M, S extends CrudService<M> = CrudService<M>> {
         this._checkIfIdsIsValid(entites);
 
         const completion = await this.service.bulkUpdate(entites);
-        if (AppUtils.not(completion)) {
+        if (AppUtils.isFalsy(completion)) {
             throw new ErrorResponse(translate('one_of_entities_not_exist'));
         }
         const response = new SuccessResponse(null);
@@ -110,7 +110,7 @@ export class CrudRouter<M, S extends CrudService<M> = CrudService<M>> {
     }
 
     private _checkIfIdsIsValid(ids: any[]) {
-        if (AppUtils.not(ids) || AppUtils.not(AppUtils.hasItemWithin(ids))) {
+        if (AppUtils.isFalsy(ids) || AppUtils.isFalsy(AppUtils.hasItemWithin(ids))) {
             throw new ErrorResponse(translate('please_provide_valid_list_of_ids'));
         }
     }

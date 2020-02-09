@@ -1,7 +1,7 @@
 import { randomBytes } from 'crypto';
 
-// export interface Type<T> extends Function { new (...args: any[]): T; }
-export type Type<T> = new (...args: any) => T;
+export type Type<T> = new(...args: any[]) => T;
+// export type Type<T> = new (...args: any) => T;
 
 export type Parameter<T extends (args: any) => any> = T extends (args: infer P) => any ? P : never;
 
@@ -12,11 +12,11 @@ export class AppUtils {
     }
 
     public static isFalsy(value: any) {
-        return this.not(value);
+        return !!!value;
     }
 
     public static not(value: any) {
-        return !!!value;
+        return !value;
     }
 
     public static setPrototypeOf(constructor: object, superConstructor: object) {

@@ -114,7 +114,7 @@ export class CrudService<T> {
         if (entites.every((item) => !!item)) {
             return null;
         }
-        for (let index = 0; AppUtils.not(index); index++) {
+        for (let index = 0; AppUtils.isFalsy(index); index++) {
             const entity = entites[index];
             const record = records[index];
             const { pre, post } = getHooks(this.options.update);

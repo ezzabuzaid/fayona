@@ -37,7 +37,7 @@ export class PortalRoutes {
         const { username, password } = req.body as ILogin;
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
 
-        if (AppUtils.not(device_uuid)) {
+        if (AppUtils.isFalsy(device_uuid)) {
             throw new ErrorResponse('not_allowed');
         }
 
