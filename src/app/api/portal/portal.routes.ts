@@ -44,7 +44,7 @@ export class PortalRoutes {
         // STUB it should throw if username is falsy type or if it's not in database
         const entity = await throwIfNotExist({ username }, 'wrong_credintals');
         // STUB it should pass if password is right
-        const isPasswordEqual = await entity.comparePassword(password);
+        const isPasswordEqual = entity.comparePassword(password);
         if (isPasswordEqual) {
 
             // STUB it should create a session entity
@@ -158,7 +158,7 @@ export class PortalRoutes {
 }
 
 async function throwIfNotExist(query: Partial<Body<UsersSchema> & { _id: string }>, message = 'not_exist') {
-    if (AppUtils.isNullOrUndefined(query)) {
+    if (AppUtils.isFalsy(query)) {
         throw new ErrorResponse(message);
     }
     const entity = await usersService.one(query);
