@@ -34,21 +34,31 @@ export class NodeServer extends Application {
                 envirnoment.load();
                 const server = new NodeServer();
                 await NodeServer.loadDatabase();
+                const sockets = {};
                 const rooms = {};
-                socketIO(server.server)
+                const io = socketIO(server.server)
                         .on('connection', (socket) => {
                                 socket.on('JoinRoom', (room: IRoom) => {
-                                        rooms[room.sender_id] = socket;
+                                        sockets[room.sender_id] = socket;
                                         console.log('New Room => ', room.sender_id);
                                 });
                                 socket.on('SendMessage', (message: IMessage) => {
                                         console.log('New Message', message);
-                                        const recipientSocket = rooms[message.recipient_id];
+                                        const recipientSocket = sockets[message.recipient_id];
                                         if (recipientSocket) {
                                                 recipientSocket.emit('Message', message);
                                         }
                                 });
+                                socket.on('JoinGroup', (roomID) => {
+                                        console.log('New Group Joiner => ', roomID);
+                                        socket.join(roomID);
+                                });
+                                socket.on('SendGroupMessage', (roomID, message) => {
+                                        console.log('New Group Message => ', roomID);
+                                        io.to(roomID).emit('Message', message);
+                                });
                         });
+
                 return server;
         }
 
