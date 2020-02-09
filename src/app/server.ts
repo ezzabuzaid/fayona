@@ -55,7 +55,7 @@ export class NodeServer extends Application {
                                 });
                                 socket.on('SendGroupMessage', (roomID, message) => {
                                         console.log('New Group Message => ', roomID);
-                                        io.to(roomID).emit('Message', message);
+                                        socket.to(roomID).emit('Message', message);
                                 });
                         });
 
