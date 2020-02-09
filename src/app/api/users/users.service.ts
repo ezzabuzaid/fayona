@@ -22,6 +22,7 @@ class UserService extends CrudService<UsersSchema> {
                 }
             }
         });
+
     }
 }
 export default new UserService();
