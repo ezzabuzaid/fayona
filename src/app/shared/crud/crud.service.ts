@@ -49,7 +49,7 @@ export class CrudService<T> {
         }
 
         const entity = this.repo.create(body);
-        const { pre, post, onSuccess } = getHooks(this.options.create);
+        const { pre, post } = getHooks(this.options.create);
         await pre(entity);
         await entity.save();
         await post(entity);

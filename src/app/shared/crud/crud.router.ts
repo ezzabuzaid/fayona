@@ -12,7 +12,7 @@ export class CrudRouter<M, S extends CrudService<M> = CrudService<M>> {
         protected service: S & CrudService<M>
     ) { }
 
-    @Post('', Auth.isAuthenticated)
+    @Post('/', Auth.isAuthenticated)
     public async create(req: Request, res: Response) {
         const result = await this.service.create(req.body);
         if (result.hasError) {
@@ -51,7 +51,7 @@ export class CrudRouter<M, S extends CrudService<M> = CrudService<M>> {
         sendResponse(res, new SuccessResponse(result.data));
     }
 
-    @Delete('', Auth.isAuthenticated)
+    @Delete('bulk', Auth.isAuthenticated)
     public async bulkDelete(req: Request, res: Response) {
         const { ids } = req.body as { ids: string[] };
         this._checkIfIdsIsValid(ids);
@@ -65,7 +65,7 @@ export class CrudRouter<M, S extends CrudService<M> = CrudService<M>> {
         res.status(response.code).json(response);
     }
 
-    @Post('', Auth.isAuthenticated)
+    @Post('bulk', Auth.isAuthenticated)
     public async bulkUpdate(req: Request, res: Response) {
         const { entites } = req.body as { entites: Array<Body<M>> };
         this._checkIfIdsIsValid(entites);
@@ -88,7 +88,7 @@ export class CrudRouter<M, S extends CrudService<M> = CrudService<M>> {
         res.status(response.code).json(response);
     }
 
-    @Get('', Auth.isAuthenticated)
+    @Get('/', Auth.isAuthenticated)
     public async fetchEntities(req: Request, res: Response) {
         // TODO: move pagination to service to allow it to be consumed by other services
         let { page, size, ...sort } = req.query;

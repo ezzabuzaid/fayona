@@ -1,17 +1,23 @@
-import { BaseModel, Entity, Field } from '@lib/mongoose';
+import { BaseModel, Entity, Field, Body } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
-import { Types } from 'mongoose';
 
 export class GroupMemberSchema {
-    @Field() public user_id: Types.ObjectId;
-    @Field({ default: false }) public isAdmin: boolean;
+    @Field({ pure: true, required: true }) public user_id: string;
+    @Field() public isAdmin: boolean = false;
 }
 
 @Entity(Constants.Schemas.GROUPS)
 export class GroupsSchema {
+
+    constructor(dto: Body<GroupsSchema>) {
+        this.title = dto.title;
+        this.logo = dto.logo;
+        this.members = dto.members;
+    }
+
     @Field() public title: string;
     @Field() public logo: string;
-    @Field() public users: GroupMemberSchema[];
+    @Field() public members: GroupMemberSchema[];
 }
 
 export default BaseModel(GroupsSchema);

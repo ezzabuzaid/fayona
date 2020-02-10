@@ -73,7 +73,8 @@ export class ErrorHandling {
                 response.message = translate(stage.production ? 'jwt_expired' : error.message);
                 response.code = NetworkStatus.UNAUTHORIZED;
                 break;
-
+            default:
+                console.log(error);
         }
         sendResponse(res, response);
         return;

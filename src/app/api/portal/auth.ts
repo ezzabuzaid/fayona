@@ -33,7 +33,7 @@ export class Auth {
                 throw new UnauthorizedResponse();
             }
         } catch (error) {
-            await sessionsService.deActivate({ device_uuid: req.header(ApplicationConstants.deviceIdHeader) });
+            await sessionsService.deActivate({ device_uuid });
             throw error;
         }
         next();

@@ -6,7 +6,7 @@ import { IExpressInternal, IRouterDecorationOption, RouterProperties } from './m
 
 const log = new Logger('Router Decorator');
 import path = require('path');
-import { IMetadata, metadata_key } from '.';
+import { IMetadata, method_metadata_key } from '.';
 
 export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
     return function <T extends new (...args: any[]) => any>(constructor: T) {
@@ -18,7 +18,7 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
 
         Reflect.getMetadataKeys(constructor)
             .forEach((key: string) => {
-                if (key.startsWith(metadata_key)) {
+                if (key.startsWith(method_metadata_key)) {
                     const metadata = Reflect.getMetadata(key, constructor) as IMetadata;
                     Reflect.deleteMetadata(key, constructor);
                     if (metadata) {

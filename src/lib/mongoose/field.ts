@@ -24,8 +24,10 @@ export function Field(options: MongooseTypes.FieldOptions = {}) {
         }
         fields[propertyKey] = {
             type: propertyType.name,
+            default: instance[propertyKey],
             ...defaults,
-            ...options
+            ...options,
+
         };
     };
 }

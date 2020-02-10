@@ -35,10 +35,10 @@ export interface IMetadata {
     handler: (...args) => any;
 }
 
-export const metadata_key = 'METHOD';
+export const method_metadata_key = 'METHOD';
 
 export function generateMetadataKey(method: METHODS, uri: string) {
-    return `${metadata_key}:${method}:${uri}`;
+    return `${method_metadata_key}:${method}:${uri}`;
 }
 
 export function define({ method, uri, middlewares, target, propertyKey }: IMetadataDto) {
