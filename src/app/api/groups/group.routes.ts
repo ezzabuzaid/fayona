@@ -14,10 +14,10 @@ export class GroupsRouter extends CrudRouter<GroupsSchema> {
 
     @Post('/', Auth.isAuthenticated)
     public async create(req: Request, res) {
-        const dto = new GroupsSchema(req.body);
-        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        dto.members.push({ user_id: decodedToken.id, isAdmin: true });
-        req.body = dto;
+        // const dto = new GroupsSchema(req.body);
+        // const decodedToken = await tokenService.decodeToken(req.headers.authorization);
+        // dto.members.push({ user_id: decodedToken.id, isAdmin: true });
+        // req.body = dto;
         return super.create(req, res);
     }
 
