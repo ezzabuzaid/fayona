@@ -8,7 +8,8 @@
     "watch:prod": "node -r ./tsconfig-paths-bootstrap.js ./dist/main.js",
     "start": "npm run watch:prod",
     "lint": "tslint -c tslint.json 'src/**/*.ts' --fix",
-    "build": "node build --env=prod"
+    "build:prod": "node build --env=prod",
+    "build:dev": "node build --env=dev"
   },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
@@ -81,7 +82,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint && npm run build && git add ."
+      "pre-commit": "npm run lint && npm run build:prod && git add ."
     }
   },
   "main": "main.ts",
