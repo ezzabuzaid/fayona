@@ -1,5 +1,6 @@
 import { BaseModel, Entity, Field, Body } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
+import { Types } from 'mongoose';
 
 // FIXME
 // cannot use GroupMemberSchema as submodel weather for single or mutliple submodel,
@@ -9,9 +10,13 @@ import { Constants } from '@core/helpers';
 // not needed because @Entity will register it as mongose model
 // (pass an option with @Entity to not to create model)
 
+@Entity('group_members')
 export class GroupMemberSchema {
     @Field({ pure: true, required: true }) public user_id: string = null;
     @Field() public isAdmin: boolean = false;
+    @Field({
+        ref: Constants.Schemas.GROUPS,
+    }) public members: Types.ObjectId[];
 }
 
 @Entity(Constants.Schemas.GROUPS)
@@ -25,7 +30,6 @@ export class GroupsSchema {
 
     @Field() public title: string;
     @Field() public logo: string;
-    @Field() public members: GroupMemberSchema[];
 }
 
 export default BaseModel(GroupsSchema);
