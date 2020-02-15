@@ -57,9 +57,6 @@ export class UsersSchema {
         }
     }) public verified: boolean;
 
-    public comparePassword(candidatePassword: string) {
-        return HashService.comparePassword(candidatePassword, this.password);
-    }
 }
 
 export const UsersModel = BaseModel<UsersSchema>(UsersSchema);

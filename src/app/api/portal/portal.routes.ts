@@ -1,4 +1,4 @@
-import { ErrorResponse, SuccessResponse, tokenService, Constants, IRefreshTokenClaim, Responses } from '@core/helpers';
+import { ErrorResponse, SuccessResponse, tokenService, Constants, IRefreshTokenClaim, Responses, HashService } from '@core/helpers';
 import { Post, Router } from '@lib/methods';
 import { Request, Response } from 'express';
 import usersService from '@api/users/users.service';
@@ -42,23 +42,23 @@ export class PortalRoutes {
         }
 
         // STUB it should throw if username is falsy type or if it's not in database
-        const entity = await throwIfNotExist({ username }, 'wrong_credintals');
+        const record = await throwIfNotExist({ username }, 'wrong_credintals');
         // STUB it should pass if password is right
-        const isPasswordEqual = entity.comparePassword(password);
+        const isPasswordEqual = HashService.comparePassword(record.password, password);
         if (isPasswordEqual) {
 
             // STUB it should create a session entity
             await sessionsService.create({
                 device_uuid,
                 active: true,
-                user_id: entity.id
+                user_id: record.id
             });
 
             const response = new SuccessResponse(null);
             // STUB test the refreshToken claims should have only entity id with expire time 12h
-            response.refreshToken = PortalHelper.generateRefreshToken(entity.id);
+            response.refreshToken = PortalHelper.generateRefreshToken(record.id);
             // STUB test token claims must have only entity id and role with 30min expire time
-            response.token = PortalHelper.generateToken(entity.id, entity.role);
+            response.token = PortalHelper.generateToken(record.id, record.role);
             return res.status(response.code).json(response);
         }
         // STUB it should throw if password was wrong

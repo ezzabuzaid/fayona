@@ -9,7 +9,6 @@ export function Entity(name: string, options: SchemaOptions = {}) {
         const fields = Reflect.getMetadata(metadataKey, constructor);
         Reflect.deleteMetadata(metadataKey, constructor);
         const schema = new BaseSchema(fields, options);
-        schema.loadClass(constructor);
         Reflect.defineMetadata(generateModelMetadataKey(constructor), model(name, schema), constructor);
     };
 }
