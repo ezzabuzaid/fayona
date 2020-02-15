@@ -17,6 +17,7 @@ export namespace Constants {
         public static readonly REFRESH_TOKEN = 'refreshtoken';
         public static readonly VERIFY_ACCOUNT = 'verifyaccount';
         public static readonly GROUPS = 'groups';
+        public static readonly MEMBERS = 'members';
     }
     export class Schemas {
         public static readonly favorites = 'favorites';
@@ -28,5 +29,6 @@ export namespace Constants {
         public static readonly SESSIONS = 'sessions';
         public static readonly USERS = 'users';
         public static readonly GROUPS = 'groups';
+        public static readonly MEMBERS = 'members';
     }
 }

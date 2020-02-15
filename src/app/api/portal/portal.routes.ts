@@ -1,4 +1,4 @@
-import { ErrorResponse, SuccessResponse, tokenService, Constants, IRefreshTokenClaim, UnauthorizedResponse } from '@core/helpers';
+import { ErrorResponse, SuccessResponse, tokenService, Constants, IRefreshTokenClaim, Responses } from '@core/helpers';
 import { Post, Router } from '@lib/methods';
 import { Request, Response } from 'express';
 import usersService from '@api/users/users.service';
@@ -80,7 +80,7 @@ export class PortalRoutes {
 
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
         if (AppUtils.isFalsy(device_uuid)) {
-            throw new UnauthorizedResponse();
+            throw new Responses.Unauthorized();
         }
         try {
             await tokenService.decodeToken(token);
@@ -96,7 +96,7 @@ export class PortalRoutes {
                     user_id: decodedRefreshToken.id
                 });
                 if (AppUtils.isFalsy(session)) {
-                    throw new UnauthorizedResponse();
+                    throw new Responses.Unauthorized();
                 }
 
                 const user = await throwIfNotExist({ _id: decodedRefreshToken.id });

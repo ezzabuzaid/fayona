@@ -3,7 +3,7 @@ import { PortalRoutes } from '@api/portal';
 import { FeedbackRouter } from '@api/feedback';
 import { SessionRouter } from '@api/sessions';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
-import { GroupsRouter } from '@api/groups';
+import { GroupsRouter, MembersRouter } from '@api/groups';
 
 export class Wrapper {
     private static list = [];
@@ -58,3 +58,4 @@ Wrapper.registerRouter(UsersRouter);
 Wrapper.registerRouter(FeedbackRouter);
 Wrapper.registerRouter(SessionRouter);
 Wrapper.registerRouter(GroupsRouter);
+Wrapper.registerRouter(MembersRouter);

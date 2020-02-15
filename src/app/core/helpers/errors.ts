@@ -3,7 +3,7 @@ import { Logger, AppUtils } from '@core/utils';
 import { translate } from '@lib/translation';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { NetworkStatus } from './network-status';
-import { sendResponse, UnauthorizedResponse } from './response.model';
+import { sendResponse, Responses } from './response.model';
 import { stage } from './stages';
 
 const log = new Logger('Errors');
@@ -101,7 +101,7 @@ export class ErrorHandling {
 
     public static throwExceptionIfDeviceUUIDIsMissing(device_uuid: string) {
         if (AppUtils.isFalsy(device_uuid)) {
-            throw new UnauthorizedResponse();
+            throw new Responses.Unauthorized();
         }
     }
 

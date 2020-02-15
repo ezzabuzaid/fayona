@@ -52,7 +52,6 @@ export class Application {
     }
 
     private populateRoutes() {
-        this.application.use(ErrorHandling.favIcon);
         this.application.use((req, res, next) => {
             const acceptLanguage = req.acceptsLanguages();
             translation.use(acceptLanguage.includes('ar') ? 'ar' : 'en');
@@ -63,6 +62,7 @@ export class Application {
             this.application.use(path.join('/api', uri), router);
         });
 
+        this.application.use(ErrorHandling.favIcon);
         this.application.get('/api', (req, res) => res.status(200).json({ work: '/API hitted' }));
         this.application.get('/', (req, res) => res.sendFile('index.html'));
         this.application.use(ErrorHandling.notFound);
@@ -83,5 +83,3 @@ export class Application {
         this.application.set(key, value);
     }
 }
-
-// TODO add lusca lib
