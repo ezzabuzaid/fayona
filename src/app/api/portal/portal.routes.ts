@@ -44,7 +44,7 @@ export class PortalRoutes {
         // STUB it should throw if username is falsy type or if it's not in database
         const record = await throwIfNotExist({ username }, 'wrong_credintals');
         // STUB it should pass if password is right
-        const isPasswordEqual = HashService.comparePassword(record.password, password);
+        const isPasswordEqual = HashService.comparePassword(password, record.password);
         if (isPasswordEqual) {
 
             // STUB it should create a session entity

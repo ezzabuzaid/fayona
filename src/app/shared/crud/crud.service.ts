@@ -8,9 +8,6 @@ function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHook
     return {
         pre: !AppUtils.isNullOrUndefined(options && options.pre) ? options.pre : (...args: any) => null,
         post: !AppUtils.isNullOrUndefined(options && options.post) ? options.post : (...args: any) => null,
-        onSuccess: !AppUtils.isNullOrUndefined(options && options.onSuccess)
-            ? options.onSuccess
-            : (...args: any) => null
     };
 }
 
