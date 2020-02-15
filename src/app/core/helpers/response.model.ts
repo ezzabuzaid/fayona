@@ -30,13 +30,29 @@ export class ErrorResponse extends HttpResponse {
     }
 
 }
-
-export class UnauthorizedResponse extends ErrorResponse {
-    constructor() {
-        super('not_authorized', NetworkStatus.UNAUTHORIZED);
+export namespace Responses {
+    export class Unauthorized extends ErrorResponse {
+        constructor() {
+            super('not_authorized', NetworkStatus.UNAUTHORIZED);
+        }
     }
-}
+    export class BadRequest extends ErrorResponse {
+        constructor(message: string = 'bad_request') {
+            super(message, NetworkStatus.BAD_REQUEST);
+        }
+    }
+    export class Ok<T> extends SuccessResponse<T> {
+        constructor(data: T) {
+            super(data);
+        }
+    }
+    export class Created extends SuccessResponse<{ id: string }> {
+        constructor(id: string) {
+            super({ id }, 'created', NetworkStatus.CREATED);
+        }
+    }
 
-export function sendResponse(res: Response, response: HttpResponse) {
-    return res.status(response.code).json(response);
+}
+export function sendResponse(res: Response, httpResponse: HttpResponse) {
+    return res.status(httpResponse.code).json(httpResponse);
 }
