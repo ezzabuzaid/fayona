@@ -18,6 +18,7 @@ export enum Errors {
     TokenExpiredError = 'TokenExpiredError',
     NotBeforeError = 'NotBeforeError',
     ValidationError = 'ValidationError',
+    MulterError = 'MulterError'
 }
 
 export class ErrorHandling {
@@ -73,6 +74,9 @@ export class ErrorHandling {
                 response.message = translate(stage.production ? 'jwt_expired' : error.message);
                 response.code = NetworkStatus.UNAUTHORIZED;
                 break;
+            case Errors.MulterError:
+                response.code = NetworkStatus.BAD_REQUEST;
+                break;
             default:
                 console.log(error);
         }
@@ -95,7 +99,7 @@ export class ErrorHandling {
         return;
     }
 
-    public static wrapRoutes(...func) {
+    public static wrapRoutes(...func: Array<(...args) => Promise<void>>) {
         return func.map((fn) => (...args) => fn(...args).catch(args[2]));
     }
 

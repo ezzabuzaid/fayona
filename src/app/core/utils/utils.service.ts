@@ -7,6 +7,10 @@ export type Parameter<T extends (args: any) => any> = T extends (args: infer P) 
 
 export class AppUtils {
 
+    static isEmptyString(value: string): boolean {
+        return typeof value !== 'string' || value === '';
+    }
+
     public static isFunction(value: any) {
         return value instanceof Function;
     }
