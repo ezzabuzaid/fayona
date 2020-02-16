@@ -1,6 +1,5 @@
 export namespace Constants {
     export class Endpoints {
-
         public static readonly ContactUs = 'contact';
         public static readonly MEALS = 'meals';
         public static readonly favorites = 'favorites';
@@ -18,6 +17,7 @@ export namespace Constants {
         public static readonly VERIFY_ACCOUNT = 'verifyaccount';
         public static readonly GROUPS = 'groups';
         public static readonly MEMBERS = 'members';
+        public static readonly UPLOADS = 'uploads';
     }
     export class Schemas {
         public static readonly favorites = 'favorites';

@@ -41,7 +41,7 @@ export class Application {
                 optionsSuccessStatus: 200,
             }))
             .use(express.json())
-            .use(express.urlencoded({ extended: true }))
+            .use(express.urlencoded({ extended: false }))
             .use(hpp())
             .use(morgan('dev'))
             .use(helmet())

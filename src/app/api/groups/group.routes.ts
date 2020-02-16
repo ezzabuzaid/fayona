@@ -46,9 +46,8 @@ export class GroupsRouter extends CrudRouter<GroupsSchema> {
         sendResponse(res, new Responses.Created(createGroupResult.data.id));
     }
 
-
     @Post('setAdmin')
-    setMemberAsAdmin() {
+    public setMemberAsAdmin() {
 
     }
 

@@ -8,19 +8,20 @@ import { Request, NextFunction, Response } from 'express';
 import { Responses, ErrorResponse } from '@core/helpers';
 
 class UploadFileDto {
-    category: string;
-    kind: string;
+    public category: string;
+    public kind: string;
     [key: string]: string;
 }
 
 export class UploadOptions {
-    allowedTypes: string[] = [];
+    public allowedTypes: string[] = [];
+
     /**
-     * number in kilobytes  
-     *  */
-    maxSize: number = 1024 * 5;
-    maxFilesNumber: number = 1;
-    fieldName: string = 'upload';
+     * number in kilobytes
+     */
+    public maxSize: number = 1024 * 5;
+    public maxFilesNumber: number = 1;
+    public fieldName: string = 'upload';
 }
 
 export class Multer {
@@ -34,7 +35,7 @@ export class Multer {
         this.upload = this.upload.bind(this);
     }
 
-    async upload(req: Request, res: Response, next: NextFunction) {
+    public async upload(req: Request, res: Response, next: NextFunction) {
         if (this.options.maxFilesNumber === 1) {
             this.multer.single(this.options.fieldName)(req, res, next);
         } else {
@@ -56,7 +57,11 @@ export class Multer {
     private get storage() {
         const fileName = (file: Express.Multer.File) => `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`;
         return multer.diskStorage({
-            destination: (req: Request<UploadFileDto>, file: Express.Multer.File, callback: (error: ErrorResponse, dest: string) => void) => {
+            destination: (
+                req: Request<UploadFileDto>,
+                file: Express.Multer.File,
+                callback: (error: ErrorResponse, dest: string) => void
+            ) => {
                 const { category, kind } = req.params;
                 if (AppUtils.isEmptyString(category)) {
                     callback(new Responses.BadRequest('please provide valid category name'), null);
