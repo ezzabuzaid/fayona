@@ -11,9 +11,7 @@ export class GroupService extends CrudService<GroupsSchema> {
 
 export class GroupMembersService extends CrudService<GroupMemberSchema> {
     constructor() {
-        super(new Repo(groupMemberModel), {
-            unique: ['user_id']
-        });
+        super(new Repo(groupMemberModel));
     }
 }
 

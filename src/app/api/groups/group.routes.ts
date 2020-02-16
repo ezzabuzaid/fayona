@@ -6,6 +6,8 @@ import { groupsService, groupMemebrsService } from './group.service';
 import { Request, Response, } from 'express';
 import { Auth } from '@api/portal';
 import { IGroupsDto } from './groups.dto';
+import { startSession } from 'mongoose';
+import { AppUtils } from '@core/utils';
 
 @Router(Constants.Endpoints.GROUPS)
 export class GroupsRouter extends CrudRouter<GroupsSchema> {
@@ -18,20 +20,36 @@ export class GroupsRouter extends CrudRouter<GroupsSchema> {
         // TODO: create member and group should be within transaction
         const { logo, title, members } = req.body as IGroupsDto;
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        const createGroupResult = await this.service.create(req.body);
+
+        if (AppUtils.isFalsy(AppUtils.hasItemWithin(members))) {
+            throw new Responses.BadRequest('a group should consist of more than one member');
+        }
+
+        const createGroupResult = await this.service.create({ logo, title });
         if (createGroupResult.hasError) {
             throw new Responses.BadRequest(createGroupResult.data);
         }
 
-        const createMemeberResult = await groupMemebrsService.create({
+        await groupMemebrsService.create({
             group_id: createGroupResult.data.id,
             user_id: decodedToken.id,
             isAdmin: true
         });
-        if (createMemeberResult.hasError) {
-            throw new Responses.BadRequest(createMemeberResult.data);
+
+        for (const member_id of members) {
+            await groupMemebrsService.create({
+                group_id: createGroupResult.data.id,
+                user_id: member_id,
+                isAdmin: false
+            });
         }
-        sendResponse(res, new Responses.Created(createGroupResult.data));
+        sendResponse(res, new Responses.Created(createGroupResult.data.id));
+    }
+
+
+    @Post('setAdmin')
+    setMemberAsAdmin() {
+
     }
 
 }

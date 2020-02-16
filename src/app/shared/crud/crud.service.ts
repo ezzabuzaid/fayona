@@ -1,9 +1,9 @@
 import { ICrudOptions, ICrudHooks } from './crud.options';
-import { Body, Document, WithID } from '@lib/mongoose';
+import { Body, WithID } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 import { Repo } from './crud.repo';
 import { translate } from '@lib/translation';
-import mongoose from 'mongoose';
+import mongoose, { ClientSession } from 'mongoose';
 
 function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHooks<T>]: any } {
     return {
@@ -31,19 +31,19 @@ export class CrudService<T> {
             const fetchOne = (field: keyof Body<T>) => this.repo.fetchOne({ [field]: body[field] } as any);
             for (let index = 0; index < this.options.unique.length; index++) {
                 const field = this.options.unique[index];
-                if (AppUtils.isFalsy(body[field])) {
+                if (AppUtils.isNullOrUndefined(body[field])) {
                     return new Result(false, `property${field} is missing`);
                 }
                 const record = await fetchOne(field);
                 if (AppUtils.isTruthy(record)) {
-                    return new Result(true, `the ${this.options.unique[index]} should be unique`);
+                    return new Result(true, this.options.unique[index]);
                 }
             }
         }
         return new Result(false);
     }
 
-    public async create(body: Body<T>) {
+    public async create(body: Body<T>, session: ClientSession = null) {
         const isExist = await this.isEntityExist(body);
         if (isExist.hasError) {
             return new Result(true, translate(`${isExist.data}_entity_exist`));
@@ -52,7 +52,7 @@ export class CrudService<T> {
         const entity = this.repo.create(body);
         const { pre, post } = getHooks(this.options.create);
         await pre(entity);
-        await entity.save();
+        await entity.save({ session });
         await post(entity);
 
         return new Result(false, { id: entity.id });
