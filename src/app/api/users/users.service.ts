@@ -14,10 +14,10 @@ class UserService extends CrudService<UsersSchema> {
         super(new Repo<UsersSchema>(UsersModel), {
             unique: ['username', 'email', 'mobile'],
             create: {
-                pre(entity) {
+                pre(record) {
                     // TODO: normalize the mobile number in order to ensure the uniqueness
                 },
-                post(entity) {
+                post(record) {
                     EmailService.sendEmail(fakeEmail());
                 }
             }

@@ -1,5 +1,5 @@
 import { GroupsSchema } from './group.model';
 
-export interface GroupsDto extends GroupsSchema {
+export interface IGroupsDto extends GroupsSchema {
     members: string[];
 }

@@ -6,8 +6,6 @@ export interface ICrudHooks<T> {
 }
 
 export interface ICrudOperation<T = any> {
-    // TODO: for each write operation should have a transaction option,
-    //  so if it's true the hooks should run within a transaction
     create?: ICrudHooks<T>;
     update?: ICrudHooks<T>;
     delete?: ICrudHooks<T>;

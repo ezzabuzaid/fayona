@@ -7,8 +7,8 @@ import mongoose from 'mongoose';
 
 function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHooks<T>]: any } {
     return {
-        pre: !AppUtils.isNullOrUndefined(options && options.pre) ? options.pre : (...args: any) => null,
-        post: !AppUtils.isNullOrUndefined(options && options.post) ? options.post : (...args: any) => null,
+        pre: AppUtils.isFunction(options && options.pre) ? options.pre : (...args: any) => null,
+        post: AppUtils.isFunction(options && options.post) ? options.post : (...args: any) => null,
     };
 }
 
@@ -84,10 +84,13 @@ export class CrudService<T> {
         }
 
         const { pre, post } = getHooks(this.options.update);
-        await pre(record);
-        await record.set(body).save();
-        await post(record);
 
+        const session = await mongoose.startSession();
+        await session.withTransaction(async () => {
+            await pre(record, session);
+            await record.set(body).save({ session });
+            await post(record, session);
+        });
         return new Result();
     }
 
@@ -111,6 +114,8 @@ export class CrudService<T> {
     }
 
     public async bulkUpdate(entites: Array<WithID<Body<T>>>) {
+        // TODO: hooks should be called
+        // TODO: all calls should be run within transaction
         const records = await Promise.all(entites.map((record) => this.repo.fetchById(record.id)));
         if (entites.every((item) => !!item)) {
             return null;
@@ -126,8 +131,7 @@ export class CrudService<T> {
         return true;
     }
 
-
-    public async bulkCreate(dtos: Body<T>[]) {
+    public async bulkCreate(dtos: Array<Body<T>>) {
         for (const dto of dtos) {
             await this.create(dto);
         }
