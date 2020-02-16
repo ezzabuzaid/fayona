@@ -5,6 +5,7 @@ import { GroupsSchema, GroupMemberSchema } from './group.model';
 import { groupsService, groupMemebrsService } from './group.service';
 import { Request, Response, } from 'express';
 import { Auth } from '@api/portal';
+import { GroupsDto } from './groups.dto';
 
 @Router(Constants.Endpoints.GROUPS)
 export class GroupsRouter extends CrudRouter<GroupsSchema> {
@@ -15,11 +16,13 @@ export class GroupsRouter extends CrudRouter<GroupsSchema> {
     @Post('/', Auth.isAuthenticated)
     public async create(req: Request, res: Response) {
         // TODO: create member and group should be within transaction
+        const { logo, title, members } = req.body as GroupsDto;
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
         const createGroupResult = await this.service.create(req.body);
         if (createGroupResult.hasError) {
             throw new Responses.BadRequest(createGroupResult.data);
         }
+
         const createMemeberResult = await groupMemebrsService.create({
             group_id: createGroupResult.data.id,
             user_id: decodedToken.id,

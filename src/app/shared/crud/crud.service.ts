@@ -3,6 +3,7 @@ import { Body, Document, WithID } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 import { Repo } from './crud.repo';
 import { translate } from '@lib/translation';
+import mongoose from 'mongoose';
 
 function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHooks<T>]: any } {
     return {
@@ -25,14 +26,17 @@ export class CrudService<T> {
         private options: ICrudOptions<T> = {} as any
     ) { }
 
-    private async isEntityExist(body) {
+    private async isEntityExist(body: Body<T>) {
         if (AppUtils.hasItemWithin(this.options.unique)) {
             const fetchOne = (field: keyof Body<T>) => this.repo.fetchOne({ [field]: body[field] } as any);
             for (let index = 0; index < this.options.unique.length; index++) {
                 const field = this.options.unique[index];
+                if (AppUtils.isFalsy(body[field])) {
+                    return new Result(false, `property${field} is missing`);
+                }
                 const record = await fetchOne(field);
                 if (AppUtils.isTruthy(record)) {
-                    return new Result(true, this.options.unique[index]);
+                    return new Result(true, `the ${this.options.unique[index]} should be unique`);
                 }
             }
         }
@@ -70,11 +74,11 @@ export class CrudService<T> {
 
     public async update(id: string, body: Partial<Body<T>>) {
         const record = await this.repo.fetchById(id);
-        if (!record) {
+        if (AppUtils.isFalsy(record)) {
             return new Result(true, 'entity_not_exist');
         }
 
-        const isExist = await this.isEntityExist(body);
+        const isExist = await this.isEntityExist(body as Body<T>);
         if (isExist.hasError) {
             return new Result(true, translate(`${isExist.data}_entity_exist`));
         }
@@ -122,7 +126,16 @@ export class CrudService<T> {
         return true;
     }
 
+
+    public async bulkCreate(dtos: Body<T>[]) {
+        for (const dto of dtos) {
+            await this.create(dto);
+        }
+        return true;
+    }
+
     public async bulkDelete(ids: string[]) {
+        // TODO: add transaction
         const records = await Promise.all(ids.map((id) => this.repo.fetchById(id)));
         if (records.every((item) => !!item)) {
             return null;
