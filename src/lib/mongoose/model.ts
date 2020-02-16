@@ -4,8 +4,9 @@ import { generateModelMetadataKey } from '.';
 import { Type } from '@core/utils';
 
 export function BaseModel<T>(schema: Type<T>) {
-    const model = Reflect.getMetadata(generateModelMetadataKey(schema), schema) as Model<T & MongooseDocument>;
-    Reflect.deleteMetadata(generateModelMetadataKey(schema), schema);
+    const metadataKey = generateModelMetadataKey(schema);
+    const model = Reflect.getMetadata(metadataKey, schema) as Model<T & MongooseDocument>;
+    Reflect.deleteMetadata(metadataKey, schema);
     if (model) {
         return model;
     }

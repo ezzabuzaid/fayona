@@ -3,7 +3,7 @@ import { Logger, AppUtils } from '@core/utils';
 import { translate } from '@lib/translation';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { NetworkStatus } from './network-status';
-import { sendResponse, UnauthorizedResponse } from './response.model';
+import { sendResponse, Responses } from './response.model';
 import { stage } from './stages';
 
 const log = new Logger('Errors');
@@ -18,6 +18,7 @@ export enum Errors {
     TokenExpiredError = 'TokenExpiredError',
     NotBeforeError = 'NotBeforeError',
     ValidationError = 'ValidationError',
+    MulterError = 'MulterError'
 }
 
 export class ErrorHandling {
@@ -73,7 +74,11 @@ export class ErrorHandling {
                 response.message = translate(stage.production ? 'jwt_expired' : error.message);
                 response.code = NetworkStatus.UNAUTHORIZED;
                 break;
-
+            case Errors.MulterError:
+                response.code = NetworkStatus.BAD_REQUEST;
+                break;
+            default:
+                console.log(error);
         }
         sendResponse(res, response);
         return;
@@ -94,13 +99,13 @@ export class ErrorHandling {
         return;
     }
 
-    public static wrapRoutes(...func) {
+    public static wrapRoutes(...func: Array<(...args) => Promise<void>>) {
         return func.map((fn) => (...args) => fn(...args).catch(args[2]));
     }
 
     public static throwExceptionIfDeviceUUIDIsMissing(device_uuid: string) {
         if (AppUtils.isFalsy(device_uuid)) {
-            throw new UnauthorizedResponse();
+            throw new Responses.Unauthorized();
         }
     }
 

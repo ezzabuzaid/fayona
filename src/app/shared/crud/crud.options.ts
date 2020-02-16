@@ -3,12 +3,9 @@ import { Body, Document } from '@lib/mongoose';
 export interface ICrudHooks<T> {
     pre?: (doc: Document<T>) => any;
     post?: (doc: Document<T>) => any;
-    onSuccess?: (doc: Document<T>) => any; // create response interface
 }
 
 export interface ICrudOperation<T = any> {
-    // TODO: for each write operation should have a transaction option,
-    //  so if it's true the hooks should run within a transaction
     create?: ICrudHooks<T>;
     update?: ICrudHooks<T>;
     delete?: ICrudHooks<T>;

@@ -2,29 +2,33 @@ import { CrudService } from './crud.service';
 import { Post, Put, Delete, Get, Patch } from '@lib/methods';
 import { Auth } from '@api/portal';
 import { Request, Response } from 'express';
-import { SuccessResponse, NetworkStatus, ErrorResponse, sendResponse } from '@core/helpers';
+import { SuccessResponse, NetworkStatus, ErrorResponse, sendResponse, Responses } from '@core/helpers';
 import { translate } from '@lib/translation';
 import { AppUtils } from '@core/utils';
 import { Body } from '@lib/mongoose';
 
-export class CrudRouter<M, S extends CrudService<M> = CrudService<M>> {
+// TODO: Generic SchemaType should inherit from RepoHooks interface which
+//  will be used to fire onSave, onUpdate, onDelete, ..etc
+export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> = CrudService<SchemaType>> {
     constructor(
-        protected service: S & CrudService<M>
+        protected service: ServiceType & CrudService<SchemaType>
     ) { }
 
-    @Post('', Auth.isAuthenticated)
+    @Post('/', Auth.isAuthenticated)
     public async create(req: Request, res: Response) {
         const result = await this.service.create(req.body);
         if (result.hasError) {
-            throw new ErrorResponse(result.data);
+            throw new Responses.BadRequest(result.data);
+        } else {
+            sendResponse(res, new Responses.Created(result.data));
         }
-        const response = new SuccessResponse(result.data, 'success', NetworkStatus.CREATED);
-        sendResponse(res, response);
+
     }
 
     @Patch(':id', Auth.isAuthenticated)
     public async update(req: Request, res: Response) {
         const { id } = req.params;
+        // TODO: imporve error handling, if id is not string throw directly
         const result = await this.service.update(id, req.body);
         if (result.hasError) {
             throw new ErrorResponse(result.data);
@@ -35,6 +39,7 @@ export class CrudRouter<M, S extends CrudService<M> = CrudService<M>> {
     @Put(':id', Auth.isAuthenticated)
     public async set(req: Request, res: Response) {
         const { id } = req.params;
+        // TODO: imporve error handling, if id is not string throw directly
         const result = await this.service.set(id, req.body);
         if (result.hasError) {
             throw new ErrorResponse(result.data);
@@ -42,8 +47,36 @@ export class CrudRouter<M, S extends CrudService<M> = CrudService<M>> {
         sendResponse(res, new SuccessResponse(result.data));
     }
 
+    @Delete('bulk', Auth.isAuthenticated)
+    public async bulkDelete(req: Request, res: Response) {
+        const { ids } = req.body as { ids: string[] };
+        this._checkIfIdsIsValid(ids);
+
+        const completion = await this.service.bulkDelete(ids);
+        if (AppUtils.isFalsy(completion)) {
+            throw new ErrorResponse(translate('one_of_entities_not_exist'));
+        }
+
+        const response = new SuccessResponse(null);
+        res.status(response.code).json(response);
+    }
+
+    @Post('bulk', Auth.isAuthenticated)
+    public async bulkUpdate(req: Request, res: Response) {
+        const { entites } = req.body as { entites: Array<Body<SchemaType>> };
+        this._checkIfIdsIsValid(entites);
+
+        const completion = await this.service.bulkUpdate(entites);
+        if (AppUtils.isFalsy(completion)) {
+            throw new ErrorResponse(translate('one_of_entities_not_exist'));
+        }
+        const response = new SuccessResponse(null);
+        res.status(response.code).json(response);
+    }
+
     @Delete(':id', Auth.isAuthenticated)
     public async delete(req: Request, res: Response) {
+        // TODO: imporve error handling, if id is not string throw directly
         const result = await this.service.delete({ _id: req.params.id } as any);
         if (result.hasError) {
             throw new ErrorResponse(result.data);
@@ -51,35 +84,9 @@ export class CrudRouter<M, S extends CrudService<M> = CrudService<M>> {
         sendResponse(res, new SuccessResponse(result.data));
     }
 
-    @Delete('', Auth.isAuthenticated)
-    public async bulkDelete(req: Request, res: Response) {
-        const { ids } = req.body as { ids: string[] };
-        this._checkIfIdsIsValid(ids);
-
-        const completion = await this.service.bulkDelete(ids);
-        if (AppUtils.not(completion)) {
-            throw new ErrorResponse(translate('one_of_entities_not_exist'));
-        }
-
-        const response = new SuccessResponse(null);
-        res.status(response.code).json(response);
-    }
-
-    @Post('', Auth.isAuthenticated)
-    public async bulkUpdate(req: Request, res: Response) {
-        const { entites } = req.body as { entites: Array<Body<M>> };
-        this._checkIfIdsIsValid(entites);
-
-        const completion = await this.service.bulkUpdate(entites);
-        if (AppUtils.not(completion)) {
-            throw new ErrorResponse(translate('one_of_entities_not_exist'));
-        }
-        const response = new SuccessResponse(null);
-        res.status(response.code).json(response);
-    }
-
     @Get(':id', Auth.isAuthenticated)
     public async fetchEntity(req: Request, res: Response) {
+        // TODO: imporve error handling, if id is not string throw directly
         const entity = await this.service.one({ _id: req.params.id } as any);
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'));
@@ -88,9 +95,11 @@ export class CrudRouter<M, S extends CrudService<M> = CrudService<M>> {
         res.status(response.code).json(response);
     }
 
-    @Get('', Auth.isAuthenticated)
+    @Get('/', Auth.isAuthenticated)
     public async fetchEntities(req: Request, res: Response) {
         // TODO: move pagination to service to allow it to be consumed by other services
+        // TODO: imporve error handling, check the types of query
+
         let { page, size, ...sort } = req.query;
         page = +page;
         size = +size;
@@ -110,7 +119,8 @@ export class CrudRouter<M, S extends CrudService<M> = CrudService<M>> {
     }
 
     private _checkIfIdsIsValid(ids: any[]) {
-        if (AppUtils.not(ids) || AppUtils.not(AppUtils.hasItemWithin(ids))) {
+        if (AppUtils.isFalsy(ids) || AppUtils.isFalsy(AppUtils.hasItemWithin(ids))) {
+            // TODO: imporve error handling, if ids is not list of string throw directly
             throw new ErrorResponse(translate('please_provide_valid_list_of_ids'));
         }
     }

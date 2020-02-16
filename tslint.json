@@ -45,9 +45,7 @@
         "no-string-throw": true,
         "no-unsafe-finally": true,
         "no-duplicate-imports": true,
-        "no-empty-interface": {
-            "severity": "warning"
-        },
+        "no-empty-interface": false,
         "ordered-imports": false,
         "forin": false,
         "no-import-side-effect": false,
@@ -60,9 +58,7 @@
         "deprecation": {
             "severity": "warning"
         },
-        "prefer-for-of": {
-            "severity": "warning"
-        },
+        "prefer-for-of": false,
         "unified-signatures": {
             "severity": "warning"
         },

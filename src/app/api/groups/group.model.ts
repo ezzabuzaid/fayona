@@ -1,17 +1,27 @@
-import { BaseModel, Entity, Field } from '@lib/mongoose';
+import { BaseModel, Entity, Field, Body } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
 import { Types } from 'mongoose';
 
+// FIXME
+// cannot use GroupMemberSchema as submodel for single or mutliple mode,
+// because the declration of the subschema is different than the primitive types
+// so we need to find a way to solve this by not adding at as Type https://mongoosejs.com/docs/subdocs.html
+// Another Issue, is that the fields in subdocument will stay a properties unless you add @Entity which in our case
+// not needed because @Entity will register it as mongose model,
+//  you can pass an option with @Entity to not to create model
+
+@Entity(Constants.Schemas.MEMBERS)
 export class GroupMemberSchema {
-    @Field() public user_id: Types.ObjectId;
-    @Field({ default: false }) public isAdmin: boolean;
+    @Field({ pure: true, required: true }) public user_id: string = null;
+    @Field() public isAdmin: boolean = false;
+    @Field({ ref: Constants.Schemas.GROUPS }) public group_id: Types.ObjectId;
 }
 
 @Entity(Constants.Schemas.GROUPS)
 export class GroupsSchema {
     @Field() public title: string;
     @Field() public logo: string;
-    @Field() public users: GroupMemberSchema[];
 }
 
-export default BaseModel(GroupsSchema);
+export const groupModel = BaseModel(GroupsSchema);
+export const groupMemberModel = BaseModel(GroupMemberSchema);

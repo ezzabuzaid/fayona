@@ -1,4 +1,4 @@
-import { tokenService, ErrorResponse, NetworkStatus, stage, StageLevel, UnauthorizedResponse } from '@core/helpers';
+import { tokenService, Responses } from '@core/helpers';
 import { Logger, AppUtils } from '@core/utils';
 import { NextFunction, Request, Response } from 'express';
 import { sessionsService } from '@api/sessions/sessions.service';
@@ -15,7 +15,7 @@ export class Auth {
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
         const token = req.header('authorization');
         if (AppUtils.isFalsy(device_uuid) || AppUtils.isFalsy(token)) {
-            throw new UnauthorizedResponse();
+            throw new Responses.Unauthorized();
         }
 
         try {
@@ -30,10 +30,10 @@ export class Auth {
             const session = await sessionsService.getActiveSession({ device_uuid });
             if (AppUtils.isFalsy(session) || AppUtils.isFalsy(session.active)) {
                 // NOTE: not active mean that the session was disabled either by admin or the user logged out
-                throw new UnauthorizedResponse();
+                throw new Responses.Unauthorized();
             }
         } catch (error) {
-            await sessionsService.deActivate({ device_uuid: req.header(ApplicationConstants.deviceIdHeader) });
+            await sessionsService.deActivate({ device_uuid });
             throw error;
         }
         next();

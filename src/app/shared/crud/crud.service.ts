@@ -1,16 +1,14 @@
 import { ICrudOptions, ICrudHooks } from './crud.options';
-import { Body, Document, WithID } from '@lib/mongoose';
+import { Body, WithID } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 import { Repo } from './crud.repo';
 import { translate } from '@lib/translation';
+import mongoose, { ClientSession } from 'mongoose';
 
 function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHooks<T>]: any } {
     return {
-        pre: !AppUtils.isNullOrUndefined(options && options.pre) ? options.pre : (...args: any) => null,
-        post: !AppUtils.isNullOrUndefined(options && options.post) ? options.post : (...args: any) => null,
-        onSuccess: !AppUtils.isNullOrUndefined(options && options.onSuccess)
-            ? options.onSuccess
-            : (...args: any) => null
+        pre: AppUtils.isFunction(options && options.pre) ? options.pre : (...args: any) => null,
+        post: AppUtils.isFunction(options && options.post) ? options.post : (...args: any) => null,
     };
 }
 
@@ -28,11 +26,14 @@ export class CrudService<T> {
         private options: ICrudOptions<T> = {} as any
     ) { }
 
-    private async isEntityExist(body) {
+    private async isEntityExist(body: Body<T>) {
         if (AppUtils.hasItemWithin(this.options.unique)) {
             const fetchOne = (field: keyof Body<T>) => this.repo.fetchOne({ [field]: body[field] } as any);
             for (let index = 0; index < this.options.unique.length; index++) {
                 const field = this.options.unique[index];
+                if (AppUtils.isNullOrUndefined(body[field])) {
+                    return new Result(false, `property${field} is missing`);
+                }
                 const record = await fetchOne(field);
                 if (AppUtils.isTruthy(record)) {
                     return new Result(true, this.options.unique[index]);
@@ -42,16 +43,16 @@ export class CrudService<T> {
         return new Result(false);
     }
 
-    public async create(body: Body<T>) {
+    public async create(body: Body<T>, session: ClientSession = null) {
         const isExist = await this.isEntityExist(body);
         if (isExist.hasError) {
             return new Result(true, translate(`${isExist.data}_entity_exist`));
         }
 
         const entity = this.repo.create(body);
-        const { pre, post, onSuccess } = getHooks(this.options.create);
+        const { pre, post } = getHooks(this.options.create);
         await pre(entity);
-        await entity.save();
+        await entity.save({ session });
         await post(entity);
 
         return new Result(false, { id: entity.id });
@@ -73,20 +74,23 @@ export class CrudService<T> {
 
     public async update(id: string, body: Partial<Body<T>>) {
         const record = await this.repo.fetchById(id);
-        if (!record) {
+        if (AppUtils.isFalsy(record)) {
             return new Result(true, 'entity_not_exist');
         }
 
-        const isExist = await this.isEntityExist(body);
+        const isExist = await this.isEntityExist(body as Body<T>);
         if (isExist.hasError) {
             return new Result(true, translate(`${isExist.data}_entity_exist`));
         }
 
         const { pre, post } = getHooks(this.options.update);
-        await pre(record);
-        await record.set(body).save();
-        await post(record);
 
+        const session = await mongoose.startSession();
+        await session.withTransaction(async () => {
+            await pre(record, session);
+            await record.set(body).save({ session });
+            await post(record, session);
+        });
         return new Result();
     }
 
@@ -110,11 +114,13 @@ export class CrudService<T> {
     }
 
     public async bulkUpdate(entites: Array<WithID<Body<T>>>) {
+        // TODO: hooks should be called
+        // TODO: all calls should be run within transaction
         const records = await Promise.all(entites.map((record) => this.repo.fetchById(record.id)));
         if (entites.every((item) => !!item)) {
             return null;
         }
-        for (let index = 0; AppUtils.not(index); index++) {
+        for (let index = 0; AppUtils.isFalsy(index); index++) {
             const entity = entites[index];
             const record = records[index];
             const { pre, post } = getHooks(this.options.update);
@@ -125,7 +131,15 @@ export class CrudService<T> {
         return true;
     }
 
+    public async bulkCreate(dtos: Array<Body<T>>) {
+        for (const dto of dtos) {
+            await this.create(dto);
+        }
+        return true;
+    }
+
     public async bulkDelete(ids: string[]) {
+        // TODO: add transaction
         const records = await Promise.all(ids.map((id) => this.repo.fetchById(id)));
         if (records.every((item) => !!item)) {
             return null;

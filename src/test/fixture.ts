@@ -79,7 +79,7 @@ export class UserFixture {
     }
 
     public async deleteUser(id = this.user.id) {
-        if (AppUtils.not(id)) { return; }
+        if (AppUtils.isFalsy(id)) { return; }
         return deleteRequest(this.usersEndpoint, id);
     }
 
