@@ -1,19 +1,20 @@
 import { Repo, CrudService } from '@shared/crud';
 import { SessionSchema, SessionModel } from './sessions.model';
-import { Document, Body, WithID } from '@lib/mongoose';
+import { Document, Body, WithMongoID } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 
 export class SessionsService extends CrudService<SessionSchema> {
 
-    public async deActivate(query: Partial<WithID<Body<SessionSchema>>>) {
+    public async deActivate(query: Partial<WithMongoID<Body<SessionSchema>>>) {
         const record = await this.getActiveSession(query);
         if (AppUtils.isTruthy(record)) {
-            return this.setAsDeactive(record);
+            await this.setAsDeactive(record);
+            return { hasError: false, data: 'Session deactivated' };
         }
         return { hasError: true, data: 'no session available' };
     }
 
-    public getActiveSession(query: Partial<WithID<Body<SessionSchema>>>) {
+    public getActiveSession(query: Partial<WithMongoID<Body<SessionSchema>>>) {
         return this.one({
             ...query,
             active: true

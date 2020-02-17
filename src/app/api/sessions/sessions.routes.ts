@@ -2,9 +2,10 @@ import { SessionSchema } from './sessions.model';
 import { Response, Request } from 'express';
 import { Auth } from '../portal/auth';
 import { Get, Router, Patch } from '@lib/methods';
-import { tokenService, SuccessResponse, Constants } from '@core/helpers';
+import { tokenService, SuccessResponse, Constants, sendResponse, Responses } from '@core/helpers';
 import { CrudRouter } from '../../shared/crud';
 import { sessionsService, SessionsService } from './sessions.service';
+import { IDeactivateSessionDto } from './session.model';
 
 @Router(Constants.Endpoints.SESSIONS)
 export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {
@@ -21,22 +22,15 @@ export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {
         return res.status(response.code).json(response);
     }
 
-    @Patch('deactivate/:user_id', Auth.isAuthenticated)
-    public async deActivateUserSessions(req: Request, res: Response) {
-        const { user_id } = req.params;
-        await this.service.deActivatedUserSessions(user_id);
-        const response = new SuccessResponse(null);
-        return res.status(response.code).json(response);
-    }
-
-    @Patch('deactivate/:id', Auth.isAuthenticated)
+    @Patch('deactivate', Auth.isAuthenticated)
     public async deActivateSession(req: Request, res: Response) {
-        const { id } = req.params;
-
-        await this.service.deActivate({ id });
-
-        const response = new SuccessResponse(null);
-        return res.status(response.code).json(response);
+        const { session_id, user_id } = req.body as IDeactivateSessionDto;
+        const result = await this.service.deActivate({ user_id, _id: session_id });
+        if (result.hasError) {
+            sendResponse(res, new Responses.BadRequest(result.data));
+        } else {
+            sendResponse(res, new Responses.Ok(result.data));
+        }
     }
 
 }

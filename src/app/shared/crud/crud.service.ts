@@ -1,5 +1,5 @@
 import { ICrudOptions, ICrudHooks } from './crud.options';
-import { Body, WithID } from '@lib/mongoose';
+import { Body, WithID, WithMongoID } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 import { Repo } from './crud.repo';
 import { translate } from '@lib/translation';
@@ -156,13 +156,13 @@ export class CrudService<T> {
         return true;
     }
 
-    public async one(query: Partial<WithID<Body<T>>>) {
+    public async one(query: Partial<WithMongoID<Body<T>>>) {
         const record = await this.repo.fetchOne(query);
         await getHooks(this.options.one).post(record);
         return record;
     }
 
-    public async all(query: Partial<WithID<Body<T>>> = {}, projection: Projection<T> = {}, options = {}) {
+    public async all(query: Partial<WithMongoID<Body<T>>> = {}, projection: Projection<T> = {}, options = {}) {
         const records = await this.repo.fetchAll(query, projection, options);
         const hook = this.options.all;
         // TODO: fix this line

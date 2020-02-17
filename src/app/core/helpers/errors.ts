@@ -99,7 +99,7 @@ export class ErrorHandling {
         return;
     }
 
-    public static wrapRoutes(...func: Array<(...args) => Promise<void>>) {
+    public static wrapRoutes(...func) {
         return func.map((fn) => (...args) => fn(...args).catch(args[2]));
     }
 
