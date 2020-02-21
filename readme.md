@@ -8,7 +8,7 @@ DDD is the core of what it means, although not the whole concept is leveraged ou
 
 ![Sample Crud](https://media-exp1.licdn.com/dms/image/C4D22AQFXto7aXpbAfw/feedshare-shrink_800/0?e=1583971200&v=beta&t=chjQfyxTaYaqpH4NYWJ0v_Rcns1L-QwLqYae_UK7swE)
 
-
+#### it would be nice to put your touches
 
 ## Contributing
 Don't hesitate to open issues and make a pull request to help improve code
@@ -41,5 +41,5 @@ For more information on SemVer, please visit http://semver.org.
 ##### Built with love <3
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE0NzYyMjc0MywtNTUwMzQ1NzgzXX0=
+eyJoaXN0b3J5IjpbLTg0MjUzMjg2NSwtNTUwMzQ1NzgzXX0=
 -->
