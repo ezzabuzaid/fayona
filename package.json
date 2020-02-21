@@ -9,7 +9,8 @@
     "start": "npm run watch:prod",
     "lint": "tslint -c tslint.json 'src/**/*.ts' --fix",
     "build:prod": "node build --env=prod",
-    "build:dev": "node build --env=dev"
+    "build:dev": "node build --env=dev",
+    "postinstall": "npm run build:prod"
   },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
