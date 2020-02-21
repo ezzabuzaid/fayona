@@ -1,6 +1,6 @@
 # Node Buildozer
 
-### Small opinionated framework build 
+### A small opinionated framework built on top of Express using Typescript with minimal 3rd party dependcies
 
 ![Sample Crud](https://media-exp1.licdn.com/dms/image/C4D22AQFXto7aXpbAfw/feedshare-shrink_800/0?e=1583971200&v=beta&t=chjQfyxTaYaqpH4NYWJ0v_Rcns1L-QwLqYae_UK7swE)
 
@@ -37,5 +37,5 @@ For more information on SemVer, please visit http://semver.org.
 ##### Built with love <3
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTgyODI4ODI5MF19
+eyJoaXN0b3J5IjpbLTU1MDM0NTc4M119
 -->
