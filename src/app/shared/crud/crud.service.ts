@@ -1,5 +1,5 @@
 import { ICrudOptions, ICrudHooks } from './crud.options';
-import { Body, WithID, WithMongoID } from '@lib/mongoose';
+import { Body, WithID, WithMongoID, Document } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 import { Repo } from './crud.repo';
 import { translate } from '@lib/translation';
@@ -72,13 +72,19 @@ export class CrudService<T> {
         return new Result();
     }
 
-    public async update(id: string, body: Partial<Body<T>>) {
-        const record = await this.repo.fetchById(id);
+    public async updateById(id: string, body: Partial<Body<T>>) {
+        return this.doUpdate(await this.repo.fetchById(id), body);
+    }
+
+    public async update(record: Document<T>, body: Partial<Body<T>>) {
+        return this.doUpdate(record, body);
+    }
+
+    private async doUpdate(record: Document<T>, dto: Partial<Body<T>>) {
         if (AppUtils.isFalsy(record)) {
             return new Result(true, 'entity_not_exist');
         }
-
-        const isExist = await this.isEntityExist(body as Body<T>);
+        const isExist = await this.isEntityExist(dto as Body<T>);
         if (isExist.hasError) {
             return new Result(true, translate(`${isExist.data}_entity_exist`));
         }
@@ -88,7 +94,7 @@ export class CrudService<T> {
         const session = await mongoose.startSession();
         await session.withTransaction(async () => {
             await pre(record, session);
-            await record.set(body).save({ session });
+            await record.set(dto).save({ session });
             await post(record, session);
         });
         return new Result();
