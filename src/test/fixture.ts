@@ -1,10 +1,11 @@
 import { Constants, tokenService } from '@core/helpers';
 import { UsersSchema, ERoles } from '@api/users';
-import { Body } from '@lib/mongoose';
+import { Body, WithMongoID } from '@lib/mongoose';
 import * as faker from 'faker';
 import { ValidationPatterns } from '@shared/common';
 import { ApplicationConstants } from '@core/constants';
 import { AppUtils } from '@core/utils';
+import { LoginPayload } from '@api/portal';
 
 export function generateDeviceUUIDHeader() {
     return {
@@ -34,15 +35,23 @@ export function getRequest(endpoint: string, headers = {}) {
         .set(headers);
 }
 
-export async function prepareUserSession() {
-    const payload = {
+export async function prepareUserSession(user?: WithMongoID<LoginPayload>) {
+    const payload = user ?? {
         email: faker.internet.email(),
         username: generateUsername(),
         mobile: generatePhoneNumber(),
         password: faker.internet.password(),
     };
+
+    let user_id = null;
+    if (AppUtils.isFalsy(user)) {
+        const createUserResponse = await sendRequest(Constants.Endpoints.USERS, payload);
+        user_id = createUserResponse.body.data.id;
+    } else {
+        user_id = user._id;
+    }
+
     const deviceUUIDHeader = generateDeviceUUIDHeader();
-    const createUserResponse = await sendRequest(Constants.Endpoints.USERS, payload);
     const loginResponse = await global.superAgent
         .post(getUri(`${Constants.Endpoints.PORTAL}/${Constants.Endpoints.LOGIN}`))
         .set(deviceUUIDHeader)
@@ -53,7 +62,7 @@ export async function prepareUserSession() {
             authorization: loginResponse.body.token,
             ...deviceUUIDHeader
         },
-        user_id: createUserResponse.body.data.id,
+        user_id: user_id,
         session_id: loginResponse.body.session_id
     };
 }
