@@ -6,10 +6,10 @@ import { ValidationPatterns } from '@shared/common';
 import { ApplicationConstants } from '@core/constants';
 import { AppUtils } from '@core/utils';
 
-export function defaultHeaders() {
+export function generateDeviceUUIDHeader() {
     return {
         [ApplicationConstants.deviceIdHeader]: faker.random.uuid()
-    };
+    }
 }
 
 export function getUri(value: string) {
@@ -20,23 +20,42 @@ export function sendRequest<T>(endpoint: string, body: T, headers = {}) {
     return global.superAgent
         .post(getUri(endpoint))
         .send(body as any)
-        .set({
-            ...defaultHeaders(),
-            ...headers,
-        });
+        .set(headers);
 }
 
 export function deleteRequest(endpoint: string, id: string, headers = {}) {
     return global.superAgent
         .delete(getUri(`${endpoint}/${id}`))
-        .set({
-            ...defaultHeaders(),
-            ...headers,
-        });
+        .set(headers);
 }
 
-export function getRequest(endpoint: string) {
-    return global.superAgent.get(getUri(endpoint)).send(defaultHeaders());
+export function getRequest(endpoint: string, headers = {}) {
+    return global.superAgent.get(getUri(endpoint))
+        .set(headers);
+}
+
+export async function prepareUserSession() {
+    const payload = {
+        email: faker.internet.email(),
+        username: generateUsername(),
+        mobile: generatePhoneNumber(),
+        password: faker.internet.password(),
+    };
+    const deviceUUIDHeader = generateDeviceUUIDHeader();
+    const createUserResponse = await sendRequest(Constants.Endpoints.USERS, payload);
+    const loginResponse = await sendRequest(
+        `${Constants.Endpoints.PORTAL}/${Constants.Endpoints.LOGIN}`,
+        payload,
+        deviceUUIDHeader
+    )
+    return {
+        headers: {
+            authorization: loginResponse.body.token,
+            ...deviceUUIDHeader
+        },
+        user_id: createUserResponse.body.data.id,
+        session_id: loginResponse.body.session_id
+    };
 }
 
 export class UserFixture {
@@ -63,20 +82,6 @@ export class UserFixture {
         return response;
     }
 
-    public async login() {
-        const payload = {
-            email: faker.internet.email(),
-            username: generateUsername(),
-            mobile: generatePhoneNumber(),
-            password: faker.internet.password(),
-        };
-        try {
-            await sendRequest<Body<Partial<UsersSchema>>>(this.usersEndpoint, payload);
-            return sendRequest(Constants.Endpoints.LOGIN, payload);
-        } catch (error) {
-            console.log(error);
-        }
-    }
 
     public async deleteUser(id = this.user.id) {
         if (AppUtils.isFalsy(id)) { return; }
