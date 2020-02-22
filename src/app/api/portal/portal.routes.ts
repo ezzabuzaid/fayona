@@ -48,13 +48,14 @@ export class PortalRoutes {
         if (isPasswordEqual) {
 
             // STUB it should create a session entity
-            await sessionsService.create({
+            const session = await sessionsService.create({
                 device_uuid,
                 active: true,
                 user_id: record.id
             });
 
             const response = new SuccessResponse(null);
+            response.session_id = session.data.id;
             // STUB test the refreshToken claims should have only entity id with expire time 12h
             response.refreshToken = PortalHelper.generateRefreshToken(record.id);
             // STUB test token claims must have only entity id and role with 30min expire time
@@ -67,7 +68,9 @@ export class PortalRoutes {
 
     @Post(Constants.Endpoints.LOGOUT, Auth.isAuthenticated)
     public async logout(req: Request, res: Response) {
-        await sessionsService.deActivate({ device_uuid: req.header(ApplicationConstants.deviceIdHeader) });
+        const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
+        // STUB check if device_uuid is exit and associated with the current user
+        await sessionsService.deActivate({ device_uuid });
         const response = new SuccessResponse(null);
         res.status(response.code).json(response);
     }
@@ -130,7 +133,7 @@ export class PortalRoutes {
         // if the procces faild 3 times, the account should be locked, and he need to call the support for that
         const { password } = req.body as Body<UsersSchema>;
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        await usersService.update(decodedToken.id, { password });
+        await usersService.updateById(decodedToken.id, { password });
         const response = new SuccessResponse(null);
         await EmailService.sendEmail(fakeEmail());
         res.status(response.code).json(response);
@@ -141,7 +144,7 @@ export class PortalRoutes {
     public async verify(req: Request, res: Response) {
         const { token } = req.query;
         const decodedToken = await tokenService.decodeToken(token);
-        await usersService.update(decodedToken.id, { verified: true });
+        await usersService.updateById(decodedToken.id, { verified: true });
         const response = new SuccessResponse(null);
         res.status(response.code).json(response);
     }
@@ -150,7 +153,7 @@ export class PortalRoutes {
     public async sendVerificationEmail(req: Request, res: Response) {
         const { token } = req.query;
         const decodedToken = await tokenService.decodeToken(token);
-        await usersService.update(decodedToken.id, { verified: true });
+        await usersService.updateById(decodedToken.id, { verified: true });
         const response = new SuccessResponse(null);
         res.status(response.code).json(response);
     }
