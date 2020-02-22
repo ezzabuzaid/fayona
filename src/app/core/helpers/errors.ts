@@ -5,6 +5,7 @@ import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { NetworkStatus } from './network-status';
 import { sendResponse, Responses } from './response.model';
 import { stage } from './stages';
+import { ApplicationConstants } from '@core/constants';
 
 const log = new Logger('Errors');
 
@@ -66,6 +67,10 @@ export class ErrorHandling {
                 // Mongoose validation error
                 response.code = NetworkStatus.BAD_REQUEST;
                 break;
+            case ApplicationConstants.PAYLOAD_VALIDATION_ERRORS:
+                // class validator validation error
+                response.code = NetworkStatus.BAD_REQUEST;
+                break;
             case Errors.TokenExpiredError:
                 response.message = translate('jwt_expired');
                 response.code = NetworkStatus.UNAUTHORIZED;
@@ -78,7 +83,6 @@ export class ErrorHandling {
                 response.code = NetworkStatus.BAD_REQUEST;
                 break;
             default:
-            // console.log(error);
         }
         sendResponse(res, response);
         return;
