@@ -65,11 +65,6 @@ export class NodeServer extends Application {
         public static async test() {
                 Logger.level = LoggerLevel.Off;
                 envirnoment.load(StageLevel.TEST);
-                // FIXME new Application()).application shouldn't be created here
-                return [
-                        await NodeServer.loadDatabase(),
-                        (new Application()).application
-                ];
         }
 
         /**

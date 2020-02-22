@@ -10,22 +10,18 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 class CustomEnvironment extends NodeEnvironment {
   constructor(config) {
     super(config);
+    this.app = (new Application()).application;
   }
 
   async setup() {
-    const [databaseConnection, app] = await NodeServer.test();
-    this.global.superAgent = request(app);
-    const collections = databaseConnection.collections;
-    for (const key in collections) {
-      const collection = collections[key];
-      await collection.deleteMany();
-    }
-    // await connectToDatabase();
+    NodeServer.test();
+    await connectToDatabase();
+    this.global.superAgent = request(this.app);
     await super.setup();
   }
 
   async teardown() {
-    // await clearDatabase();
+    await closeDatabase();
     await super.teardown();
   }
 
@@ -39,26 +35,28 @@ module.exports = CustomEnvironment;
 
 const mongod = new MongoMemoryServer();
 async function connectToDatabase() {
-  const uri = await mongod.getConnectionString();
+  const uri = await mongod.getUri();
   const mongooseOpts = {
     useNewUrlParser: true,
     autoReconnect: true,
     reconnectTries: Number.MAX_VALUE,
-    reconnectInterval: 1000
+    reconnectInterval: 1000,
+    poolSize: 10
   };
-  await mongoose.connect(uri, mongooseOpts);
+
+  return mongoose.connect(uri, mongooseOpts);
 }
 
 
 async function closeDatabase() {
   await mongoose.connection.dropDatabase();
   await mongoose.connection.close();
+  await mongoose.disconnect();
   await mongod.stop();
 }
 
 async function clearDatabase() {
   const collections = mongoose.connection.collections;
-
   for (const key in collections) {
     const collection = collections[key];
     await collection.deleteMany();
