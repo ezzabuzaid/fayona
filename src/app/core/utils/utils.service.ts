@@ -49,6 +49,15 @@ export class AppUtils {
         return clone;
     }
 
+
+    public static strictAssign<T>(thisType: ThisType<T>, payload: Partial<T>) {
+        for (const key in thisType) {
+            if (thisType.hasOwnProperty(key)) {
+                thisType[key] = payload[key];
+            }
+        }
+    }
+
     public static defineProperty(prototype: object, propertyKey: string, options: PropertyDescriptor) {
         return Object.defineProperty(prototype, propertyKey, {
             enumerable: false, // cannot show in keys and for in
@@ -85,11 +94,11 @@ export class AppUtils {
         return rest;
     }
 
-    public static pick(obj, keys) {
+    public static pickProperties(obj, keys) {
         return { ...{ ...keys.map((k) => k in obj ? { [k]: obj[k] } : {}) } };
     }
 
-    public static reject(obj, keys) {
+    public static omitProperties(obj, keys) {
         return Object.assign({}, ...Object.keys(obj).filter((k) => !keys.includes(k)).map((k) => ({ [k]: obj[k] })));
     }
 
@@ -98,11 +107,12 @@ export class AppUtils {
     }
 
     public static hasItemWithin(list: any[]) {
+        // TODO: add support for plain objects
         return Array.isArray(list) && list.length > 0;
     }
 
-    public static assignObject<T>(target: T, source1: Partial<T>, source2?: Partial<T>): T {
-        return Object.assign(target, source1, source2);
+    public static extendObject<T>(target: T, source1: Partial<T>): T {
+        return Object.assign(target, source1);
     }
 
     public static getProps<T>(target: T, ...keys: Array<keyof T>): Partial<T> {

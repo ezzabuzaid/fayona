@@ -43,11 +43,11 @@ export async function prepareUserSession() {
     };
     const deviceUUIDHeader = generateDeviceUUIDHeader();
     const createUserResponse = await sendRequest(Constants.Endpoints.USERS, payload);
-    const loginResponse = await sendRequest(
-        `${Constants.Endpoints.PORTAL}/${Constants.Endpoints.LOGIN}`,
-        payload,
-        deviceUUIDHeader
-    )
+    const loginResponse = await global.superAgent
+        .post(getUri(`${Constants.Endpoints.PORTAL}/${Constants.Endpoints.LOGIN}`))
+        .set(deviceUUIDHeader)
+        .send(payload);
+
     return {
         headers: {
             authorization: loginResponse.body.token,
