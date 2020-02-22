@@ -78,7 +78,7 @@ export class ErrorHandling {
                 response.code = NetworkStatus.BAD_REQUEST;
                 break;
             default:
-                console.log(error);
+            // console.log(error);
         }
         sendResponse(res, response);
         return;

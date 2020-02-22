@@ -12,7 +12,7 @@ export class SuccessResponse<T> extends HttpResponse {
     public name = SuccessResponse.name;
     constructor(public data: T, message = 'success', code = NetworkStatus.OK, status?: string) {
         super();
-        this.message = translate(message);
+        this.message = typeof message === 'string' ? translate(message) : message;
         this.code = code;
         this.status = status || NetworkStatus.getStatusText(code);
     }
@@ -46,9 +46,9 @@ export namespace Responses {
             super(data);
         }
     }
-    export class Created extends SuccessResponse<{ id: string }> {
-        constructor(id: string) {
-            super({ id }, 'created', NetworkStatus.CREATED);
+    export class Created<T> extends SuccessResponse<T> {
+        constructor(data: T) {
+            super(data, 'created', NetworkStatus.CREATED);
         }
     }
 
