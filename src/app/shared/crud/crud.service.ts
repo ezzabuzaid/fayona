@@ -91,12 +91,9 @@ export class CrudService<T> {
 
         const { pre, post } = getHooks(this.options.update);
 
-        const session = await mongoose.startSession();
-        await session.withTransaction(async () => {
-            await pre(record, session);
-            await record.set(dto).save({ session });
-            await post(record, session);
-        });
+        await pre(record);
+        await record.set(dto).save();
+        await post(record);
         return new Result();
     }
 
