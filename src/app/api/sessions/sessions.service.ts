@@ -22,6 +22,10 @@ export class SessionsService extends CrudService<SessionSchema> {
         });
     }
 
+    public getActiveUserSession(user_id: string) {
+        return this.all({ user_id, active: true });
+    }
+
     private setAsDeactive(record: Document<SessionSchema>) {
         return this.update(record, { active: false });
     }

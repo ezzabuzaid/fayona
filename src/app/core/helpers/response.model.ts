@@ -32,8 +32,8 @@ export class ErrorResponse extends HttpResponse {
 }
 export namespace Responses {
     export class Unauthorized extends ErrorResponse {
-        constructor() {
-            super('not_authorized', NetworkStatus.UNAUTHORIZED);
+        constructor(message: string = 'not_authorized') {
+            super(message, NetworkStatus.UNAUTHORIZED);
         }
     }
     export class BadRequest extends ErrorResponse {
