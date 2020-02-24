@@ -17,11 +17,11 @@ import { translate } from '@lib/translation';
 export class LoginPayload {
     @IsString({
         message: translate('string_constraint', { name: 'username' })
-    }) username: string = null;
+    }) public username: string = null;
 
     @IsString({
         message: translate('string_constraint', { name: 'password' })
-    }) password: string = null;
+    }) public password: string = null;
 
     constructor(payload: LoginPayload) {
         AppUtils.strictAssign(this, payload);
@@ -60,22 +60,22 @@ export class PortalRoutes {
         const isPasswordEqual = HashService.comparePassword(password, record.password);
         if (AppUtils.isFalsy(isPasswordEqual)) {
             throwIfNotExist(null, 'wrong_credintals');
+        } else {
+            // STUB it should create a session entity
+            const session = await sessionsService.create({
+                device_uuid,
+                active: true,
+                user_id: record.id
+            });
+
+            const response = new SuccessResponse(null);
+            response.session_id = session.data.id;
+            // STUB test the refreshToken claims should have only entity id with expire time 12h
+            response.refreshToken = PortalHelper.generateRefreshToken(record.id);
+            // STUB test token claims must have only entity id and role with 30min expire time
+            response.token = PortalHelper.generateToken(record.id, record.role);
+            res.status(response.code).json(response);
         }
-
-        // STUB it should create a session entity
-        const session = await sessionsService.create({
-            device_uuid,
-            active: true,
-            user_id: record.id
-        });
-
-        const response = new SuccessResponse(null);
-        response.session_id = session.data.id;
-        // STUB test the refreshToken claims should have only entity id with expire time 12h
-        response.refreshToken = PortalHelper.generateRefreshToken(record.id);
-        // STUB test token claims must have only entity id and role with 30min expire time
-        response.token = PortalHelper.generateToken(record.id, record.role);
-        return res.status(response.code).json(response);
     }
 
     @Post(Constants.Endpoints.LOGOUT, Auth.isAuthenticated)

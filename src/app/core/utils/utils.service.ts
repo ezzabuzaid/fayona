@@ -49,7 +49,6 @@ export class AppUtils {
         return clone;
     }
 
-
     public static strictAssign<T>(thisType: ThisType<T>, payload: Partial<T>) {
         for (const key in thisType) {
             if (thisType.hasOwnProperty(key)) {

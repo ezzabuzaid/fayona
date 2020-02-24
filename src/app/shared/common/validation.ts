@@ -6,7 +6,6 @@ export class ValidationPatterns {
     public static NoSpecialChar = /^[a-zA-z0-9_.]+$/;
 }
 
-
 export async function validatePayload<T>(payload: T) {
     try {
         await validateOrReject(payload);

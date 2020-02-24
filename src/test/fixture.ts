@@ -10,7 +10,7 @@ import { LoginPayload } from '@api/portal';
 export function generateDeviceUUIDHeader() {
     return {
         [ApplicationConstants.deviceIdHeader]: faker.random.uuid()
-    }
+    };
 }
 
 export function getUri(value: string) {
@@ -62,7 +62,7 @@ export async function prepareUserSession(user?: WithMongoID<LoginPayload>) {
             authorization: loginResponse.body.token,
             ...deviceUUIDHeader
         },
-        user_id: user_id,
+        user_id,
         session_id: loginResponse.body.session_id
     };
 }
@@ -90,7 +90,6 @@ export class UserFixture {
         } catch (error) { }
         return response;
     }
-
 
     public async deleteUser(id = this.user.id) {
         if (AppUtils.isFalsy(id)) { return; }

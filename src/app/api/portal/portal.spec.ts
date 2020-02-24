@@ -1,5 +1,8 @@
 import { Constants, NetworkStatus } from '@core/helpers';
-import { UserFixture, sendRequest, generateUsername, generateExpiredToken, generateToken, prepareUserSession, generateDeviceUUIDHeader, getUri } from '@test/fixture';
+import {
+    UserFixture, sendRequest, generateUsername, generateExpiredToken,
+    prepareUserSession, generateDeviceUUIDHeader, getUri
+} from '@test/fixture';
 import { IRefreshTokenBody, LoginPayload } from './portal.routes';
 import { PortalHelper } from './portal.helper';
 import * as faker from 'faker';
@@ -93,7 +96,6 @@ describe('#INTERGRATION', () => {
         test.todo('returned Token has the appropriate schema');
     });
 
-
 });
 
 describe('Forgot password ', () => {
@@ -173,4 +175,3 @@ describe('Refresh Token', () => {
     //     expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
     // });
 });
-
