@@ -9,6 +9,7 @@ export namespace Constants {
         public static readonly USERS = 'users';
         public static readonly PORTAL = 'portal';
         public static readonly SESSIONS = 'sessions';
+        public static readonly USER_SESSIONS = 'user';
         public static readonly LOGIN = `login`;
         public static readonly LOGOUT = `logout`;
         public static readonly FORGET_PASSWORD = 'forgetpassword';

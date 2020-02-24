@@ -21,6 +21,7 @@
         "member-ordering": false,
         "max-classes-per-file": false,
         "variable-name": false,
+        "no-return-await": true,
         "only-arrow-functions": false,
         "quotemark": [
             true,

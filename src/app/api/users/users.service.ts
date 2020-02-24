@@ -18,7 +18,7 @@ class UserService extends CrudService<UsersSchema> {
                     // TODO: normalize the mobile number in order to ensure the uniqueness
                 },
                 post(record) {
-                    EmailService.sendEmail(fakeEmail());
+                    // EmailService.sendEmail(fakeEmail());
                 }
             }
         });

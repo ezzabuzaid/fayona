@@ -68,7 +68,7 @@ export class Database {
             })
             .catch((error) => {
                 log.error('Database Not Connected', error);
-                return null as any;
+                return null;
             });
     }
 

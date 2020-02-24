@@ -10,6 +10,7 @@
     "invalid_syntax": "invalid path syntax, please make sure that the requested valid entity, the id is wrong, it's not mongoose like id",
     "endpoint_not_found": "endpoint_not_found",
     "updated": "{name} updated successfully",
+    "string_constraint": "{name} must be string",
     "created_success": "Created",
     "entity_exist": "Entity is exist",
     "entity_not_exist": "Entity not exist",

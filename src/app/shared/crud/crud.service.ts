@@ -1,5 +1,5 @@
 import { ICrudOptions, ICrudHooks } from './crud.options';
-import { Body, WithID } from '@lib/mongoose';
+import { Body, WithID, WithMongoID, Document } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 import { Repo } from './crud.repo';
 import { translate } from '@lib/translation';
@@ -72,25 +72,28 @@ export class CrudService<T> {
         return new Result();
     }
 
-    public async update(id: string, body: Partial<Body<T>>) {
-        const record = await this.repo.fetchById(id);
+    public async updateById(id: string, body: Partial<Body<T>>) {
+        return this.doUpdate(await this.repo.fetchById(id), body);
+    }
+
+    public async update(record: Document<T>, body: Partial<Body<T>>) {
+        return this.doUpdate(record, body);
+    }
+
+    private async doUpdate(record: Document<T>, dto: Partial<Body<T>>) {
         if (AppUtils.isFalsy(record)) {
             return new Result(true, 'entity_not_exist');
         }
-
-        const isExist = await this.isEntityExist(body as Body<T>);
+        const isExist = await this.isEntityExist(dto as Body<T>);
         if (isExist.hasError) {
             return new Result(true, translate(`${isExist.data}_entity_exist`));
         }
 
         const { pre, post } = getHooks(this.options.update);
 
-        const session = await mongoose.startSession();
-        await session.withTransaction(async () => {
-            await pre(record, session);
-            await record.set(body).save({ session });
-            await post(record, session);
-        });
+        await pre(record);
+        await record.set(dto).save();
+        await post(record);
         return new Result();
     }
 
@@ -156,13 +159,13 @@ export class CrudService<T> {
         return true;
     }
 
-    public async one(query: Partial<WithID<Body<T>>>) {
+    public async one(query: Partial<WithMongoID<Body<T>>>) {
         const record = await this.repo.fetchOne(query);
         await getHooks(this.options.one).post(record);
         return record;
     }
 
-    public async all(query: Partial<WithID<Body<T>>> = {}, projection: Projection<T> = {}, options = {}) {
+    public async all(query: Partial<WithMongoID<Body<T>>> = {}, projection: Projection<T> = {}, options = {}) {
         const records = await this.repo.fetchAll(query, projection, options);
         const hook = this.options.all;
         // TODO: fix this line

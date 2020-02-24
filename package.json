@@ -1,15 +1,16 @@
 {
   "scripts": {
     "snyk": "snyk test",
-    "test": "clear && jest --detectOpenHandles --passWithNoTests --silent --verbose",
-    "test:watch": "clear && npm test --watch --runInBand",
+    "test": "clear && jest --detectOpenHandles --passWithNoTests --verbose --silent",
+    "test:watch": "clear && jest --detectOpenHandles --passWithNoTests --verbose --silent --watch --runInBand",
     "dev": "ts-node -r tsconfig-paths/register ./src/main.ts",
     "watch:dev": "clear && nodemon -e ts -w ./src -x npm run dev",
     "watch:prod": "node -r ./tsconfig-paths-bootstrap.js ./dist/main.js",
     "start": "npm run watch:prod",
     "lint": "tslint -c tslint.json 'src/**/*.ts' --fix",
     "build:prod": "node build --env=prod",
-    "build:dev": "node build --env=dev"
+    "build:dev": "node build --env=dev",
+    "postinstall": "npm run build:prod"
   },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
@@ -34,6 +35,7 @@
     "ansi-colors": "^3.2.4",
     "bcrypt": "^3.0.8",
     "body-parser": "^1.18.3",
+    "class-validator": "^0.11.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "csv-parser": "^2.3.0",

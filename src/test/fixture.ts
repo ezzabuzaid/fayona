@@ -1,12 +1,13 @@
 import { Constants, tokenService } from '@core/helpers';
 import { UsersSchema, ERoles } from '@api/users';
-import { Body } from '@lib/mongoose';
+import { Body, WithMongoID } from '@lib/mongoose';
 import * as faker from 'faker';
 import { ValidationPatterns } from '@shared/common';
 import { ApplicationConstants } from '@core/constants';
 import { AppUtils } from '@core/utils';
+import { LoginPayload } from '@api/portal';
 
-export function defaultHeaders() {
+export function generateDeviceUUIDHeader() {
     return {
         [ApplicationConstants.deviceIdHeader]: faker.random.uuid()
     };
@@ -20,23 +21,50 @@ export function sendRequest<T>(endpoint: string, body: T, headers = {}) {
     return global.superAgent
         .post(getUri(endpoint))
         .send(body as any)
-        .set({
-            ...defaultHeaders(),
-            ...headers,
-        });
+        .set(headers);
 }
 
 export function deleteRequest(endpoint: string, id: string, headers = {}) {
     return global.superAgent
         .delete(getUri(`${endpoint}/${id}`))
-        .set({
-            ...defaultHeaders(),
-            ...headers,
-        });
+        .set(headers);
 }
 
-export function getRequest(endpoint: string) {
-    return global.superAgent.get(getUri(endpoint)).send(defaultHeaders());
+export function getRequest(endpoint: string, headers = {}) {
+    return global.superAgent.get(getUri(endpoint))
+        .set(headers);
+}
+
+export async function prepareUserSession(user?: WithMongoID<LoginPayload>) {
+    const payload = user ?? {
+        email: faker.internet.email(),
+        username: generateUsername(),
+        mobile: generatePhoneNumber(),
+        password: faker.internet.password(),
+    };
+
+    let user_id = null;
+    if (AppUtils.isFalsy(user)) {
+        const createUserResponse = await sendRequest(Constants.Endpoints.USERS, payload);
+        user_id = createUserResponse.body.data.id;
+    } else {
+        user_id = user._id;
+    }
+
+    const deviceUUIDHeader = generateDeviceUUIDHeader();
+    const loginResponse = await global.superAgent
+        .post(getUri(`${Constants.Endpoints.PORTAL}/${Constants.Endpoints.LOGIN}`))
+        .set(deviceUUIDHeader)
+        .send(payload);
+
+    return {
+        headers: {
+            authorization: loginResponse.body.token,
+            ...deviceUUIDHeader
+        },
+        user_id,
+        session_id: loginResponse.body.session_id
+    };
 }
 
 export class UserFixture {
@@ -61,21 +89,6 @@ export class UserFixture {
             this.user.id = response.body.data.id;
         } catch (error) { }
         return response;
-    }
-
-    public async login() {
-        const payload = {
-            email: faker.internet.email(),
-            username: generateUsername(),
-            mobile: generatePhoneNumber(),
-            password: faker.internet.password(),
-        };
-        try {
-            await sendRequest<Body<Partial<UsersSchema>>>(this.usersEndpoint, payload);
-            return sendRequest(Constants.Endpoints.LOGIN, payload);
-        } catch (error) {
-            console.log(error);
-        }
     }
 
     public async deleteUser(id = this.user.id) {

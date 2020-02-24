@@ -6,7 +6,6 @@ import { groupsService, groupMemebrsService } from './group.service';
 import { Request, Response, } from 'express';
 import { Auth } from '@api/portal';
 import { IGroupsDto } from './groups.dto';
-import { startSession } from 'mongoose';
 import { AppUtils } from '@core/utils';
 
 @Router(Constants.Endpoints.GROUPS)
@@ -31,19 +30,19 @@ export class GroupsRouter extends CrudRouter<GroupsSchema> {
         }
 
         await groupMemebrsService.create({
-            group_id: createGroupResult.data.id,
+            group_id: createGroupResult.data,
             user_id: decodedToken.id,
             isAdmin: true
         });
 
         for (const member_id of members) {
             await groupMemebrsService.create({
-                group_id: createGroupResult.data.id,
+                group_id: createGroupResult.data,
                 user_id: member_id,
                 isAdmin: false
             });
         }
-        sendResponse(res, new Responses.Created(createGroupResult.data.id));
+        sendResponse(res, new Responses.Created(createGroupResult.data));
     }
 
     @Post('setAdmin')

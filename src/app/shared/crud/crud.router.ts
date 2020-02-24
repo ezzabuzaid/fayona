@@ -29,7 +29,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
     public async update(req: Request, res: Response) {
         const { id } = req.params;
         // TODO: imporve error handling, if id is not string throw directly
-        const result = await this.service.update(id, req.body);
+        const result = await this.service.updateById(id, req.body);
         if (result.hasError) {
             throw new ErrorResponse(result.data);
         }
