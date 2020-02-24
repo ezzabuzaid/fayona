@@ -36,6 +36,7 @@ export class NodeServer extends Application {
                 await NodeServer.loadDatabase();
                 const sockets = {};
                 const rooms = {};
+                // TODO: Move this out
                 const io = socketIO(server.server)
                         .on('connection', (socket) => {
                                 socket.on('JoinRoom', (room: IRoom) => {
@@ -72,7 +73,7 @@ export class NodeServer extends Application {
          * Start the server and return an instance of it.
          * @returns {Promise<httpServer>}
          */
-        private populateServer() {
+        private populateServer(): void {
                 //     key: fs.readFileSync('./key.pem'),
                 //     cert: fs.readFileSync('./cert.pem'),
                 //     passphrase: 'YOUR PASSPHRASE HERE'
@@ -82,7 +83,7 @@ export class NodeServer extends Application {
                 this.startServer();
         }
 
-        private startServer() {
+        private startServer(): void {
                 this.server.listen(this.path.port, +this.path.hostname, () => {
                         log.info(`${new Date()} Server running at ${this.path.href}`);
                 });

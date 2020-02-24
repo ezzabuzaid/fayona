@@ -1,22 +1,15 @@
 REVIEW Features
-2_ use dependency injection to resolve mongoose models
-33_ use mongoose plugin to retrive name attribute depend on user language
+* Use get_it to manage dependency injection
+* use mongoose plugin to retrive <name> attribute depends on user language
 
 SECTION ALERTS
-1_ if a certin environment not available such as a "NODE_ENV" ..etc, and throw an error before building
-2_ eleminate register mutiple router to the same app or router instance by checking if the id of the router is registred before
-3_ make sure that two router doesn't have the same path, check it in the router decorator
-4_ attached router method (http method) shouldn't have the same paths, consider make a checker function
+* If a certin environment not available such as a "NODE_ENV" ..etc, throw an error before building
+* Make sure that two router doesn't have the same path, check it in the wrapper class
 
 TODO
-7_ read all files to get the string in `translate` function and auto export it to json file
-9_ important (curd generator)
-
-SECTION IMPORTANT
-1_ an application instance not allowed to be accesses, just in server class
-2_ upon the validation layer hierarchy the nested object request not allowed
-3_ user model should not be used explicty
-4_ model, repo and routes used as component 
+* Extract all `translate` arguments and export them json file, see ngx-translate-extract
+* Crud generator
+* Export Application class instance to be used with server less
 
 SECTION mongoose model
 1_ add hook decorator
@@ -24,7 +17,6 @@ SECTION mongoose model
 3_ query helper
 
 https://www.npmjs.com/package/injection-js
-web socket class
 
 use http://www.hygen.io/create style for documention section
 
@@ -48,29 +40,6 @@ use http://www.hygen.io/create style for documention section
 // })
 // export class CustomersModule { }
 
-// // Why i need to create a new mongoose model instance ?????
-// // inject the wrapper class into sub router and assign it
-// // inject the wrapper class mean retrive the injector that hold the class instance
-
-// // ask about this type of defining routes path and it's children or by injection style or by calling it
-// // explicity Wrapper.assginTo(superRouter, router) | Wrapper.assginTo(superRouter, subSuperRouter, router)
-
-// // # resolve all route like urlSegment angular
-
-// // Both style must be implemented the angular style, and Wrapper style
-
-// // does he really need this style ?
-// // what about he just wanna to use one RouterClass
-// // should just user @Router and define path there
-// // and about the guard(middleware) just add them when you define router to easy setup
-// // i think that this should be used when you add more than just path and router
-
-// // when you wanna to set a list of dependencies because he inject them in router classs
-// // constructor(private one: One){}
-// // { path: 'customers', deps: [One] }
-// // try to make use of angular way by injecting it directly
-
-// // Take care of error handling
 
 
 // REVIEW  controller => handler(service => unitofwork(repo, model))
