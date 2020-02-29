@@ -1,53 +1,49 @@
 import { CrudService } from './crud.service';
 import { Repo } from './crud.repo';
-
-// const crud = new CrudRouter(null);
+import { ICrudOperation } from './crud.options';
+import { DocumentQuery } from 'mongoose';
 
 const MockCrudService = jest.fn<Partial<CrudService<any>>, ConstructorParameters<typeof CrudService>>(() => ({
     create: jest.fn(),
     all: jest.fn()
 }));
 
+const MockRepo = jest.fn<Partial<Repo<any>>, ConstructorParameters<typeof Repo>>(() => ({
+    fetchAll: jest.fn().mockImplementation(() => new DocumentQuery())
+}));
+
 describe('#MockService', () => {
     describe('[ALL]', () => {
-        test('verify that fetch all entites from repo method was called', () => {
-            const MockRepo = jest.fn<Partial<Repo<any>>, ConstructorParameters<typeof Repo>>(() => ({
-                fetchAll: jest.fn().mockImplementation(() => [])
-            }));
+        test('should fetch all entites from repo', () => {
             const repo = new MockRepo(null);
             const crudService = new CrudService(repo as any);
-            crudService.all({}, {});
+            crudService.all({}, {}, {});
             expect(repo.fetchAll).toHaveBeenCalledWith({}, {}, {});
         });
-        test('verify that the method will not throw if no hook provided', () => {
-            const MockRepo = jest.fn<Partial<Repo<any>>, ConstructorParameters<typeof Repo>>(() => ({
-                fetchAll: jest.fn().mockImplementation(() => [])
-            }));
-            const crudService = new CrudService(new MockRepo(null) as any);
-            crudService.all();
-            expect(true).toBeTruthy();
-        });
-        test('should invoke the post hook', async () => {
-            const MockRepo = jest.fn<Partial<Repo<any>>, ConstructorParameters<typeof Repo>>(() => ({
-                fetchAll: jest.fn().mockImplementation(() => [])
-            }));
-            const options = {
+        test('should invoke the hooks', async () => {
+            const options: ICrudOperation = {
                 all: {
-                    post: jest.fn()
+                    post: () => {
+                        expect(true).toBeTruthy();
+                    },
+                    pre: () => {
+                        expect(true).toBeTruthy();
+                    },
                 }
             };
-            const crudService = new CrudService(new MockRepo(null) as any, options);
+            const documentQuery = new Object();
+            const mockRepo: Partial<Repo<any>> = { fetchAll: jest.fn().mockReturnValue(documentQuery) };
+            const crudService = new CrudService(mockRepo as any, options);
             await crudService.all();
-            expect(options.all.post).toHaveBeenCalledWith([]);
         });
-        test('should return an instance of array (list)', async () => {
-            const MockRepo = jest.fn<Partial<Repo<any>>, ConstructorParameters<typeof Repo>>(() => ({
-                fetchAll: jest.fn().mockImplementation(() => [])
-            }));
-            const crudService = new CrudService(new MockRepo(null) as any);
-            expect(await crudService.all()).toBeInstanceOf(Array);
+        test('should return the value', async () => {
+            const returnValue = [new Object()];
+            const mockRepo: Partial<Repo<any>> = {
+                fetchAll: jest.fn().mockReturnValue(Promise.resolve(returnValue))
+            };
+            const crudService = new CrudService(mockRepo as any);
+            expect(await crudService.all()).toEqual(returnValue);
         });
-
     });
 });
 
