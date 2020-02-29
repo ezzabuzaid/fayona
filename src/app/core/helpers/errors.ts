@@ -19,7 +19,8 @@ export enum Errors {
     TokenExpiredError = 'TokenExpiredError',
     NotBeforeError = 'NotBeforeError',
     ValidationError = 'ValidationError',
-    MulterError = 'MulterError'
+    MulterError = 'MulterError',
+    PayloadTooLargeError = 'PayloadTooLargeError:'
 }
 
 export class ErrorHandling {
@@ -82,8 +83,13 @@ export class ErrorHandling {
             case Errors.MulterError:
                 response.code = NetworkStatus.BAD_REQUEST;
                 break;
+            case Errors.PayloadTooLargeError:
+                response.code = NetworkStatus.BAD_REQUEST;
+                response.message = 'request entity too large';
+                break;
             default:
         }
+        console.log(error);
         sendResponse(res, response);
         return;
     }
