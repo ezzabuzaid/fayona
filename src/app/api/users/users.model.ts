@@ -26,6 +26,8 @@ export class UsersSchema {
     }) public profile: {}; // TODO: update this field to be ProfileSchema instead
     @Field({
         pure: true,
+        // STUB test password should not return with the response
+        select: false,
         required: true,
         set: (value: string) => HashService.hashSync(value)
     }) public password: string;

@@ -13,7 +13,7 @@ export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {
         super(sessionsService);
     }
 
-    @Get(Constants.Endpoints.USER_SESSIONS, Auth.isAuthenticated)
+    @Get(Constants.Endpoints.USERS_SESSIONS, Auth.isAuthenticated)
     public async getUserSessions(req: Request, res: Response) {
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
         const records = await this.service.all({ user_id: decodedToken.id });

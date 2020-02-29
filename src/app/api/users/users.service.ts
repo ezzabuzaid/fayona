@@ -9,7 +9,7 @@ import { Repo } from '@shared/crud';
 
 // TODO: Validate the body to meet the schema exactly using reflect metadata
 
-class UserService extends CrudService<UsersSchema> {
+export class UserService extends CrudService<UsersSchema> {
     constructor() {
         super(new Repo<UsersSchema>(UsersModel), {
             unique: ['username', 'email', 'mobile'],
@@ -22,7 +22,12 @@ class UserService extends CrudService<UsersSchema> {
                 }
             }
         });
+    }
 
+    searchForUser(username: string) {
+        return this.repo.fetchAll()
+            .merge({ username: { $regex: username, $options: 'i' } })
+            .exec();
     }
 }
 export default new UserService();
