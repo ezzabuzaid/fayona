@@ -1,6 +1,5 @@
-import { Constants, NetworkStatus } from '@core/helpers';
-import { getUri, getRequest, prepareUserSession } from '@test/fixture';
-import path from 'path';
+import { Constants } from '@core/helpers';
+import { getUri, prepareUserSession } from '@test/fixture';
 import { Types } from 'mongoose';
 import { IDeactivateSessionPayload } from './sessions.model';
 // import { SessionsService } from "./sessions.service";
@@ -23,7 +22,7 @@ describe('#INTEGRATION', () => {
         test('should not allow UNAUTHORIZED user', async () => {
             const response = await global.superAgent
                 .get(USER_SESSION_ENDPOINT);
-            expect(response.status).toBe(NetworkStatus.UNAUTHORIZED);
+            expect(response.unauthorized).toBeTruthy();
         });
 
         test('should return user sessions', async () => {
@@ -31,7 +30,7 @@ describe('#INTEGRATION', () => {
             const response = await global.superAgent
                 .get(USER_SESSION_ENDPOINT)
                 .set(lastSession.headers);
-            expect(response.status).toBe(NetworkStatus.OK);
+            expect(response.ok).toBeTruthy();
             expect(response.body.data.length).toEqual(1);
         });
 
@@ -46,7 +45,7 @@ describe('#INTEGRATION', () => {
                     user_id: userSession.user_id,
                     session_id: userSession.session_id
                 } as IDeactivateSessionPayload);
-            expect(response.status).toBe(NetworkStatus.OK);
+            expect(response.ok).toBeTruthy();
             expect(response.body.data).toBe('Session deactivated');
         });
 
@@ -58,7 +57,7 @@ describe('#INTEGRATION', () => {
                     user_id: userSession.user_id,
                     session_id: new Types.ObjectId().toHexString(),
                 } as IDeactivateSessionPayload);
-            expect(response.status).toBe(NetworkStatus.BAD_REQUEST);
+            expect(response.badRequest).toBeTruthy();
             expect(response.body.message).toBe('no session available');
         });
 
@@ -70,7 +69,7 @@ describe('#INTEGRATION', () => {
                     user_id: userSession.user_id,
                     session_id: false as any,
                 } as IDeactivateSessionPayload);
-            expect(response.status).toBe(NetworkStatus.BAD_REQUEST);
+            expect(response.badRequest).toBeTruthy();
             expect(response.body.message).toBe('session_id must be string');
         });
 
@@ -82,7 +81,7 @@ describe('#INTEGRATION', () => {
                     user_id: false as any,
                     session_id: userSession.session_id,
                 } as IDeactivateSessionPayload);
-            expect(response.status).toBe(NetworkStatus.BAD_REQUEST);
+            expect(response.badRequest).toBeTruthy();
             expect(response.body.message).toBe('user_id must be string');
         });
     });

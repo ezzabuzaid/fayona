@@ -1,4 +1,4 @@
-import { generatePhoneNumber, generateUsername, UserFixture, getUri } from '@test/fixture';
+import { generatePhoneNumber, generateUsername, UserFixture, getUri, prepareUserSession } from '@test/fixture';
 import { NetworkStatus, Constants } from '@core/helpers';
 import { ERoles } from './users.model';
 import * as faker from 'faker';
@@ -99,27 +99,21 @@ describe('[INTERGRATION]', () => {
         });
 
         test('should be unverified by default', async () => {
-            const response = await userFixture.createUser({ username: 'test_name', verified: null });
+            const { body: { data: { id } } } = await userFixture.createUser({ verified: null });
+            const { headers } = await prepareUserSession();
+            const response = await global.superAgent
+                .get(`${getUri(Constants.Endpoints.USERS)}/${id}`)
+                .set(headers);
             expect(response.body.data.verified).toEqual(false);
         });
 
         test.todo('user should have a defualt profile equal to empty {}');
-        // test('Profile Should have an empty object when creating a new user', async () => {
-        //     const req = superAgent.post(ENDPOINT);
-        //     const res = await req.send(user);
-        //     expect(((res.body) as Body<UsersSchema>)./api/users/undefinedprofile).toBe(undefined);
-        //     // TODO: the profile object should has a default value in the service
-        //              and not in model, then uncomment the below code
-        //     // expect(((res.body) as Body<UsersSchema>).profile).toMatchObject({});
-        //     expect(res.status).toBe(NetworkStatus.CREATED);
-        // });
-
     });
 
     describe('#SEARCH FOR USES', () => {
-        test.todo('should return list of users depends on the provided name', () => {
+        test.skip('should return list of users depends on the provided name', () => {
             global.superAgent.get(USER_SESSION_ENDPOINT);
         });
-    })
+    });
 
 });

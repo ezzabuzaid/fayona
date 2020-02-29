@@ -24,7 +24,7 @@ export class UserService extends CrudService<UsersSchema> {
         });
     }
 
-    searchForUser(username: string) {
+    public searchForUser(username: string) {
         return this.repo.fetchAll()
             .merge({ username: { $regex: username, $options: 'i' } })
             .exec();

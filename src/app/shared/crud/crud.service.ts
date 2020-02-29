@@ -161,7 +161,7 @@ export class CrudService<T> {
 
     public async one(query: Partial<WithMongoID<Body<T>>>, projection: Projection<T> = {}, ) {
         const record = await this.repo.fetchOne(query, projection);
-        await getHooks(this.options.one).post(record)
+        await getHooks(this.options.one).post(record);
         return record;
     }
 
@@ -175,4 +175,3 @@ export class CrudService<T> {
     }
 
 }
-

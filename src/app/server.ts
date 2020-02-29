@@ -63,7 +63,7 @@ export class NodeServer extends Application {
                 return server;
         }
 
-        public static async test() {
+        public static test() {
                 Logger.level = LoggerLevel.Off;
                 envirnoment.load(StageLevel.TEST);
         }

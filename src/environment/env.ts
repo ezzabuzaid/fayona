@@ -29,7 +29,7 @@ class Envirnoment {
         return value;
     }
 
-    public get(envKey: string): string {
+    public get(envKey: keyof NodeJS.ProcessEnv): string {
         return this.env[envKey];
     }
 

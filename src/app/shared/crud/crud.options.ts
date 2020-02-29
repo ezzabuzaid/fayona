@@ -12,8 +12,8 @@ export interface ICrudOperation<T = any> {
     delete?: ICrudHooks<T>;
     one?: ICrudHooks<T>;
     all?: {
-        pre?: (doc: DocumentQuery<Document<T>[], Document<T>>) => any;
-        post?: (doc: DocumentQuery<Document<T>[], Document<T>>) => any;
+        pre?: (doc: DocumentQuery<Array<Document<T>>, Document<T>>) => any;
+        post?: (doc: DocumentQuery<Array<Document<T>>, Document<T>>) => any;
     };
 }
 export interface ICrudOptions<T> extends ICrudOperation<T> {

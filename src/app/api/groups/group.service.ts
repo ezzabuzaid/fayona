@@ -15,7 +15,7 @@ export class GroupMembersService extends CrudService<GroupMemberSchema> {
         super(new Repo(groupMemberModel), {
             all: {
                 async pre(documents) {
-                    documents = documents.populate('user');
+                    documents.populate('user');
                 }
             }
         });

@@ -45,8 +45,10 @@ export async function prepareUserSession(user?: WithMongoID<LoginPayload>) {
 
     let user_id = null;
     if (AppUtils.isFalsy(user)) {
-        const createUserResponse = await sendRequest(Constants.Endpoints.USERS, payload);
-        user_id = createUserResponse.body.data.id;
+        const { body: { data: { id } } } = await global.superAgent
+            .post(getUri(Constants.Endpoints.USERS))
+            .send(payload);
+        user_id = id;
     } else {
         user_id = user._id;
     }
@@ -72,19 +74,21 @@ export class UserFixture {
         id: null,
         token: null
     };
-    private usersEndpoint = Constants.Endpoints.USERS;
+    private usersEndpoint = getUri(Constants.Endpoints.USERS);
 
     public async createUser(body: Partial<Body<UsersSchema>> = {}) {
-        const response = await sendRequest<Body<UsersSchema>>(this.usersEndpoint, {
-            email: faker.internet.email(),
-            username: generateUsername(),
-            mobile: generatePhoneNumber(),
-            password: faker.internet.password(),
-            verified: false,
-            role: ERoles.ADMIN,
-            profile: null,
-            ...body
-        });
+        const response = await global.superAgent.post(this.usersEndpoint)
+            .set(generateDeviceUUIDHeader())
+            .send({
+                email: faker.internet.email(),
+                username: generateUsername(),
+                mobile: generatePhoneNumber(),
+                password: faker.internet.password(),
+                verified: false,
+                role: ERoles.ADMIN,
+                profile: null,
+                ...body
+            });
         try {
             this.user.id = response.body.data.id;
         } catch (error) { }
@@ -92,7 +96,7 @@ export class UserFixture {
     }
 
     public async deleteUser(id = this.user.id) {
-        if (AppUtils.isFalsy(id)) { return; }
+        if (false) { return; }
         return deleteRequest(this.usersEndpoint, id);
     }
 
@@ -109,7 +113,7 @@ export function generateUsername() {
 }
 
 export function generateExpiredToken() {
-    return tokenService.generateToken({} as any, { expiresIn: '-10s' });
+    return tokenService.generateToken({ id: AppUtils.generateRandomString() }, { expiresIn: '-10s' });
 }
 
 export function generateToken() {

@@ -1,12 +1,12 @@
 export enum StageLevel {
     LOCAL = 'local',
-    DEV = 'dev',
+    DEV = 'development',
     TEST = 'test',
-    PROD = 'prod'
+    PROD = 'production'
 }
 
 /**
- * this string must be the same as the name in env files
+ * NODE_STAGE name must be identical in .env*. files
  */
 export const NODE_STAGE = 'NODE_STAGE';
 

@@ -52,14 +52,14 @@ export class PortalRoutes {
 
         const activeUserSessions = await sessionsService.getActiveUserSession(record.id);
 
-        if (activeUserSessions.length >= 3) {
-            throw new Responses.Unauthorized('exceed_allowed_sesison');
-        }
+        // if (activeUserSessions.length >= 3) {
+        //     throw new Responses.Unauthorized('exceed_allowed_sesison');
+        // }
 
         // STUB it should pass if password is right
         const isPasswordEqual = HashService.comparePassword(password, record.password);
         if (AppUtils.isFalsy(isPasswordEqual)) {
-            throwIfNotExist(null, 'wrong_credintals');
+            throw new Responses.BadRequest('wrong_credintals');
         } else {
             // STUB it should create a session entity
             const session = await sessionsService.create({
@@ -105,10 +105,6 @@ export class PortalRoutes {
             if (error instanceof TokenExpiredError) {
 
                 const session = await sessionsService.getActiveSession({
-                    device_uuid,
-                    user_id: decodedRefreshToken.id
-                });
-                console.log({
                     device_uuid,
                     user_id: decodedRefreshToken.id
                 });
@@ -178,7 +174,7 @@ async function throwIfNotExist(query: Partial<Body<UsersSchema> & { _id: string 
     if (AppUtils.isFalsy(query)) {
         throw new ErrorResponse(message);
     }
-    const entity = await usersService.one(query);
+    const entity = await usersService.one(query, { password: 1 });
     if (!!entity) {
         return entity;
     }
