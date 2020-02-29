@@ -12,9 +12,9 @@ import { Types } from 'mongoose';
 
 @Entity(Constants.Schemas.MEMBERS)
 export class GroupMemberSchema {
-    @Field({ pure: true, required: true }) public user_id: string = null;
+    @Field({ required: true, ref: Constants.Schemas.USERS }) public user: Types.ObjectId = null;
     @Field() public isAdmin: boolean = false;
-    @Field({ ref: Constants.Schemas.GROUPS }) public group_id: Types.ObjectId;
+    @Field({ ref: Constants.Schemas.GROUPS, required: true }) public group: Types.ObjectId;
 }
 
 @Entity(Constants.Schemas.GROUPS)

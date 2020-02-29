@@ -1,5 +1,6 @@
 import { CrudService, Repo } from '@shared/crud';
 import { groupModel, GroupsSchema, groupMemberModel, GroupMemberSchema } from './group.model';
+import { Constants } from '@core/helpers';
 
 export class GroupService extends CrudService<GroupsSchema> {
     // TODO: you can easily move the creation logic from the group router to be used here
@@ -11,8 +12,15 @@ export class GroupService extends CrudService<GroupsSchema> {
 
 export class GroupMembersService extends CrudService<GroupMemberSchema> {
     constructor() {
-        super(new Repo(groupMemberModel));
+        super(new Repo(groupMemberModel), {
+            all: {
+                async pre(documents) {
+                    documents = documents.populate('user');
+                }
+            }
+        });
     }
+
 }
 
 export const groupsService = new GroupService();

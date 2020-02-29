@@ -30,24 +30,19 @@ export class GroupsRouter extends CrudRouter<GroupsSchema> {
         }
 
         await groupMemebrsService.create({
-            group_id: createGroupResult.data,
-            user_id: decodedToken.id,
+            group: createGroupResult.data,
+            user: decodedToken.id,
             isAdmin: true
         });
 
         for (const member_id of members) {
             await groupMemebrsService.create({
-                group_id: createGroupResult.data,
-                user_id: member_id,
+                group: createGroupResult.data,
+                user: member_id,
                 isAdmin: false
             });
         }
         sendResponse(res, new Responses.Created(createGroupResult.data));
-    }
-
-    @Post('setAdmin')
-    public setMemberAsAdmin() {
-
     }
 
 }
@@ -61,9 +56,9 @@ export class MembersRouter extends CrudRouter<GroupMemberSchema> {
     @Get('/groups/:group_id', Auth.isAuthenticated)
     public async getMembersByGroupId(req: Request, res: Response) {
         const { group_id } = req.params;
-        const records = await this.service.all({ group_id }, { group_id: 0 });
-        const response = new Responses.Ok(records);
-        response.count = records.length;
+        const members = await this.service.all({ group: group_id }, { group: 0 });
+        const response = new Responses.Ok(members);
+        response.count = members.length;
         sendResponse(res, response);
     }
 }
