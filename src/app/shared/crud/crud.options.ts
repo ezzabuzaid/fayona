@@ -1,4 +1,5 @@
 import { Body, Document } from '@lib/mongoose';
+import { DocumentQuery } from 'mongoose';
 
 export interface ICrudHooks<T> {
     pre?: (doc: Document<T>) => any;
@@ -11,7 +12,8 @@ export interface ICrudOperation<T = any> {
     delete?: ICrudHooks<T>;
     one?: ICrudHooks<T>;
     all?: {
-        post: (docs: Array<Document<T>>) => any
+        pre?: (doc: DocumentQuery<Array<Document<T>>, Document<T>>) => any;
+        post?: (doc: DocumentQuery<Array<Document<T>>, Document<T>>) => any;
     };
 }
 export interface ICrudOptions<T> extends ICrudOperation<T> {

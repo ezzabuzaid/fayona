@@ -1,5 +1,5 @@
 import { ICrudOptions, ICrudHooks } from './crud.options';
-import { Body, WithID, WithMongoID, Document } from '@lib/mongoose';
+import { Body, WithID, WithMongoID, Document, Projection } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 import { Repo } from './crud.repo';
 import { translate } from '@lib/translation';
@@ -80,11 +80,11 @@ export class CrudService<T> {
         return this.doUpdate(record, body);
     }
 
-    private async doUpdate(record: Document<T>, dto: Partial<Body<T>>) {
+    private async doUpdate(record: Document<T>, payload: Partial<Body<T>>) {
         if (AppUtils.isFalsy(record)) {
             return new Result(true, 'entity_not_exist');
         }
-        const isExist = await this.isEntityExist(dto as Body<T>);
+        const isExist = await this.isEntityExist(payload as Body<T>);
         if (isExist.hasError) {
             return new Result(true, translate(`${isExist.data}_entity_exist`));
         }
@@ -92,25 +92,25 @@ export class CrudService<T> {
         const { pre, post } = getHooks(this.options.update);
 
         await pre(record);
-        await record.set(dto).save();
+        await record.set(payload).save();
         await post(record);
         return new Result();
     }
 
-    public async set(id: string, body: Body<T>) {
+    public async set(id: string, payload: Body<T>) {
         const record = await this.repo.fetchById(id);
         if (!record) {
             return new Result(true, 'entity_not_exist');
         }
 
-        const isExist = await this.isEntityExist(body);
+        const isExist = await this.isEntityExist(payload);
         if (isExist.hasError) {
             return new Result(true, translate(`${isExist.data}_entity_exist`));
         }
 
         const { pre, post } = getHooks(this.options.update);
         await pre(record);
-        await record.set(body).save();
+        await record.set(payload).save();
         await post(record);
 
         return new Result();
@@ -159,21 +159,19 @@ export class CrudService<T> {
         return true;
     }
 
-    public async one(query: Partial<WithMongoID<Body<T>>>) {
-        const record = await this.repo.fetchOne(query);
+    public async one(query: Partial<WithMongoID<Body<T>>>, projection: Projection<T> = {}, ) {
+        const record = await this.repo.fetchOne(query, projection);
         await getHooks(this.options.one).post(record);
         return record;
     }
 
     public async all(query: Partial<WithMongoID<Body<T>>> = {}, projection: Projection<T> = {}, options = {}) {
-        const records = await this.repo.fetchAll(query, projection, options);
-        const hook = this.options.all;
-        // TODO: fix this line
-        const post = !AppUtils.isNullOrUndefined(hook) ? hook.post : () => null;
-        await post(records);
-        return records;
+        const { pre, post } = getHooks(this.options.all);
+        const documentQuery = this.repo.fetchAll(query, projection, options);
+        await pre(documentQuery);
+        const documents = await documentQuery;
+        await post(documents);
+        return documents;
     }
 
 }
-
-type Projection<T> = Partial<{ [key in keyof Body<T>]: 1 | 0 }>;

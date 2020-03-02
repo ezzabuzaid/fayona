@@ -1,11 +1,11 @@
-import { generatePhoneNumber, generateUsername, UserFixture } from '@test/fixture';
-import { NetworkStatus } from '@core/helpers';
+import { generatePhoneNumber, generateUsername, UserFixture, getUri, prepareUserSession } from '@test/fixture';
+import { NetworkStatus, Constants } from '@core/helpers';
 import { ERoles } from './users.model';
 import * as faker from 'faker';
+const USER_SESSION_ENDPOINT = getUri(`${Constants.Endpoints.USERS}/${Constants.Endpoints.USERS_SEARCH}`);
 
 describe('[INTERGRATION]', () => {
 
-    // NOTE test the fail then test the success
     describe('#CREATE USER', () => {
 
         let userFixture: UserFixture;
@@ -68,15 +68,15 @@ describe('[INTERGRATION]', () => {
         });
 
         describe('should pass if', () => {
-            test('should pass if mobile number is correct', async () => {
+            test('mobile number is correct', async () => {
                 const response = await userFixture.createUser({ mobile: '+962792807794' });
                 expect(response.status).toBe(NetworkStatus.CREATED);
             });
-            test('should pass if the role is one of supported roles', async () => {
+            test('the role is one of supported roles', async () => {
                 const response = await userFixture.createUser({ role: ERoles.ADMIN });
                 expect(response.status).toBe(NetworkStatus.CREATED);
             });
-            test('should pass if the email has correct format', async () => {
+            test('the email has correct format', async () => {
                 const response = await userFixture.createUser({ email: 'ezzabuzaid@hotmail.com' });
                 expect(response.status).toBe(NetworkStatus.CREATED);
             });
@@ -98,24 +98,22 @@ describe('[INTERGRATION]', () => {
             });
         });
 
-        // xit.todo('should have verified to false by default', async () => {
-        //     const sendRequestResponse = await sendRequest(ENDPOINT, user());
-        //     const getRequestResponse = await getRequest(`${ENDPOINT}/${sendRequestResponse.body.data.id}`);
-        //     console.log((getRequestResponse.body));
-        //     expect(getRequestResponse.body.data.verified).toEqual(false);
-        // });
+        test('should be unverified by default', async () => {
+            const { body: { data: { id } } } = await userFixture.createUser({ verified: null });
+            const { headers } = await prepareUserSession();
+            const response = await global.superAgent
+                .get(`${getUri(Constants.Endpoints.USERS)}/${id}`)
+                .set(headers);
+            expect(response.body.data.verified).toEqual(false);
+        });
 
         test.todo('user should have a defualt profile equal to empty {}');
-        // test('Profile Should have an empty object when creating a new user', async () => {
-        //     const req = superAgent.post(ENDPOINT);
-        //     const res = await req.send(user);
-        //     expect(((res.body) as Body<UsersSchema>)./api/users/undefinedprofile).toBe(undefined);
-        //     // TODO: the profile object should has a default value in the service
-        //              and not in model, then uncomment the below code
-        //     // expect(((res.body) as Body<UsersSchema>).profile).toMatchObject({});
-        //     expect(res.status).toBe(NetworkStatus.CREATED);
-        // });
+    });
 
+    describe('#SEARCH FOR USES', () => {
+        test.skip('should return list of users depends on the provided name', () => {
+            global.superAgent.get(USER_SESSION_ENDPOINT);
+        });
     });
 
 });

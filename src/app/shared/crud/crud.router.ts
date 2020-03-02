@@ -6,6 +6,7 @@ import { SuccessResponse, NetworkStatus, ErrorResponse, sendResponse, Responses 
 import { translate } from '@lib/translation';
 import { AppUtils } from '@core/utils';
 import { Body } from '@lib/mongoose';
+import { isValidObjectId } from 'mongoose';
 
 // TODO: Generic SchemaType should inherit from RepoHooks interface which
 //  will be used to fire onSave, onUpdate, onDelete, ..etc
@@ -16,6 +17,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
 
     @Post('/', Auth.isAuthenticated)
     public async create(req: Request, res: Response) {
+        // TODO: payload is not validated yet
         const result = await this.service.create(req.body);
         if (result.hasError) {
             throw new Responses.BadRequest(result.data);
@@ -28,22 +30,34 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
     @Patch(':id', Auth.isAuthenticated)
     public async update(req: Request, res: Response) {
         const { id } = req.params;
-        // TODO: imporve error handling, if id is not string throw directly
+
+        if (AppUtils.not(isValidObjectId(id))) {
+            throw new Responses.BadRequest('id_not_valid');
+        }
+
         const result = await this.service.updateById(id, req.body);
+
         if (result.hasError) {
             throw new ErrorResponse(result.data);
         }
+
         sendResponse(res, new SuccessResponse(result.data));
     }
 
     @Put(':id', Auth.isAuthenticated)
     public async set(req: Request, res: Response) {
         const { id } = req.params;
-        // TODO: imporve error handling, if id is not string throw directly
+
+        if (AppUtils.not(isValidObjectId(id))) {
+            throw new Responses.BadRequest('id_not_valid');
+        }
+
         const result = await this.service.set(id, req.body);
+
         if (result.hasError) {
             throw new ErrorResponse(result.data);
         }
+
         sendResponse(res, new SuccessResponse(result.data));
     }
 

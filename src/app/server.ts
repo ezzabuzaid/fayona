@@ -5,7 +5,7 @@ import { envirnoment } from '@environment/env';
 import http = require('http');
 import { URL } from 'url';
 import { Application } from './app';
-import socketIO from 'socket.io';
+import socketIO, { Room } from 'socket.io';
 
 const log = new Logger('Server init');
 
@@ -34,7 +34,7 @@ export class NodeServer extends Application {
                 envirnoment.load();
                 const server = new NodeServer();
                 await NodeServer.loadDatabase();
-                const sockets = {};
+                const sockets: { [key: string]: socketIO.Socket } = {};
                 const rooms = {};
                 // TODO: Move this out
                 const io = socketIO(server.server)
@@ -46,24 +46,27 @@ export class NodeServer extends Application {
                                 socket.on('SendMessage', (message: IMessage) => {
                                         console.log('New Message', message);
                                         const recipientSocket = sockets[message.recipient_id];
-                                        if (recipientSocket) {
+                                        // TODO after validating the message save it in the database
+                                        if (recipientSocket && recipientSocket.connected) {
                                                 recipientSocket.emit('Message', message);
+                                        } else {
+                                                sockets[message.recipient_id] = undefined;
                                         }
                                 });
-                                socket.on('JoinGroup', (roomID) => {
-                                        console.log('New Group Joiner => ', roomID);
-                                        socket.join(roomID);
+                                socket.on('JoinGroup', (room: IRoom) => {
+                                        console.log('New Group Joiner => ', room.recipient_id);
+                                        socket.join(room.recipient_id);
                                 });
-                                socket.on('SendGroupMessage', (roomID, message) => {
-                                        console.log('New Group Message => ', roomID);
-                                        socket.to(roomID).emit('Message', message);
+                                socket.on('SendGroupMessage', (message: IMessage) => {
+                                        console.log('New Group Message from => ', message.sender_id);
+                                        socket.to(message.recipient_id).emit('Message', message);
                                 });
                         });
 
                 return server;
         }
 
-        public static async test() {
+        public static test() {
                 Logger.level = LoggerLevel.Off;
                 envirnoment.load(StageLevel.TEST);
         }

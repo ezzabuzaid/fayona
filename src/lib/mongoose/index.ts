@@ -26,3 +26,5 @@ export type Body<T> = CastObjectIDToString<OmitProperties<T, (...args: any) => a
 export function generateModelMetadataKey(target: any) {
     return `model:${target.name}`;
 }
+
+export type Projection<T> = Partial<{ [key in keyof Body<T>]: 1 | 0 }>;
