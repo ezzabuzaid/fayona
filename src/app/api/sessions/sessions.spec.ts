@@ -31,7 +31,7 @@ describe('#INTEGRATION', () => {
                 .get(USER_SESSION_ENDPOINT)
                 .set(lastSession.headers);
             expect(response.ok).toBeTruthy();
-            expect(response.body.data.length).toEqual(1);
+            expect(response.payload.data.length).toEqual(1);
         });
 
     });
@@ -46,7 +46,7 @@ describe('#INTEGRATION', () => {
                     session_id: userSession.session_id
                 } as IDeactivateSessionPayload);
             expect(response.ok).toBeTruthy();
-            expect(response.body.data).toBe('Session deactivated');
+            expect(response.payload.data).toBe('Session deactivated');
         });
 
         test('should return bad request if there is no session', async () => {
@@ -58,7 +58,7 @@ describe('#INTEGRATION', () => {
                     session_id: new Types.ObjectId().toHexString(),
                 } as IDeactivateSessionPayload);
             expect(response.badRequest).toBeTruthy();
-            expect(response.body.message).toBe('no session available');
+            expect(response.payload.message).toBe('no session available');
         });
 
         test('should not accept non string session id', async () => {
@@ -70,7 +70,7 @@ describe('#INTEGRATION', () => {
                     session_id: false as any,
                 } as IDeactivateSessionPayload);
             expect(response.badRequest).toBeTruthy();
-            expect(response.body.message).toBe('session_id must be string');
+            expect(response.payload.message).toBe('session_id must be string');
         });
 
         test('should not accept non string user id', async () => {
@@ -82,7 +82,7 @@ describe('#INTEGRATION', () => {
                     session_id: userSession.session_id,
                 } as IDeactivateSessionPayload);
             expect(response.badRequest).toBeTruthy();
-            expect(response.body.message).toBe('user_id must be string');
+            expect(response.payload.message).toBe('user_id must be string');
         });
     });
 

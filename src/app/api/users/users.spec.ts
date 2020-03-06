@@ -20,7 +20,7 @@ describe('[INTERGRATION]', () => {
                 const username = generateUsername();
                 await userFixture.createUser({ username });
                 const response = await userFixture.createUser({ username });
-                expect(response.body.message).toMatch('username_entity_exist');
+                expect(response.payload.message).toMatch('username_entity_exist');
                 expect(response.status).toBe(NetworkStatus.BAD_REQUEST);
             });
 
@@ -28,7 +28,7 @@ describe('[INTERGRATION]', () => {
                 const email = faker.internet.email();
                 await userFixture.createUser({ email });
                 const response = await userFixture.createUser({ email });
-                expect(response.body.message).toMatch('email_entity_exist');
+                expect(response.payload.message).toMatch('email_entity_exist');
                 expect(response.status).toBe(NetworkStatus.BAD_REQUEST);
             });
 
@@ -36,19 +36,19 @@ describe('[INTERGRATION]', () => {
                 const mobile = generatePhoneNumber();
                 await userFixture.createUser({ mobile });
                 const response = await userFixture.createUser({ mobile });
-                expect(response.body.message).toMatch('mobile_entity_exist');
+                expect(response.payload.message).toMatch('mobile_entity_exist');
                 expect(response.status).toBe(NetworkStatus.BAD_REQUEST);
             });
 
             test('username contains special char', async () => {
                 const response = await userFixture.createUser({ username: 'testCreate2#$' });
-                expect(response.body.message).toContain('wrong_username');
+                expect(response.payload.message).toContain('wrong_username');
                 expect(response.status).toBe(NetworkStatus.BAD_REQUEST);
             });
 
             test('mobile number is wrong', async () => {
                 const response = await userFixture.createUser({ mobile: '0792807794' });
-                expect(response.body.message).toContain('wrong_mobile');
+                expect(response.payload.message).toContain('wrong_mobile');
                 expect(response.status).toBe(NetworkStatus.BAD_REQUEST);
             });
             test('role is not one of supported roles', async () => {
@@ -57,12 +57,12 @@ describe('[INTERGRATION]', () => {
             });
             test('email has no suffix', async () => {
                 const response = await userFixture.createUser({ email: 'test@test' });
-                expect(response.body.message).toContain('wrong_email');
+                expect(response.payload.message).toContain('wrong_email');
                 expect(response.status).toBe(NetworkStatus.BAD_REQUEST);
             });
             test('email has no @', async () => {
                 const response = await userFixture.createUser({ email: 'testtest.com' });
-                expect(response.body.message).toContain('wrong_email');
+                expect(response.payload.message).toContain('wrong_email');
                 expect(response.status).toBe(NetworkStatus.BAD_REQUEST);
             });
         });
@@ -99,12 +99,12 @@ describe('[INTERGRATION]', () => {
         });
 
         test('should be unverified by default', async () => {
-            const { body: { data: { id } } } = await userFixture.createUser({ verified: null });
+            const { payload: { data: { id } } } = await userFixture.createUser({ verified: null });
             const { headers } = await prepareUserSession();
             const response = await global.superAgent
                 .get(`${getUri(Constants.Endpoints.USERS)}/${id}`)
                 .set(headers);
-            expect(response.body.data.verified).toEqual(false);
+            expect(response.payload.data.verified).toEqual(false);
         });
 
         test.todo('user should have a defualt profile equal to empty {}');

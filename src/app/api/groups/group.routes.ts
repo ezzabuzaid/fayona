@@ -38,7 +38,6 @@ export class GroupsRouter extends CrudRouter<GroupsSchema> {
         // TODO: create member and group should be within transaction
         const { logo, title, members } = new GroupPayload(req.body);
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        console.log(members);
         if (AppUtils.isFalsy(AppUtils.hasItemWithin(members))) {
             throw new Responses.BadRequest('a group should consist of more than one member');
         }

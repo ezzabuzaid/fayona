@@ -20,11 +20,10 @@ export type CastObjectIDToString<T> = { [key in keyof T]: T[key] extends Types.O
 export type WithID<T> = { id?: string } & T;
 export type WithMongoID<T> = { _id: string } & T;
 
-// TODO: rename it Payload
-export type Body<T> = CastObjectIDToString<OmitProperties<T, (...args: any) => any>>;
+export type Payload<T> = CastObjectIDToString<OmitProperties<T, (...args: any) => any>>;
 
 export function generateModelMetadataKey(target: any) {
     return `model:${target.name}`;
 }
 
-export type Projection<T> = Partial<{ [key in keyof Body<T>]: 1 | 0 }>;
+export type Projection<T> = Partial<{ [key in keyof Payload<T>]: 1 | 0 }>;

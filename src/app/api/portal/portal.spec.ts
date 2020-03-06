@@ -28,7 +28,7 @@ describe('#INTERGRATION', () => {
                     .set(generateDeviceUUIDHeader())
                     .send(fakeLoginPaylod);
 
-                expect(response.body.message).toMatch('Wrong credintals');
+                expect(response.payload.message).toMatch('Wrong credintals');
                 expect(response.badRequest).toBeTruthy();
             });
 
@@ -40,7 +40,7 @@ describe('#INTERGRATION', () => {
                     .set(generateDeviceUUIDHeader())
                     .send(AppUtils.extendObject(fakeLoginPaylod, { password: faker.internet.password() }));
 
-                expect(response.body.message).toMatch('Wrong credintals');
+                expect(response.payload.message).toMatch('Wrong credintals');
                 expect(response.badRequest).toBeTruthy();
             });
 
@@ -74,7 +74,7 @@ describe('#INTERGRATION', () => {
                     .set(session.headers)
                     .send(fakeLoginPaylod);
 
-                expect(lastSession.body.message).toMatch('exceed_allowed_sesison');
+                expect(lastSession.payload.message).toMatch('exceed_allowed_sesison');
                 expect(lastSession.unauthorized).toBeTruthy();
             });
 

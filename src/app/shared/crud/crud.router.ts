@@ -5,7 +5,7 @@ import { Request, Response } from 'express';
 import { SuccessResponse, NetworkStatus, ErrorResponse, sendResponse, Responses } from '@core/helpers';
 import { translate } from '@lib/translation';
 import { AppUtils } from '@core/utils';
-import { Body } from '@lib/mongoose';
+import { Payload } from '@lib/mongoose';
 import { isValidObjectId } from 'mongoose';
 
 // TODO: Generic SchemaType should inherit from RepoHooks interface which
@@ -52,7 +52,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
             throw new Responses.BadRequest('id_not_valid');
         }
 
-        const result = await this.service.set(id, req.body);
+        const result = await this.service.updateById(id, req.body);
 
         if (result.hasError) {
             throw new ErrorResponse(result.data);
@@ -77,7 +77,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
 
     @Post('bulk', Auth.isAuthenticated)
     public async bulkUpdate(req: Request, res: Response) {
-        const { entites } = req.body as { entites: Array<Body<SchemaType>> };
+        const { entites } = req.body as { entites: Array<Payload<SchemaType>> };
         this._checkIfIdsIsValid(entites);
 
         const completion = await this.service.bulkUpdate(entites);
