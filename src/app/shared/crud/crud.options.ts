@@ -1,5 +1,6 @@
 import { Payload, Document } from '@lib/mongoose';
 import { DocumentQuery } from 'mongoose';
+import { Type } from '@core/utils';
 
 export interface ICrudHooks<T> {
     pre?: (doc: Document<T>) => any;
@@ -7,6 +8,8 @@ export interface ICrudHooks<T> {
 }
 
 export interface ICrudOperation<T = any> {
+    dto?: Type<any>;
+    bodyValidator?: Type<any>;
     create?: ICrudHooks<T>;
     update?: ICrudHooks<T>;
     delete?: ICrudHooks<T>;

@@ -2,18 +2,20 @@ import { CrudService } from './crud.service';
 import { Post, Put, Delete, Get, Patch } from '@lib/methods';
 import { Auth } from '@api/portal';
 import { Request, Response } from 'express';
-import { SuccessResponse, NetworkStatus, ErrorResponse, sendResponse, Responses } from '@core/helpers';
+import { SuccessResponse, ErrorResponse, sendResponse, Responses } from '@core/helpers';
 import { translate } from '@lib/translation';
 import { AppUtils } from '@core/utils';
 import { Payload } from '@lib/mongoose';
 import { isValidObjectId } from 'mongoose';
-
+import assert from 'assert';
 // TODO: Generic SchemaType should inherit from RepoHooks interface which
 //  will be used to fire onSave, onUpdate, onDelete, ..etc
 export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> = CrudService<SchemaType>> {
     constructor(
         protected service: ServiceType & CrudService<SchemaType>
-    ) { }
+    ) {
+        assert(AppUtils.notNullOrUndefined(service));
+    }
 
     @Post('/', Auth.isAuthenticated)
     public async create(req: Request, res: Response) {
@@ -90,8 +92,13 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
 
     @Delete(':id', Auth.isAuthenticated)
     public async delete(req: Request, res: Response) {
-        // TODO: imporve error handling, if id is not string throw directly
-        const result = await this.service.delete({ _id: req.params.id } as any);
+        const { id } = req.params;
+
+        if (AppUtils.not(isValidObjectId(id))) {
+            throw new Responses.BadRequest('id_not_valid');
+        }
+
+        const result = await this.service.delete({ _id: id } as any);
         if (result.hasError) {
             throw new ErrorResponse(result.data);
         }
@@ -100,13 +107,17 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
 
     @Get(':id', Auth.isAuthenticated)
     public async fetchEntity(req: Request, res: Response) {
-        // TODO: imporve error handling, if id is not string throw directly
-        const entity = await this.service.one({ _id: req.params.id } as any);
+        const { id } = req.params;
+
+        if (AppUtils.not(isValidObjectId(id))) {
+            throw new Responses.BadRequest('id_not_valid');
+        }
+
+        const entity = await this.service.one({ _id: id } as any);
         if (!entity) {
             throw new ErrorResponse(translate('entity_not_found'));
         }
-        const response = new SuccessResponse(entity);
-        res.status(response.code).json(response);
+        sendResponse(res, new Responses.Ok(entity));
     }
 
     @Get('/', Auth.isAuthenticated)
@@ -133,8 +144,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
     }
 
     private _checkIfIdsIsValid(ids: any[]) {
-        if (AppUtils.isFalsy(ids) || AppUtils.isFalsy(AppUtils.hasItemWithin(ids))) {
-            // TODO: imporve error handling, if ids is not list of string throw directly
+        if (AppUtils.not(AppUtils.hasItemWithin(ids))) {
             throw new ErrorResponse(translate('please_provide_valid_list_of_ids'));
         }
     }
