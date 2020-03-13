@@ -27,7 +27,6 @@ export class NodeServer extends Application {
                 super();
                 this.path = new URL(`http://${this.host}:${this.port}`);
                 this.populateServer();
-
         }
 
         public static async bootstrap() {
@@ -36,7 +35,7 @@ export class NodeServer extends Application {
                 await NodeServer.loadDatabase();
                 const sockets: { [key: string]: socketIO.Socket } = {};
                 // TODO: Move this out
-                const io = socketIO(server.server)
+                socketIO(server.server)
                         .on('connection', (socket) => {
                                 socket.on('JoinRoom', (room: IRoom) => {
                                         sockets[room.sender_id] = socket;
