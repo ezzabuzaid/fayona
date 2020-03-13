@@ -22,6 +22,10 @@ export class SessionsService extends CrudService<SessionSchema> {
         });
     }
 
+    public getAllActiveSession() {
+        return this.all({ active: true });
+    }
+
     public getActiveUserSession(user_id: string) {
         return this.all({ user_id, active: true });
     }

@@ -1,4 +1,7 @@
-import { ErrorResponse, SuccessResponse, tokenService, Constants, IRefreshTokenClaim, Responses, HashService } from '@core/helpers';
+import {
+    ErrorResponse, SuccessResponse, tokenService, Constants,
+    IRefreshTokenClaim, Responses, HashService, sendResponse
+} from '@core/helpers';
 import { Post, Router } from '@lib/methods';
 import { Request, Response } from 'express';
 import usersService from '@api/users/users.service';
@@ -13,6 +16,7 @@ import { ApplicationConstants } from '@core/constants';
 import { sessionsService } from '@api/sessions/sessions.service';
 import { IsString } from 'class-validator';
 import { translate } from '@lib/translation';
+import { scheduleJob } from 'node-schedule';
 
 export class LoginPayload {
     @IsString({
@@ -52,9 +56,9 @@ export class PortalRoutes {
 
         const activeUserSessions = await sessionsService.getActiveUserSession(record.id);
 
-        // if (activeUserSessions.length >= 3) {
-        //     throw new Responses.Unauthorized('exceed_allowed_sesison');
-        // }
+        if (activeUserSessions.length >= 3) {
+            throw new Responses.Unauthorized('exceed_allowed_sesison');
+        }
 
         // STUB it should pass if password is right
         const isPasswordEqual = HashService.comparePassword(password, record.password);
@@ -78,13 +82,17 @@ export class PortalRoutes {
         }
     }
 
-    @Post(Constants.Endpoints.LOGOUT, Auth.isAuthenticated)
+    @Post(Constants.Endpoints.LOGOUT)
     public async logout(req: Request, res: Response) {
-        const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
-        // STUB check if device_uuid is exit and associated with the current user
-        await sessionsService.deActivate({ device_uuid });
-        const response = new SuccessResponse(null);
-        res.status(response.code).json(response);
+        const device_uuid = req.body[ApplicationConstants.deviceIdHeader];
+        if (device_uuid) {
+            const result = await sessionsService.deActivate({ device_uuid });
+            if (AppUtils.not(result.hasError)) {
+                sendResponse(res, new Responses.Ok(result.data));
+                return;
+            }
+        }
+        sendResponse(res, new Responses.BadRequest('logout_wrong_device_uuid'));
     }
 
     @Post(Constants.Endpoints.REFRESH_TOKEN)
@@ -180,6 +188,13 @@ async function throwIfNotExist(query: Partial<Body<UsersSchema> & { _id: string 
     }
     throw new ErrorResponse(message);
 }
+
+scheduleJob('30 * * * *', async () => {
+    const sessions = await sessionsService.getAllActiveSession();
+    sessions.forEach((session) => {
+        // TODO deActivate usless sessions
+    });
+});
 
 // TODO: Forget and reset password scenario
 // Enter a unique info like partial of profile info page 1

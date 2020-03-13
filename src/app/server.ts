@@ -6,7 +6,6 @@ import http = require('http');
 import { URL } from 'url';
 import { Application } from './app';
 import socketIO, { Room } from 'socket.io';
-
 const log = new Logger('Server init');
 
 interface IRoom {
@@ -31,7 +30,7 @@ export class NodeServer extends Application {
         }
 
         public static async bootstrap() {
-                envirnoment.load();
+                envirnoment.load(StageLevel.DEV);
                 const server = new NodeServer();
                 await NodeServer.loadDatabase();
                 const sockets: { [key: string]: socketIO.Socket } = {};

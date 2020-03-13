@@ -7,12 +7,14 @@ import { LoginPayload } from './portal.routes';
 import { PortalHelper } from './portal.helper';
 import { AppUtils } from '@core/utils';
 import * as faker from 'faker';
+import { ApplicationConstants } from '@core/constants';
 
 const ENDPOINT = (suffix: string) => `${Constants.Endpoints.PORTAL}/${suffix}`;
 const LOGIN_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.LOGIN));
 const REFRESH_TOKEN = getUri(ENDPOINT(Constants.Endpoints.REFRESH_TOKEN));
 const RESET_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.RESET_PASSWORD));
 const FORGET_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.FORGET_PASSWORD));
+const LOGUT_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.LOGOUT));
 
 const fakeLoginPaylod: LoginPayload = {
     password: faker.internet.password(),
@@ -20,7 +22,7 @@ const fakeLoginPaylod: LoginPayload = {
 };
 
 describe('#INTERGRATION', () => {
-    fdescribe('Login should', () => {
+    describe('Login should', () => {
         describe('fail if..', () => {
             test('user not exist, aka username is wrong', async () => {
                 const response = await global.superAgent
@@ -54,6 +56,7 @@ describe('#INTERGRATION', () => {
                 const userFixture = new UserFixture();
                 await userFixture.createUser(fakeLoginPaylod);
 
+                // NOTE prepareUserSession will make a login request
                 const session = await prepareUserSession({
                     _id: userFixture.user.id,
                     ...fakeLoginPaylod
@@ -95,7 +98,7 @@ describe('#INTERGRATION', () => {
         test.todo('returned Token has the appropriate schema');
     });
 
-    xdescribe('Refresh Token', () => {
+    fdescribe('Refresh Token', () => {
         const performRequest = (refreshToken: string, token: string = null) => {
             return global.superAgent
                 .post(REFRESH_TOKEN)
@@ -110,12 +113,12 @@ describe('#INTERGRATION', () => {
             expect(response.unauthorized).toBeTruthy();
         });
 
-        test('should be UNAUTHORIZED if the refresh token is invalid', async () => {
+        test.skip('should be UNAUTHORIZED if the refresh token is invalid', async () => {
             const response = await performRequest(INVALID_TOKEN);
             expect(response.unauthorized).toBeTruthy();
         });
 
-        test('should be UNAUTHORIZED if the token is invalid', async () => {
+        test.skip('should be UNAUTHORIZED if the token is invalid', async () => {
             const response = await performRequest(
                 PortalHelper.generateRefreshToken(null),
                 INVALID_TOKEN
@@ -162,6 +165,35 @@ describe('#INTERGRATION', () => {
         //     );
         //     expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
         // });
+    });
+
+    describe('LOGOUT', () => {
+        test('should deactive user session', async () => {
+            const session = await prepareUserSession();
+
+            const response = await global.superAgent
+                .post(LOGUT_ENDPOINT)
+                .send({ [ApplicationConstants.deviceIdHeader]: session.headers['x-device-uuid'] });
+
+            expect(response.ok).toBeTruthy();
+        });
+        test('should return bad request if the device uuid was not specifed', async () => {
+            const response = await global.superAgent
+                .post(LOGUT_ENDPOINT);
+
+            expect(response.body.message).toMatch('cannot logout unknown users');
+            expect(response.badRequest).toBeTruthy();
+        });
+
+        test('should return bad request if the device uuid does not belong to any user', async () => {
+            const response = await global.superAgent
+                .post(LOGUT_ENDPOINT)
+                .send(generateDeviceUUIDHeader());
+
+            expect(response.body.message).toMatch('cannot logout unknown users');
+            expect(response.badRequest).toBeTruthy();
+        });
+
     });
 
 });
