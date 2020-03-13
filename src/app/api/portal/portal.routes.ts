@@ -6,7 +6,7 @@ import { Post, Router } from '@lib/methods';
 import { Request, Response } from 'express';
 import usersService from '@api/users/users.service';
 import { UsersSchema } from '@api/users';
-import { Body } from '@lib/mongoose';
+import { Payload } from '@lib/mongoose';
 import { EmailService, fakeEmail } from '@shared/email';
 import { AppUtils } from '@core/utils';
 import { PortalHelper } from './portal.helper';
@@ -135,7 +135,7 @@ export class PortalRoutes {
 
     @Post(Constants.Endpoints.FORGET_PASSWORD)
     public async forgotPassword(req: Request, res: Response) {
-        const { username } = req.body as Body<UsersSchema>;
+        const { username } = req.body as Payload<UsersSchema>;
         const entity = await throwIfNotExist({ username }, 'Error sending the password reset message. Please try again shortly.');
         const token = tokenService.generateToken({ id: entity.id, role: entity.role }, { expiresIn: '1h' });
         await EmailService.sendEmail(fakeEmail(token));
@@ -149,7 +149,7 @@ export class PortalRoutes {
         // so we need to know that the user who really did that by answering a specifc questions, doing 2FA
         // the attempts should be limited to 3 times, after that he need to re do the process again,
         // if the procces faild 3 times, the account should be locked, and he need to call the support for that
-        const { password } = req.body as Body<UsersSchema>;
+        const { password } = req.body as Payload<UsersSchema>;
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
         await usersService.updateById(decodedToken.id, { password });
         const response = new SuccessResponse(null);
@@ -178,7 +178,7 @@ export class PortalRoutes {
 
 }
 
-async function throwIfNotExist(query: Partial<Body<UsersSchema> & { _id: string }>, message = 'not_exist') {
+async function throwIfNotExist(query: Partial<Payload<UsersSchema> & { _id: string }>, message = 'not_exist') {
     if (AppUtils.isFalsy(query)) {
         throw new ErrorResponse(message);
     }

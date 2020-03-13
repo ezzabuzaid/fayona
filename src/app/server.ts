@@ -5,7 +5,8 @@ import { envirnoment } from '@environment/env';
 import http = require('http');
 import { URL } from 'url';
 import { Application } from './app';
-import socketIO, { Room } from 'socket.io';
+import socketIO from 'socket.io';
+
 const log = new Logger('Server init');
 
 interface IRoom {
@@ -26,7 +27,6 @@ export class NodeServer extends Application {
                 super();
                 this.path = new URL(`http://${this.host}:${this.port}`);
                 this.populateServer();
-
         }
 
         public static async bootstrap() {
@@ -34,9 +34,8 @@ export class NodeServer extends Application {
                 const server = new NodeServer();
                 await NodeServer.loadDatabase();
                 const sockets: { [key: string]: socketIO.Socket } = {};
-                const rooms = {};
                 // TODO: Move this out
-                const io = socketIO(server.server)
+                socketIO(server.server)
                         .on('connection', (socket) => {
                                 socket.on('JoinRoom', (room: IRoom) => {
                                         sockets[room.sender_id] = socket;

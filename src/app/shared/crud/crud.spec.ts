@@ -122,10 +122,10 @@ describe('#MockService', () => {
 //         expect(res.status).toBe(NetworkStatus.NOT_ACCEPTABLE);
 //     });
 
-//     test('resposne body should equal to', async () => {
+//     test('resposne payload should equal to', async () => {
 //         const req = superAgent.delete(`${ENDPOINT}/${user.id}`);
 //         const res = await req.set('Authorization', user.token);
-//         const { data } = res.body;
+//         const { data } = res.payload;
 //         expect(data).toBeNull();
 //     });
 // });
@@ -149,10 +149,10 @@ describe('#MockService', () => {
 //         expect(res.status).toBe(NetworkStatus.NOT_ACCEPTABLE);
 //     });
 
-//     test('resposne body should equal to', async () => {
+//     test('resposne payload should equal to', async () => {
 //         const req = superAgent.get(`${ENDPOINT}/${user.id}`);
 //         const res = await req.set('Authorization', user.token);
-//         const { data } = res.body;
+//         const { data } = res.payload;
 //         expect(data).toHaveProperty('username');
 //         expect(data).toHaveProperty('email');
 //         expect(data).toHaveProperty('mobile');
@@ -165,5 +165,5 @@ describe('#MockService', () => {
 // });
 
 describe('#GET USER', () => {
-    test.todo(`user body should contain only id`);
+    test.todo(`user payload should contain only id`);
 });

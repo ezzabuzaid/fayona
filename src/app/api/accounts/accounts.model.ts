@@ -1,3 +1,10 @@
 export interface IAccount {
-    name: string;
+    firstName: string;
+    lastName: string;
+    city: string;
+    country: string;
+    nationality: string;
+    placeOfBirth: string;
+    gender: string;
+    occupation: string;
 }

@@ -105,9 +105,20 @@ export class AppUtils {
         return value === undefined || value === null;
     }
 
-    public static hasItemWithin(list: any[]) {
-        // TODO: add support for plain objects
-        return Array.isArray(list) && list.length > 0;
+    public static notNullOrUndefined(value: any) {
+        return this.isTruthy(value !== undefined && value !== null);
+    }
+
+    public static hasItemWithin(object: object) {
+        if (Array.isArray(object)) {
+            return this.isTruthy(object.length);
+        }
+
+        if (new Object(object) === object) {
+            return this.isTruthy(Object.keys(object).length);
+        }
+
+        return null;
     }
 
     public static extendObject<T>(target: T, source1: Partial<T>): T {

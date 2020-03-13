@@ -1,5 +1,6 @@
-import { Body, Document } from '@lib/mongoose';
+import { Payload, Document } from '@lib/mongoose';
 import { DocumentQuery } from 'mongoose';
+import { Type } from '@core/utils';
 
 export interface ICrudHooks<T> {
     pre?: (doc: Document<T>) => any;
@@ -7,6 +8,8 @@ export interface ICrudHooks<T> {
 }
 
 export interface ICrudOperation<T = any> {
+    dto?: Type<any>;
+    bodyValidator?: Type<any>;
     create?: ICrudHooks<T>;
     update?: ICrudHooks<T>;
     delete?: ICrudHooks<T>;
@@ -20,5 +23,5 @@ export interface ICrudOptions<T> extends ICrudOperation<T> {
     /**
      * indicate that the entity should be unique, and the check will be on the provided properties
      */
-    unique?: Array<keyof Body<T>>;
+    unique?: Array<keyof Payload<T>>;
 }
