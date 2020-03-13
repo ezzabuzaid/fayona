@@ -49,6 +49,7 @@
         "no-empty-interface": false,
         "ordered-imports": false,
         "forin": false,
+        "member-access": false,
         "no-import-side-effect": false,
         "no-var-keyword": {
             "severity": "warning"

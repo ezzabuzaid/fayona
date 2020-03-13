@@ -1,6 +1,6 @@
 import en from '@assets/languages/en.json';
 import ar from '@assets/languages/ar.json';
-import { ErrorHandling, stage, StageLevel } from '@core/helpers';
+import { ErrorHandling, StageLevel } from '@core/helpers';
 import { Logger } from '@core/utils';
 import { translation } from '@lib/translation';
 import compression = require('compression');
@@ -11,6 +11,7 @@ import morgan = require('morgan');
 import { Wrapper } from './wrapper';
 import path from 'path';
 import cors from 'cors';
+import stage from '@core/helpers/stage';
 
 const log = new Logger('Application instance');
 

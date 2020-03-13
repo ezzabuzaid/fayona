@@ -32,5 +32,6 @@ export namespace Constants {
         public static readonly USERS = 'users';
         public static readonly GROUPS = 'groups';
         public static readonly MEMBERS = 'members';
+        public static readonly UPLOADS = 'uploads';
     }
 }

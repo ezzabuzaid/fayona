@@ -4,8 +4,8 @@ import { translate } from '@lib/translation';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { NetworkStatus } from './network-status';
 import { sendResponse, Responses } from './response.model';
-import { stage } from './stages';
 import { ApplicationConstants } from '@core/constants';
+import stage from './stage';
 
 const log = new Logger('Errors');
 

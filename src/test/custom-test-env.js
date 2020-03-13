@@ -8,13 +8,13 @@ const request = require('supertest');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
 class CustomEnvironment extends NodeEnvironment {
-  constructor(config) {
+  constructor (config) {
+    NodeServer.test();
     super(config);
     this.app = (new Application()).application;
   }
 
   async setup() {
-    NodeServer.test();
     await connectToDatabase();
     this.global.superAgent = request(this.app);
     await super.setup();

@@ -1,7 +1,8 @@
-import { NODE_STAGE, stage, StageLevel } from '@core/helpers';
+import { NODE_STAGE, StageLevel } from '@core/helpers';
 import { AppUtils, Logger } from '@core/utils';
 import { config as envConfig } from 'dotenv';
 import { join } from 'path';
+import stage from '@core/helpers/stage';
 const log = new Logger('Envirnoment Class');
 
 class Envirnoment {

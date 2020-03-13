@@ -1,6 +1,7 @@
 import { Entity, Field, BaseModel } from '@lib/mongoose';
+import { Constants } from '@core/helpers';
 
-@Entity(name)
+@Entity(Constants.Schemas.UPLOADS)
 export class UploadsSchema {
     @Field() public type: string;
     @Field() public size: number;

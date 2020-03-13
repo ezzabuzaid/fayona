@@ -1,11 +1,12 @@
 import { Database } from '@core/database';
-import { stage, StageLevel } from '@core/helpers';
+import { StageLevel } from '@core/helpers';
 import { Logger, LoggerLevel, AppUtils } from '@core/utils';
 import { envirnoment } from '@environment/env';
 import http = require('http');
 import { URL } from 'url';
 import { Application } from './app';
 import socketIO from 'socket.io';
+import stage from '@core/helpers/stage';
 
 const log = new Logger('Server init');
 

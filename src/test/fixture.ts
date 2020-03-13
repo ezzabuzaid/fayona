@@ -45,7 +45,7 @@ export async function prepareUserSession(user?: WithMongoID<LoginPayload>) {
 
     let user_id = null;
     if (AppUtils.isFalsy(user)) {
-        const { payload: { data: { id } } } = await global.superAgent
+        const { body: { data: { id } } } = await global.superAgent
             .post(getUri(Constants.Endpoints.USERS))
             .send(payload);
         user_id = id;
@@ -61,11 +61,13 @@ export async function prepareUserSession(user?: WithMongoID<LoginPayload>) {
 
     return {
         headers: {
-            authorization: loginResponse.payload.token,
+            authorization: loginResponse.body.token,
             ...deviceUUIDHeader
         },
         user_id,
-        session_id: loginResponse.payload.session_id
+        session_id: loginResponse.body.session_id,
+        token: loginResponse.body.token,
+        refreshToken: loginResponse.body.refreshToken
     };
 }
 
@@ -90,7 +92,7 @@ export class UserFixture {
                 ...paylod
             });
         try {
-            this.user.id = response.payload.data.id;
+            this.user.id = response.body.data.id;
         } catch (error) { }
         return response;
     }
@@ -117,5 +119,5 @@ export function generateExpiredToken() {
 }
 
 export function generateToken() {
-    return tokenService.generateToken({ id: '' });
+    return tokenService.generateToken({ id: AppUtils.generateAlphabeticString() });
 }

@@ -1,12 +1,9 @@
-import {
-    ErrorResponse, SuccessResponse, tokenService, Constants,
-    IRefreshTokenClaim, Responses, HashService, sendResponse
-} from '@core/helpers';
+import { tokenService, Constants, IRefreshTokenClaim, Responses, HashService, sendResponse } from '@core/helpers';
 import { Post, Router } from '@lib/methods';
 import { Request, Response } from 'express';
 import usersService from '@api/users/users.service';
 import { UsersSchema } from '@api/users';
-import { Payload } from '@lib/mongoose';
+import { Payload, WithID } from '@lib/mongoose';
 import { EmailService, fakeEmail } from '@shared/email';
 import { AppUtils } from '@core/utils';
 import { PortalHelper } from './portal.helper';
@@ -32,9 +29,23 @@ export class LoginPayload {
     }
 }
 
-export interface IRefreshTokenBody {
-    token: string;
-    refreshToken: string;
+export class RefreshTokenDto {
+    public token: string;
+    public refreshToken: string;
+    constructor(user: Payload<WithID<UsersSchema>>) {
+        this.token = PortalHelper.generateToken(user.id, user.role);
+        this.refreshToken = PortalHelper.generateRefreshToken(user.id);
+    }
+}
+export class RefreshTokenPayload {
+    @IsString()
+    public token: string = null;
+    @IsString()
+    public refreshToken: string = null;
+
+    constructor(payload: RefreshTokenPayload) {
+        AppUtils.strictAssign(this, payload);
+    }
 }
 
 @Router(Constants.Endpoints.PORTAL)
@@ -72,7 +83,7 @@ export class PortalRoutes {
                 user_id: record.id
             });
 
-            const response = new SuccessResponse(null);
+            const response = new Responses.Ok(null);
             response.session_id = session.data.id;
             // STUB test the refreshToken claims should have only entity id with expire time 12h
             response.refreshToken = PortalHelper.generateRefreshToken(record.id);
@@ -80,6 +91,7 @@ export class PortalRoutes {
             response.token = PortalHelper.generateToken(record.id, record.role);
             res.status(response.code).json(response);
         }
+
     }
 
     @Post(Constants.Endpoints.LOGOUT)
@@ -97,15 +109,14 @@ export class PortalRoutes {
 
     @Post(Constants.Endpoints.REFRESH_TOKEN)
     public async refreshToken(req: Request, res: Response) {
-        const { token, refreshToken } = req.body as IRefreshTokenBody;
-        // NOTE: if it was invalid or expired it will implicity thrown an error
-        const decodedRefreshToken = await tokenService.decodeToken<IRefreshTokenClaim>(refreshToken);
-
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
-
         if (AppUtils.isFalsy(device_uuid)) {
             throw new Responses.Unauthorized();
         }
+
+        const { token, refreshToken } = new RefreshTokenPayload(req.body);
+        // NOTE: if it was invalid or expired it will implicity thrown an error
+        const decodedRefreshToken = await tokenService.decodeToken<IRefreshTokenClaim>(refreshToken);
 
         try {
             await tokenService.decodeToken(token);
@@ -116,21 +127,19 @@ export class PortalRoutes {
                     device_uuid,
                     user_id: decodedRefreshToken.id
                 });
+
                 if (AppUtils.isFalsy(session)) {
                     throw new Responses.Unauthorized();
                 }
 
                 const user = await throwIfNotExist({ _id: decodedRefreshToken.id });
-                const response = new SuccessResponse<IRefreshTokenBody>({
-                    token: PortalHelper.generateToken(user.id, user.role),
-                    refreshToken
-                });
+                const response = new Responses.Ok(new RefreshTokenDto(user));
                 return res.status(response.code).json(response);
             } else {
                 throw error;
             }
         }
-        throw new ErrorResponse('not_allowed');
+        throw new Responses.BadRequest('not_allowed');
     }
 
     @Post(Constants.Endpoints.FORGET_PASSWORD)
@@ -139,7 +148,7 @@ export class PortalRoutes {
         const entity = await throwIfNotExist({ username }, 'Error sending the password reset message. Please try again shortly.');
         const token = tokenService.generateToken({ id: entity.id, role: entity.role }, { expiresIn: '1h' });
         await EmailService.sendEmail(fakeEmail(token));
-        const response = new SuccessResponse('An e-mail has been sent to ${user.email} with further instructions');
+        const response = new Responses.Ok('An e-mail has been sent to ${user.email} with further instructions');
         res.status(response.code).json(response);
     }
 
@@ -152,7 +161,7 @@ export class PortalRoutes {
         const { password } = req.body as Payload<UsersSchema>;
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
         await usersService.updateById(decodedToken.id, { password });
-        const response = new SuccessResponse(null);
+        const response = new Responses.Ok(null);
         await EmailService.sendEmail(fakeEmail());
         res.status(response.code).json(response);
     }
@@ -163,7 +172,7 @@ export class PortalRoutes {
         const { token } = req.query;
         const decodedToken = await tokenService.decodeToken(token);
         await usersService.updateById(decodedToken.id, { verified: true });
-        const response = new SuccessResponse(null);
+        const response = new Responses.Ok(null);
         res.status(response.code).json(response);
     }
 
@@ -172,7 +181,7 @@ export class PortalRoutes {
         const { token } = req.query;
         const decodedToken = await tokenService.decodeToken(token);
         await usersService.updateById(decodedToken.id, { verified: true });
-        const response = new SuccessResponse(null);
+        const response = new Responses.Ok(null);
         res.status(response.code).json(response);
     }
 
@@ -180,13 +189,13 @@ export class PortalRoutes {
 
 async function throwIfNotExist(query: Partial<Payload<UsersSchema> & { _id: string }>, message = 'not_exist') {
     if (AppUtils.isFalsy(query)) {
-        throw new ErrorResponse(message);
+        throw new Responses.BadRequest(message);
     }
     const entity = await usersService.one(query, { password: 1 });
     if (!!entity) {
         return entity;
     }
-    throw new ErrorResponse(message);
+    throw new Responses.BadRequest(message);
 }
 
 scheduleJob('30 * * * *', async () => {
