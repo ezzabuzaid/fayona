@@ -13,7 +13,7 @@ export class Auth {
         // STUB test if the request doesn't have a `deviceIdHeader` header
         // STUB test if the request doesn't have an `authorization` header
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
-        const token = req.header('authorization');
+        const token = req.header(ApplicationConstants.authorization);
         if (AppUtils.isFalsy(device_uuid) || AppUtils.isFalsy(token)) {
             throw new Responses.Unauthorized();
         }

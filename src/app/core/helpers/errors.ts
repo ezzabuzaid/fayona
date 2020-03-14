@@ -94,6 +94,7 @@ export class ErrorHandling {
                 break;
             default:
         }
+        console.log(error);
         sendResponse(res, response);
         return;
     }

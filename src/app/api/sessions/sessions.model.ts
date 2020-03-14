@@ -9,7 +9,7 @@ export class SessionSchema {
     @Field() public active: boolean = true;
     // TODO rename it to user
     @Field() public user_id: Types.ObjectId;
-    @Field() public device_uuid: string;
+    @Field({ lowercase: false }) public device_uuid: string;
     // TODO: create a collection for device info
     // TODO: presist device info and user location
 }

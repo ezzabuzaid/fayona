@@ -63,45 +63,44 @@ export class PortalRoutes {
         }
 
         // STUB it should throw if username is falsy type or if it's not in database
-        const record = await throwIfNotExist({ username }, 'wrong_credintals');
-
-        const activeUserSessions = await sessionsService.getActiveUserSession(record.id);
-
-        if (activeUserSessions.length >= 3) {
-            throw new Responses.Unauthorized('exceed_allowed_sesison');
-        }
+        const user = await throwIfNotExist({ username }, 'wrong_credintals');
 
         // STUB it should pass if password is right
-        const isPasswordEqual = HashService.comparePassword(password, record.password);
+        const isPasswordEqual = HashService.comparePassword(password, user.password);
         if (AppUtils.isFalsy(isPasswordEqual)) {
             throw new Responses.BadRequest('wrong_credintals');
         } else {
+            const activeUserSessions = await sessionsService.getActiveUserSession(user.id);
+            if (activeUserSessions.length >= 3) {
+                throw new Responses.Unauthorized('exceeded_allowed_sesison');
+            }
             // STUB it should create a session entity
             const session = await sessionsService.create({
                 device_uuid,
                 active: true,
-                user_id: record.id
+                user_id: user.id
             });
 
             const response = new Responses.Ok(null);
             response.session_id = session.data.id;
             // STUB test the refreshToken claims should have only entity id with expire time 12h
-            response.refreshToken = PortalHelper.generateRefreshToken(record.id);
+            response.refreshToken = PortalHelper.generateRefreshToken(user.id);
             // STUB test token claims must have only entity id and role with 30min expire time
-            response.token = PortalHelper.generateToken(record.id, record.role);
+            response.token = PortalHelper.generateToken(user.id, user.role);
             res.status(response.code).json(response);
         }
 
     }
 
-    @Post(Constants.Endpoints.LOGOUT)
+    @Post(Constants.Endpoints.LOGOUT + '/:uuid')
     public async logout(req: Request, res: Response) {
-        const device_uuid = req.body[ApplicationConstants.deviceIdHeader];
+        let device_uuid = req.params.uuid;
         if (device_uuid) {
+            device_uuid = decodeURI(device_uuid).toLowerCase();
+            console.log(device_uuid);
             const result = await sessionsService.deActivate({ device_uuid });
             if (AppUtils.not(result.hasError)) {
-                sendResponse(res, new Responses.Ok(result.data));
-                return;
+                return sendResponse(res, new Responses.Ok(result.data));
             }
         }
         sendResponse(res, new Responses.BadRequest('logout_wrong_device_uuid'));

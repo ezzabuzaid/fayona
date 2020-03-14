@@ -31,7 +31,7 @@ export class NodeServer extends Application {
         }
 
         public static async bootstrap() {
-                envirnoment.load(StageLevel.DEV);
+                envirnoment.load(StageLevel.PROD);
                 const server = new NodeServer();
                 await NodeServer.loadDatabase();
                 const sockets: { [key: string]: socketIO.Socket } = {};
