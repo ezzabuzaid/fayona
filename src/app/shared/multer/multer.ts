@@ -5,10 +5,12 @@ import assert = require('assert');
 
 import { AppUtils, Parameter } from '@core/utils';
 import { Request, NextFunction, Response } from 'express';
-import { Responses, ErrorResponse } from '@core/helpers';
+import { Responses, ErrorResponse, tokenService } from '@core/helpers';
+import uploadsService from '@api/uploads/uploads.service';
+import { isValidObjectId } from 'mongoose';
 
 class UploadFileDto {
-    public category: string;
+    public folder: string;
     public kind: string;
     [key: string]: string;
 }
@@ -55,26 +57,37 @@ export class Multer {
     }
 
     private get storage() {
-        const fileName = (file: Express.Multer.File) => `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`;
+        const timestamp = Date.now();
+        const formatFileName = (file: Express.Multer.File) => `${file.fieldname}-${timestamp}${path.extname(file.originalname)}`;
         return multer.diskStorage({
-            destination: (
+            destination: async (
                 req: Request<UploadFileDto>,
                 file: Express.Multer.File,
                 callback: (error: ErrorResponse, dest: string) => void
             ) => {
-                const { category, kind } = req.params;
-                if (AppUtils.isEmptyString(category)) {
-                    callback(new Responses.BadRequest('please provide valid category name'), null);
+                const { folder, kind } = req.params as UploadFileDto;
+                if (AppUtils.not(isValidObjectId(folder))) {
+                    callback(new Responses.BadRequest('please provide valid folder id'), null);
                 } else if (AppUtils.isEmptyString(kind)) {
                     callback(new Responses.BadRequest('please provide valid kind id'), null);
                 } else {
-                    const uploadFile = path.join(process.cwd(), '../', 'uploads', category, kind);
+                    const filePath = path.join(folder, kind);
+                    const uploadFile = path.join(process.cwd(), '../', 'uploads', filePath);
                     fileSystem.mkdirSync(uploadFile, { recursive: true });
+                    const decodedToken = await tokenService.decodeToken(req.headers.authorization);
+                    await uploadsService.create({
+                        user: decodedToken.id,
+                        name: file.originalname,
+                        size: file.size,
+                        type: file.mimetype,
+                        path: path.join(filePath, formatFileName(file)),
+                        folder
+                    });
                     callback(null, uploadFile);
                 }
             },
             filename(req: Express.Request, file, cb) {
-                cb(null, fileName(file));
+                cb(null, formatFileName(file));
             }
         });
     }
