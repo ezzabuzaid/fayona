@@ -20,6 +20,11 @@
             "script": "watch:prod",
             "group": "build",
             "problemMatcher": []
+        },
+        {
+            "type": "npm",
+            "script": "start",
+            "problemMatcher": []
         }
     ]
 }

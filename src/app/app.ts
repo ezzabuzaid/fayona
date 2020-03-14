@@ -18,7 +18,7 @@ const log = new Logger('Application instance');
 export class Application {
     public application = express();
     private staticDirectory = path.join(process.cwd(), 'public');
-    private uploadDirectory = path.join(process.cwd(), 'uploads');
+    private uploadDirectory = path.join(process.cwd(), '../', 'uploads');
     constructor() {
         this.configure();
         this.setupLocalization();
