@@ -5,8 +5,10 @@ import assert = require('assert');
 
 import { AppUtils, Parameter } from '@core/utils';
 import { Request, NextFunction, Response } from 'express';
-import { Responses, ErrorResponse, tokenService } from '@core/helpers';
-import uploadsService from '@api/uploads/uploads.service';
+import { Responses, ErrorResponse } from '@core/helpers';
+import { Application } from 'app/app';
+import { Types } from 'mongoose';
+import foldersService from '@api/uploads/folders.service';
 
 class UploadFilePayload {
     public folder: string;
@@ -63,12 +65,17 @@ export class Multer {
                 callback: (error: ErrorResponse, dest: string) => void
             ) => {
                 const { folder } = req.params as UploadFilePayload;
-                if (AppUtils.isEmptyString(folder)) {
-                    callback(new Responses.BadRequest('please provide valid folder id'), null);
+                const folderExistance = await foldersService.exists({ _id: folder });
+                if (folderExistance.hasError) {
+                    callback(new Responses.BadRequest(folderExistance.data), null);
                 } else {
-                    const uploadFile = path.join(process.cwd(), '../', 'uploads', folder);
-                    fileSystem.mkdirSync(uploadFile, { recursive: true });
-                    callback(null, uploadFile);
+                    if (Types.ObjectId.isValid(folder)) {
+                        const uploadFile = path.join(Application.uploadDirectory, folder);
+                        fileSystem.mkdirSync(uploadFile, { recursive: true });
+                        callback(null, uploadFile);
+                    } else {
+                        callback(new Responses.BadRequest('folder_id_not_valid'), null);
+                    }
                 }
             },
             filename(req: Express.Request, file, cb) {
