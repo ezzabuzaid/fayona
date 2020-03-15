@@ -6,6 +6,22 @@ export type Type<T> = new (...args: any[]) => T;
 export type Parameter<T extends (args: any) => any> = T extends (args: infer P) => any ? P : never;
 
 export class AppUtils {
+    /**
+     * remove null and undefined properties from an object expect empty string
+     * @param withEmptyString to indicate of the empty values should be removed
+     */
+    static excludeEmptyKeys(object: object, withEmptyString = false) {
+        const replaceUndefinedOrNull = (key: string, value: any) => {
+            if (withEmptyString) {
+                return this.isEmptyString(value) || this.isNullOrUndefined(value)
+                    ? undefined
+                    : value;
+            } else {
+                return this.isNullOrUndefined(value) ? undefined : value;
+            }
+        };
+        return JSON.parse(JSON.stringify(object, replaceUndefinedOrNull));
+    }
 
     public static isEmptyString(value: string): boolean {
         return typeof value !== 'string' || value === '';

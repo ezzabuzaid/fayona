@@ -23,7 +23,6 @@ export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {
     @Patch('deactivate', Auth.isAuthenticated)
     public async deActivateSession(req: Request<any>, res: Response) {
         const payload = new IDeactivateSessionPayload(req.body);
-
         await validatePayload(payload);
 
         const result = await this.service.deActivate({
