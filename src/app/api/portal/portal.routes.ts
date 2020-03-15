@@ -94,10 +94,8 @@ export class PortalRoutes {
 
     @Post(Constants.Endpoints.LOGOUT + '/:uuid')
     public async logout(req: Request, res: Response) {
-        let device_uuid = req.params.uuid;
+        const device_uuid = req.params.uuid;
         if (device_uuid) {
-            device_uuid = decodeURI(device_uuid).toLowerCase();
-            console.log(device_uuid);
             const result = await sessionsService.deActivate({ device_uuid });
             if (AppUtils.not(result.hasError)) {
                 return sendResponse(res, new Responses.Ok(result.data));
