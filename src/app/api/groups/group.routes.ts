@@ -1,9 +1,9 @@
-import { Router, Post, Get } from '@lib/methods';
+import { Router, Post, Get, Intercept } from '@lib/methods';
 import { Constants, tokenService, Responses, sendResponse } from '@core/helpers';
 import { CrudRouter } from '@shared/crud';
 import { GroupsSchema, GroupMemberSchema } from './group.model';
 import { groupsService, groupMemebrsService } from './group.service';
-import { Request, Response, } from 'express';
+import { Request, Response, NextFunction, } from 'express';
 import { Auth } from '@api/portal';
 import { AppUtils } from '@core/utils';
 import { IsArray, IsString } from 'class-validator';
@@ -17,18 +17,27 @@ class GroupPayload {
     }
 }
 
-@Router(Constants.Endpoints.GROUPS)
+@Router(Constants.Endpoints.GROUPS, {
+    middleware: [Auth.isAuthenticated]
+})
 export class GroupsRouter extends CrudRouter<GroupsSchema> {
     constructor() {
         super(groupsService);
     }
 
-    @Post('/', Auth.isAuthenticated)
+    @Intercept()
+    public async interceptRequests(req: Request, res: Response, next: NextFunction) {
+        console.log('originalUrl => ', req.originalUrl);
+        console.log('url => ', req.url);
+        console.log('baseUrl => ', req.baseUrl);
+        next();
+    }
+
+    @Post('/')
     public async create(req: Request, res: Response) {
         // TODO: create member and group should be within transaction
         const { logo, title, members } = new GroupPayload(req.body);
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        console.log(members);
         if (AppUtils.isFalsy(AppUtils.hasItemWithin(members))) {
             throw new Responses.BadRequest('a group should consist of more than one member');
         }

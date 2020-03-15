@@ -4,14 +4,15 @@ import { translate } from '@lib/translation';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { NetworkStatus } from './network-status';
 import { sendResponse, Responses } from './response.model';
-import { stage } from './stages';
 import { ApplicationConstants } from '@core/constants';
+import stage from './stage';
 
 const log = new Logger('Errors');
 
 export enum Errors {
     CastError = 'CastError',
     AssertionError = 'AssertionError',
+    ERR_AMBIGUOUS_ARGUMENT = 'ERR_AMBIGUOUS_ARGUMENT',
     MongoError = 'MongoError',
     ErrorResponse = 'ErrorResponse',
     SuccessResponse = 'SuccessResponse',
@@ -60,6 +61,10 @@ export class ErrorHandling {
         );
 
         switch (error.name) {
+            case Errors.AssertionError:
+            case Errors.ERR_AMBIGUOUS_ARGUMENT:
+                response.code = stage.production ? NetworkStatus.BAD_REQUEST : response.code;
+
             case Errors.CastError:
                 response.message = translate('invalid_syntax');
                 response.code = NetworkStatus.BAD_REQUEST;
@@ -89,6 +94,7 @@ export class ErrorHandling {
                 break;
             default:
         }
+        console.log(error);
         sendResponse(res, response);
         return;
     }

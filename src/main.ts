@@ -1,5 +1,4 @@
 import { NodeServer } from './app/server';
-process.chdir('./src/');
 
 NodeServer.bootstrap()
     .then(() => {

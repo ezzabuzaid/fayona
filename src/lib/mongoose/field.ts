@@ -19,6 +19,7 @@ export function Field(options: MongooseTypes.FieldOptions = {}) {
             defaults = {
                 lowercase: true,
                 trim: true,
+                // TODO: mark all fields as required unless explicty sitted as false
                 required: true
             };
         }

@@ -6,6 +6,22 @@ export type Type<T> = new (...args: any[]) => T;
 export type Parameter<T extends (args: any) => any> = T extends (args: infer P) => any ? P : never;
 
 export class AppUtils {
+    /**
+     * remove null and undefined properties from an object expect empty string
+     * @param withEmptyString to indicate of the empty values should be removed
+     */
+    static excludeEmptyKeys(object: object, withEmptyString = false) {
+        const replaceUndefinedOrNull = (key: string, value: any) => {
+            if (withEmptyString) {
+                return this.isEmptyString(value) || this.isNullOrUndefined(value)
+                    ? undefined
+                    : value;
+            } else {
+                return this.isNullOrUndefined(value) ? undefined : value;
+            }
+        };
+        return JSON.parse(JSON.stringify(object, replaceUndefinedOrNull));
+    }
 
     public static isEmptyString(value: string): boolean {
         return typeof value !== 'string' || value === '';
@@ -105,9 +121,20 @@ export class AppUtils {
         return value === undefined || value === null;
     }
 
-    public static hasItemWithin(list: any[]) {
-        // TODO: add support for plain objects
-        return Array.isArray(list) && list.length > 0;
+    public static notNullOrUndefined(value: any) {
+        return this.isTruthy(value !== undefined && value !== null);
+    }
+
+    public static hasItemWithin(object: object) {
+        if (Array.isArray(object)) {
+            return this.isTruthy(object.length);
+        }
+
+        if (new Object(object) === object) {
+            return this.isTruthy(Object.keys(object).length);
+        }
+
+        return null;
     }
 
     public static extendObject<T>(target: T, source1: Partial<T>): T {

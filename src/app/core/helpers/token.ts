@@ -1,6 +1,6 @@
 import jwt = require('jsonwebtoken');
 import { ERoles } from '@api/users';
-import { stage } from './stages';
+import stage from './stage';
 
 export interface ITokenClaim {
     id: string;

@@ -4,7 +4,7 @@ import { FeedbackRouter } from '@api/feedback';
 import { SessionRouter } from '@api/sessions';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
 import { GroupsRouter, MembersRouter } from '@api/groups';
-import { FileUploadRoutes } from '@api/file-uploads';
+import { FileUploadRoutes } from '@api/uploads';
 
 export class Wrapper {
     private static list = [];

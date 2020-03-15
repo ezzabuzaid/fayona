@@ -1,6 +1,7 @@
-import { stage, StageLevel } from '@core/helpers';
+import { StageLevel } from '@core/helpers';
 
 import { Logger } from '@core/utils';
+import stage from '@core/helpers/stage';
 const log = new Logger('Local Class');
 
 export class Local<T> {

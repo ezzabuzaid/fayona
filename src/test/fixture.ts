@@ -1,6 +1,6 @@
 import { Constants, tokenService } from '@core/helpers';
 import { UsersSchema, ERoles } from '@api/users';
-import { Body, WithMongoID } from '@lib/mongoose';
+import { Payload, WithMongoID } from '@lib/mongoose';
 import * as faker from 'faker';
 import { ValidationPatterns } from '@shared/common';
 import { ApplicationConstants } from '@core/constants';
@@ -17,10 +17,10 @@ export function getUri(value: string) {
     return `/api/${value}`;
 }
 
-export function sendRequest<T>(endpoint: string, body: T, headers = {}) {
+export function sendRequest<T>(endpoint: string, payload: T, headers = {}) {
     return global.superAgent
         .post(getUri(endpoint))
-        .send(body as any)
+        .send(payload as any)
         .set(headers);
 }
 
@@ -65,7 +65,9 @@ export async function prepareUserSession(user?: WithMongoID<LoginPayload>) {
             ...deviceUUIDHeader
         },
         user_id,
-        session_id: loginResponse.body.session_id
+        session_id: loginResponse.body.session_id,
+        token: loginResponse.body.token,
+        refreshToken: loginResponse.body.refreshToken
     };
 }
 
@@ -76,7 +78,7 @@ export class UserFixture {
     };
     private usersEndpoint = getUri(Constants.Endpoints.USERS);
 
-    public async createUser(body: Partial<Body<UsersSchema>> = {}) {
+    public async createUser(paylod: Partial<Payload<UsersSchema>> = {}) {
         const response = await global.superAgent.post(this.usersEndpoint)
             .set(generateDeviceUUIDHeader())
             .send({
@@ -87,7 +89,7 @@ export class UserFixture {
                 verified: false,
                 role: ERoles.ADMIN,
                 profile: null,
-                ...body
+                ...paylod
             });
         try {
             this.user.id = response.body.data.id;
@@ -117,5 +119,5 @@ export function generateExpiredToken() {
 }
 
 export function generateToken() {
-    return tokenService.generateToken({ id: '' });
+    return tokenService.generateToken({ id: AppUtils.generateAlphabeticString() });
 }

@@ -1,4 +1,4 @@
-import { BaseModel, Entity, Field, Body } from '@lib/mongoose';
+import { BaseModel, Entity, Field, Payload } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
 import { Types } from 'mongoose';
 

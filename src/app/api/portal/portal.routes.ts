@@ -1,9 +1,9 @@
-import { ErrorResponse, SuccessResponse, tokenService, Constants, IRefreshTokenClaim, Responses, HashService } from '@core/helpers';
+import { tokenService, Constants, IRefreshTokenClaim, Responses, HashService, sendResponse } from '@core/helpers';
 import { Post, Router } from '@lib/methods';
 import { Request, Response } from 'express';
 import usersService from '@api/users/users.service';
 import { UsersSchema } from '@api/users';
-import { Body } from '@lib/mongoose';
+import { Payload, WithID } from '@lib/mongoose';
 import { EmailService, fakeEmail } from '@shared/email';
 import { AppUtils } from '@core/utils';
 import { PortalHelper } from './portal.helper';
@@ -13,6 +13,7 @@ import { ApplicationConstants } from '@core/constants';
 import { sessionsService } from '@api/sessions/sessions.service';
 import { IsString } from 'class-validator';
 import { translate } from '@lib/translation';
+import { scheduleJob } from 'node-schedule';
 
 export class LoginPayload {
     @IsString({
@@ -28,9 +29,23 @@ export class LoginPayload {
     }
 }
 
-export interface IRefreshTokenBody {
-    token: string;
-    refreshToken: string;
+export class RefreshTokenDto {
+    public token: string;
+    public refreshToken: string;
+    constructor(user: Payload<WithID<UsersSchema>>) {
+        this.token = PortalHelper.generateToken(user.id, user.role);
+        this.refreshToken = PortalHelper.generateRefreshToken(user.id);
+    }
+}
+export class RefreshTokenPayload {
+    @IsString()
+    public token: string = null;
+    @IsString()
+    public refreshToken: string = null;
+
+    constructor(payload: RefreshTokenPayload) {
+        AppUtils.strictAssign(this, payload);
+    }
 }
 
 @Router(Constants.Endpoints.PORTAL)
@@ -48,56 +63,57 @@ export class PortalRoutes {
         }
 
         // STUB it should throw if username is falsy type or if it's not in database
-        const record = await throwIfNotExist({ username }, 'wrong_credintals');
-
-        const activeUserSessions = await sessionsService.getActiveUserSession(record.id);
-
-        // if (activeUserSessions.length >= 3) {
-        //     throw new Responses.Unauthorized('exceed_allowed_sesison');
-        // }
+        const user = await throwIfNotExist({ username }, 'wrong_credintals');
 
         // STUB it should pass if password is right
-        const isPasswordEqual = HashService.comparePassword(password, record.password);
+        const isPasswordEqual = HashService.comparePassword(password, user.password);
         if (AppUtils.isFalsy(isPasswordEqual)) {
             throw new Responses.BadRequest('wrong_credintals');
         } else {
+            const activeUserSessions = await sessionsService.getActiveUserSession(user.id);
+            if (activeUserSessions.length >= 3) {
+                throw new Responses.Unauthorized('exceeded_allowed_sesison');
+            }
             // STUB it should create a session entity
             const session = await sessionsService.create({
                 device_uuid,
                 active: true,
-                user_id: record.id
+                user_id: user.id
             });
 
-            const response = new SuccessResponse(null);
+            const response = new Responses.Ok(null);
             response.session_id = session.data.id;
             // STUB test the refreshToken claims should have only entity id with expire time 12h
-            response.refreshToken = PortalHelper.generateRefreshToken(record.id);
+            response.refreshToken = PortalHelper.generateRefreshToken(user.id);
             // STUB test token claims must have only entity id and role with 30min expire time
-            response.token = PortalHelper.generateToken(record.id, record.role);
+            response.token = PortalHelper.generateToken(user.id, user.role);
             res.status(response.code).json(response);
         }
+
     }
 
-    @Post(Constants.Endpoints.LOGOUT, Auth.isAuthenticated)
+    @Post(Constants.Endpoints.LOGOUT + '/:uuid')
     public async logout(req: Request, res: Response) {
-        const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
-        // STUB check if device_uuid is exit and associated with the current user
-        await sessionsService.deActivate({ device_uuid });
-        const response = new SuccessResponse(null);
-        res.status(response.code).json(response);
+        const device_uuid = req.params.uuid;
+        if (device_uuid) {
+            const result = await sessionsService.deActivate({ device_uuid });
+            if (AppUtils.not(result.hasError)) {
+                return sendResponse(res, new Responses.Ok(result.data));
+            }
+        }
+        sendResponse(res, new Responses.BadRequest('logout_wrong_device_uuid'));
     }
 
     @Post(Constants.Endpoints.REFRESH_TOKEN)
     public async refreshToken(req: Request, res: Response) {
-        const { token, refreshToken } = req.body as IRefreshTokenBody;
-        // NOTE: if it was invalid or expired it will implicity thrown an error
-        const decodedRefreshToken = await tokenService.decodeToken<IRefreshTokenClaim>(refreshToken);
-
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
-
         if (AppUtils.isFalsy(device_uuid)) {
             throw new Responses.Unauthorized();
         }
+
+        const { token, refreshToken } = new RefreshTokenPayload(req.body);
+        // NOTE: if it was invalid or expired it will implicity thrown an error
+        const decodedRefreshToken = await tokenService.decodeToken<IRefreshTokenClaim>(refreshToken);
 
         try {
             await tokenService.decodeToken(token);
@@ -108,30 +124,28 @@ export class PortalRoutes {
                     device_uuid,
                     user_id: decodedRefreshToken.id
                 });
+
                 if (AppUtils.isFalsy(session)) {
                     throw new Responses.Unauthorized();
                 }
 
                 const user = await throwIfNotExist({ _id: decodedRefreshToken.id });
-                const response = new SuccessResponse<IRefreshTokenBody>({
-                    token: PortalHelper.generateToken(user.id, user.role),
-                    refreshToken
-                });
+                const response = new Responses.Ok(new RefreshTokenDto(user));
                 return res.status(response.code).json(response);
             } else {
                 throw error;
             }
         }
-        throw new ErrorResponse('not_allowed');
+        throw new Responses.BadRequest('not_allowed');
     }
 
     @Post(Constants.Endpoints.FORGET_PASSWORD)
     public async forgotPassword(req: Request, res: Response) {
-        const { username } = req.body as Body<UsersSchema>;
+        const { username } = req.body as Payload<UsersSchema>;
         const entity = await throwIfNotExist({ username }, 'Error sending the password reset message. Please try again shortly.');
         const token = tokenService.generateToken({ id: entity.id, role: entity.role }, { expiresIn: '1h' });
         await EmailService.sendEmail(fakeEmail(token));
-        const response = new SuccessResponse('An e-mail has been sent to ${user.email} with further instructions');
+        const response = new Responses.Ok('An e-mail has been sent to ${user.email} with further instructions');
         res.status(response.code).json(response);
     }
 
@@ -141,10 +155,10 @@ export class PortalRoutes {
         // so we need to know that the user who really did that by answering a specifc questions, doing 2FA
         // the attempts should be limited to 3 times, after that he need to re do the process again,
         // if the procces faild 3 times, the account should be locked, and he need to call the support for that
-        const { password } = req.body as Body<UsersSchema>;
+        const { password } = req.body as Payload<UsersSchema>;
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
         await usersService.updateById(decodedToken.id, { password });
-        const response = new SuccessResponse(null);
+        const response = new Responses.Ok(null);
         await EmailService.sendEmail(fakeEmail());
         res.status(response.code).json(response);
     }
@@ -155,7 +169,7 @@ export class PortalRoutes {
         const { token } = req.query;
         const decodedToken = await tokenService.decodeToken(token);
         await usersService.updateById(decodedToken.id, { verified: true });
-        const response = new SuccessResponse(null);
+        const response = new Responses.Ok(null);
         res.status(response.code).json(response);
     }
 
@@ -164,22 +178,29 @@ export class PortalRoutes {
         const { token } = req.query;
         const decodedToken = await tokenService.decodeToken(token);
         await usersService.updateById(decodedToken.id, { verified: true });
-        const response = new SuccessResponse(null);
+        const response = new Responses.Ok(null);
         res.status(response.code).json(response);
     }
 
 }
 
-async function throwIfNotExist(query: Partial<Body<UsersSchema> & { _id: string }>, message = 'not_exist') {
+async function throwIfNotExist(query: Partial<Payload<UsersSchema> & { _id: string }>, message = 'not_exist') {
     if (AppUtils.isFalsy(query)) {
-        throw new ErrorResponse(message);
+        throw new Responses.BadRequest(message);
     }
     const entity = await usersService.one(query, { password: 1 });
     if (!!entity) {
         return entity;
     }
-    throw new ErrorResponse(message);
+    throw new Responses.BadRequest(message);
 }
+
+scheduleJob('30 * * * *', async () => {
+    const sessions = await sessionsService.getAllActiveSession();
+    sessions.forEach((session) => {
+        // TODO deActivate usless sessions
+    });
+});
 
 // TODO: Forget and reset password scenario
 // Enter a unique info like partial of profile info page 1

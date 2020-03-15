@@ -19,5 +19,7 @@
     "email_exist": "email_exist",
     "no_speical_char": "Value contains special char",
     "wrong_email": "Please enter correct email address",
-    "wrong_mobile_number": "Please enter correct mobile number"
+    "wrong_mobile_number": "Please enter correct mobile number",
+    "logout_wrong_device_uuid": "cannot logout unknown users",
+    "folder_id_not_valid": "Folder is not valid"
 }

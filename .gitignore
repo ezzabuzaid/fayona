@@ -101,4 +101,4 @@ typings/
 .qovery
 local_configuration.json
 
-uploads
+uploads/**/*

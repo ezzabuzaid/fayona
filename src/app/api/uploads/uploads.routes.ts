@@ -1,0 +1,113 @@
+import { Router, Post, Get, Delete } from '@lib/methods';
+import { Multer } from '@shared/multer';
+import { Request, Response } from 'express';
+import { sendResponse, Responses, Constants, tokenService } from '@core/helpers';
+import { Auth } from '@api/portal';
+import { CrudRouter } from '@shared/crud';
+import { UploadsSchema } from './uploads.model';
+import uploadsService, { UploadsService } from './uploads.service';
+import foldersService from './folders.service';
+import path from 'path';
+import { AppUtils } from '@core/utils';
+import { IsString, IsMongoId } from 'class-validator';
+import { validatePayload } from '@shared/common';
+import { Types } from 'mongoose';
+
+const allowedImageTypes = [
+    'image/jpg', 'image/JPG', 'image/jpeg', 'image/JPEG',
+    'image/png', 'image/PNG', 'image/gif', 'image/GIF'
+];
+
+const multer = new Multer({ allowedTypes: allowedImageTypes });
+@Router(Constants.Endpoints.UPLOADS, {
+    middleware: [Auth.isAuthenticated]
+})
+export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> {
+
+    constructor() {
+        super(uploadsService);
+    }
+
+    @Post('folders')
+    public async createFolder(req: Request, res: Response) {
+        const { name } = req.body;
+        const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
+        if (AppUtils.isEmptyString(name)) {
+            throw new Responses.BadRequest('please provide valid name');
+        } else {
+            const result = await foldersService.create({ name, user: user_id });
+            if (AppUtils.not(result.hasError)) {
+                return sendResponse(res, new Responses.Created(result.data));
+            }
+        }
+    }
+
+    @Post('/:folder', multer.upload)
+    public async uploadFile(req: Request, res: Response) {
+        const { folder } = req.params;
+        const { file } = req;
+        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
+        const result = await uploadsService.create({
+            folder,
+            user: decodedToken.id,
+            name: file.originalname,
+            size: file.size,
+            type: file.mimetype,
+            path: path.join(folder, file.filename),
+        });
+        if (result.hasError) {
+            sendResponse(res, new Responses.BadRequest(result.data));
+        }
+        sendResponse(res, new Responses.Created(result.data));
+    }
+
+    @Get('folders')
+    public async getFolders(req: Request, res: Response) {
+        const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
+
+        const folders = await foldersService.all({ user: user_id });
+        sendResponse(res, new Responses.Ok(folders));
+    }
+
+    @Delete('folders/:id')
+    public async deleteFolder(req: Request, res: Response) {
+        const { id } = req.params;
+        if (Types.ObjectId.isValid(id)) {
+            const result = await foldersService.delete({ _id: id });
+            if (result.hasError) {
+                sendResponse(res, new Responses.BadRequest(result.data));
+            } else {
+                sendResponse(res, new Responses.Ok(result.data));
+            }
+        } else {
+            sendResponse(res, new Responses.BadRequest('folder_id_not_valid'));
+        }
+    }
+
+    @Get('search')
+    public async searchForUsers(req: Request, res: Response) {
+        const payload = new FilesSearchPayload(req.query);
+        await validatePayload(payload);
+        const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
+        const files = await this.service.searchForFiles({
+            name: payload.file,
+            folder: payload.folder,
+            user: user_id
+        });
+        sendResponse(res, new Responses.Ok(files));
+    }
+
+}
+
+class FilesSearchPayload {
+    @IsMongoId()
+    @IsString({
+        message: 'folder_id_not_valid'
+    }) folder: string = null;
+
+    file: string = null;
+
+    constructor(payload: FilesSearchPayload) {
+        AppUtils.strictAssign(this, payload);
+    }
+}

@@ -6,10 +6,12 @@ import assert = require('assert');
 import { AppUtils, Parameter } from '@core/utils';
 import { Request, NextFunction, Response } from 'express';
 import { Responses, ErrorResponse } from '@core/helpers';
+import { Application } from 'app/app';
+import { Types } from 'mongoose';
+import foldersService from '@api/uploads/folders.service';
 
-class UploadFileDto {
-    public category: string;
-    public kind: string;
+class UploadFilePayload {
+    public folder: string;
     [key: string]: string;
 }
 
@@ -55,26 +57,29 @@ export class Multer {
     }
 
     private get storage() {
-        const fileName = (file: Express.Multer.File) => `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`;
+        const formatFileName = (file: Express.Multer.File) => `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`;
         return multer.diskStorage({
-            destination: (
-                req: Request<UploadFileDto>,
+            destination: async (
+                req: Request<UploadFilePayload>,
                 file: Express.Multer.File,
                 callback: (error: ErrorResponse, dest: string) => void
             ) => {
-                const { category, kind } = req.params;
-                if (AppUtils.isEmptyString(category)) {
-                    callback(new Responses.BadRequest('please provide valid category name'), null);
-                } else if (AppUtils.isEmptyString(kind)) {
-                    callback(new Responses.BadRequest('please provide valid kind id'), null);
+                const { folder } = req.params as UploadFilePayload;
+                const folderExistance = await foldersService.exists({ _id: folder });
+                if (folderExistance.hasError) {
+                    callback(new Responses.BadRequest(folderExistance.data), null);
                 } else {
-                    const uploadFile = path.join(process.cwd(), '../', 'uploads', category, kind);
-                    fileSystem.mkdirSync(uploadFile, { recursive: true });
-                    callback(null, uploadFile);
+                    if (Types.ObjectId.isValid(folder)) {
+                        const uploadFile = path.join(Application.uploadDirectory, folder);
+                        fileSystem.mkdirSync(uploadFile, { recursive: true });
+                        callback(null, uploadFile);
+                    } else {
+                        callback(new Responses.BadRequest('folder_id_not_valid'), null);
+                    }
                 }
             },
             filename(req: Express.Request, file, cb) {
-                cb(null, fileName(file));
+                cb(null, formatFileName(file));
             }
         });
     }

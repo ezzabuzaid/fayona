@@ -1,6 +1,6 @@
 import en from '@assets/languages/en.json';
 import ar from '@assets/languages/ar.json';
-import { ErrorHandling, stage, StageLevel } from '@core/helpers';
+import { ErrorHandling, StageLevel } from '@core/helpers';
 import { Logger } from '@core/utils';
 import { translation } from '@lib/translation';
 import compression = require('compression');
@@ -11,13 +11,15 @@ import morgan = require('morgan');
 import { Wrapper } from './wrapper';
 import path from 'path';
 import cors from 'cors';
+import stage from '@core/helpers/stage';
 
 const log = new Logger('Application instance');
 
 export class Application {
     public application = express();
-    private staticDirectory = path.join(process.cwd(), 'public');
-    private uploadDirectory = path.join(process.cwd(), 'uploads');
+    public static staticDirectory = path.join(process.cwd(), 'src', 'public');
+    public static uploadDirectory = path.join(process.cwd(), 'uploads');
+
     constructor() {
         this.configure();
         this.setupLocalization();
@@ -46,8 +48,11 @@ export class Application {
             .use(morgan('dev'))
             .use(helmet())
             .use(compression())
-            .use(express.static(this.staticDirectory))
-            .use(express.static(this.uploadDirectory));
+            .use(express.static(Application.staticDirectory))
+            .use(express.static(Application.uploadDirectory, {
+                index: 'index.html',
+                maxAge: '10weeks',
+            }));
 
     }
 
@@ -64,7 +69,6 @@ export class Application {
 
         this.application.use(ErrorHandling.favIcon);
         this.application.get('/api', (req, res) => res.status(200).json({ work: '/API hitted' }));
-        this.application.get('/', (req, res) => res.sendFile('index.html'));
         this.application.use(ErrorHandling.notFound);
         this.application.use(ErrorHandling.catchError);
     }

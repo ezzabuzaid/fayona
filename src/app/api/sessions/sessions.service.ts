@@ -1,11 +1,11 @@
 import { Repo, CrudService } from '@shared/crud';
 import { SessionSchema, SessionModel } from './sessions.model';
-import { Document, Body, WithMongoID } from '@lib/mongoose';
+import { Document, Payload, WithMongoID } from '@lib/mongoose';
 import { AppUtils, Omit } from '@core/utils';
 
 export class SessionsService extends CrudService<SessionSchema> {
 
-    public async deActivate(query: Partial<Omit<WithMongoID<Body<SessionSchema>>, 'active'>>) {
+    public async deActivate(query: Partial<Omit<WithMongoID<Payload<SessionSchema>>, 'active'>>) {
         const record = await this.getActiveSession(query);
         if (AppUtils.isTruthy(record)) {
             await this.setAsDeactive(record);
@@ -15,11 +15,15 @@ export class SessionsService extends CrudService<SessionSchema> {
         return { hasError: true, data: 'no session available' };
     }
 
-    public getActiveSession(query: Partial<Body<SessionSchema>>) {
+    public getActiveSession(query: Partial<Payload<SessionSchema>>) {
         return this.one({
             ...query,
             active: true
         });
+    }
+
+    public getAllActiveSession() {
+        return this.all({ active: true });
     }
 
     public getActiveUserSession(user_id: string) {

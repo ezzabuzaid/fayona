@@ -11,42 +11,34 @@ export enum StageLevel {
 export const NODE_STAGE = 'NODE_STAGE';
 
 class Stage {
-    private _level = null;
+    private stage = null;
 
     public load(env: StageLevel) {
-        this.LEVEL = env || StageLevel.LOCAL;
-    }
-
-    public get LEVEL() {
-        return this._level;
-    }
-
-    public set LEVEL(value) {
-        this._level = value;
+        this.stage = env || StageLevel.LOCAL;
     }
 
     public get development() {
-        return StageLevel.DEV === this.LEVEL;
+        return StageLevel.DEV === this.stage;
     }
 
     public get production() {
-        return StageLevel.PROD === this.LEVEL;
+        return StageLevel.PROD === this.stage;
     }
 
     public get testing() {
-        return StageLevel.TEST === this.LEVEL;
+        return StageLevel.TEST === this.stage;
     }
 
     public test(
-        _stage: StageLevel,
+        stage: StageLevel,
         ifCallback: () => void,
         elseCallback = () => { }
     ) {
-        if (_stage === this.LEVEL) {
+        if (stage === this.stage) {
             ifCallback();
         } else {
             elseCallback();
         }
     }
 }
-export const stage = new Stage();
+export default new Stage();

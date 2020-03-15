@@ -31,7 +31,7 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
                 }
             });
 
-        if (options.middleware && options.middleware.length) {
+        if (AppUtils.hasItemWithin(options.middleware)) {
             router.use(`${routerUri}`, ErrorHandling.wrapRoutes(...options.middleware));
         }
 

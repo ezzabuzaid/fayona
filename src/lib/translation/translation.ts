@@ -1,7 +1,8 @@
-import { stage, StageLevel } from '@core/helpers';
+import { StageLevel } from '@core/helpers';
 import { Local } from './local';
 
 import { Logger } from '@core/utils';
+import stage from '@core/helpers/stage';
 const log = new Logger('Localization Class');
 
 class Translation<T> {
