@@ -7,11 +7,9 @@ import { AppUtils, Parameter } from '@core/utils';
 import { Request, NextFunction, Response } from 'express';
 import { Responses, ErrorResponse, tokenService } from '@core/helpers';
 import uploadsService from '@api/uploads/uploads.service';
-import { isValidObjectId } from 'mongoose';
 
-class UploadFileDto {
+class UploadFilePayload {
     public folder: string;
-    public kind: string;
     [key: string]: string;
 }
 
@@ -57,32 +55,19 @@ export class Multer {
     }
 
     private get storage() {
-        const timestamp = Date.now();
-        const formatFileName = (file: Express.Multer.File) => `${file.fieldname}-${timestamp}${path.extname(file.originalname)}`;
+        const formatFileName = (file: Express.Multer.File) => `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`;
         return multer.diskStorage({
             destination: async (
-                req: Request<UploadFileDto>,
+                req: Request<UploadFilePayload>,
                 file: Express.Multer.File,
                 callback: (error: ErrorResponse, dest: string) => void
             ) => {
-                const { folder, kind } = req.params as UploadFileDto;
-                if (AppUtils.not(isValidObjectId(folder))) {
+                const { folder } = req.params as UploadFilePayload;
+                if (AppUtils.isEmptyString(folder)) {
                     callback(new Responses.BadRequest('please provide valid folder id'), null);
-                } else if (AppUtils.isEmptyString(kind)) {
-                    callback(new Responses.BadRequest('please provide valid kind id'), null);
                 } else {
-                    const filePath = path.join(folder, kind);
-                    const uploadFile = path.join(process.cwd(), '../', 'uploads', filePath);
+                    const uploadFile = path.join(process.cwd(), '../', 'uploads', folder);
                     fileSystem.mkdirSync(uploadFile, { recursive: true });
-                    const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-                    await uploadsService.create({
-                        user: decodedToken.id,
-                        name: file.originalname,
-                        size: file.size,
-                        type: file.mimetype,
-                        path: path.join(filePath, formatFileName(file)),
-                        folder
-                    });
                     callback(null, uploadFile);
                 }
             },
