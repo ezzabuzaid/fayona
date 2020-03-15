@@ -1,4 +1,4 @@
-import { Router, Post, Get } from '@lib/methods';
+import { Router, Post, Get, Delete } from '@lib/methods';
 import { Multer } from '@shared/multer';
 import { Request, Response } from 'express';
 import { sendResponse, Responses, Constants, tokenService } from '@core/helpers';
@@ -11,6 +11,7 @@ import path from 'path';
 import { AppUtils } from '@core/utils';
 import { IsString, IsMongoId } from 'class-validator';
 import { validatePayload } from '@shared/common';
+import { Types } from 'mongoose';
 
 const allowedImageTypes = [
     'image/jpg', 'image/JPG', 'image/jpeg', 'image/JPEG',
@@ -18,32 +19,35 @@ const allowedImageTypes = [
 ];
 
 const multer = new Multer({ allowedTypes: allowedImageTypes });
-@Router(Constants.Endpoints.UPLOADS)
+@Router(Constants.Endpoints.UPLOADS, {
+    middleware: [Auth.isAuthenticated]
+})
 export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> {
 
     constructor() {
         super(uploadsService);
     }
 
-    @Post('folders', Auth.isAuthenticated)
+    @Post('folders')
     public async createFolder(req: Request, res: Response) {
         const { name } = req.body;
         const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
-        if (AppUtils.not(AppUtils.isEmptyString(name))) {
+        if (AppUtils.isEmptyString(name)) {
+            throw new Responses.BadRequest('please provide valid name');
+        } else {
             const result = await foldersService.create({ name, user: user_id });
             if (AppUtils.not(result.hasError)) {
                 return sendResponse(res, new Responses.Created(result.data));
             }
         }
-        throw new Responses.BadRequest('please provide valid name');
     }
 
-    @Post('/:folder', Auth.isAuthenticated, multer.upload)
+    @Post('/:folder', multer.upload)
     public async uploadFile(req: Request, res: Response) {
         const { folder } = req.params;
         const { file } = req;
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        await uploadsService.create({
+        const result = await uploadsService.create({
             folder,
             user: decodedToken.id,
             name: file.originalname,
@@ -51,7 +55,10 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
             type: file.mimetype,
             path: path.join(folder, file.filename),
         });
-        sendResponse(res, new Responses.Created(`${req.params.folder}/${req.file.filename}`));
+        if (result.hasError) {
+            sendResponse(res, new Responses.BadRequest(result.data));
+        }
+        sendResponse(res, new Responses.Created(result.data));
     }
 
     @Get('folders')
@@ -62,7 +69,22 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         sendResponse(res, new Responses.Ok(folders));
     }
 
-    @Get('search', Auth.isAuthenticated)
+    @Delete('folders/:id')
+    public async deleteFolder(req: Request, res: Response) {
+        const { id } = req.params;
+        if (Types.ObjectId.isValid(id)) {
+            const result = await foldersService.delete({ _id: id });
+            if (result.hasError) {
+                sendResponse(res, new Responses.BadRequest(result.data));
+            } else {
+                sendResponse(res, new Responses.Ok(result.data));
+            }
+        } else {
+            sendResponse(res, new Responses.BadRequest('folder_id_not_valid'));
+        }
+    }
+
+    @Get('search')
     public async searchForUsers(req: Request, res: Response) {
         const payload = new FilesSearchPayload(req.query);
         await validatePayload(payload);
@@ -80,7 +102,7 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
 class FilesSearchPayload {
     @IsMongoId()
     @IsString({
-        message: 'you cannot filter without a folder, please make sure to include the folder name'
+        message: 'folder_id_not_valid'
     }) folder: string = null;
 
     file: string = null;
