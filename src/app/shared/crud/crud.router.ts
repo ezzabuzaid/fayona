@@ -6,7 +6,7 @@ import { SuccessResponse, ErrorResponse, sendResponse, Responses } from '@core/h
 import { translate } from '@lib/translation';
 import { AppUtils } from '@core/utils';
 import { Payload } from '@lib/mongoose';
-import { isValidObjectId } from 'mongoose';
+import { Types } from 'mongoose';
 import assert from 'assert';
 // TODO: Generic SchemaType should inherit from RepoHooks interface which
 //  will be used to fire onSave, onUpdate, onDelete, ..etc
@@ -33,7 +33,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
     public async update(req: Request, res: Response) {
         const { id } = req.params;
 
-        if (AppUtils.not(isValidObjectId(id))) {
+        if (AppUtils.not(Types.ObjectId.isValid(id))) {
             throw new Responses.BadRequest('id_not_valid');
         }
 
@@ -50,7 +50,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
     public async set(req: Request, res: Response) {
         const { id } = req.params;
 
-        if (AppUtils.not(isValidObjectId(id))) {
+        if (AppUtils.not(Types.ObjectId.isValid(id))) {
             throw new Responses.BadRequest('id_not_valid');
         }
 
@@ -94,7 +94,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
     public async delete(req: Request, res: Response) {
         const { id } = req.params;
 
-        if (AppUtils.not(isValidObjectId(id))) {
+        if (AppUtils.not(Types.ObjectId.isValid(id))) {
             throw new Responses.BadRequest('id_not_valid');
         }
 
@@ -109,7 +109,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
     public async fetchEntity(req: Request, res: Response) {
         const { id } = req.params;
 
-        if (AppUtils.not(isValidObjectId(id))) {
+        if (AppUtils.not(Types.ObjectId.isValid(id))) {
             throw new Responses.BadRequest('id_not_valid');
         }
 
