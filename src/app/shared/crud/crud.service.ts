@@ -58,7 +58,7 @@ export class CrudService<T> {
         return new Result(false, { id: entity.id });
     }
 
-    public async delete(query: Partial<Payload<T>>) {
+    public async delete(query: Partial<WithMongoID<Payload<T>>>) {
         const entity = await this.repo.fetchOne(query);
         if (!entity) {
             return new Result(true, 'entity_not_exist');
@@ -103,6 +103,7 @@ export class CrudService<T> {
     }
 
     public async bulkUpdate(entites: Array<WithID<Payload<T>>>) {
+        // TODO: to be tested
         // TODO: hooks should be called
         // TODO: all calls should be run within transaction
         const records = await Promise.all(entites.map((record) => this.repo.fetchById(record.id)));
@@ -120,17 +121,19 @@ export class CrudService<T> {
         return true;
     }
 
-    public async bulkCreate(dtos: Array<Payload<T>>) {
-        for (const dto of dtos) {
-            await this.create(dto);
+    public async bulkCreate(payloads: Array<Payload<T>>) {
+        // TODO: to be tested
+        for (const payload of payloads) {
+            await this.create(payload);
         }
-        return true;
+        return new Result();
     }
 
     public async bulkDelete(ids: string[]) {
+        // TODO: to be tested
         // TODO: add transaction
         const records = await Promise.all(ids.map((id) => this.repo.fetchById(id)));
-        if (records.every((item) => !!item)) {
+        if (records.every(AppUtils.isTruthy)) {
             return null;
         }
         const { pre, post } = getHooks(this.options.delete);
@@ -145,8 +148,8 @@ export class CrudService<T> {
         return true;
     }
 
-    public async one(query: Partial<WithMongoID<Payload<T>>>, projection: Projection<T> = {}, ) {
-        const record = await this.repo.fetchOne(query, projection);
+    public async one(query: Partial<WithMongoID<Payload<T>>>, projection: Projection<T> = {}, options = {}) {
+        const record = await this.repo.fetchOne(query, projection, options);
         await getHooks(this.options.one).post(record);
         return record;
     }
@@ -160,4 +163,13 @@ export class CrudService<T> {
         return documents;
     }
 
+    public async exists(query: Partial<WithMongoID<Payload<T>>>) {
+        if (AppUtils.isTruthy(await this.one(query, {}, { lean: true }))) {
+            return new Result();
+        }
+        return new Result(true, 'entity_not_exist');
+    }
+
 }
+
+class CrudQuery { }
