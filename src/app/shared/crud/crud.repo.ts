@@ -12,8 +12,8 @@ export class Repo<T> {
         assert(AppUtils.notNullOrUndefined(model));
     }
 
-    public fetchOne(query: Partial<Payload<T>>, projection: Projection<T> = {}) {
-        return this.model.findOne(query, projection);
+    public fetchOne(query: Partial<Payload<T>>, projection: Projection<T> = {}, options = {}) {
+        return this.model.findOne(query, projection, options);
     }
 
     public fetchAll(query: Partial<Payload<T>> = {}, projection: Projection<T> = {}, options = {}) {
