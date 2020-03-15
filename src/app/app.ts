@@ -17,8 +17,9 @@ const log = new Logger('Application instance');
 
 export class Application {
     public application = express();
-    private staticDirectory = path.join(process.cwd(), 'public');
-    private uploadDirectory = path.join(process.cwd(), '../', 'uploads');
+    public static staticDirectory = path.join(process.cwd(), 'src', 'public');
+    public static uploadDirectory = path.join(process.cwd(), 'uploads');
+
     constructor() {
         this.configure();
         this.setupLocalization();
@@ -47,8 +48,8 @@ export class Application {
             .use(morgan('dev'))
             .use(helmet())
             .use(compression())
-            .use(express.static(this.staticDirectory))
-            .use(express.static(this.uploadDirectory));
+            .use(express.static(Application.staticDirectory))
+            .use(express.static(Application.uploadDirectory));
 
     }
 
