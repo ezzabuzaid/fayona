@@ -4,7 +4,7 @@ import { FeedbackRouter } from '@api/feedback';
 import { SessionRouter } from '@api/sessions';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
 import { GroupsRouter, MembersRouter } from '@api/groups';
-import { FileUploadRoutes } from '@api/uploads';
+import { FileUploadRoutes, FoldersRoutes } from '@api/uploads';
 
 export class Wrapper {
     private static list = [];
@@ -61,3 +61,4 @@ Wrapper.registerRouter(SessionRouter);
 Wrapper.registerRouter(GroupsRouter);
 Wrapper.registerRouter(MembersRouter);
 Wrapper.registerRouter(FileUploadRoutes);
+Wrapper.registerRouter(FoldersRoutes);

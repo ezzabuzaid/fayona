@@ -125,7 +125,8 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         // TODO: move pagination to service to allow it to be consumed by other services
         // TODO: imporve error handling, check the types of query
 
-        let { page, size, ...sort } = req.query;
+        let { page, size } = req.query;
+        const { ...sort } = req.query;
         page = +page;
         size = +size;
         // TODO: Check that the sort object has the same properties in <T>

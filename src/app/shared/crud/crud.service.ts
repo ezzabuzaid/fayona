@@ -43,7 +43,7 @@ export class CrudService<T> {
         return new Result(false);
     }
 
-    public async create(payload: Payload<T>, session: ClientSession = null) {
+    public async create(payload: Payload<T>) {
         const isExist = await this.isEntityExist(payload);
         if (isExist.hasError) {
             return new Result(true, translate(`${isExist.data}_entity_exist`));
@@ -52,7 +52,7 @@ export class CrudService<T> {
         const entity = this.repo.create(payload);
         const { pre, post } = getHooks(this.options.create);
         await pre(entity);
-        await entity.save({ session });
+        await entity.save();
         await post(entity);
 
         return new Result(false, { id: entity.id });
@@ -158,7 +158,7 @@ export class CrudService<T> {
         const { pre, post } = getHooks(this.options.all);
         const documentQuery = this.repo.fetchAll(query, projection, options);
         await pre(documentQuery);
-        const documents = await documentQuery;
+        const documents = await documentQuery.exec();
         await post(documents);
         return documents;
     }
