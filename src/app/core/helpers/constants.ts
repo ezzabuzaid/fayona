@@ -21,6 +21,7 @@ export namespace Constants {
         public static readonly MEMBERS = 'members';
         public static readonly UPLOADS = 'uploads';
         public static readonly FOLDERS = 'folders';
+        public static readonly Conversation = 'conversation';
     }
     export class Schemas {
         public static readonly favorites = 'favorites';
@@ -35,5 +36,7 @@ export namespace Constants {
         public static readonly MEMBERS = 'members';
         public static readonly UPLOADS = 'uploads';
         public static readonly FOLDERS = 'folders';
+        public static readonly Conversation = 'conversation';
+        public static readonly Messages = 'messages';
     }
 }
