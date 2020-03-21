@@ -7,8 +7,10 @@ import { AppUtils } from '@core/utils';
 @Entity(Constants.Schemas.SESSIONS)
 export class SessionSchema {
     @Field() public active: boolean = true;
-    // TODO rename it to user
-    @Field() public user_id: Types.ObjectId;
+    @Field({
+        required: true,
+        ref: Constants.Schemas.USERS
+    }) public user: Types.ObjectId;
     @Field({ lowercase: false }) public device_uuid: string;
     // TODO: create a collection for device info
     // TODO: presist device info and user location
@@ -19,8 +21,8 @@ export const SessionModel = BaseModel<SessionSchema>(SessionSchema);
 export class IDeactivateSessionPayload {
 
     @IsMongoId({})
-    @IsString({ message: 'user_id must be string' })
-    public user_id: string = null;
+    @IsString({ message: 'user must be string' })
+    public user: string = null;
 
     @IsMongoId()
     @IsString({ message: 'session_id must be string' })
