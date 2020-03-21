@@ -33,18 +33,22 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         const { folder } = req.params;
         const { file } = req;
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
+        const filePath = path.join(folder, file.filename);
         const result = await uploadsService.create({
             folder,
             user: decodedToken.id,
             name: file.originalname,
             size: file.size,
             type: file.mimetype,
-            path: path.join(folder, file.filename),
+            path: filePath,
         });
         if (result.hasError) {
             sendResponse(res, new Responses.BadRequest(result.data));
         }
-        sendResponse(res, new Responses.Created(result.data));
+        sendResponse(res, new Responses.Created({
+            ...result.data,
+            path: filePath
+        }));
     }
 
     @Get('search')
