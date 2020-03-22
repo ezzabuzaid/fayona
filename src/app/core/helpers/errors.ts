@@ -21,7 +21,8 @@ export enum Errors {
     NotBeforeError = 'NotBeforeError',
     ValidationError = 'ValidationError',
     MulterError = 'MulterError',
-    PayloadTooLargeError = 'PayloadTooLargeError:'
+    PayloadTooLargeError = 'PayloadTooLargeError:',
+    StrictModeError = 'StrictModeError'
 }
 
 export class ErrorHandling {
@@ -64,7 +65,10 @@ export class ErrorHandling {
             case Errors.AssertionError:
             case Errors.ERR_AMBIGUOUS_ARGUMENT:
                 response.code = stage.production ? NetworkStatus.BAD_REQUEST : response.code;
-
+            case Errors.StrictModeError:
+                response.message = translate('over_posting_is_not_allowed');
+                response.code = NetworkStatus.BAD_REQUEST;
+                break;
             case Errors.CastError:
                 response.message = translate('invalid_syntax');
                 response.code = NetworkStatus.BAD_REQUEST;
