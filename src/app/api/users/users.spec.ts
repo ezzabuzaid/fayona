@@ -2,7 +2,7 @@ import { generatePhoneNumber, generateUsername, UserFixture, getUri, prepareUser
 import { NetworkStatus, Constants } from '@core/helpers';
 import { ERoles } from './users.model';
 import * as faker from 'faker';
-const USER_SESSION_ENDPOINT = getUri(`${Constants.Endpoints.USERS}/${Constants.Endpoints.USERS_SEARCH}`);
+const USER_SESSION_ENDPOINT = getUri(`${Constants.Endpoints.USERS}/${Constants.Endpoints.SEARCH}`);
 
 describe('[INTERGRATION]', () => {
 
