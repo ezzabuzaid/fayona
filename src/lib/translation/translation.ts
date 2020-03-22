@@ -83,21 +83,7 @@ class Translation<T> {
     /**
      * the active local
      */
-    private _local: Local<T>;
-
-    /**
-     * get the active local
-     */
-    get local() {
-        return this._local;
-    }
-
-    /**
-     * set local as active one
-     */
-    set local(local) {
-        this._local = local;
-    }
+    public local: Local<T>;
 
 }
 

@@ -64,8 +64,6 @@ export class NodeServer extends Application {
                         .on('connection', (socket) => {
                                 socket.on('JoinRoom', async (room: IRoom) => {
                                         sockets[room.sender_id] = socket;
-                                        console.log('New Room => ', room.sender_id);
-                                        // await conversationsService.exists(room.)
                                 });
                                 socket.on('SendMessage', async (message: Message) => {
                                         const payload = new MessagePayload(message);
