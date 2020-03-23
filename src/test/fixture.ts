@@ -17,24 +17,6 @@ export function getUri(value: string) {
     return `/api/${value}`;
 }
 
-export function sendRequest<T>(endpoint: string, payload: T, headers = {}) {
-    return global.superAgent
-        .post(getUri(endpoint))
-        .send(payload as any)
-        .set(headers);
-}
-
-export function deleteRequest(endpoint: string, id: string, headers = {}) {
-    return global.superAgent
-        .delete(getUri(`${endpoint}/${id}`))
-        .set(headers);
-}
-
-export function getRequest(endpoint: string, headers = {}) {
-    return global.superAgent.get(getUri(endpoint))
-        .set(headers);
-}
-
 export async function prepareUserSession(user?: WithMongoID<LoginPayload>) {
     const payload = user ?? {
         email: faker.internet.email(),
@@ -95,11 +77,6 @@ export class UserFixture {
             this.user.id = response.body.data.id;
         } catch (error) { }
         return response;
-    }
-
-    public async deleteUser(id = this.user.id) {
-        if (false) { return; }
-        return deleteRequest(this.usersEndpoint, id);
     }
 
 }

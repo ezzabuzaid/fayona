@@ -5,6 +5,16 @@ import { AppUtils, Omit } from '@core/utils';
 
 export class SessionsService extends CrudService<SessionSchema> {
 
+    constructor() {
+        super(new Repo<SessionSchema>(SessionModel), {
+            all: {
+                pre(documentsQuery) {
+                    documentsQuery.populate('user');
+                }
+            }
+        });
+    }
+
     public async deActivate(query: Partial<Omit<WithMongoID<Payload<SessionSchema>>, 'active'>>) {
         const record = await this.getActiveSession(query);
         if (AppUtils.isTruthy(record)) {
@@ -26,19 +36,19 @@ export class SessionsService extends CrudService<SessionSchema> {
         return this.all({ active: true });
     }
 
-    public getActiveUserSession(user_id: string) {
-        return this.all({ user_id, active: true });
+    public getActiveUserSession(user: string) {
+        return this.all({ user, active: true });
     }
 
     private setAsDeactive(record: Document<SessionSchema>) {
         return this.update(record, { active: false });
     }
 
-    public async deActivatedUserSessions(user_id: string) {
-        const records = await this.all({ user_id });
+    public async deActivatedUserSessions(user: string) {
+        const records = await this.all({ user });
         return Promise.all(records.map((record) => this.setAsDeactive(record)));
     }
 
 }
 
-export const sessionsService = new SessionsService(new Repo<SessionSchema>(SessionModel));
+export const sessionsService = new SessionsService();

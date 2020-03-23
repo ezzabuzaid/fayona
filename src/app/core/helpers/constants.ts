@@ -10,7 +10,7 @@ export namespace Constants {
         public static readonly SESSIONS = 'sessions';
         public static readonly USERS = 'users';
         public static readonly USERS_SESSIONS = 'user';
-        public static readonly USERS_SEARCH = 'search';
+        public static readonly SEARCH = 'search';
         public static readonly LOGIN = `login`;
         public static readonly LOGOUT = `logout`;
         public static readonly FORGET_PASSWORD = 'forgetpassword';
@@ -20,6 +20,8 @@ export namespace Constants {
         public static readonly GROUPS = 'groups';
         public static readonly MEMBERS = 'members';
         public static readonly UPLOADS = 'uploads';
+        public static readonly FOLDERS = 'folders';
+        public static readonly Conversation = 'conversation';
     }
     export class Schemas {
         public static readonly favorites = 'favorites';
@@ -34,5 +36,7 @@ export namespace Constants {
         public static readonly MEMBERS = 'members';
         public static readonly UPLOADS = 'uploads';
         public static readonly FOLDERS = 'folders';
+        public static readonly Conversation = 'conversation';
+        public static readonly Messages = 'messages';
     }
 }

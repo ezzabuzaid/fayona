@@ -19,8 +19,8 @@ export class GroupMemberSchema {
 
 @Entity(Constants.Schemas.GROUPS)
 export class GroupsSchema {
-    @Field() public title: string;
-    @Field() public logo: string;
+    @Field({ pure: true }) public title?: string = '';
+    @Field({ pure: true }) public logo?: string = null;
 }
 
 export const groupModel = BaseModel(GroupsSchema);

@@ -16,7 +16,7 @@ export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {
     @Get(Constants.Endpoints.USERS_SESSIONS, Auth.isAuthenticated)
     public async getUserSessions(req: Request, res: Response) {
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        const records = await this.service.all({ user_id: decodedToken.id });
+        const records = await this.service.all({ user: decodedToken.id });
         sendResponse(res, new Responses.Ok(records));
     }
 
@@ -27,7 +27,7 @@ export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {
 
         const result = await this.service.deActivate({
             _id: payload.session_id,
-            user_id: payload.user_id
+            user: payload.user
         });
         if (result.hasError) {
             sendResponse(res, new Responses.BadRequest(result.data));

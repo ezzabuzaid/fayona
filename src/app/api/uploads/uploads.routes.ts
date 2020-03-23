@@ -6,12 +6,12 @@ import { Auth } from '@api/portal';
 import { CrudRouter } from '@shared/crud';
 import { UploadsSchema } from './uploads.model';
 import uploadsService, { UploadsService } from './uploads.service';
-import foldersService from './folders.service';
+import foldersService, { FoldersService } from './folders.service';
 import path from 'path';
 import { AppUtils } from '@core/utils';
 import { IsString, IsMongoId } from 'class-validator';
 import { validatePayload } from '@shared/common';
-import { Types } from 'mongoose';
+import { FoldersSchema } from './folders.model';
 
 const allowedImageTypes = [
     'image/jpg', 'image/JPG', 'image/jpeg', 'image/JPEG',
@@ -28,64 +28,31 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         super(uploadsService);
     }
 
-    @Post('folders')
-    public async createFolder(req: Request, res: Response) {
-        const { name } = req.body;
-        const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
-        if (AppUtils.isEmptyString(name)) {
-            throw new Responses.BadRequest('please provide valid name');
-        } else {
-            const result = await foldersService.create({ name, user: user_id });
-            if (AppUtils.not(result.hasError)) {
-                return sendResponse(res, new Responses.Created(result.data));
-            }
-        }
-    }
-
     @Post('/:folder', multer.upload)
     public async uploadFile(req: Request, res: Response) {
         const { folder } = req.params;
         const { file } = req;
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
+        const filePath = path.join(folder, file.filename);
         const result = await uploadsService.create({
             folder,
             user: decodedToken.id,
             name: file.originalname,
             size: file.size,
             type: file.mimetype,
-            path: path.join(folder, file.filename),
+            path: filePath,
         });
         if (result.hasError) {
             sendResponse(res, new Responses.BadRequest(result.data));
         }
-        sendResponse(res, new Responses.Created(result.data));
+        sendResponse(res, new Responses.Created({
+            ...result.data,
+            path: filePath
+        }));
     }
 
-    @Get('folders')
-    public async getFolders(req: Request, res: Response) {
-        const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
-
-        const folders = await foldersService.all({ user: user_id });
-        sendResponse(res, new Responses.Ok(folders));
-    }
-
-    @Delete('folders/:id')
-    public async deleteFolder(req: Request, res: Response) {
-        const { id } = req.params;
-        if (Types.ObjectId.isValid(id)) {
-            const result = await foldersService.delete({ _id: id });
-            if (result.hasError) {
-                sendResponse(res, new Responses.BadRequest(result.data));
-            } else {
-                sendResponse(res, new Responses.Ok(result.data));
-            }
-        } else {
-            sendResponse(res, new Responses.BadRequest('folder_id_not_valid'));
-        }
-    }
-
-    @Get('search')
-    public async searchForUsers(req: Request, res: Response) {
+    @Get(Constants.Endpoints.SEARCH)
+    public async searchForFolders(req: Request, res: Response) {
         const payload = new FilesSearchPayload(req.query);
         await validatePayload(payload);
         const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
@@ -97,6 +64,40 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         sendResponse(res, new Responses.Ok(files));
     }
 
+}
+
+@Router(Constants.Endpoints.FOLDERS, {
+    middleware: [Auth.isAuthenticated],
+})
+export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
+
+    constructor() {
+        super(foldersService);
+    }
+
+    @Get('/')
+    public async getFolders(req: Request, res: Response) {
+        // TODO: very important is to find a way to pass the current user to service
+        const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
+
+        const folders = await foldersService.all({ user: user_id });
+        sendResponse(res, new Responses.Ok(folders));
+    }
+
+    @Post('/')
+    public async createFolder(req: Request, res: Response) {
+        // TODO: very important is to find a way to pass the current user to service
+        const { name } = req.body;
+        const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
+        if (AppUtils.isEmptyString(name)) {
+            throw new Responses.BadRequest('please provide valid name');
+        } else {
+            const result = await foldersService.create({ name, user: user_id });
+            if (AppUtils.not(result.hasError)) {
+                return sendResponse(res, new Responses.Created(result.data));
+            }
+        }
+    }
 }
 
 class FilesSearchPayload {

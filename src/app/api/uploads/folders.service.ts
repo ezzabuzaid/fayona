@@ -3,6 +3,14 @@ import { FoldersSchema, FoldersModel } from './folders.model';
 import { UploadsHelper } from './uploads.helper';
 
 export class FoldersService extends CrudService<FoldersSchema> {
+    _user = null;
+    get user() {
+        return this._user;
+    }
+    set user(value) {
+        this._user = value;
+    }
+
     constructor() {
         super(new Repo(FoldersModel), {
             create: {

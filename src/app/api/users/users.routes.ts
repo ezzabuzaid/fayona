@@ -18,11 +18,11 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
         return super.create(req, res);
     }
 
-    @Get(`${Constants.Endpoints.USERS_SEARCH}/:username`, Auth.isAuthenticated)
+    @Get(Constants.Endpoints.SEARCH, Auth.isAuthenticated)
     public async searchForUsers(req: Request, res: Response) {
-        const { username } = req.params;
+        let { username } = req.query;
         if (AppUtils.isEmptyString(username)) {
-            throw new Responses.BadRequest('username is not valid');
+            username = '';
         }
         const users = await this.service.searchForUser(username);
         sendResponse(res, new Responses.Ok(users));

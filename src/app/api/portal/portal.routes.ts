@@ -37,6 +37,17 @@ export class RefreshTokenDto {
         this.refreshToken = PortalHelper.generateRefreshToken(user.id);
     }
 }
+
+export class LoginDto extends RefreshTokenDto {
+    public others_folder = 'others';
+    constructor(
+        user: ConstructorParameters<typeof RefreshTokenDto>[0],
+        public session_id: string,
+    ) {
+        super(user);
+    }
+}
+
 export class RefreshTokenPayload {
     @IsString()
     public token: string = null;
@@ -71,23 +82,20 @@ export class PortalRoutes {
             throw new Responses.BadRequest('wrong_credintals');
         } else {
             const activeUserSessions = await sessionsService.getActiveUserSession(user.id);
-            if (activeUserSessions.length >= 3) {
+
+            if (activeUserSessions.length >= 10) {
                 throw new Responses.Unauthorized('exceeded_allowed_sesison');
             }
             // STUB it should create a session entity
             const session = await sessionsService.create({
                 device_uuid,
                 active: true,
-                user_id: user.id
+                user: user.id
             });
 
-            const response = new Responses.Ok(null);
-            response.session_id = session.data.id;
             // STUB test the refreshToken claims should have only entity id with expire time 12h
-            response.refreshToken = PortalHelper.generateRefreshToken(user.id);
             // STUB test token claims must have only entity id and role with 30min expire time
-            response.token = PortalHelper.generateToken(user.id, user.role);
-            res.status(response.code).json(response);
+            sendResponse(res, new Responses.Ok(new LoginDto(user, session.data.id)));
         }
 
     }
@@ -122,7 +130,7 @@ export class PortalRoutes {
 
                 const session = await sessionsService.getActiveSession({
                     device_uuid,
-                    user_id: decodedRefreshToken.id
+                    user: decodedRefreshToken.id
                 });
 
                 if (AppUtils.isFalsy(session)) {

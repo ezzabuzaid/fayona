@@ -42,7 +42,7 @@ describe('#INTEGRATION', () => {
             const response = await global.superAgent.patch(DEACTIVATE_ENDPOINT)
                 .set(userSession.headers)
                 .send({
-                    user_id: userSession.user_id,
+                    user: userSession.user_id,
                     session_id: userSession.session_id
                 } as IDeactivateSessionPayload);
             expect(response.ok).toBeTruthy();
@@ -54,7 +54,7 @@ describe('#INTEGRATION', () => {
             const response = await global.superAgent.patch(DEACTIVATE_ENDPOINT)
                 .set(userSession.headers)
                 .send({
-                    user_id: userSession.user_id,
+                    user: userSession.user_id,
                     session_id: new Types.ObjectId().toHexString(),
                 } as IDeactivateSessionPayload);
             expect(response.badRequest).toBeTruthy();
@@ -66,7 +66,7 @@ describe('#INTEGRATION', () => {
             const response = await global.superAgent.patch(DEACTIVATE_ENDPOINT)
                 .set(userSession.headers)
                 .send({
-                    user_id: userSession.user_id,
+                    user: userSession.user_id,
                     session_id: false as any,
                 } as IDeactivateSessionPayload);
             expect(response.badRequest).toBeTruthy();
@@ -78,11 +78,11 @@ describe('#INTEGRATION', () => {
             const response = await global.superAgent.patch(DEACTIVATE_ENDPOINT)
                 .set(userSession.headers)
                 .send({
-                    user_id: false as any,
+                    user: false as any,
                     session_id: userSession.session_id,
                 } as IDeactivateSessionPayload);
             expect(response.badRequest).toBeTruthy();
-            expect(response.body.message).toBe('user_id must be string');
+            expect(response.body.message).toBe('user must be string');
         });
     });
 

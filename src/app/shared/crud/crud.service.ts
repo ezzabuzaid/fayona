@@ -3,7 +3,6 @@ import { Payload, WithID, WithMongoID, Document, Projection } from '@lib/mongoos
 import { AppUtils } from '@core/utils';
 import { Repo } from './crud.repo';
 import { translate } from '@lib/translation';
-import mongoose, { ClientSession } from 'mongoose';
 
 function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHooks<T>]: any } {
     return {
@@ -43,7 +42,7 @@ export class CrudService<T> {
         return new Result(false);
     }
 
-    public async create(payload: Payload<T>, session: ClientSession = null) {
+    public async create(payload: Payload<T>) {
         const isExist = await this.isEntityExist(payload);
         if (isExist.hasError) {
             return new Result(true, translate(`${isExist.data}_entity_exist`));
@@ -52,7 +51,7 @@ export class CrudService<T> {
         const entity = this.repo.create(payload);
         const { pre, post } = getHooks(this.options.create);
         await pre(entity);
-        await entity.save({ session });
+        await entity.save();
         await post(entity);
 
         return new Result(false, { id: entity.id });
@@ -149,16 +148,19 @@ export class CrudService<T> {
     }
 
     public async one(query: Partial<WithMongoID<Payload<T>>>, projection: Projection<T> = {}, options = {}) {
-        const record = await this.repo.fetchOne(query, projection, options);
-        await getHooks(this.options.one).post(record);
+        const { post, pre } = getHooks(this.options.one as any);
+        const documentQuery = this.repo.fetchOne(query, projection, options);
+        await pre(documentQuery);
+        const record = await documentQuery.exec();
+        await post(record);
         return record;
     }
 
     public async all(query: Partial<WithMongoID<Payload<T>>> = {}, projection: Projection<T> = {}, options = {}) {
-        const { pre, post } = getHooks(this.options.all);
+        const { pre, post } = getHooks(this.options.all as any);
         const documentQuery = this.repo.fetchAll(query, projection, options);
         await pre(documentQuery);
-        const documents = await documentQuery;
+        const documents = await documentQuery.exec();
         await post(documents);
         return documents;
     }

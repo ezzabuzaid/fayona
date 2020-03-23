@@ -9,11 +9,7 @@ import { Responses, ErrorResponse } from '@core/helpers';
 import { Application } from 'app/app';
 import { Types } from 'mongoose';
 import foldersService from '@api/uploads/folders.service';
-
-class UploadFilePayload {
-    public folder: string;
-    [key: string]: string;
-}
+import { UploadsHelper } from '@api/uploads/uploads.helper';
 
 export class UploadOptions {
     public allowedTypes: string[] = [];
@@ -60,23 +56,25 @@ export class Multer {
         const formatFileName = (file: Express.Multer.File) => `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`;
         return multer.diskStorage({
             destination: async (
-                req: Request<UploadFilePayload>,
+                req: Request,
                 file: Express.Multer.File,
                 callback: (error: ErrorResponse, dest: string) => void
             ) => {
-                const { folder } = req.params as UploadFilePayload;
-                const folderExistance = await foldersService.exists({ _id: folder });
-                if (folderExistance.hasError) {
-                    callback(new Responses.BadRequest(folderExistance.data), null);
-                } else {
+                const { folder } = req.params;
+
+                if (folder !== 'others') {
                     if (Types.ObjectId.isValid(folder)) {
-                        const uploadFile = path.join(Application.uploadDirectory, folder);
-                        fileSystem.mkdirSync(uploadFile, { recursive: true });
-                        callback(null, uploadFile);
+                        const folderExistance = await foldersService.exists({ _id: folder });
+                        if (folderExistance.hasError) {
+                            callback(new Responses.BadRequest(folderExistance.data), null);
+                        }
                     } else {
                         callback(new Responses.BadRequest('folder_id_not_valid'), null);
                     }
                 }
+                // TODO: MOVE folder creation upload helper
+                UploadsHelper.createFolderDirectory(folder);
+                callback(null, UploadsHelper.folderPath(folder));
             },
             filename(req: Express.Request, file, cb) {
                 cb(null, formatFileName(file));
