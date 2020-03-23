@@ -59,7 +59,7 @@ export class Application {
     private populateRoutes() {
         this.application.use((req, res, next) => {
             const acceptLanguage = req.acceptsLanguages();
-            const localToUse = acceptLanguage.includes('ar') ? 'ar' : 'en'
+            const localToUse = acceptLanguage.includes('ar') ? 'ar' : 'en';
             if (translation.local.name !== localToUse) {
                 translation.use(localToUse);
             }

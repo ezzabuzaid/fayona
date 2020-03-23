@@ -51,7 +51,7 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         }));
     }
 
-    @Get('search')
+    @Get(Constants.Endpoints.SEARCH)
     public async searchForFolders(req: Request, res: Response) {
         const payload = new FilesSearchPayload(req.query);
         await validatePayload(payload);

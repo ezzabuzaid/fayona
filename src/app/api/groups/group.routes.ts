@@ -10,8 +10,6 @@ import { IsArray, IsString } from 'class-validator';
 
 class GroupPayload {
     @IsArray() public members: string[] = null;
-    @IsString() public title: string = null;
-    @IsString() public logo: string = null;
     constructor(payload: GroupPayload) {
         AppUtils.strictAssign(this, payload);
     }
@@ -36,31 +34,32 @@ export class GroupsRouter extends CrudRouter<GroupsSchema> {
     @Post('/')
     public async create(req: Request, res: Response) {
         // TODO: create member and group should be within transaction
-        const { logo, title, members } = new GroupPayload(req.body);
+        const { members } = new GroupPayload(req.body);
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
         if (AppUtils.isFalsy(AppUtils.hasItemWithin(members))) {
             throw new Responses.BadRequest('a group should consist of more than one member');
         }
 
-        const createGroupResult = await this.service.create({ logo, title });
-        if (createGroupResult.hasError) {
-            throw new Responses.BadRequest(createGroupResult.data);
+        const group = await this.service.create({});
+        if (group.hasError) {
+            throw new Responses.BadRequest(group.data);
         }
 
         await groupMemebrsService.create({
-            group: createGroupResult.data.id,
+            group: group.data.id,
             user: decodedToken.id,
             isAdmin: true
         });
 
+        // FIXME this will do several round trip to database server
         for (const member_id of members) {
             await groupMemebrsService.create({
-                group: createGroupResult.data.id,
+                group: group.data.id,
                 user: member_id,
                 isAdmin: false
             });
         }
-        sendResponse(res, new Responses.Created(createGroupResult.data));
+        sendResponse(res, new Responses.Created(group.data));
     }
 
 }
@@ -79,4 +78,5 @@ export class MembersRouter extends CrudRouter<GroupMemberSchema> {
         response.count = members.length;
         sendResponse(res, response);
     }
+
 }

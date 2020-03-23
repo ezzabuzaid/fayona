@@ -51,3 +51,6 @@ use http://www.hygen.io/create style for documention section
  * to procced the operation then
  * it asks the repo to hold the data in the model(database)
  */
+
+
+mongod --dbpath ~/data/db 

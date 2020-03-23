@@ -56,7 +56,6 @@ export class ConversationRouter extends CrudRouter<ConversationSchema, Conversat
 
 }
 
-
 class ConversationPayload {
     @IsMongoId()
     user1: string = null;
