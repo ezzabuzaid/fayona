@@ -15,7 +15,8 @@ import { FoldersSchema } from './folders.model';
 
 const allowedImageTypes = [
     'image/jpg', 'image/JPG', 'image/jpeg', 'image/JPEG',
-    'image/png', 'image/PNG', 'image/gif', 'image/GIF'
+    'image/png', 'image/PNG', 'image/gif', 'image/GIF',
+    'application/pdf'
 ];
 
 const multer = new Multer({ allowedTypes: allowedImageTypes });

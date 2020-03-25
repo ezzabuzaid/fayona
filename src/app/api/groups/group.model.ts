@@ -19,6 +19,7 @@ export class GroupMemberSchema {
 
 @Entity(Constants.Schemas.GROUPS)
 export class GroupsSchema {
+    @Field() folder?: string = null;
     @Field({ pure: true }) public title?: string = '';
     @Field({ pure: true }) public logo?: string = null;
 }

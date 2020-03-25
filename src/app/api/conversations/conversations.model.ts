@@ -14,7 +14,7 @@ export class ConversationSchema {
         required: true,
         ref: Constants.Schemas.USERS
     }) user2: Types.ObjectId;
-    @Field() folder: string = null;
+    @Field() folder?: string = null;
 }
 // participant
 export default BaseModel(ConversationSchema);

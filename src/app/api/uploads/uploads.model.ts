@@ -4,6 +4,7 @@ import { Types } from 'mongoose';
 
 @Entity(Constants.Schemas.UPLOADS)
 export class UploadsSchema {
+    @Field({ required: false }) tag?: string = '';
     @Field() public type: string;
     @Field() public size: number;
     @Field() public name: string;
