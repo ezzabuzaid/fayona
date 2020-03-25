@@ -125,21 +125,16 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         // TODO: move pagination to service to allow it to be consumed by other services
         // TODO: imporve error handling, check the types of query
 
-        let { page, size } = req.query;
-        const { ...sort } = req.query;
+        // tslint:disable-next-line: prefer-const
+        let { page, size, ...sort } = req.query;
         page = +page;
         size = +size;
-        // TODO: Check that the sort object has the same properties in <T>
-        if (size === 0) {
-            throw new ErrorResponse(translate('no_size_0'));
-        }
-        const entites = await this.service.all({}, {}, {
-            sort,
-            limit: size,
-            skip: page * size
-        });
 
-        const response = new SuccessResponse(entites);
+        // TODO: Check that the sort object has the same properties in <T>
+
+        const entites = await this.service.all({}, { sort, size, page });
+
+        const response = new Responses.Ok(entites);
         response.count = entites.length;
         res.status(response.code).json(response);
     }

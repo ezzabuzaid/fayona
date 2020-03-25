@@ -17,7 +17,7 @@ describe('#MockService', () => {
         test('should fetch all entites from repo', () => {
             const repo = new MockRepo(null);
             const crudService = new CrudService(repo as any);
-            crudService.all({}, {}, {});
+            crudService.all({}, {});
             expect(repo.fetchAll).toHaveBeenCalledWith({}, {}, {});
         });
         test('should invoke the hooks', async () => {
