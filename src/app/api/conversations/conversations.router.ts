@@ -7,8 +7,22 @@ import { Response, Request } from 'express';
 import { Auth } from '@api/portal';
 import messagesService from './messages.service';
 import { IsMongoId, IsString } from 'class-validator';
-import { validatePayload } from '@shared/common';
-import { AppUtils } from '@core/utils';
+import { validate } from '@shared/common';
+import { AppUtils, cast } from '@core/utils';
+
+class ConversationPayload {
+    @IsMongoId()
+    user1: string = null;
+
+    @IsMongoId()
+    user2: string = null;
+
+    @IsString()
+    message: string = null;
+    constructor(payload: ConversationPayload) {
+        AppUtils.strictAssign(this, payload);
+    }
+}
 
 @Router(Constants.Endpoints.Conversation, {
     middleware: [Auth.isAuthenticated]
@@ -35,10 +49,9 @@ export class ConversationRouter extends CrudRouter<ConversationSchema, Conversat
         sendResponse(res, new Responses.Ok(result));
     }
 
-    @Post()
+    @Post('/', validate(ConversationPayload))
     async createConversation(req: Request, res: Response) {
-        const payload = new ConversationPayload(req.body);
-        await validatePayload(payload);
+        const payload = cast<ConversationPayload>(req.body);
         const result = await conversationsService.create({
             user1: payload.user1,
             user2: payload.user2
@@ -54,18 +67,4 @@ export class ConversationRouter extends CrudRouter<ConversationSchema, Conversat
         sendResponse(res, new Responses.Ok(result.data));
     }
 
-}
-
-class ConversationPayload {
-    @IsMongoId()
-    user1: string = null;
-
-    @IsMongoId()
-    user2: string = null;
-
-    @IsString()
-    message: string = null;
-    constructor(payload: ConversationPayload) {
-        AppUtils.strictAssign(this, payload);
-    }
 }

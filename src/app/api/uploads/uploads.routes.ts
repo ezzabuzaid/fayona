@@ -8,10 +8,23 @@ import { UploadsSchema } from './uploads.model';
 import uploadsService, { UploadsService } from './uploads.service';
 import foldersService, { FoldersService } from './folders.service';
 import path from 'path';
-import { AppUtils } from '@core/utils';
+import { AppUtils, cast } from '@core/utils';
 import { IsString, IsMongoId } from 'class-validator';
-import { validatePayload } from '@shared/common';
+import { validate } from '@shared/common';
 import { FoldersSchema } from './folders.model';
+
+class FilesSearchPayload {
+    @IsMongoId()
+    @IsString({
+        message: 'folder_id_not_valid'
+    }) folder: string = null;
+
+    file: string = null;
+
+    constructor(payload: FilesSearchPayload) {
+        AppUtils.strictAssign(this, payload);
+    }
+}
 
 const allowedImageTypes = [
     'image/jpg', 'image/JPG', 'image/jpeg', 'image/JPEG',
@@ -52,10 +65,9 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         }));
     }
 
-    @Get(Constants.Endpoints.SEARCH)
+    @Get(Constants.Endpoints.SEARCH, validate(FilesSearchPayload, 'query'))
     public async searchForFolders(req: Request, res: Response) {
-        const payload = new FilesSearchPayload(req.query);
-        await validatePayload(payload);
+        const payload = cast<FilesSearchPayload>(req.query);
         const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
         const files = await this.service.searchForFiles({
             name: payload.file,
@@ -98,18 +110,5 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
                 return sendResponse(res, new Responses.Created(result.data));
             }
         }
-    }
-}
-
-class FilesSearchPayload {
-    @IsMongoId()
-    @IsString({
-        message: 'folder_id_not_valid'
-    }) folder: string = null;
-
-    file: string = null;
-
-    constructor(payload: FilesSearchPayload) {
-        AppUtils.strictAssign(this, payload);
     }
 }

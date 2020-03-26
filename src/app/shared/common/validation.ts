@@ -1,5 +1,7 @@
 import { validateOrReject, ValidationError } from 'class-validator';
 import { ApplicationConstants } from '@core/constants';
+import { Type, AppUtils } from '@core/utils';
+import { NextFunction, Response, Request } from 'express';
 
 export class ValidationPatterns {
     public static EmailValidation = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -15,4 +17,15 @@ export async function validatePayload<T>(payload: T) {
         error.name = ApplicationConstants.PAYLOAD_VALIDATION_ERRORS;
         throw error;
     }
+}
+
+export abstract class PayloadValidator { }
+
+export function validate<T extends PayloadValidator>(validator: Type<T>, type: 'body' | 'query' | 'params' = 'body') {
+    return async (req: Request, res: Response, next: NextFunction) => {
+        const validatee = new validator();
+        AppUtils.strictAssign(validatee, req[type]);
+        await validatePayload(validatee);
+        next();
+    };
 }
