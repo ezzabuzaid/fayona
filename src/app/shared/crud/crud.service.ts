@@ -164,7 +164,15 @@ export class CrudService<T> {
         await pre(documentQuery);
         const documents = await documentQuery.exec();
         await post(documents);
-        return documents;
+
+        const count = await documentQuery.estimatedDocumentCount();
+
+        return new Result(false, {
+            documents,
+            count: documents.length,
+            totalCount: count,
+            pages: Math.ceil(count / readOptions.limit),
+        });
     }
 
     public async exists(query: Partial<WithMongoID<Payload<T>>>) {

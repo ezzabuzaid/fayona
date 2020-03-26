@@ -132,10 +132,9 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
 
         // TODO: Check that the sort object has the same properties in <T>
 
-        const entites = await this.service.all({}, { sort, size, page });
+        const result = await this.service.all({}, { sort, size, page });
 
-        const response = new Responses.Ok(entites);
-        response.count = entites.length;
+        const response = new Responses.Ok(result.data);
         res.status(response.code).json(response);
     }
 
