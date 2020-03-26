@@ -168,10 +168,10 @@ export class CrudService<T> {
         const count = await documentQuery.estimatedDocumentCount();
 
         return new Result(false, {
-            documents,
+            list: documents,
             count: documents.length,
             totalCount: count,
-            pages: Math.ceil(count / readOptions.limit),
+            pages: Math.ceil((count / readOptions.limit) || 0),
         });
     }
 
