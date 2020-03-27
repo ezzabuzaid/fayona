@@ -1,4 +1,3 @@
-import { ErrorHandling } from '@core/helpers';
 import { AppUtils, Logger } from '@core/utils';
 import { Router as expressRouter } from 'express';
 import 'reflect-metadata';
@@ -6,7 +5,8 @@ import { IExpressInternal, IRouterDecorationOption, RouterProperties } from './m
 
 const log = new Logger('Router Decorator');
 import path = require('path');
-import { IMetadata, method_metadata_key } from '.';
+import { IMetadata, method_metadata_key } from './index';
+import { wrapRoutes } from '@core/helpers/route';
 
 export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
     return function <T extends new (...args: any[]) => any>(constructor: T) {
@@ -24,7 +24,7 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
                     if (metadata) {
                         const { handler, method, middlewares, uri } = metadata;
                         const normalizedURI = path.normalize(path.join('/', uri));
-                        router[method](normalizedURI, ErrorHandling.wrapRoutes(...middlewares, function() {
+                        router[method](normalizedURI, wrapRoutes(...middlewares, function originalMethod() {
                             return handler.apply(instance, arguments);
                         }));
                     }
@@ -32,7 +32,7 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
             });
 
         if (AppUtils.hasItemWithin(options.middleware)) {
-            router.use(`${routerUri}`, ErrorHandling.wrapRoutes(...options.middleware));
+            router.use(`${routerUri}`, wrapRoutes(...options.middleware));
         }
 
         AppUtils.defineProperty(prototype, RouterProperties.RoutesPath, { get() { return routerUri; } });

@@ -81,6 +81,10 @@ export class AppUtils {
         });
     }
 
+    public static isPromise(value: any) {
+        return Boolean(value && typeof value.then === 'function');
+    }
+
     public static joinPath(...path) {
         const connectedPath = path.join('/');
         const cleanedPath = connectedPath.split('/').filter((_path) => !!_path);

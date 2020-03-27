@@ -1,9 +1,9 @@
 import { ErrorResponse } from '@core/helpers';
 import { Logger, AppUtils } from '@core/utils';
 import { translate } from '@lib/translation';
-import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { NetworkStatus } from './network-status';
-import { sendResponse, Responses } from './response.model';
+import { Responses } from './response';
 import { ApplicationConstants } from '@core/constants';
 import stage from './stage';
 
@@ -54,7 +54,7 @@ export class ErrorHandling {
         });
     }
 
-    public static catchError(error: any, req: Request, res: Response, next: NextFunction): ErrorRequestHandler {
+    public static catchError(error: any, req: Request, res: Response, next: NextFunction) {
         const response = new ErrorResponse(error.message,
             isNaN(error.code)
                 ? NetworkStatus.INTERNAL_SERVER_ERROR
@@ -98,9 +98,7 @@ export class ErrorHandling {
                 break;
             default:
         }
-        console.log(error);
-        sendResponse(res, response);
-        return;
+        res.status(response.code).json(response);
     }
 
     public static notFound(req: Request, res: Response, next: NextFunction) {
@@ -116,10 +114,6 @@ export class ErrorHandling {
         }
         next();
         return;
-    }
-
-    public static wrapRoutes(...func) {
-        return func.map((fn) => (...args) => fn(...args).catch(args[2]));
     }
 
     public static throwExceptionIfDeviceUUIDIsMissing(device_uuid: string) {

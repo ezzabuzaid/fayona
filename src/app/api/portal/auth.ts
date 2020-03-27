@@ -15,11 +15,10 @@ export class Auth {
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
         const token = req.header(ApplicationConstants.authorization);
         if (AppUtils.isFalsy(device_uuid) || AppUtils.isFalsy(token)) {
-            throw new Responses.Unauthorized();
+            return new Responses.Unauthorized();
         }
 
         try {
-            log.info('Start checking JWT');
             // STUB test if the request doesn't have an `authorization` header
             // STUB test if the request has an `authorization` header with invalid token
             // STUB test if the request has an `authorization` header with expired token
@@ -28,13 +27,15 @@ export class Auth {
             // STUB test if there's no session associated with `deviceIdHeader` header
             // STUB test if the session is not active
             const session = await sessionsService.getActiveSession({ device_uuid });
+
             if (AppUtils.isFalsy(session) || AppUtils.isFalsy(session.active)) {
                 // NOTE: not active mean that the session was disabled either by admin or the user logged out
-                throw new Responses.Unauthorized();
+                return new Responses.Unauthorized();
             }
         } catch (error) {
+            log.info('JWT verifing faild');
             await sessionsService.deActivate({ device_uuid });
-            throw error;
+            return new Responses.Unauthorized();
         }
         next();
     }

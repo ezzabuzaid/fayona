@@ -2,14 +2,15 @@ import { CrudService } from './crud.service';
 import { Post, Put, Delete, Get, Patch } from '@lib/methods';
 import { Auth } from '@api/portal';
 import { Request, Response } from 'express';
-import { SuccessResponse, ErrorResponse, sendResponse, Responses } from '@core/helpers';
-import { translate } from '@lib/translation';
+import { Responses } from '@core/helpers';
 import { AppUtils } from '@core/utils';
 import { Payload } from '@lib/mongoose';
 import { Types } from 'mongoose';
 import assert from 'assert';
+
 // TODO: Generic SchemaType should inherit from RepoHooks interface which
 //  will be used to fire onSave, onUpdate, onDelete, ..etc
+
 export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> = CrudService<SchemaType>> {
     constructor(
         protected service: ServiceType & CrudService<SchemaType>
@@ -22,11 +23,9 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         // TODO: payload is not validated yet
         const result = await this.service.create(req.body);
         if (result.hasError) {
-            throw new Responses.BadRequest(result.data);
-        } else {
-            sendResponse(res, new Responses.Created(result.data));
+            return new Responses.BadRequest(result.data);
         }
-
+        return new Responses.Created(result.data);
     }
 
     @Patch(':id', Auth.isAuthenticated)
@@ -40,10 +39,10 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         const result = await this.service.updateById(id, req.body);
 
         if (result.hasError) {
-            throw new ErrorResponse(result.data);
+            return new Responses.BadRequest(result.data);
         }
 
-        sendResponse(res, new SuccessResponse(result.data));
+        return result.data;
     }
 
     @Put(':id', Auth.isAuthenticated)
@@ -57,10 +56,10 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         const result = await this.service.updateById(id, req.body);
 
         if (result.hasError) {
-            throw new ErrorResponse(result.data);
+            return new Responses.BadRequest(result.data);
         }
 
-        sendResponse(res, new SuccessResponse(result.data));
+        return result.data;
     }
 
     @Delete('bulk', Auth.isAuthenticated)
@@ -70,11 +69,10 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
 
         const completion = await this.service.bulkDelete(ids);
         if (AppUtils.isFalsy(completion)) {
-            throw new ErrorResponse(translate('one_of_entities_not_exist'));
+            return new Responses.BadRequest('one_of_entities_not_exist');
         }
 
-        const response = new SuccessResponse(null);
-        res.status(response.code).json(response);
+        return null;
     }
 
     @Post('bulk', Auth.isAuthenticated)
@@ -84,10 +82,10 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
 
         const completion = await this.service.bulkUpdate(entites);
         if (AppUtils.isFalsy(completion)) {
-            throw new ErrorResponse(translate('one_of_entities_not_exist'));
+            return new Responses.BadRequest('one_of_entities_not_exist');
         }
-        const response = new SuccessResponse(null);
-        res.status(response.code).json(response);
+
+        return new Responses.Ok(null);
     }
 
     @Delete(':id', Auth.isAuthenticated)
@@ -99,10 +97,12 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         }
 
         const result = await this.service.delete({ _id: id } as any);
+
         if (result.hasError) {
-            throw new ErrorResponse(result.data);
+            return new Responses.BadRequest(result.data);
         }
-        sendResponse(res, new SuccessResponse(result.data));
+
+        return result.data;
     }
 
     @Get(':id', Auth.isAuthenticated)
@@ -114,33 +114,26 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         }
 
         const entity = await this.service.one({ _id: id } as any);
-        if (!entity) {
-            throw new ErrorResponse(translate('entity_not_found'));
+        if (AppUtils.isNullOrUndefined(entity)) {
+            return new Responses.BadRequest('entity_not_found');
         }
-        sendResponse(res, new Responses.Ok(entity));
+        return entity;
     }
 
     @Get('/', Auth.isAuthenticated)
-    public async fetchEntities(req: Request, res: Response) {
-        // TODO: move pagination to service to allow it to be consumed by other services
-        // TODO: imporve error handling, check the types of query
-
-        // tslint:disable-next-line: prefer-const
-        let { page, size, ...sort } = req.query;
-        page = +page;
-        size = +size;
-
+    public async fetchEntities(req: Request) {
         // TODO: Check that the sort object has the same properties in <T>
-
+        const { page, size, ...sort } = req.query;
         const result = await this.service.all({}, { sort, size, page });
-
-        const response = new Responses.Ok(result.data);
-        res.status(response.code).json(response);
+        if (result.hasError) {
+            return new Responses.BadRequest(result.data as any);
+        }
+        return new Responses.Ok(result.data);
     }
 
     private _checkIfIdsIsValid(ids: any[]) {
         if (AppUtils.not(AppUtils.hasItemWithin(ids))) {
-            throw new ErrorResponse(translate('please_provide_valid_list_of_ids'));
+            return new Responses.BadRequest('please_provide_valid_list_of_ids');
         }
     }
 

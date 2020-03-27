@@ -1,7 +1,7 @@
 import { CrudRouter } from '@shared/crud';
 import usersService, { UserService } from './users.service';
 import { Constants, Responses, sendResponse } from '@core/helpers';
-import { Router, Post, Delete, Get } from '@lib/methods';
+import { Router, Post, Get } from '@lib/methods';
 import { UsersSchema } from './users.model';
 import { Request, Response } from 'express';
 import { Auth } from '@api/portal';

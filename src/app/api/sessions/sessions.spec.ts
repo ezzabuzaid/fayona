@@ -1,15 +1,7 @@
 import { Constants } from '@core/helpers';
 import { getUri, prepareUserSession } from '@test/fixture';
 import { Types } from 'mongoose';
-import { IDeactivateSessionPayload } from './sessions.model';
-// import { SessionsService } from "./sessions.service";
-
-// describe('Session Service', () => {
-
-//    const service= new SessionsService(null);
-//     service.deActivate(query);
-
-// });
+import { DeactivateSessionPayload } from './sessions.routes';
 
 const ENDPOINT = Constants.Endpoints.SESSIONS;
 const DEACTIVATE_ENDPOINT = getUri(`${ENDPOINT}/deactivate`);
@@ -44,7 +36,7 @@ describe('#INTEGRATION', () => {
                 .send({
                     user: userSession.user_id,
                     session_id: userSession.session_id
-                } as IDeactivateSessionPayload);
+                } as DeactivateSessionPayload);
             expect(response.ok).toBeTruthy();
             expect(response.body.data).toBe('Session deactivated');
         });
@@ -56,7 +48,7 @@ describe('#INTEGRATION', () => {
                 .send({
                     user: userSession.user_id,
                     session_id: new Types.ObjectId().toHexString(),
-                } as IDeactivateSessionPayload);
+                } as DeactivateSessionPayload);
             expect(response.badRequest).toBeTruthy();
             expect(response.body.message).toBe('no session available');
         });
@@ -68,7 +60,7 @@ describe('#INTEGRATION', () => {
                 .send({
                     user: userSession.user_id,
                     session_id: false as any,
-                } as IDeactivateSessionPayload);
+                } as DeactivateSessionPayload);
             expect(response.badRequest).toBeTruthy();
             expect(response.body.message).toBe('session_id must be string');
         });
@@ -80,7 +72,7 @@ describe('#INTEGRATION', () => {
                 .send({
                     user: false as any,
                     session_id: userSession.session_id,
-                } as IDeactivateSessionPayload);
+                } as DeactivateSessionPayload);
             expect(response.badRequest).toBeTruthy();
             expect(response.body.message).toBe('user must be string');
         });
