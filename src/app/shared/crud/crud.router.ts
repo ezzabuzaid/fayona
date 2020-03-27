@@ -1,7 +1,7 @@
 import { CrudService } from './crud.service';
 import { Post, Put, Delete, Get, Patch } from '@lib/methods';
 import { Auth } from '@api/portal';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { Responses } from '@core/helpers';
 import { AppUtils } from '@core/utils';
 import { Payload } from '@lib/mongoose';
@@ -19,7 +19,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
     }
 
     @Post('/', Auth.isAuthenticated)
-    public async create(req: Request, res: Response) {
+    public async create(req: Request) {
         // TODO: payload is not validated yet
         const result = await this.service.create(req.body);
         if (result.hasError) {
@@ -29,7 +29,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
     }
 
     @Patch(':id', Auth.isAuthenticated)
-    public async update(req: Request, res: Response) {
+    public async update(req: Request) {
         const { id } = req.params;
 
         if (AppUtils.not(Types.ObjectId.isValid(id))) {
@@ -46,7 +46,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
     }
 
     @Put(':id', Auth.isAuthenticated)
-    public async set(req: Request, res: Response) {
+    public async set(req: Request) {
         const { id } = req.params;
 
         if (AppUtils.not(Types.ObjectId.isValid(id))) {
@@ -62,34 +62,8 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return result.data;
     }
 
-    @Delete('bulk', Auth.isAuthenticated)
-    public async bulkDelete(req: Request, res: Response) {
-        const { ids } = req.body as { ids: string[] };
-        this._checkIfIdsIsValid(ids);
-
-        const completion = await this.service.bulkDelete(ids);
-        if (AppUtils.isFalsy(completion)) {
-            return new Responses.BadRequest('one_of_entities_not_exist');
-        }
-
-        return null;
-    }
-
-    @Post('bulk', Auth.isAuthenticated)
-    public async bulkUpdate(req: Request, res: Response) {
-        const { entites } = req.body as { entites: Array<Payload<SchemaType>> };
-        this._checkIfIdsIsValid(entites);
-
-        const completion = await this.service.bulkUpdate(entites);
-        if (AppUtils.isFalsy(completion)) {
-            return new Responses.BadRequest('one_of_entities_not_exist');
-        }
-
-        return new Responses.Ok(null);
-    }
-
     @Delete(':id', Auth.isAuthenticated)
-    public async delete(req: Request, res: Response) {
+    public async delete(req: Request) {
         const { id } = req.params;
 
         if (AppUtils.not(Types.ObjectId.isValid(id))) {
@@ -106,7 +80,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
     }
 
     @Get(':id', Auth.isAuthenticated)
-    public async fetchEntity(req: Request, res: Response) {
+    public async fetchEntity(req: Request) {
         const { id } = req.params;
 
         if (AppUtils.not(Types.ObjectId.isValid(id))) {
@@ -131,10 +105,38 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    private _checkIfIdsIsValid(ids: any[]) {
-        if (AppUtils.not(AppUtils.hasItemWithin(ids))) {
+    @Delete('bulk', Auth.isAuthenticated)
+    public async bulkDelete(req: Request) {
+        const idsList = req.query.ids.split(',');
+
+        if (this._checkIfIdsIsValid(idsList)) {
             return new Responses.BadRequest('please_provide_valid_list_of_ids');
         }
+
+        const completion = await this.service.bulkDelete(idsList);
+        if (AppUtils.isFalsy(completion)) {
+            return new Responses.BadRequest('one_of_entities_not_exist');
+        }
+
+        return null;
+    }
+
+    @Post('bulk', Auth.isAuthenticated)
+    public async bulkUpdate(req: Request) {
+        const { entites } = req.body as { entites: Array<Payload<SchemaType>> };
+        if (this._checkIfIdsIsValid(entites)) {
+            return new Responses.BadRequest('please_provide_valid_list_of_ids');
+        }
+        const completion = await this.service.bulkUpdate(entites);
+        if (AppUtils.isFalsy(completion)) {
+            return new Responses.BadRequest('one_of_entities_not_exist');
+        }
+
+        return new Responses.Ok(null);
+    }
+
+    private _checkIfIdsIsValid(ids: any[]) {
+        return AppUtils.not(AppUtils.hasItemWithin(ids));
     }
 
 }

@@ -1,6 +1,6 @@
 import { Router, Get, Post } from '@lib/methods';
 import { CrudRouter } from '@shared/crud';
-import { Constants, tokenService, sendResponse, Responses } from '@core/helpers';
+import { Constants, tokenService, Responses } from '@core/helpers';
 import conversationsService, { ConversationsService } from './conversations.service';
 import { ConversationSchema } from './conversations.model';
 import { Response, Request } from 'express';
@@ -34,7 +34,7 @@ export class ConversationRouter extends CrudRouter<ConversationSchema, Conversat
         const { user } = req.params;
         const { id } = await tokenService.decodeToken(req.headers.authorization);
         const result = await this.service.getConversation(user, id);
-        sendResponse(res, new Responses.Ok(result));
+        return new Responses.Ok(result);
     }
 
     @Get('messages/:conversation')
@@ -43,7 +43,7 @@ export class ConversationRouter extends CrudRouter<ConversationSchema, Conversat
         const result = await messagesService.all({
             conversation
         });
-        sendResponse(res, new Responses.Ok(result));
+        return new Responses.Ok(result.data);
     }
 
     @Post('/', validate(ConversationPayload))
@@ -61,7 +61,7 @@ export class ConversationRouter extends CrudRouter<ConversationSchema, Conversat
             user: payload.user1,
             conversation: result.data.id
         });
-        sendResponse(res, new Responses.Ok(result.data));
+        return new Responses.Ok(result.data);
     }
 
 }

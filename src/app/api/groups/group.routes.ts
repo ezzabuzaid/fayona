@@ -1,5 +1,5 @@
 import { Router, Post, Get, Intercept } from '@lib/methods';
-import { Constants, tokenService, Responses, sendResponse } from '@core/helpers';
+import { Constants, tokenService, Responses } from '@core/helpers';
 import { CrudRouter } from '@shared/crud';
 import { GroupsSchema, GroupMemberSchema } from './group.model';
 import { groupsService, groupMemebrsService } from './group.service';
@@ -32,7 +32,7 @@ export class GroupsRouter extends CrudRouter<GroupsSchema> {
     }
 
     @Post('/')
-    public async create(req: Request, res: Response) {
+    public async create(req: Request) {
         // TODO: create member and group should be within transaction
         const { members } = new GroupPayload(req.body);
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
@@ -59,7 +59,7 @@ export class GroupsRouter extends CrudRouter<GroupsSchema> {
                 isAdmin: false
             });
         }
-        sendResponse(res, new Responses.Created(group.data));
+        return new Responses.Created(group.data);
     }
 
 }
@@ -74,7 +74,7 @@ export class MembersRouter extends CrudRouter<GroupMemberSchema> {
     public async getMembersByGroupId(req: Request, res: Response) {
         const { group_id } = req.params;
         const result = await this.service.all({ group: group_id }, { projection: { group: 0 } });
-        sendResponse(res, new Responses.Ok(result));
+        return new Responses.Ok(result.data);
     }
 
 }

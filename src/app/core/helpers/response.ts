@@ -53,6 +53,3 @@ export namespace Responses {
     }
 
 }
-export function sendResponse(res: Response, httpResponse: HttpResponse) {
-    return res.status(httpResponse.code).json(httpResponse);
-}

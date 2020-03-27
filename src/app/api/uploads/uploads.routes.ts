@@ -1,7 +1,7 @@
-import { Router, Post, Get, Delete } from '@lib/methods';
+import { Router, Post, Get } from '@lib/methods';
 import { Multer } from '@shared/multer';
 import { Request, Response } from 'express';
-import { sendResponse, Responses, Constants, tokenService } from '@core/helpers';
+import { Responses, Constants, tokenService } from '@core/helpers';
 import { Auth } from '@api/portal';
 import { CrudRouter } from '@shared/crud';
 import { UploadsSchema } from './uploads.model';
@@ -54,12 +54,12 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
             path: filePath,
         });
         if (result.hasError) {
-            sendResponse(res, new Responses.BadRequest(result.data));
+            return new Responses.BadRequest(result.data);
         }
-        sendResponse(res, new Responses.Created({
+        return new Responses.Created({
             ...result.data,
             path: filePath
-        }));
+        });
     }
 
     @Get(Constants.Endpoints.SEARCH, validate(FilesSearchPayload, 'query'))
@@ -71,7 +71,7 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
             folder: payload.folder,
             user: user_id
         });
-        sendResponse(res, new Responses.Ok(files));
+        return new Responses.Ok(files);
     }
 
 }
@@ -91,7 +91,7 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
         const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
 
         const folders = await foldersService.all({ user: user_id });
-        sendResponse(res, new Responses.Ok(folders));
+        return new Responses.Ok(folders);
     }
 
     @Post('/')
@@ -104,7 +104,7 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
         } else {
             const result = await foldersService.create({ name, user: user_id });
             if (AppUtils.not(result.hasError)) {
-                return sendResponse(res, new Responses.Created(result.data));
+                return new Responses.Created(result.data);
             }
         }
     }
