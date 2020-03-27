@@ -91,7 +91,7 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
         const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
 
         const folders = await foldersService.all({ user: user_id });
-        return new Responses.Ok(folders);
+        return new Responses.Ok(folders.data);
     }
 
     @Post('/')

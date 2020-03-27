@@ -14,9 +14,7 @@ export function wrapRoutes(...middlewares) {
                 }
             }
         } catch (error) {
-            // console.log(req.baseUrl, error);
-            // return res.status(error.code).json(error);
-            // next(error);
+            next(error);
         }
     });
 }
