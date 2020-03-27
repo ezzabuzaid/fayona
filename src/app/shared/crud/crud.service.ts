@@ -11,14 +11,14 @@ function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHook
     };
 }
 
-class Result {
+class Result<T> {
     constructor(
         public hasError = false,
-        public data = null
+        public data: T = null
     ) { }
 }
 
-export class CrudService<T> {
+export class CrudService<T = null> {
 
     constructor(
         protected repo: Repo<T>,
@@ -45,7 +45,7 @@ export class CrudService<T> {
     public async create(payload: Payload<T>) {
         const isExist = await this.isEntityExist(payload);
         if (isExist.hasError) {
-            return new Result(true, translate(`${isExist.data}_entity_exist`));
+            return new Result(true, translate(`${isExist.data}_entity_exist`)) as any;
         }
 
         const entity = this.repo.create(payload);
@@ -68,7 +68,7 @@ export class CrudService<T> {
         await entity.remove();
         await post(entity);
 
-        return new Result();
+        return new Result<null>();
     }
 
     public async updateById(id: string, payload: Partial<Payload<T>>) {
@@ -80,7 +80,7 @@ export class CrudService<T> {
     }
 
     private async doUpdate(record: Document<T>, payload: Partial<Payload<T>>) {
-        if (AppUtils.isFalsy(record)) {
+        if (AppUtils.isNullOrUndefined(record)) {
             return new Result(true, 'entity_not_exist');
         }
 
@@ -94,7 +94,7 @@ export class CrudService<T> {
         await record.set(payload).save();
         await post(record);
 
-        return new Result();
+        return new Result<string>(false, null);
     }
 
     public async set(id: string, payload: Payload<T>) {
@@ -169,7 +169,7 @@ export class CrudService<T> {
 
         return new Result(false, {
             list: documents,
-            count: documents.length,
+            length: documents.length,
             totalCount: count,
             pages: Math.ceil((count / readOptions.limit) || 0),
         });
@@ -177,7 +177,7 @@ export class CrudService<T> {
 
     public async exists(query: Partial<WithMongoID<Payload<T>>>) {
         if (AppUtils.isTruthy(await this.one(query, { lean: true }))) {
-            return new Result();
+            return new Result(false, true) as any;
         }
         return new Result(true, 'entity_not_exist');
     }

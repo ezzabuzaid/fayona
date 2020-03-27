@@ -45,8 +45,8 @@ export class SessionsService extends CrudService<SessionSchema> {
     }
 
     public async deActivatedUserSessions(user: string) {
-        const records = await this.all({ user });
-        return Promise.all(records.map((record) => this.setAsDeactive(record)));
+        const result = await this.all({ user });
+        return Promise.all(result.data.list.map((record) => this.setAsDeactive(record)));
     }
 
 }

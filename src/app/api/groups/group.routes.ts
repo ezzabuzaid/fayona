@@ -73,10 +73,8 @@ export class MembersRouter extends CrudRouter<GroupMemberSchema> {
     @Get('/groups/:group_id', Auth.isAuthenticated)
     public async getMembersByGroupId(req: Request, res: Response) {
         const { group_id } = req.params;
-        const members = await this.service.all({ group: group_id }, { group: 0 });
-        const response = new Responses.Ok(members);
-        response.count = members.length;
-        sendResponse(res, response);
+        const result = await this.service.all({ group: group_id }, { projection: { group: 0 } });
+        sendResponse(res, new Responses.Ok(result));
     }
 
 }

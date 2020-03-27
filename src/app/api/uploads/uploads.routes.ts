@@ -21,9 +21,6 @@ class FilesSearchPayload {
 
     file: string = null;
 
-    constructor(payload: FilesSearchPayload) {
-        AppUtils.strictAssign(this, payload);
-    }
 }
 
 const allowedImageTypes = [

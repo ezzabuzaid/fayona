@@ -8,7 +8,7 @@ import { Auth } from '@api/portal';
 import messagesService from './messages.service';
 import { IsMongoId, IsString } from 'class-validator';
 import { validate } from '@shared/common';
-import { AppUtils, cast } from '@core/utils';
+import { cast } from '@core/utils';
 
 class ConversationPayload {
     @IsMongoId()
@@ -19,9 +19,6 @@ class ConversationPayload {
 
     @IsString()
     message: string = null;
-    constructor(payload: ConversationPayload) {
-        AppUtils.strictAssign(this, payload);
-    }
 }
 
 @Router(Constants.Endpoints.Conversation, {

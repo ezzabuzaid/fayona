@@ -83,7 +83,7 @@ export class PortalRoutes {
         } else {
             const activeUserSessions = await sessionsService.getActiveUserSession(user.id);
 
-            if (activeUserSessions.length >= 10) {
+            if (activeUserSessions.data.length >= 10) {
                 throw new Responses.Unauthorized('exceeded_allowed_sesison');
             }
             // STUB it should create a session entity
@@ -196,7 +196,7 @@ async function throwIfNotExist(query: Partial<Payload<UsersSchema> & { _id: stri
     if (AppUtils.isFalsy(query)) {
         throw new Responses.BadRequest(message);
     }
-    const entity = await usersService.one(query, { password: 1 });
+    const entity = await usersService.one(query, { projection: { password: 1 } });
     if (!!entity) {
         return entity;
     }
@@ -205,7 +205,7 @@ async function throwIfNotExist(query: Partial<Payload<UsersSchema> & { _id: stri
 
 scheduleJob('30 * * * *', async () => {
     const sessions = await sessionsService.getAllActiveSession();
-    sessions.forEach((session) => {
+    sessions.data.list.forEach((session) => {
         // TODO deActivate usless sessions
     });
 });
