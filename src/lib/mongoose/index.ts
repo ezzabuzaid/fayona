@@ -27,3 +27,4 @@ export function generateModelMetadataKey(target: any) {
 }
 
 export type Projection<T> = Partial<{ [key in keyof Payload<T>]: 1 | 0 }>;
+export type ColumnSort<T> = { [ket in keyof T]: 'asc' | 'desc' | 'ascending' | 'descending' };

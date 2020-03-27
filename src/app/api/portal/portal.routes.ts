@@ -1,4 +1,4 @@
-import { tokenService, Constants, IRefreshTokenClaim, Responses, HashService, sendResponse } from '@core/helpers';
+import { tokenService, Constants, IRefreshTokenClaim, Responses, HashService } from '@core/helpers';
 import { Post, Router } from '@lib/methods';
 import { Request, Response } from 'express';
 import usersService from '@api/users/users.service';
@@ -83,7 +83,7 @@ export class PortalRoutes {
         } else {
             const activeUserSessions = await sessionsService.getActiveUserSession(user.id);
 
-            if (activeUserSessions.length >= 10) {
+            if (activeUserSessions.data.length >= 10) {
                 throw new Responses.Unauthorized('exceeded_allowed_sesison');
             }
             // STUB it should create a session entity
@@ -95,7 +95,7 @@ export class PortalRoutes {
 
             // STUB test the refreshToken claims should have only entity id with expire time 12h
             // STUB test token claims must have only entity id and role with 30min expire time
-            sendResponse(res, new Responses.Ok(new LoginDto(user, session.data.id)));
+            return new Responses.Ok(new LoginDto(user, session.data.id));
         }
 
     }
@@ -106,10 +106,10 @@ export class PortalRoutes {
         if (device_uuid) {
             const result = await sessionsService.deActivate({ device_uuid });
             if (AppUtils.not(result.hasError)) {
-                return sendResponse(res, new Responses.Ok(result.data));
+                return new Responses.Ok(result.data);
             }
         }
-        sendResponse(res, new Responses.BadRequest('logout_wrong_device_uuid'));
+        return new Responses.BadRequest('logout_wrong_device_uuid');
     }
 
     @Post(Constants.Endpoints.REFRESH_TOKEN)
@@ -196,7 +196,7 @@ async function throwIfNotExist(query: Partial<Payload<UsersSchema> & { _id: stri
     if (AppUtils.isFalsy(query)) {
         throw new Responses.BadRequest(message);
     }
-    const entity = await usersService.one(query, { password: 1 });
+    const entity = await usersService.one(query, { projection: { password: 1 } });
     if (!!entity) {
         return entity;
     }
@@ -205,7 +205,7 @@ async function throwIfNotExist(query: Partial<Payload<UsersSchema> & { _id: stri
 
 scheduleJob('30 * * * *', async () => {
     const sessions = await sessionsService.getAllActiveSession();
-    sessions.forEach((session) => {
+    sessions.data.list.forEach((session) => {
         // TODO deActivate usless sessions
     });
 });

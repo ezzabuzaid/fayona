@@ -1,6 +1,6 @@
 import en from '@assets/languages/en.json';
 import ar from '@assets/languages/ar.json';
-import { ErrorHandling, StageLevel } from '@core/helpers';
+import { ErrorHandling, StageLevel, wrapRoutes } from '@core/helpers';
 import { Logger } from '@core/utils';
 import { translation } from '@lib/translation';
 import compression = require('compression');
@@ -70,9 +70,9 @@ export class Application {
             this.application.use(path.join('/api', uri), router);
         });
 
-        this.application.use(ErrorHandling.favIcon);
-        this.application.get('/api', (req, res) => res.status(200).json({ work: '/API hitted' }));
-        this.application.use(ErrorHandling.notFound);
+        this.application.use(wrapRoutes(ErrorHandling.favIcon));
+        this.application.get('/api', wrapRoutes(() => ({ work: '/API hitted' })));
+        this.application.use(wrapRoutes(ErrorHandling.notFound));
         this.application.use(ErrorHandling.catchError);
     }
 

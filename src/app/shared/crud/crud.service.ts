@@ -1,5 +1,5 @@
 import { ICrudOptions, ICrudHooks } from './crud.options';
-import { Payload, WithID, WithMongoID, Document, Projection } from '@lib/mongoose';
+import { Payload, WithID, WithMongoID, Document, Projection, ColumnSort } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 import { Repo } from './crud.repo';
 import { translate } from '@lib/translation';
@@ -11,14 +11,14 @@ function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHook
     };
 }
 
-class Result {
+class Result<T> {
     constructor(
         public hasError = false,
-        public data = null
+        public data: T = null
     ) { }
 }
 
-export class CrudService<T> {
+export class CrudService<T = null> {
 
     constructor(
         protected repo: Repo<T>,
@@ -45,7 +45,7 @@ export class CrudService<T> {
     public async create(payload: Payload<T>) {
         const isExist = await this.isEntityExist(payload);
         if (isExist.hasError) {
-            return new Result(true, translate(`${isExist.data}_entity_exist`));
+            return new Result(true, translate(`${isExist.data}_entity_exist`)) as any;
         }
 
         const entity = this.repo.create(payload);
@@ -68,7 +68,7 @@ export class CrudService<T> {
         await entity.remove();
         await post(entity);
 
-        return new Result();
+        return new Result<null>();
     }
 
     public async updateById(id: string, payload: Partial<Payload<T>>) {
@@ -80,7 +80,7 @@ export class CrudService<T> {
     }
 
     private async doUpdate(record: Document<T>, payload: Partial<Payload<T>>) {
-        if (AppUtils.isFalsy(record)) {
+        if (AppUtils.isNullOrUndefined(record)) {
             return new Result(true, 'entity_not_exist');
         }
 
@@ -94,7 +94,7 @@ export class CrudService<T> {
         await record.set(payload).save();
         await post(record);
 
-        return new Result();
+        return new Result<string>(false, null);
     }
 
     public async set(id: string, payload: Payload<T>) {
@@ -147,27 +147,37 @@ export class CrudService<T> {
         return true;
     }
 
-    public async one(query: Partial<WithMongoID<Payload<T>>>, projection: Projection<T> = {}, options = {}) {
+    public async one(query: Partial<WithMongoID<Payload<T>>>, options: Partial<IReadAllOptions<T>> = {}) {
         const { post, pre } = getHooks(this.options.one as any);
-        const documentQuery = this.repo.fetchOne(query, projection, options);
+        const documentQuery = this.repo.fetchOne(query, options.projection, options);
         await pre(documentQuery);
         const record = await documentQuery.exec();
         await post(record);
         return record;
     }
 
-    public async all(query: Partial<WithMongoID<Payload<T>>> = {}, projection: Projection<T> = {}, options = {}) {
+    public async all(query: Partial<WithMongoID<Payload<T>>> = {}, options: Partial<IReadAllOptions<T>> = {}) {
         const { pre, post } = getHooks(this.options.all as any);
-        const documentQuery = this.repo.fetchAll(query, projection, options);
+
+        const readOptions = new ReadAllOptions(options);
+        const documentQuery = this.repo.fetchAll(query, readOptions.projection, readOptions);
         await pre(documentQuery);
         const documents = await documentQuery.exec();
         await post(documents);
-        return documents;
+
+        const count = await documentQuery.estimatedDocumentCount();
+
+        return new Result(false, {
+            list: documents,
+            length: documents.length,
+            totalCount: count,
+            pages: Math.ceil((count / readOptions.limit) || 0),
+        });
     }
 
     public async exists(query: Partial<WithMongoID<Payload<T>>>) {
-        if (AppUtils.isTruthy(await this.one(query, {}, { lean: true }))) {
-            return new Result();
+        if (AppUtils.isTruthy(await this.one(query, { lean: true }))) {
+            return new Result(false, true) as any;
         }
         return new Result(true, 'entity_not_exist');
     }
@@ -175,3 +185,27 @@ export class CrudService<T> {
 }
 
 class CrudQuery { }
+interface IReadOneOptions<T> {
+    projection: Projection<T>;
+    lean: boolean;
+}
+
+interface IReadAllOptions<T> extends IReadOneOptions<T> {
+    sort: ColumnSort<T>;
+    page: number;
+    size: number;
+}
+
+class ReadAllOptions<T> {
+    public skip = 0;
+    public limit = null;
+    public sort: ColumnSort<T> = null;
+    public projection: Projection<T> = {};
+    public lean = false;
+
+    constructor({ page = 0, size = 0, sort }: Partial<IReadAllOptions<T>>) {
+        this.skip = page * size || null;
+        this.limit = size || null;
+        this.sort = sort;
+    }
+}

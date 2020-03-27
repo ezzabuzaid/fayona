@@ -1,8 +1,6 @@
 import { BaseModel, Entity, Field } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
 import { Types } from 'mongoose';
-import { IsMongoId, IsString } from 'class-validator';
-import { AppUtils } from '@core/utils';
 
 @Entity(Constants.Schemas.SESSIONS)
 export class SessionSchema {
@@ -17,18 +15,3 @@ export class SessionSchema {
 }
 
 export const SessionModel = BaseModel<SessionSchema>(SessionSchema);
-
-export class IDeactivateSessionPayload {
-
-    @IsMongoId({})
-    @IsString({ message: 'user must be string' })
-    public user: string = null;
-
-    @IsMongoId()
-    @IsString({ message: 'session_id must be string' })
-    public session_id: string = null;
-
-    constructor(payload: IDeactivateSessionPayload) {
-        AppUtils.strictAssign(this, payload);
-    }
-}

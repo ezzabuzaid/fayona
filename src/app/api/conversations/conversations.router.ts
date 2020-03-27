@@ -1,14 +1,25 @@
 import { Router, Get, Post } from '@lib/methods';
 import { CrudRouter } from '@shared/crud';
-import { Constants, tokenService, sendResponse, Responses } from '@core/helpers';
+import { Constants, tokenService, Responses } from '@core/helpers';
 import conversationsService, { ConversationsService } from './conversations.service';
 import { ConversationSchema } from './conversations.model';
 import { Response, Request } from 'express';
 import { Auth } from '@api/portal';
 import messagesService from './messages.service';
 import { IsMongoId, IsString } from 'class-validator';
-import { validatePayload } from '@shared/common';
-import { AppUtils } from '@core/utils';
+import { validate } from '@shared/common';
+import { cast } from '@core/utils';
+
+class ConversationPayload {
+    @IsMongoId()
+    user1: string = null;
+
+    @IsMongoId()
+    user2: string = null;
+
+    @IsString()
+    message: string = null;
+}
 
 @Router(Constants.Endpoints.Conversation, {
     middleware: [Auth.isAuthenticated]
@@ -23,7 +34,7 @@ export class ConversationRouter extends CrudRouter<ConversationSchema, Conversat
         const { user } = req.params;
         const { id } = await tokenService.decodeToken(req.headers.authorization);
         const result = await this.service.getConversation(user, id);
-        sendResponse(res, new Responses.Ok(result));
+        return new Responses.Ok(result);
     }
 
     @Get('messages/:conversation')
@@ -32,13 +43,12 @@ export class ConversationRouter extends CrudRouter<ConversationSchema, Conversat
         const result = await messagesService.all({
             conversation
         });
-        sendResponse(res, new Responses.Ok(result));
+        return new Responses.Ok(result.data);
     }
 
-    @Post()
+    @Post('/', validate(ConversationPayload))
     async createConversation(req: Request, res: Response) {
-        const payload = new ConversationPayload(req.body);
-        await validatePayload(payload);
+        const payload = cast<ConversationPayload>(req.body);
         const result = await conversationsService.create({
             user1: payload.user1,
             user2: payload.user2
@@ -51,21 +61,7 @@ export class ConversationRouter extends CrudRouter<ConversationSchema, Conversat
             user: payload.user1,
             conversation: result.data.id
         });
-        sendResponse(res, new Responses.Ok(result.data));
+        return new Responses.Ok(result.data);
     }
 
-}
-
-class ConversationPayload {
-    @IsMongoId()
-    user1: string = null;
-
-    @IsMongoId()
-    user2: string = null;
-
-    @IsString()
-    message: string = null;
-    constructor(payload: ConversationPayload) {
-        AppUtils.strictAssign(this, payload);
-    }
 }
