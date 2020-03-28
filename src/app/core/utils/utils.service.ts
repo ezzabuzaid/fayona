@@ -6,6 +6,27 @@ export type Type<T> = new (...args: any[]) => T;
 export type Parameter<T extends (args: any) => any> = T extends (args: infer P) => any ? P : never;
 
 export class AppUtils {
+
+    static isTruthy(value: any) {
+        return !!value;
+    }
+
+    static equals<T>(...values: T[]) {
+        return values.every((value, i, arr) => JSON.stringify(value) === JSON.stringify(arr[0]));
+    }
+
+    static notEquals<T>(...values: T[]) {
+        return !this.equals(...values);
+    }
+
+    public static notNullOrUndefined(value: any) {
+        return AppUtils.isFalsy(AppUtils.isNullOrUndefined(value));
+    }
+
+    public static inverse(value: boolean) {
+        return !value;
+    }
+
     /**
      * remove null and undefined properties from an object expect empty string
      * @param withEmptyString to indicate of the empty values should be removed
@@ -29,10 +50,6 @@ export class AppUtils {
 
     public static isFunction(value: any) {
         return value instanceof Function;
-    }
-
-    public static isTruthy(value: any) {
-        return !!value;
     }
 
     public static isFalsy(value: any) {
@@ -123,10 +140,6 @@ export class AppUtils {
 
     public static isNullOrUndefined(value: any) {
         return value === undefined || value === null;
-    }
-
-    public static notNullOrUndefined(value: any) {
-        return this.isTruthy(value !== undefined && value !== null);
     }
 
     public static hasItemWithin(object: object) {
