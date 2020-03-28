@@ -5,7 +5,7 @@ import usersService from '@api/users/users.service';
 import { UsersSchema } from '@api/users';
 import { Payload, WithID } from '@lib/mongoose';
 import { EmailService, fakeEmail } from '@shared/email';
-import { AppUtils } from '@core/utils';
+import { AppUtils, cast } from '@core/utils';
 import { PortalHelper } from './portal.helper';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { Auth } from './auth';
@@ -14,6 +14,7 @@ import { sessionsService } from '@api/sessions/sessions.service';
 import { IsString } from 'class-validator';
 import { translate } from '@lib/translation';
 import { scheduleJob } from 'node-schedule';
+import { validate } from '@shared/common';
 
 export class LoginPayload {
     @IsString({
@@ -23,10 +24,6 @@ export class LoginPayload {
     @IsString({
         message: translate('string_constraint', { name: 'password' })
     }) public password: string = null;
-
-    constructor(payload: LoginPayload) {
-        AppUtils.strictAssign(this, payload);
-    }
 }
 
 export class RefreshTokenDto {
@@ -53,20 +50,16 @@ export class RefreshTokenPayload {
     public token: string = null;
     @IsString()
     public refreshToken: string = null;
-
-    constructor(payload: RefreshTokenPayload) {
-        AppUtils.strictAssign(this, payload);
-    }
 }
 
 @Router(Constants.Endpoints.PORTAL)
 export class PortalRoutes {
 
-    @Post(Constants.Endpoints.LOGIN)
+    @Post(Constants.Endpoints.LOGIN, validate(LoginPayload))
     public async login(req: Request, res: Response) {
         // TODO: send an email to user to notify him about login attempt.
 
-        const { username, password } = new LoginPayload(req.body);
+        const { username, password } = cast<LoginPayload>(req.body);
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
 
         if (AppUtils.isFalsy(device_uuid)) {
@@ -112,14 +105,14 @@ export class PortalRoutes {
         return new Responses.BadRequest('logout_wrong_device_uuid');
     }
 
-    @Post(Constants.Endpoints.REFRESH_TOKEN)
+    @Post(Constants.Endpoints.REFRESH_TOKEN, validate(RefreshTokenPayload))
     public async refreshToken(req: Request, res: Response) {
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
         if (AppUtils.isFalsy(device_uuid)) {
             throw new Responses.Unauthorized();
         }
 
-        const { token, refreshToken } = new RefreshTokenPayload(req.body);
+        const { token, refreshToken } = cast<RefreshTokenPayload>(req.body);
         // NOTE: if it was invalid or expired it will implicity thrown an error
         const decodedRefreshToken = await tokenService.decodeToken<IRefreshTokenClaim>(refreshToken);
 
