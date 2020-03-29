@@ -1,5 +1,5 @@
 import { Database } from '@core/database';
-import { StageLevel } from '@core/helpers';
+import { StageLevel, tokenService } from '@core/helpers';
 import { Logger, LoggerLevel, AppUtils } from '@core/utils';
 import { envirnoment } from '@environment/env';
 import http = require('http');
@@ -7,7 +7,7 @@ import { URL } from 'url';
 import { Application } from './app';
 import socketIO from 'socket.io';
 import stage from '@core/helpers/stage';
-import messagesService from '@api/conversations/messages.service';
+import messagesService from '@api/messages/messages.service';
 import { IsString, IsMongoId } from 'class-validator';
 import { validatePayload } from '@shared/common';
 
@@ -20,7 +20,6 @@ interface IRoom {
 interface IMessage {
         id: string;
         text: string;
-        user: string;
 }
 
 class MessagePayload {
@@ -28,8 +27,6 @@ class MessagePayload {
         public text: string = null;
         @IsMongoId()
         public id: string = null;
-        @IsMongoId()
-        public user: string = null;
 
         constructor(payload: MessagePayload) {
                 AppUtils.strictAssign(this, payload);
@@ -52,30 +49,41 @@ export class NodeServer extends Application {
                 envirnoment.load(StageLevel.DEV);
                 const server = new NodeServer();
                 await NodeServer.loadDatabase();
-                const sockets: { [key: string]: socketIO.Socket } = {};
+
                 // TODO: Move this out
-                const io = socketIO(server.server)
-                        .on('connection', (socket) => {
-                                socket.on('Join', async (room: IRoom) => {
-                                        log.debug('New Joiner => ', room.id);
-                                        socket.join(room.id);
-                                });
-                                socket.on('SendMessage', async (message: IMessage) => {
-                                        const payload = new MessagePayload(message);
-                                        try {
-                                                await validatePayload(payload);
-                                                const createdMessage = await messagesService.create({
-                                                        conversation: payload.id,
-                                                        user: payload.user,
-                                                        text: payload.text
-                                                });
-                                                log.debug('New Message from => ', createdMessage);
-                                                io.to(message.id).emit('Message', createdMessage);
-                                        } catch (error) {
-                                                socket.emit('MessageValidationError', message);
-                                        }
-                                });
+                const io = socketIO(server.server);
+                io.use(async (socket, next) => {
+                        try {
+                                socket['decodedToken'] = await tokenService.decodeToken(socket.handshake.query.token);
+                        } catch (error) {
+                                next(new Error('Authentication error'));
+                        }
+                        next();
+                });
+
+                io.on('connection', (socket) => {
+                        socket.on('Join', async (room: IRoom) => {
+                                log.debug('New Joiner => ', room.id);
+                                socket.join(room.id);
                         });
+                        socket.on('SendMessage', async (message: IMessage) => {
+                                const { id } = socket['decodedToken'];
+                                log.debug('New Message from => ', message);
+                                const payload = new MessagePayload(message);
+                                try {
+                                        await validatePayload(payload);
+                                        const createdMessage = await messagesService.create({
+                                                conversation: payload.id,
+                                                user: id,
+                                                text: payload.text
+                                        });
+                                        log.debug('New Message from => ', createdMessage);
+                                        io.sockets.in(message.id).emit('Message', createdMessage);
+                                } catch (error) {
+                                        socket.emit('MessageValidationError', message);
+                                }
+                        });
+                });
 
                 return server;
         }
