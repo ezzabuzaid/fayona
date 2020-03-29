@@ -3,7 +3,14 @@ import messagesModel, { MessagesSchema } from './messages.model';
 
 export class MessagesService extends CrudService<MessagesSchema> {
     constructor() {
-        super(new Repo(messagesModel));
+        super(
+            new Repo(messagesModel),
+            {
+                create: {
+                    result: (document) => document
+                }
+            }
+        );
     }
 }
 
