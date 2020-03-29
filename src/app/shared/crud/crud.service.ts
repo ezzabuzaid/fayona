@@ -165,7 +165,7 @@ export class CrudService<T = null> {
         const documents = await documentQuery.exec();
         await post(documents);
 
-        const count = await documentQuery.estimatedDocumentCount();
+        const count = await this.repo.fetchAll().estimatedDocumentCount();
 
         return new Result(false, {
             list: documents,
@@ -204,8 +204,8 @@ class ReadAllOptions<T> {
     public lean = false;
 
     constructor({ page = 0, size = 0, sort }: Partial<IReadAllOptions<T>>) {
-        this.skip = page * size || null;
-        this.limit = size || null;
+        this.skip = +page * size || null;
+        this.limit = +size || null;
         this.sort = sort;
     }
 }
