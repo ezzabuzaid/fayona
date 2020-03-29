@@ -8,6 +8,7 @@ function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHook
     return {
         pre: AppUtils.isFunction(options && options.pre) ? options.pre : (...args: any) => null,
         post: AppUtils.isFunction(options && options.post) ? options.post : (...args: any) => null,
+        result: AppUtils.isFunction(options && options.result) ? options.result : null,
     };
 }
 
@@ -49,12 +50,11 @@ export class CrudService<T = null> {
         }
 
         const entity = this.repo.create(payload);
-        const { pre, post } = getHooks(this.options.create);
+        const { pre, post, result } = getHooks(this.options.create);
         await pre(entity);
         await entity.save();
         await post(entity);
-
-        return new Result(false, { id: entity.id });
+        return result ? result(entity) : new Result(false, { id: entity.id });
     }
 
     public async delete(query: Partial<WithMongoID<Payload<T>>>) {
