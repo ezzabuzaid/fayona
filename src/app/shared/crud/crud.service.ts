@@ -59,7 +59,7 @@ export class CrudService<T = null> {
 
     public async delete(query: Partial<WithMongoID<Payload<T>>>) {
         const entity = await this.repo.fetchOne(query);
-        if (!entity) {
+        if (AppUtils.isNullOrUndefined(entity)) {
             return new Result(true, 'entity_not_exist');
         }
 
