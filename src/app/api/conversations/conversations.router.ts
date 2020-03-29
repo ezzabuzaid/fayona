@@ -3,9 +3,9 @@ import { CrudRouter } from '@shared/crud';
 import { Constants, tokenService, Responses } from '@core/helpers';
 import conversationsService, { ConversationsService } from './conversations.service';
 import { ConversationSchema } from './conversations.model';
-import { Response, Request } from 'express';
+import { Request } from 'express';
 import { Auth } from '@api/portal';
-import messagesService from './messages.service';
+import messagesService from '../messages/messages.service';
 import { IsMongoId, IsString } from 'class-validator';
 import { validate } from '@shared/common';
 import { cast } from '@core/utils';
@@ -29,8 +29,15 @@ export class ConversationRouter extends CrudRouter<ConversationSchema, Conversat
         super(conversationsService);
     }
 
+    @Get()
+    async getConversations(req: Request) {
+        const { id } = await tokenService.decodeToken(req.headers.authorization);
+        const result = await this.service.getConversations(id);
+        return result;
+    }
+
     @Get('user/:user')
-    async getConversationByUsersKeys(req: Request, res: Response) {
+    async getConversationByUsersKeys(req: Request) {
         const { user } = req.params;
         const { id } = await tokenService.decodeToken(req.headers.authorization);
         const result = await this.service.getConversation(user, id);
@@ -38,7 +45,7 @@ export class ConversationRouter extends CrudRouter<ConversationSchema, Conversat
     }
 
     @Get('messages/:conversation')
-    async getConversationMessages(req: Request, res: Response) {
+    async getConversationMessages(req: Request) {
         const { conversation } = req.params;
         const result = await messagesService.all({
             conversation
@@ -47,7 +54,7 @@ export class ConversationRouter extends CrudRouter<ConversationSchema, Conversat
     }
 
     @Post('/', validate(ConversationPayload))
-    async createConversation(req: Request, res: Response) {
+    async createConversation(req: Request) {
         const payload = cast<ConversationPayload>(req.body);
         const result = await conversationsService.create({
             user1: payload.user1,

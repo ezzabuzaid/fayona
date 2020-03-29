@@ -4,8 +4,8 @@ import { Types } from 'mongoose';
 
 @Entity(Constants.Schemas.Messages)
 export class MessagesSchema {
-    @Field() text: string;
-    @Field() user: string;
+    @Field({ lowercase: false }) text: string;
+    @Field() user: Types.ObjectId;
     @Field({
         required: true
     }) conversation: Types.ObjectId;

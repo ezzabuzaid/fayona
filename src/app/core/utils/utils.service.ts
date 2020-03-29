@@ -6,6 +6,27 @@ export type Type<T> = new (...args: any[]) => T;
 export type Parameter<T extends (args: any) => any> = T extends (args: infer P) => any ? P : never;
 
 export class AppUtils {
+
+    static isTruthy(value: any) {
+        return !!value;
+    }
+
+    static equals<T>(...values: T[]) {
+        return values.every((value, i, arr) => JSON.stringify(value) === JSON.stringify(arr[0]));
+    }
+
+    static notEquals<T>(...values: T[]) {
+        return !this.equals(...values);
+    }
+
+    public static notNullOrUndefined(value: any) {
+        return AppUtils.isFalsy(AppUtils.isNullOrUndefined(value));
+    }
+
+    public static inverse(value: boolean) {
+        return !value;
+    }
+
     /**
      * remove null and undefined properties from an object expect empty string
      * @param withEmptyString to indicate of the empty values should be removed
@@ -29,10 +50,6 @@ export class AppUtils {
 
     public static isFunction(value: any) {
         return value instanceof Function;
-    }
-
-    public static isTruthy(value: any) {
-        return !!value;
     }
 
     public static isFalsy(value: any) {
@@ -125,20 +142,28 @@ export class AppUtils {
         return value === undefined || value === null;
     }
 
-    public static notNullOrUndefined(value: any) {
-        return this.isTruthy(value !== undefined && value !== null);
-    }
-
-    public static hasItemWithin(object: object) {
+    /**
+     *
+     * @param object check if the list has at least an item
+     */
+    public static hasItemWithin(object: any) {
         if (Array.isArray(object)) {
-            return this.isTruthy(object.length);
+            return AppUtils.isTruthy(object.length);
         }
 
         if (new Object(object) === object) {
-            return this.isTruthy(Object.keys(object).length);
+            return AppUtils.isTruthy(Object.keys(object).length);
         }
 
-        return null;
+        return AppUtils.isFalsy(AppUtils.isEmptyString(object));
+    }
+
+    /**
+     * check if the givin value is empty
+     * supported values are string, array, pojo {}
+     */
+    static isEmpty(value: any) {
+        return AppUtils.isFalsy(AppUtils.hasItemWithin(value));
     }
 
     public static extendObject<T>(target: T, source1: Partial<T>): T {

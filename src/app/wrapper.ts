@@ -3,9 +3,11 @@ import { PortalRoutes } from '@api/portal';
 import { FeedbackRouter } from '@api/feedback';
 import { SessionRouter } from '@api/sessions';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
-import { GroupsRouter, MembersRouter } from '@api/groups';
+import { GroupsRouter } from '@api/groups';
 import { FileUploadRoutes, FoldersRoutes } from '@api/uploads';
 import { ConversationRouter } from '@api/conversations';
+import { SettingRoutes } from '@api/settings';
+import { MembersRouter } from '@api/members';
 
 export class Wrapper {
     private static list = [];
@@ -64,3 +66,4 @@ Wrapper.registerRouter(MembersRouter);
 Wrapper.registerRouter(FileUploadRoutes);
 Wrapper.registerRouter(FoldersRoutes);
 Wrapper.registerRouter(ConversationRouter);
+Wrapper.registerRouter(SettingRoutes);

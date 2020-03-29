@@ -55,5 +55,16 @@
       "node",
       "jest"
     ]
+  },
+  "typedocOptions": {
+    "mode": "modules",
+    "out": "docs",
+    "exclude": [
+      "**/*+(index|.spec|.e2e).ts",
+      "./src/test/**/*",
+      "./global.d.ts"
+    ],
+    "excludePrivate": true,
+    "excludeProtected": true
   }
 }

@@ -5,7 +5,7 @@ import usersService from '@api/users/users.service';
 import { UsersSchema } from '@api/users';
 import { Payload, WithID } from '@lib/mongoose';
 import { EmailService, fakeEmail } from '@shared/email';
-import { AppUtils } from '@core/utils';
+import { AppUtils, cast } from '@core/utils';
 import { PortalHelper } from './portal.helper';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { Auth } from './auth';
@@ -14,6 +14,7 @@ import { sessionsService } from '@api/sessions/sessions.service';
 import { IsString } from 'class-validator';
 import { translate } from '@lib/translation';
 import { scheduleJob } from 'node-schedule';
+import { validate } from '@shared/common';
 
 export class LoginPayload {
     @IsString({
@@ -23,10 +24,6 @@ export class LoginPayload {
     @IsString({
         message: translate('string_constraint', { name: 'password' })
     }) public password: string = null;
-
-    constructor(payload: LoginPayload) {
-        AppUtils.strictAssign(this, payload);
-    }
 }
 
 export class RefreshTokenDto {
@@ -53,24 +50,22 @@ export class RefreshTokenPayload {
     public token: string = null;
     @IsString()
     public refreshToken: string = null;
-
-    constructor(payload: RefreshTokenPayload) {
-        AppUtils.strictAssign(this, payload);
-    }
+    @IsString()
+    public uuid: string = null;
 }
 
 @Router(Constants.Endpoints.PORTAL)
 export class PortalRoutes {
 
-    @Post(Constants.Endpoints.LOGIN)
-    public async login(req: Request, res: Response) {
+    @Post(Constants.Endpoints.LOGIN, validate(LoginPayload))
+    public async login(req: Request) {
         // TODO: send an email to user to notify him about login attempt.
 
-        const { username, password } = new LoginPayload(req.body);
+        const { username, password } = cast<LoginPayload>(req.body);
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
 
         if (AppUtils.isFalsy(device_uuid)) {
-            throw new Responses.Unauthorized();
+            throw new Responses.BadRequest();
         }
 
         // STUB it should throw if username is falsy type or if it's not in database
@@ -84,7 +79,7 @@ export class PortalRoutes {
             const activeUserSessions = await sessionsService.getActiveUserSession(user.id);
 
             if (activeUserSessions.data.length >= 10) {
-                throw new Responses.Unauthorized('exceeded_allowed_sesison');
+                throw new Responses.BadRequest('exceeded_allowed_sesison');
             }
             // STUB it should create a session entity
             const session = await sessionsService.create({
@@ -101,7 +96,7 @@ export class PortalRoutes {
     }
 
     @Post(Constants.Endpoints.LOGOUT + '/:uuid')
-    public async logout(req: Request, res: Response) {
+    public async logout(req: Request) {
         const device_uuid = req.params.uuid;
         if (device_uuid) {
             const result = await sessionsService.deActivate({ device_uuid });
@@ -112,14 +107,10 @@ export class PortalRoutes {
         return new Responses.BadRequest('logout_wrong_device_uuid');
     }
 
-    @Post(Constants.Endpoints.REFRESH_TOKEN)
+    @Post(Constants.Endpoints.REFRESH_TOKEN, validate(RefreshTokenPayload))
     public async refreshToken(req: Request, res: Response) {
-        const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
-        if (AppUtils.isFalsy(device_uuid)) {
-            throw new Responses.Unauthorized();
-        }
+        const { uuid, token, refreshToken } = cast<RefreshTokenPayload>(req.body);
 
-        const { token, refreshToken } = new RefreshTokenPayload(req.body);
         // NOTE: if it was invalid or expired it will implicity thrown an error
         const decodedRefreshToken = await tokenService.decodeToken<IRefreshTokenClaim>(refreshToken);
 
@@ -129,17 +120,16 @@ export class PortalRoutes {
             if (error instanceof TokenExpiredError) {
 
                 const session = await sessionsService.getActiveSession({
-                    device_uuid,
+                    device_uuid: uuid,
                     user: decodedRefreshToken.id
                 });
 
                 if (AppUtils.isFalsy(session)) {
-                    throw new Responses.Unauthorized();
+                    throw new Responses.Unauthorized('not_allowed');
                 }
 
                 const user = await throwIfNotExist({ _id: decodedRefreshToken.id });
-                const response = new Responses.Ok(new RefreshTokenDto(user));
-                return res.status(response.code).json(response);
+                return new RefreshTokenDto(user);
             } else {
                 throw error;
             }

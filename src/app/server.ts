@@ -1,5 +1,5 @@
 import { Database } from '@core/database';
-import { StageLevel } from '@core/helpers';
+import { StageLevel, tokenService } from '@core/helpers';
 import { Logger, LoggerLevel, AppUtils } from '@core/utils';
 import { envirnoment } from '@environment/env';
 import http = require('http');
@@ -7,35 +7,26 @@ import { URL } from 'url';
 import { Application } from './app';
 import socketIO from 'socket.io';
 import stage from '@core/helpers/stage';
-import messagesService from '@api/conversations/messages.service';
+import messagesService from '@api/messages/messages.service';
 import { IsString, IsMongoId } from 'class-validator';
 import { validatePayload } from '@shared/common';
 
 const log = new Logger('Server init');
 
 interface IRoom {
-        recipient_id: string;
-        sender_id: string;
+        id: string;
 }
 
-class Message {
-        constructor(
-                public text: string,
-                public conversation: string,
-                public sender_id: string,
-                public recipient_id: string
-        ) { }
+interface IMessage {
+        id: string;
+        text: string;
 }
 
 class MessagePayload {
         @IsString()
         public text: string = null;
         @IsMongoId()
-        public conversation: string = null;
-        @IsMongoId()
-        public sender_id: string = null;
-        @IsMongoId()
-        public recipient_id: string = null;
+        public id: string = null;
 
         constructor(payload: MessagePayload) {
                 AppUtils.strictAssign(this, payload);
@@ -58,45 +49,41 @@ export class NodeServer extends Application {
                 envirnoment.load(StageLevel.DEV);
                 const server = new NodeServer();
                 await NodeServer.loadDatabase();
-                const sockets: { [key: string]: socketIO.Socket } = {};
+
                 // TODO: Move this out
-                socketIO(server.server)
-                        .on('connection', (socket) => {
-                                socket.on('JoinRoom', async (room: IRoom) => {
-                                        sockets[room.sender_id] = socket;
-                                });
-                                socket.on('SendMessage', async (message: Message) => {
-                                        const payload = new MessagePayload(message);
-                                        try {
-                                                await validatePayload(payload);
-                                                const createdMessage = await messagesService.create({
-                                                        conversation: payload.conversation,
-                                                        user: payload.sender_id,
-                                                        text: payload.text
-                                                });
-                                                const newMessage = await messagesService.one({
-                                                        _id: createdMessage.data.id
-                                                });
-                                                const recipientSocket = sockets[payload.recipient_id];
-                                                if (recipientSocket && recipientSocket.connected) {
-                                                        recipientSocket.emit('Message', newMessage);
-                                                } else {
-                                                        sockets[payload.recipient_id] = undefined;
-                                                }
-                                                socket.emit('Message', newMessage);
-                                        } catch (error) {
-                                                socket.emit('MessageValidationError', message);
-                                        }
-                                });
-                                socket.on('JoinGroup', (room: IRoom) => {
-                                        console.log('New Group Joiner => ', room.recipient_id);
-                                        socket.join(room.recipient_id);
-                                });
-                                socket.on('SendGroupMessage', (message: Message) => {
-                                        console.log('New Group Message from => ', message.sender_id);
-                                        socket.to(message.recipient_id).emit('Message', message);
-                                });
+                const io = socketIO(server.server);
+                io.use(async (socket, next) => {
+                        try {
+                                socket['decodedToken'] = await tokenService.decodeToken(socket.handshake.query.token);
+                        } catch (error) {
+                                next(new Error('Authentication error'));
+                        }
+                        next();
+                });
+
+                io.on('connection', (socket) => {
+                        socket.on('Join', async (room: IRoom) => {
+                                log.debug('New Joiner => ', room.id);
+                                socket.join(room.id);
                         });
+                        socket.on('SendMessage', async (message: IMessage) => {
+                                const { id } = socket['decodedToken'];
+                                log.debug('New Message from => ', message);
+                                const payload = new MessagePayload(message);
+                                try {
+                                        await validatePayload(payload);
+                                        const createdMessage = await messagesService.create({
+                                                conversation: payload.id,
+                                                user: id,
+                                                text: payload.text
+                                        });
+                                        log.debug('New Message from => ', createdMessage);
+                                        io.sockets.in(message.id).emit('Message', createdMessage);
+                                } catch (error) {
+                                        socket.emit('MessageValidationError', message);
+                                }
+                        });
+                });
 
                 return server;
         }
@@ -112,10 +99,7 @@ export class NodeServer extends Application {
          * @returns {Promise<httpServer>}
          */
         private populateServer(): void {
-                //     key: fs.readFileSync('./key.pem'),
-                //     cert: fs.readFileSync('./cert.pem'),
-                //     passphrase: 'YOUR PASSPHRASE HERE'
-                if (AppUtils.isFalsy(this.server)) {
+                if (AppUtils.isNullOrUndefined(this.server)) {
                         this.server = http.createServer(this.application);
                 }
                 this.startServer();

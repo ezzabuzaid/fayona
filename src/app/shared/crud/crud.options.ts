@@ -3,8 +3,9 @@ import { DocumentQuery } from 'mongoose';
 import { Type } from '@core/utils';
 
 export interface ICrudHooks<T> {
-    pre?: (doc: Document<T>) => any;
-    post?: (doc: Document<T>) => any;
+    pre?: (document: Document<T>) => any;
+    post?: (document: Document<T>) => any;
+    result?: (document: Document<T>) => any;
 }
 
 export interface ICrudOperation<T = any> {
