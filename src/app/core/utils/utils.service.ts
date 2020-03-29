@@ -142,16 +142,28 @@ export class AppUtils {
         return value === undefined || value === null;
     }
 
-    public static hasItemWithin(object: object) {
+    /**
+     *
+     * @param object check if the list has at least an item
+     */
+    public static hasItemWithin(object: any) {
         if (Array.isArray(object)) {
-            return this.isTruthy(object.length);
+            return AppUtils.isTruthy(object.length);
         }
 
         if (new Object(object) === object) {
-            return this.isTruthy(Object.keys(object).length);
+            return AppUtils.isTruthy(Object.keys(object).length);
         }
 
-        return null;
+        return AppUtils.isFalsy(AppUtils.isEmptyString(object));
+    }
+
+    /**
+     * check if the givin value is empty
+     * supported values are string, array, pojo {}
+     */
+    static isEmpty(value: any) {
+        return AppUtils.isFalsy(AppUtils.hasItemWithin(value));
     }
 
     public static extendObject<T>(target: T, source1: Partial<T>): T {
