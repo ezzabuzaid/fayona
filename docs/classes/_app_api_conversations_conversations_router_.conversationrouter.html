@@ -104,6 +104,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_app_api_conversations_conversations_router_.conversationrouter.html#fetchentity" class="tsd-kind-icon">fetch<wbr>Entity</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_app_api_conversations_conversations_router_.conversationrouter.html#getconversationbyuserskeys" class="tsd-kind-icon">get<wbr>Conversation<wbr>ByUsers<wbr>Keys</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_app_api_conversations_conversations_router_.conversationrouter.html#getconversationmessages" class="tsd-kind-icon">get<wbr>Conversation<wbr>Messages</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_app_api_conversations_conversations_router_.conversationrouter.html#getconversations" class="tsd-kind-icon">get<wbr>Conversations</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_app_api_conversations_conversations_router_.conversationrouter.html#set" class="tsd-kind-icon">set</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_app_api_conversations_conversations_router_.conversationrouter.html#update" class="tsd-kind-icon">update</a></li>
 							</ul>
@@ -124,7 +125,7 @@
 							<aside class="tsd-sources">
 								<p>Overrides <a href="_app_shared_crud_crud_router_.crudrouter.html">CrudRouter</a>.<a href="_app_shared_crud_crud_router_.crudrouter.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/51f286b/src/app/api/conversations/conversations.router.ts#L27">src/app/api/conversations/conversations.router.ts:27</a></li>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/api/conversations/conversations.router.ts#L27">src/app/api/conversations/conversations.router.ts:27</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="_app_api_conversations_conversations_router_.conversationrouter.html" class="tsd-signature-type">ConversationRouter</a></h4>
@@ -145,7 +146,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_app_shared_crud_crud_router_.crudrouter.html">CrudRouter</a>.<a href="_app_shared_crud_crud_router_.crudrouter.html#bulkdelete">bulkDelete</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/51f286b/src/app/shared/crud/crud.router.ts#L109">src/app/shared/crud/crud.router.ts:109</a></li>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/shared/crud/crud.router.ts#L109">src/app/shared/crud/crud.router.ts:109</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -169,7 +170,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_app_shared_crud_crud_router_.crudrouter.html">CrudRouter</a>.<a href="_app_shared_crud_crud_router_.crudrouter.html#bulkupdate">bulkUpdate</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/51f286b/src/app/shared/crud/crud.router.ts#L125">src/app/shared/crud/crud.router.ts:125</a></li>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/shared/crud/crud.router.ts#L125">src/app/shared/crud/crud.router.ts:125</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -193,7 +194,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_app_shared_crud_crud_router_.crudrouter.html">CrudRouter</a>.<a href="_app_shared_crud_crud_router_.crudrouter.html#create">create</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/51f286b/src/app/shared/crud/crud.router.ts#L22">src/app/shared/crud/crud.router.ts:22</a></li>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/shared/crud/crud.router.ts#L22">src/app/shared/crud/crud.router.ts:22</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -210,22 +211,19 @@
 					<a name="createconversation" class="tsd-anchor"></a>
 					<h3>create<wbr>Conversation</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">create<wbr>Conversation<span class="tsd-signature-symbol">(</span>req<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Request</span>, res<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Response</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_app_core_helpers_response_.responses.ok.html" class="tsd-signature-type">Ok</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Conversation<span class="tsd-signature-symbol">(</span>req<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Request</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_app_core_helpers_response_.responses.ok.html" class="tsd-signature-type">Ok</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/51f286b/src/app/api/conversations/conversations.router.ts#L50">src/app/api/conversations/conversations.router.ts:50</a></li>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/api/conversations/conversations.router.ts#L57">src/app/api/conversations/conversations.router.ts:57</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>req: <span class="tsd-signature-type">Request</span></h5>
-								</li>
-								<li>
-									<h5>res: <span class="tsd-signature-type">Response</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_app_core_helpers_response_.responses.ok.html" class="tsd-signature-type">Ok</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -236,14 +234,14 @@
 					<a name="delete" class="tsd-anchor"></a>
 					<h3>delete</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
-						<li class="tsd-signature tsd-kind-icon">delete<span class="tsd-signature-symbol">(</span>req<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Request</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="_app_core_helpers_response_.responses.badrequest.html" class="tsd-signature-type">BadRequest</a><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">delete<span class="tsd-signature-symbol">(</span>req<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Request</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_app_core_helpers_response_.responses.badrequest.html" class="tsd-signature-type">BadRequest</a><span class="tsd-signature-symbol"> | </span><a href="_app_core_helpers_response_.responses.ok.html" class="tsd-signature-type">Ok</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_app_shared_crud_crud_router_.crudrouter.html">CrudRouter</a>.<a href="_app_shared_crud_crud_router_.crudrouter.html#delete">delete</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/51f286b/src/app/shared/crud/crud.router.ts#L66">src/app/shared/crud/crud.router.ts:66</a></li>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/shared/crud/crud.router.ts#L66">src/app/shared/crud/crud.router.ts:66</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -252,7 +250,7 @@
 									<h5>req: <span class="tsd-signature-type">Request</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><a href="_app_core_helpers_response_.responses.badrequest.html" class="tsd-signature-type">BadRequest</a><span class="tsd-signature-symbol">&gt;</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_app_core_helpers_response_.responses.badrequest.html" class="tsd-signature-type">BadRequest</a><span class="tsd-signature-symbol"> | </span><a href="_app_core_helpers_response_.responses.ok.html" class="tsd-signature-type">Ok</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -267,7 +265,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_app_shared_crud_crud_router_.crudrouter.html">CrudRouter</a>.<a href="_app_shared_crud_crud_router_.crudrouter.html#fetchentities">fetchEntities</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/51f286b/src/app/shared/crud/crud.router.ts#L98">src/app/shared/crud/crud.router.ts:98</a></li>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/shared/crud/crud.router.ts#L98">src/app/shared/crud/crud.router.ts:98</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -291,7 +289,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_app_shared_crud_crud_router_.crudrouter.html">CrudRouter</a>.<a href="_app_shared_crud_crud_router_.crudrouter.html#fetchentity">fetchEntity</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/51f286b/src/app/shared/crud/crud.router.ts#L83">src/app/shared/crud/crud.router.ts:83</a></li>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/shared/crud/crud.router.ts#L83">src/app/shared/crud/crud.router.ts:83</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -308,22 +306,19 @@
 					<a name="getconversationbyuserskeys" class="tsd-anchor"></a>
 					<h3>get<wbr>Conversation<wbr>ByUsers<wbr>Keys</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Conversation<wbr>ByUsers<wbr>Keys<span class="tsd-signature-symbol">(</span>req<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Request</span>, res<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Response</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_app_core_helpers_response_.responses.ok.html" class="tsd-signature-type">Ok</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Document</span><span class="tsd-signature-symbol"> &amp; </span><a href="_app_api_conversations_conversations_model_.conversationschema.html" class="tsd-signature-type">ConversationSchema</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Conversation<wbr>ByUsers<wbr>Keys<span class="tsd-signature-symbol">(</span>req<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Request</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_app_core_helpers_response_.responses.ok.html" class="tsd-signature-type">Ok</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Document</span><span class="tsd-signature-symbol"> &amp; </span><a href="_app_api_conversations_conversations_model_.conversationschema.html" class="tsd-signature-type">ConversationSchema</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/51f286b/src/app/api/conversations/conversations.router.ts#L33">src/app/api/conversations/conversations.router.ts:33</a></li>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/api/conversations/conversations.router.ts#L40">src/app/api/conversations/conversations.router.ts:40</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>req: <span class="tsd-signature-type">Request</span></h5>
-								</li>
-								<li>
-									<h5>res: <span class="tsd-signature-type">Response</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_app_core_helpers_response_.responses.ok.html" class="tsd-signature-type">Ok</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Document</span><span class="tsd-signature-symbol"> &amp; </span><a href="_app_api_conversations_conversations_model_.conversationschema.html" class="tsd-signature-type">ConversationSchema</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -334,13 +329,13 @@
 					<a name="getconversationmessages" class="tsd-anchor"></a>
 					<h3>get<wbr>Conversation<wbr>Messages</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Conversation<wbr>Messages<span class="tsd-signature-symbol">(</span>req<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Request</span>, res<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Response</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_app_core_helpers_response_.responses.ok.html" class="tsd-signature-type">Ok</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>length<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>list<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">Document</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>pages<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>totalCount<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Conversation<wbr>Messages<span class="tsd-signature-symbol">(</span>req<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Request</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_app_core_helpers_response_.responses.ok.html" class="tsd-signature-type">Ok</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>length<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>list<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">Document</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>pages<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>totalCount<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/51f286b/src/app/api/conversations/conversations.router.ts#L41">src/app/api/conversations/conversations.router.ts:41</a></li>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/api/conversations/conversations.router.ts#L48">src/app/api/conversations/conversations.router.ts:48</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -348,11 +343,31 @@
 								<li>
 									<h5>req: <span class="tsd-signature-type">Request</span></h5>
 								</li>
-								<li>
-									<h5>res: <span class="tsd-signature-type">Response</span></h5>
-								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="_app_core_helpers_response_.responses.ok.html" class="tsd-signature-type">Ok</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>length<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>list<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">Document</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>pages<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>totalCount<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getconversations" class="tsd-anchor"></a>
+					<h3>get<wbr>Conversations</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Conversations<span class="tsd-signature-symbol">(</span>req<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Request</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">Document</span><span class="tsd-signature-symbol"> &amp; </span><a href="_app_api_conversations_conversations_model_.conversationschema.html" class="tsd-signature-type">ConversationSchema</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/api/conversations/conversations.router.ts#L33">src/app/api/conversations/conversations.router.ts:33</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>req: <span class="tsd-signature-type">Request</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">Document</span><span class="tsd-signature-symbol"> &amp; </span><a href="_app_api_conversations_conversations_model_.conversationschema.html" class="tsd-signature-type">ConversationSchema</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -367,7 +382,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_app_shared_crud_crud_router_.crudrouter.html">CrudRouter</a>.<a href="_app_shared_crud_crud_router_.crudrouter.html#set">set</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/51f286b/src/app/shared/crud/crud.router.ts#L49">src/app/shared/crud/crud.router.ts:49</a></li>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/shared/crud/crud.router.ts#L49">src/app/shared/crud/crud.router.ts:49</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -391,7 +406,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from <a href="_app_shared_crud_crud_router_.crudrouter.html">CrudRouter</a>.<a href="_app_shared_crud_crud_router_.crudrouter.html#update">update</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/51f286b/src/app/shared/crud/crud.router.ts#L32">src/app/shared/crud/crud.router.ts:32</a></li>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/shared/crud/crud.router.ts#L32">src/app/shared/crud/crud.router.ts:32</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -456,6 +471,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_app_api_conversations_conversations_router_.conversationrouter.html#getconversationmessages" class="tsd-kind-icon">get<wbr>Conversation<wbr>Messages</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_app_api_conversations_conversations_router_.conversationrouter.html#getconversations" class="tsd-kind-icon">get<wbr>Conversations</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="_app_api_conversations_conversations_router_.conversationrouter.html#set" class="tsd-kind-icon">set</a>
