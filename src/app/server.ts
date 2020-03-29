@@ -14,28 +14,22 @@ import { validatePayload } from '@shared/common';
 const log = new Logger('Server init');
 
 interface IRoom {
-        recipient_id: string;
-        sender_id: string;
+        id: string;
 }
 
-class Message {
-        constructor(
-                public text: string,
-                public conversation: string,
-                public sender_id: string,
-                public recipient_id: string
-        ) { }
+interface IMessage {
+        id: string;
+        text: string;
+        user: string;
 }
 
 class MessagePayload {
         @IsString()
         public text: string = null;
         @IsMongoId()
-        public conversation: string = null;
+        public id: string = null;
         @IsMongoId()
-        public sender_id: string = null;
-        @IsMongoId()
-        public recipient_id: string = null;
+        public user: string = null;
 
         constructor(payload: MessagePayload) {
                 AppUtils.strictAssign(this, payload);
@@ -60,41 +54,26 @@ export class NodeServer extends Application {
                 await NodeServer.loadDatabase();
                 const sockets: { [key: string]: socketIO.Socket } = {};
                 // TODO: Move this out
-                socketIO(server.server)
+                const io = socketIO(server.server)
                         .on('connection', (socket) => {
-                                socket.on('JoinRoom', async (room: IRoom) => {
-                                        sockets[room.sender_id] = socket;
+                                socket.on('Join', async (room: IRoom) => {
+                                        log.debug('New Joiner => ', room.id);
+                                        socket.join(room.id);
                                 });
-                                socket.on('SendMessage', async (message: Message) => {
+                                socket.on('SendMessage', async (message: IMessage) => {
                                         const payload = new MessagePayload(message);
                                         try {
                                                 await validatePayload(payload);
                                                 const createdMessage = await messagesService.create({
-                                                        conversation: payload.conversation,
-                                                        user: payload.sender_id,
+                                                        conversation: payload.id,
+                                                        user: payload.user,
                                                         text: payload.text
                                                 });
-                                                const newMessage = await messagesService.one({
-                                                        _id: createdMessage.data.id
-                                                });
-                                                const recipientSocket = sockets[payload.recipient_id];
-                                                if (recipientSocket && recipientSocket.connected) {
-                                                        recipientSocket.emit('Message', newMessage);
-                                                } else {
-                                                        sockets[payload.recipient_id] = undefined;
-                                                }
-                                                socket.emit('Message', newMessage);
+                                                log.debug('New Message from => ', createdMessage);
+                                                io.to(message.id).emit('Message', createdMessage);
                                         } catch (error) {
                                                 socket.emit('MessageValidationError', message);
                                         }
-                                });
-                                socket.on('JoinGroup', (room: IRoom) => {
-                                        console.log('New Group Joiner => ', room.recipient_id);
-                                        socket.join(room.recipient_id);
-                                });
-                                socket.on('SendGroupMessage', (message: Message) => {
-                                        console.log('New Group Message from => ', message.sender_id);
-                                        socket.to(message.recipient_id).emit('Message', message);
                                 });
                         });
 
@@ -112,10 +91,7 @@ export class NodeServer extends Application {
          * @returns {Promise<httpServer>}
          */
         private populateServer(): void {
-                //     key: fs.readFileSync('./key.pem'),
-                //     cert: fs.readFileSync('./cert.pem'),
-                //     passphrase: 'YOUR PASSPHRASE HERE'
-                if (AppUtils.isFalsy(this.server)) {
+                if (AppUtils.isNullOrUndefined(this.server)) {
                         this.server = http.createServer(this.application);
                 }
                 this.startServer();
