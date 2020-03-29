@@ -65,7 +65,7 @@ export class PortalRoutes {
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
 
         if (AppUtils.isFalsy(device_uuid)) {
-            throw new Responses.Unauthorized();
+            throw new Responses.BadRequest();
         }
 
         // STUB it should throw if username is falsy type or if it's not in database
@@ -79,7 +79,7 @@ export class PortalRoutes {
             const activeUserSessions = await sessionsService.getActiveUserSession(user.id);
 
             if (activeUserSessions.data.length >= 10) {
-                throw new Responses.Unauthorized('exceeded_allowed_sesison');
+                throw new Responses.BadRequest('exceeded_allowed_sesison');
             }
             // STUB it should create a session entity
             const session = await sessionsService.create({
