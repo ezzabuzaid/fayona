@@ -25,6 +25,9 @@ export class ConversationsService extends CrudService<ConversationSchema> {
                             user: conversation.user1 as any
                         });
                         conversation.folder = folder.data.id;
+                    },
+                    result(document) {
+                        return document;
                     }
                 }
             }
@@ -43,6 +46,21 @@ export class ConversationsService extends CrudService<ConversationSchema> {
                     user1: user2
                 }
             ])
+            .exec();
+    }
+
+    getConversations(user: string) {
+        return this.repo.fetchAll({})
+            .or([
+                {
+                    user1: user
+                },
+                {
+                    user2: user
+                }
+            ])
+            .populate('user1')
+            .populate('user2')
             .exec();
     }
 
