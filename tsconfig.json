@@ -54,7 +54,7 @@
     "types": [
       "node",
       "jest"
-    ],
+    ]
   },
   "typedocOptions": {
     "mode": "modules",
@@ -64,7 +64,7 @@
       "./src/test/**/*",
       "./global.d.ts"
     ],
-    "excludePrivate":true,
-    "excludeProtected":true
+    "excludePrivate": true,
+    "excludeProtected": true
   }
 }
