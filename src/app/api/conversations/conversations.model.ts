@@ -4,8 +4,6 @@ import { Types } from 'mongoose';
 
 @Entity(Constants.Schemas.Conversation)
 export class ConversationSchema {
-    // @Field() members: GroupMemberSchema[] = [];
-    // @Field() messages: MessageSchema[];
     @Field({
         required: true,
         ref: Constants.Schemas.USERS
@@ -16,7 +14,6 @@ export class ConversationSchema {
     }) user2: Types.ObjectId;
     @Field() folder?: string = null;
 }
-// participant
 export default BaseModel(ConversationSchema);
 
 /**
@@ -31,7 +28,7 @@ export default BaseModel(ConversationSchema);
 /**
  * 1. list of conversation will be shown, conversation simply two or more participant talking to each other at the same time
  * 2. if the user opened a coneversation it will open a connection to socket
- * 3. when the user select participant from search an server request should be issue in order to get the old messages
+ * 3. when the user select participant from search a server request should be issue in order to get the old messages
  * if there was no message then a new conversation will be created only after the first message
  * 4.
  */

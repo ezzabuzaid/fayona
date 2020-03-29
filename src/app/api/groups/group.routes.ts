@@ -1,14 +1,15 @@
-import { Router, Post, Get, Intercept } from '@lib/methods';
+import { Router, Post, Intercept } from '@lib/methods';
 import { Constants, tokenService, Responses } from '@core/helpers';
 import { CrudRouter } from '@shared/crud';
-import { GroupsSchema, GroupMemberSchema } from './group.model';
-import { groupsService, groupMemebrsService } from './group.service';
+import { GroupsSchema } from './group.model';
+import { groupsService, GroupService } from './group.service';
 import { Request, Response, NextFunction, } from 'express';
 import { Auth } from '@api/portal';
 import { ArrayNotEmpty, IsString } from 'class-validator';
 import { cast } from '@core/utils';
 import { validate } from '@shared/common';
-import messagesService from '@api/conversations/messages.service';
+import messagesService from '@api/messages/messages.service';
+import membersService from '@api/members/members.service';
 
 class GroupPayload {
     @ArrayNotEmpty({
@@ -20,16 +21,16 @@ class GroupPayload {
 @Router(Constants.Endpoints.GROUPS, {
     middleware: [Auth.isAuthenticated]
 })
-export class GroupsRouter extends CrudRouter<GroupsSchema> {
+export class GroupsRouter extends CrudRouter<GroupsSchema, GroupService> {
     constructor() {
         super(groupsService);
     }
 
     @Intercept()
     public async interceptRequests(req: Request, res: Response, next: NextFunction) {
-        console.log('originalUrl => ', req.originalUrl);
-        console.log('url => ', req.url);
-        console.log('baseUrl => ', req.baseUrl);
+        // console.log('originalUrl => ', req.originalUrl);
+        // console.log('url => ', req.url);
+        // console.log('baseUrl => ', req.baseUrl);
         next();
     }
 
@@ -50,7 +51,7 @@ export class GroupsRouter extends CrudRouter<GroupsSchema> {
             conversation: group.data.id
         });
 
-        await groupMemebrsService.create({
+        await membersService.create({
             group: group.data.id,
             // TODO: find a way to pass the token to service so you don't need this method
             user: decodedToken.id,
@@ -59,7 +60,7 @@ export class GroupsRouter extends CrudRouter<GroupsSchema> {
 
         // FIXME this will do several round trip to database server
         for (const member_id of members) {
-            await groupMemebrsService.create({
+            await membersService.create({
                 group: group.data.id,
                 user: member_id,
                 isAdmin: false
@@ -68,19 +69,7 @@ export class GroupsRouter extends CrudRouter<GroupsSchema> {
         return new Responses.Created(group.data);
     }
 
-}
-
-@Router(Constants.Endpoints.MEMBERS)
-export class MembersRouter extends CrudRouter<GroupMemberSchema> {
-    constructor() {
-        super(groupMemebrsService);
-    }
-
-    @Get('/groups/:group_id', Auth.isAuthenticated)
-    public async getMembersByGroupId(req: Request, res: Response) {
-        const { group_id } = req.params;
-        const result = await this.service.all({ group: group_id }, { projection: { group: 0 } });
-        return new Responses.Ok(result.data);
+    groupByMemebers() {
     }
 
 }
