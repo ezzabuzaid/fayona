@@ -5,14 +5,16 @@ import { GroupsSchema, GroupMemberSchema } from './group.model';
 import { groupsService, groupMemebrsService } from './group.service';
 import { Request, Response, NextFunction, } from 'express';
 import { Auth } from '@api/portal';
-import { AppUtils } from '@core/utils';
-import { IsArray, IsString } from 'class-validator';
+import { ArrayNotEmpty, IsString } from 'class-validator';
+import { cast } from '@core/utils';
+import { validate } from '@shared/common';
+import messagesService from '@api/conversations/messages.service';
 
 class GroupPayload {
-    @IsArray() public members: string[] = null;
-    constructor(payload: GroupPayload) {
-        AppUtils.strictAssign(this, payload);
-    }
+    @ArrayNotEmpty({
+        message: 'a group should consist of more than one member'
+    }) public members: string[] = null;
+    @IsString() message: string = null;
 }
 
 @Router(Constants.Endpoints.GROUPS, {
@@ -31,22 +33,26 @@ export class GroupsRouter extends CrudRouter<GroupsSchema> {
         next();
     }
 
-    @Post('/')
+    @Post('/', validate(GroupPayload))
     public async create(req: Request) {
         // TODO: create member and group should be within transaction
-        const { members } = new GroupPayload(req.body);
+        const { members, message } = cast<GroupPayload>(req.body);
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        if (AppUtils.isFalsy(AppUtils.hasItemWithin(members))) {
-            throw new Responses.BadRequest('a group should consist of more than one member');
-        }
 
         const group = await this.service.create({});
         if (group.hasError) {
             throw new Responses.BadRequest(group.data);
         }
 
+        await messagesService.create({
+            text: message,
+            user: decodedToken.id,
+            conversation: group.data.id
+        });
+
         await groupMemebrsService.create({
             group: group.data.id,
+            // TODO: find a way to pass the token to service so you don't need this method
             user: decodedToken.id,
             isAdmin: true
         });
