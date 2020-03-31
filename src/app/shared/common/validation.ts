@@ -21,7 +21,7 @@ export async function validatePayload<T>(payload: T) {
 
 export abstract class PayloadValidator { }
 
-export function validate<T extends PayloadValidator>(validator: Type<T>, type: 'body' | 'query' | 'params' | 'headers' = 'body') {
+export function validate<T extends PayloadValidator>(validator: Type<T>, type: 'body' | 'query' | 'params' | 'headers' | 'queryPolluted' = 'body') {
     return async (req: Request, res: Response, next: NextFunction) => {
         const validatee = new validator();
         AppUtils.strictAssign(validatee, req[type]);
