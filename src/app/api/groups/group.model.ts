@@ -13,7 +13,7 @@ import { Constants } from '@core/helpers';
 export class GroupsSchema {
     @Field() folder?: string = null;
     @Field({ pure: true }) public title?: string = '';
-    @Field({ pure: true }) public logo?: string = null;
+    @Field({ pure: true }) public avatar?: string = null;
 }
 
 export const groupModel = BaseModel(GroupsSchema);
