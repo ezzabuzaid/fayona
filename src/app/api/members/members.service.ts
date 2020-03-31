@@ -10,51 +10,30 @@ export class GroupMembersService extends CrudService<GroupMemberSchema> {
                 }
             },
         });
-        // this.getGroup().then((x) => console.log('Count', x));
     }
 
-    getGroup() {
-        const ids = [
-            '5e7931ea2dd4a528921dab78',
-            '5e7bdd0392a3680b5755a39a'
-        ];
+    getGroup(ids: string[]) {
+        return this.repo.model.aggregate([
+            {
+                $group: {
+                    _id: '$group',
+                    members: {
+                        $push: {
+                            $toString: '$user',
+                        }
+                    },
 
-        return this.repo.model
-            .find()
-            // .count({
-            //     user:
-            // })
-            .or(ids.map((id) => ({ user: id })))
-            // .aggregate([
-            //     {
-            //         $group: ""
-            //     }
-            // ])
-            .exec();
+                },
+            }])
+            .exec()
+            .then((groups) => {
+                return groups.find((group) => {
+                    // TODO: check if there's a way to this check using mongo aggregate
+                    const sameMembers = group.members.every((element) => ids.includes(element));
+                    return sameMembers ? group : null;
+                });
+            });
     }
 }
 
 export default new GroupMembersService();
-
-const x = [
-    {
-        name: 'test',
-        g: 'group_1'
-    },
-    {
-        name: 'test',
-        g: 'group_w'
-    },
-    {
-        name: 'admin',
-        g: 'group_1'
-    },
-    {
-        name: 'test',
-        g: 'group_3'
-    },
-    {
-        name: 'admin',
-        g: 'group_3'
-    }
-];
