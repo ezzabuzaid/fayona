@@ -1,9 +1,9 @@
-import { Router, Post, Intercept } from '@lib/methods';
+import { Router, Post, Intercept, Get } from '@lib/methods';
 import { Constants, tokenService, Responses } from '@core/helpers';
 import { CrudRouter } from '@shared/crud';
 import { GroupsSchema } from './group.model';
 import { groupsService, GroupService } from './group.service';
-import { Request, Response, NextFunction, } from 'express';
+import { Request } from 'express';
 import { Auth } from '@api/portal';
 import { ArrayNotEmpty, IsString } from 'class-validator';
 import { cast } from '@core/utils';
@@ -18,6 +18,12 @@ class GroupPayload {
     @IsString() message: string = null;
 }
 
+class SearchForGroupByMemberValidator {
+    @ArrayNotEmpty({
+        message: 'a group should consist of more than one member'
+    }) public members: string[] = null;
+}
+
 @Router(Constants.Endpoints.GROUPS, {
     middleware: [Auth.isAuthenticated]
 })
@@ -26,12 +32,13 @@ export class GroupsRouter extends CrudRouter<GroupsSchema, GroupService> {
         super(groupsService);
     }
 
-    @Intercept()
-    public async interceptRequests(req: Request, res: Response, next: NextFunction) {
-        // console.log('originalUrl => ', req.originalUrl);
-        // console.log('url => ', req.url);
-        // console.log('baseUrl => ', req.baseUrl);
-        next();
+    @Get('members', validate(SearchForGroupByMemberValidator, 'queryPolluted'))
+    async getGroupByMemebers(req: Request) {
+        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
+        const { members } = cast<SearchForGroupByMemberValidator>(req['queryPolluted']);
+        members.push(decodedToken.id);
+        const group = await membersService.getGroup(members);
+        return new Responses.Ok(group);
     }
 
     @Post('/', validate(GroupPayload))
@@ -67,9 +74,6 @@ export class GroupsRouter extends CrudRouter<GroupsSchema, GroupService> {
             });
         }
         return new Responses.Created(group.data);
-    }
-
-    groupByMemebers() {
     }
 
 }
