@@ -16,7 +16,8 @@ export class GroupService extends CrudService<GroupsSchema> {
                         user: group.id
                     });
                     group.folder = folder.data.id;
-                }
+                },
+                result: (group) => group
             }
         });
     }

@@ -21,7 +21,7 @@ export class SettingRoutes {
     }
 
     @Get('/:name')
-    async  getSetting(req: Request) {
+    async getSetting(req: Request) {
         const { name } = req.params;
         const document = await settingsModel.findOne();
         return document.settings[name];
