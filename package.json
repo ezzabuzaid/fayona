@@ -6,7 +6,7 @@
     "dev": "ts-node -r tsconfig-paths/register ./src/main.ts",
     "watch:dev": "clear && nodemon -e ts -w ./src -x npm run dev",
     "watch:prod": "node -r ./tsconfig-paths-bootstrap.js ./dist/main.js",
-    "start": "npm run watch:prod",
+    "start": "npm run watch:dev",
     "lint": "tslint -c tslint.json 'src/**/*.ts' --fix",
     "build:prod": "node build --env=production",
     "build:dev": "node build --env=development",
