@@ -3,11 +3,11 @@ import { PortalRoutes } from '@api/portal';
 import { FeedbackRouter } from '@api/feedback';
 import { SessionRouter } from '@api/sessions';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
-import { GroupsRouter } from '@api/groups';
+import { GroupsRouter } from '@api/chat/groups';
 import { FileUploadRoutes, FoldersRoutes } from '@api/uploads';
-import { ConversationRouter } from '@api/conversations';
+import { ConversationRouter } from '@api/chat/conversations';
 import { SettingRoutes } from '@api/settings';
-import { MembersRouter } from '@api/members';
+import { MembersRouter } from '@api/chat/members';
 
 export class Wrapper {
     private static list = [];

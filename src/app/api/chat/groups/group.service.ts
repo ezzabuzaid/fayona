@@ -18,6 +18,15 @@ export class GroupService extends CrudService<GroupsSchema> {
                     group.folder = folder.data.id;
                 },
                 result: (group) => group
+            },
+            all: {
+                post(groups) {
+                    groups.map((group) => {
+                        if (group.single) {
+                            group.title = '';
+                        }
+                    });
+                }
             }
         });
     }

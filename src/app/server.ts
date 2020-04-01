@@ -7,7 +7,7 @@ import { URL } from 'url';
 import { Application } from './app';
 import socketIO from 'socket.io';
 import stage from '@core/helpers/stage';
-import messagesService from '@api/messages/messages.service';
+import messagesService from '@api/chat/messages/messages.service';
 import { IsString, IsMongoId } from 'class-validator';
 import { validatePayload } from '@shared/common';
 
