@@ -1,9 +1,9 @@
-import { Router, Post, Intercept, Get } from '@lib/methods';
+import { Router, Post, Get } from '@lib/methods';
 import { Constants, tokenService, Responses } from '@core/helpers';
 import { CrudRouter } from '@shared/crud';
 import { GroupsSchema } from './group.model';
 import { groupsService, GroupService } from './group.service';
-import { Request, response } from 'express';
+import { Request } from 'express';
 import { Auth } from '@api/portal';
 import { ArrayNotEmpty, IsString } from 'class-validator';
 import { cast } from '@core/utils';
@@ -16,6 +16,7 @@ class GroupPayload {
         message: 'a group should consist of more than one member'
     }) public members: string[] = null;
     @IsString() message: string = null;
+    name: string = null;
 }
 
 class SearchForGroupByMemberValidator {
@@ -41,20 +42,15 @@ export class GroupsRouter extends CrudRouter<GroupsSchema, GroupService> {
         return new Responses.Ok(group);
     }
 
-    // @Get()
-    // public getGroups() {
-    //     const groups = this.service.all({});
-    //     return new Responses.Ok();
-    // }
-
     @Post('/', validate(GroupPayload))
     public async create(req: Request) {
         // TODO: create member and group should be within transaction
-        const { members, message } = cast<GroupPayload>(req.body);
+        const { members, message, name } = cast<GroupPayload>(req.body);
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
 
         const group = await this.service.create({
-            single: members.length > 1
+            single: members.length > 1,
+            name
         });
         if (group.hasError) {
             throw new Responses.BadRequest(group.data);

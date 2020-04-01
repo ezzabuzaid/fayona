@@ -12,7 +12,7 @@ import { Constants } from '@core/helpers';
 @Entity(Constants.Schemas.GROUPS)
 export class GroupsSchema {
     @Field() folder?: string = null;
-    @Field({ pure: true }) public title?: string = null;
+    @Field({ pure: true }) public name?: string = null;
     @Field({ pure: true }) public avatar?: string = null;
     @Field() single = true;
 }
