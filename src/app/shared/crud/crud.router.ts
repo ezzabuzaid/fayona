@@ -42,7 +42,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
             return new Responses.BadRequest(result.data);
         }
 
-        return result.data;
+        return new Responses.Ok(result.data);
     }
 
     @Put(':id', Auth.isAuthenticated)
