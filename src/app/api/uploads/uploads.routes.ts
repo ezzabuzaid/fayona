@@ -108,4 +108,28 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
             }
         }
     }
+
+    @Get('tags')
+    getTags() {
+        const tags = [
+            new Tag('white'),
+            new Tag('blue'),
+            new Tag('grey'),
+            new Tag('purple'),
+            new Tag('red'),
+            new Tag('green'),
+            new Tag('yellow'),
+            new Tag('pink'),
+            new Tag('white'),
+        ];
+        return new Responses.Ok(tags);
+    }
+}
+
+class Tag {
+    static count = -1;
+    id = ++Tag.count;
+    constructor(
+        public color: string = null,
+    ) { }
 }
