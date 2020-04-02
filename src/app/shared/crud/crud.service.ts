@@ -1,7 +1,7 @@
 import { ICrudOptions, ICrudHooks } from './crud.options';
 import { Payload, WithID, WithMongoID, Document, Projection, ColumnSort } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
-import { Repo } from './crud.repo';
+import { Repo, IReadAllOptions } from './crud.repo';
 import { translate } from '@lib/translation';
 
 function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHooks<T>]: any } {
@@ -185,16 +185,6 @@ export class CrudService<T = null> {
 }
 
 class CrudQuery { }
-interface IReadOneOptions<T> {
-    projection: Projection<T>;
-    lean: boolean;
-}
-
-interface IReadAllOptions<T> extends IReadOneOptions<T> {
-    sort: ColumnSort<T>;
-    page: number;
-    size: number;
-}
 
 class ReadAllOptions<T> {
     public skip = 0;

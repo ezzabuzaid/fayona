@@ -1,6 +1,6 @@
 import assert from 'assert';
-import { Model } from 'mongoose';
-import { Document, Payload, Projection } from '@lib/mongoose';
+import { Model, Types } from 'mongoose';
+import { Document, Payload, Projection, WithMongoID, ColumnSort } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 
 // TODO: Before any query or write check the body to meet the
@@ -12,11 +12,15 @@ export class Repo<T> {
         assert(AppUtils.notNullOrUndefined(model));
     }
 
-    public fetchOne(query: Partial<Payload<T>>, projection: Projection<T> = {}, options = {}) {
+    public fetchOne(query: Partial<WithMongoID<Payload<T>>>, projection: Projection<T> = {}, options = {}) {
         return this.model.findOne(query, projection, options);
     }
 
-    public fetchAll(query: Partial<Payload<T>> = {}, projection: Projection<T> = {}, options = {}) {
+    public fetchAll(
+        query: Partial<WithMongoID<Payload<T>>> = {},
+        projection: Projection<T> = {},
+        options: Partial<IReadAllOptions<T>> = {}
+    ) {
         return this.model.find(query, projection, options);
     }
 
@@ -27,4 +31,19 @@ export class Repo<T> {
     public create(payload: Payload<T>) {
         return new this.model(payload as any);
     }
+}
+interface IReadOneOptions<T> {
+    projection: Projection<T>;
+    lean: boolean;
+    populate: ObjectIDOnly<T> | { path: keyof T, select: string };
+}
+
+type ObjectIDOnly<T> = {
+    [P in keyof T]: Types.ObjectId extends T[P] ? P : never
+}[keyof T];
+
+export interface IReadAllOptions<T> extends IReadOneOptions<T> {
+    sort: ColumnSort<T>;
+    page: number;
+    size: number;
 }
