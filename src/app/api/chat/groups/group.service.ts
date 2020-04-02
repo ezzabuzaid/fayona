@@ -19,15 +19,15 @@ export class GroupService extends CrudService<GroupsSchema> {
                 },
                 result: (group) => group
             },
-            all: {
-                post(groups) {
-                    groups.map((group) => {
-                        if (group.single) {
-                            group.title = '';
-                        }
-                    });
-                }
-            }
+            // all: {
+            //     post(groups) {
+            //         groups.map((group) => {
+            //             if (group.single) {
+            //                 group.title = '';
+            //             }
+            //         });
+            //     }
+            // }
         });
     }
 }

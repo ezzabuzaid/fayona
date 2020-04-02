@@ -12,6 +12,12 @@ export class GroupMembersService extends CrudService<GroupMemberSchema> {
         });
     }
 
+    getMemberGroups(id: string) {
+        return this.repo.fetchAll({ user: id }, {}, {
+            populate: 'group'
+        });
+    }
+
     getGroup(ids: string[]) {
         return this.repo.model.aggregate([
             {

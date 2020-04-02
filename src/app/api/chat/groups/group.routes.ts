@@ -7,7 +7,7 @@ import { Request } from 'express';
 import { Auth } from '@api/portal';
 import { ArrayNotEmpty, IsString } from 'class-validator';
 import { cast } from '@core/utils';
-import { validate } from '@shared/common';
+import { validate, isValidId } from '@shared/common';
 import messagesService from '@api/chat/messages/messages.service';
 import membersService from '@api/chat/members/members.service';
 
@@ -33,14 +33,6 @@ export class GroupsRouter extends CrudRouter<GroupsSchema, GroupService> {
         super(groupsService);
     }
 
-    @Get('members', validate(SearchForGroupByMemberValidator, 'queryPolluted'))
-    async getGroupByMemebers(req: Request) {
-        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        const { members } = cast<SearchForGroupByMemberValidator>(req['queryPolluted']);
-        members.push(decodedToken.id);
-        const group = await membersService.getGroup(members);
-        return new Responses.Ok(group);
-    }
 
     @Post('/', validate(GroupPayload))
     public async create(req: Request) {
@@ -78,6 +70,32 @@ export class GroupsRouter extends CrudRouter<GroupsSchema, GroupService> {
             });
         }
         return new Responses.Created(group.data);
+    }
+
+    @Get('members', validate(SearchForGroupByMemberValidator, 'queryPolluted'))
+    async getGroupByMemebers(req: Request) {
+        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
+        const { members } = cast<SearchForGroupByMemberValidator>(req['queryPolluted']);
+        members.push(decodedToken.id);
+        const group = await membersService.getGroup(members);
+        return new Responses.Ok(group);
+    }
+
+    @Get('member/:id', isValidId())
+    async getGroup(req: Request) {
+        const { id } = req.params;
+        return membersService.getMemberGroups(id);
+    }
+
+    @Get(':id/members', isValidId())
+    public async getMembersByGroupId(req: Request) {
+        const { group_id } = req.params;
+        const result = await membersService.all({ group: group_id }, {
+            projection: {
+                group: 0
+            }
+        });
+        return new Responses.Ok(result.data);
     }
 
 }
