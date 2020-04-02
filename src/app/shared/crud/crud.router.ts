@@ -2,11 +2,12 @@ import { CrudService } from './crud.service';
 import { Post, Put, Delete, Get, Patch } from '@lib/methods';
 import { Auth } from '@api/portal';
 import { Request } from 'express';
-import { Responses } from '@core/helpers';
+import { Responses, HttpResultResponse } from '@core/helpers';
 import { AppUtils } from '@core/utils';
 import { Payload } from '@lib/mongoose';
 import { Types } from 'mongoose';
 import assert from 'assert';
+import { isValidId } from '@shared/common';
 
 // TODO: Generic SchemaType should inherit from RepoHooks interface which
 //  will be used to fire onSave, onUpdate, onDelete, ..etc
@@ -28,14 +29,10 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Created(result.data);
     }
 
-    @Patch(':id', Auth.isAuthenticated)
+    @Patch(':id', Auth.isAuthenticated, isValidId())
     public async update(req: Request) {
         const { id } = req.params;
 
-        if (AppUtils.not(Types.ObjectId.isValid(id))) {
-            throw new Responses.BadRequest('id_not_valid');
-        }
-
         const result = await this.service.updateById(id, req.body);
 
         if (result.hasError) {
@@ -45,32 +42,11 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    @Put(':id', Auth.isAuthenticated)
+    @Put(':id', Auth.isAuthenticated, isValidId())
     public async set(req: Request) {
         const { id } = req.params;
 
-        if (AppUtils.not(Types.ObjectId.isValid(id))) {
-            throw new Responses.BadRequest('id_not_valid');
-        }
-
         const result = await this.service.updateById(id, req.body);
-
-        if (result.hasError) {
-            return new Responses.BadRequest(result.data);
-        }
-
-        return result.data;
-    }
-
-    @Delete(':id', Auth.isAuthenticated)
-    public async delete(req: Request) {
-        const { id } = req.params;
-
-        if (AppUtils.not(Types.ObjectId.isValid(id))) {
-            throw new Responses.BadRequest('id_not_valid');
-        }
-
-        const result = await this.service.delete({ _id: id } as any);
 
         if (result.hasError) {
             return new Responses.BadRequest(result.data);
@@ -79,19 +55,23 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    @Get(':id', Auth.isAuthenticated)
-    public async fetchEntity(req: Request) {
+    @Delete(':id', Auth.isAuthenticated, isValidId())
+    public async delete(req: Request) {
         const { id } = req.params;
 
-        if (AppUtils.not(Types.ObjectId.isValid(id))) {
-            throw new Responses.BadRequest('id_not_valid');
-        }
+        const result = await this.service.delete({ _id: id } as any);
 
-        const entity = await this.service.one({ _id: id } as any);
-        if (AppUtils.isNullOrUndefined(entity)) {
-            return new Responses.BadRequest('entity_not_found');
-        }
-        return entity;
+        const response = new HttpResultResponse(result.data);
+
+        return result.hasError ? response.badRequest() : response.ok();
+    }
+
+    @Get(':id', Auth.isAuthenticated, isValidId())
+    public async fetchEntity(req: Request) {
+        const { id } = req.params;
+        const result = await this.service.one({ _id: id } as any);
+        const response = new HttpResultResponse(result.data);
+        return result.hasError ? response.badRequest() : response.ok();
     }
 
     @Get('/', Auth.isAuthenticated)

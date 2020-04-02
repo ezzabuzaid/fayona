@@ -152,8 +152,13 @@ export class CrudService<T = null> {
         const documentQuery = this.repo.fetchOne(query, options.projection, options);
         await pre(documentQuery);
         const record = await documentQuery.exec();
+
+        if (AppUtils.isNullOrUndefined(record)) {
+            return new Result(true, 'entity_not_exist');
+        }
+
         await post(record);
-        return record;
+        return new Result(false, record);
     }
 
     public async all(query: Partial<WithMongoID<Payload<T>>> = {}, options: Partial<IReadAllOptions<T>> = {}) {

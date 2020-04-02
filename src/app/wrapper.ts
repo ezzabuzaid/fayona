@@ -7,7 +7,6 @@ import { GroupsRouter } from '@api/chat/groups';
 import { FileUploadRoutes, FoldersRoutes } from '@api/uploads';
 import { ConversationRouter } from '@api/chat/conversations';
 import { SettingRoutes } from '@api/settings';
-import { MembersRouter } from '@api/chat/members';
 
 export class Wrapper {
     private static list = [];
@@ -62,7 +61,6 @@ Wrapper.registerRouter(UsersRouter);
 Wrapper.registerRouter(FeedbackRouter);
 Wrapper.registerRouter(SessionRouter);
 Wrapper.registerRouter(GroupsRouter);
-Wrapper.registerRouter(MembersRouter);
 Wrapper.registerRouter(FileUploadRoutes);
 Wrapper.registerRouter(FoldersRoutes);
 Wrapper.registerRouter(ConversationRouter);

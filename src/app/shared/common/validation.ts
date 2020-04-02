@@ -1,4 +1,4 @@
-import { validateOrReject, ValidationError } from 'class-validator';
+import { validateOrReject, ValidationError, IsString, IsMongoId } from 'class-validator';
 import { ApplicationConstants } from '@core/constants';
 import { Type, AppUtils } from '@core/utils';
 import { NextFunction, Response, Request } from 'express';
@@ -6,6 +6,13 @@ import { NextFunction, Response, Request } from 'express';
 export class ValidationPatterns {
     public static EmailValidation = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     public static NoSpecialChar = /^[a-zA-z0-9_.]+$/;
+}
+
+export function isValidId() {
+    class IdValidator {
+        @IsMongoId({ message: 'id_not_valid' }) id: string = null;
+    }
+    return validate(IdValidator, 'params');
 }
 
 export async function validatePayload<T>(payload: T) {

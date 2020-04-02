@@ -33,7 +33,6 @@ export class GroupsRouter extends CrudRouter<GroupsSchema, GroupService> {
         super(groupsService);
     }
 
-
     @Post('/', validate(GroupPayload))
     public async create(req: Request) {
         // TODO: create member and group should be within transaction
