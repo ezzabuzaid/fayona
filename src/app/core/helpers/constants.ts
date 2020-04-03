@@ -1,11 +1,7 @@
 export namespace Constants {
     export class Endpoints {
-        public static readonly ContactUs = 'contact';
-        public static readonly MEALS = 'meals';
-        public static readonly favorites = 'favorites';
-        public static readonly MENUS = 'menus';
-        public static readonly Feedback = 'feedback';
-        public static readonly Account = 'account';
+        public static readonly FEEDBACK = 'feedback';
+        public static readonly ACCOUNTS = 'accounts';
         public static readonly PORTAL = 'portal';
         public static readonly SESSIONS = 'sessions';
         public static readonly USERS = 'users';
@@ -21,22 +17,18 @@ export namespace Constants {
         public static readonly MEMBERS = 'members';
         public static readonly UPLOADS = 'uploads';
         public static readonly FOLDERS = 'folders';
-        public static readonly Conversation = 'conversation';
+        public static readonly CONVERSATIONS = 'conversation';
     }
     export class Schemas {
-        public static readonly favorites = 'favorites';
-        public static readonly meals = 'meals';
-        public static readonly MENUS = 'menus';
-        public static readonly ContactUs = 'contact';
         public static readonly Feedback = 'feedback';
-        public static readonly Account = 'account';
+        public static readonly ACCOUNTS = 'accounts';
         public static readonly SESSIONS = 'sessions';
         public static readonly USERS = 'users';
         public static readonly GROUPS = 'groups';
         public static readonly MEMBERS = 'members';
         public static readonly UPLOADS = 'uploads';
         public static readonly FOLDERS = 'folders';
-        public static readonly Conversation = 'conversation';
-        public static readonly Messages = 'messages';
+        public static readonly CONVERSATIONS = 'conversation';
+        public static readonly MESSAGES = 'messages';
     }
 }

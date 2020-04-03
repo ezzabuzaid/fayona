@@ -21,7 +21,7 @@ class ConversationPayload {
     message: string = null;
 }
 
-@Router(Constants.Endpoints.Conversation, {
+@Router(Constants.Endpoints.CONVERSATIONS, {
     middleware: [Auth.isAuthenticated]
 })
 export class ConversationRouter extends CrudRouter<ConversationSchema, ConversationsService> {

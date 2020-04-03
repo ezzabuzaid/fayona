@@ -2,7 +2,7 @@ import { Entity, Field, BaseModel } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
 import { Types } from 'mongoose';
 
-@Entity(Constants.Schemas.Conversation)
+@Entity(Constants.Schemas.CONVERSATIONS)
 export class ConversationSchema {
     @Field({
         required: true,
