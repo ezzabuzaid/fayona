@@ -9,7 +9,6 @@ module.exports = {
   moduleFileExtensions: ["ts", "js", "json", "node"],
   moduleNameMapper,
   testEnvironment: "<rootDir>/src/test/custom-test-env.js",
-  // testEnvironment: 'node'
   // globalSetup: "<rootDir>/test/setup.ts",
   // globalTeardown: "<rootDir>/test/teardown.ts",
 }
