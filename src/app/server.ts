@@ -10,6 +10,7 @@ import stage from '@core/helpers/stage';
 import messagesService from '@api/chat/messages/messages.service';
 import { IsString, IsMongoId } from 'class-validator';
 import { validatePayload } from '@shared/common';
+import sqlite from 'sqlite';
 
 const log = new Logger('Server init');
 

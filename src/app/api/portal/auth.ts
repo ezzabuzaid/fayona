@@ -28,7 +28,7 @@ export class Auth {
             // STUB test if the session is not active
             const session = await sessionsService.getActiveSession({ device_uuid });
 
-            if (AppUtils.isFalsy(session) || AppUtils.isFalsy(session.active)) {
+            if (AppUtils.isFalsy(session.hasError)) {
                 // NOTE: not active mean that the session was disabled either by admin or the user logged out
                 return new Responses.Unauthorized();
             }

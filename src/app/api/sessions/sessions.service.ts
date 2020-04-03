@@ -17,12 +17,15 @@ export class SessionsService extends CrudService<SessionSchema> {
 
     public async deActivate(query: Partial<Omit<WithMongoID<Payload<SessionSchema>>, 'active'>>) {
         const record = await this.getActiveSession(query);
-        if (AppUtils.isTruthy(record)) {
-            await this.setAsDeactive(record);
-            // TODO: use Result class instead
-            return { hasError: false, data: 'Session deactivated' };
+        if (record.hasError) {
+            return {
+                hasError: true,
+                data: 'no session available'
+            };
         }
-        return { hasError: true, data: 'no session available' };
+        await this.setAsDeactive(record.data);
+        // TODO: use Result class instead
+        return { hasError: false, data: 'Session deactivated' };
     }
 
     public getActiveSession(query: Partial<Payload<SessionSchema>>) {

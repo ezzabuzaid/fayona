@@ -13,10 +13,15 @@ function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHook
 }
 
 class Result<T> {
-    constructor(
-        public hasError = false,
-        public data: T = null
-    ) { }
+    public hasError = false;
+    public data: T = null;
+    public message: string = null;
+
+    constructor(result: Partial<Result<T>> = new Result<T>({})) {
+        this.data = result.data;
+        this.message = result.message || null;
+        this.hasError = result.hasError ?? AppUtils.isTruthy(result.message) ?? false;
+    }
 }
 
 export class CrudService<T = null> {
@@ -32,21 +37,21 @@ export class CrudService<T = null> {
             for (let index = 0; index < this.options.unique.length; index++) {
                 const field = this.options.unique[index];
                 if (AppUtils.isNullOrUndefined(payload[field])) {
-                    return new Result(false, `property${field} is missing`);
+                    return new Result({ message: `property${field} is missing`, });
                 }
                 const record = await fetchOne(field);
                 if (AppUtils.isTruthy(record)) {
-                    return new Result(true, this.options.unique[index]);
+                    return new Result({ message: translate(`${this.options.unique[index]}_entity_exist`) });
                 }
             }
         }
-        return new Result(false);
+        return new Result();
     }
 
     public async create(payload: Payload<T>) {
         const isExist = await this.isEntityExist(payload);
         if (isExist.hasError) {
-            return new Result(true, translate(`${isExist.data}_entity_exist`)) as any;
+            return isExist;
         }
 
         const entity = this.repo.create(payload);
@@ -54,13 +59,13 @@ export class CrudService<T = null> {
         await pre(entity);
         await entity.save();
         await post(entity);
-        return result ? result(entity) : new Result(false, { id: entity.id });
+        return result ? result(entity) : new Result({ data: { id: entity.id } });
     }
 
     public async delete(query: Partial<WithMongoID<Payload<T>>>) {
         const entity = await this.repo.fetchOne(query);
         if (AppUtils.isNullOrUndefined(entity)) {
-            return new Result(true, 'entity_not_exist');
+            return new Result({ message: 'entity_not_exist' });
         }
 
         const { pre, post } = getHooks(this.options.delete);
@@ -68,7 +73,7 @@ export class CrudService<T = null> {
         await entity.remove();
         await post(entity);
 
-        return new Result<null>();
+        return new Result();
     }
 
     public async updateById(id: string, payload: Partial<Payload<T>>) {
@@ -81,12 +86,12 @@ export class CrudService<T = null> {
 
     private async doUpdate(record: Document<T>, payload: Partial<Payload<T>>) {
         if (AppUtils.isNullOrUndefined(record)) {
-            return new Result(true, 'entity_not_exist');
+            return new Result({ message: 'entity_not_exist' });
         }
 
         const isExist = await this.isEntityExist(payload as Payload<T>);
         if (isExist.hasError) {
-            return new Result(true, translate(`${isExist.data}_entity_exist`));
+            return isExist;
         }
 
         const { pre, post } = getHooks(this.options.update);
@@ -94,7 +99,7 @@ export class CrudService<T = null> {
         await record.set(payload).save();
         await post(record);
 
-        return new Result<string>(false, null);
+        return new Result();
     }
 
     public async set(id: string, payload: Payload<T>) {
@@ -152,13 +157,12 @@ export class CrudService<T = null> {
         const documentQuery = this.repo.fetchOne(query, options.projection, options);
         await pre(documentQuery);
         const record = await documentQuery.exec();
-
         if (AppUtils.isNullOrUndefined(record)) {
-            return new Result(true, 'entity_not_exist');
+            return new Result<Document<T>>({ message: 'entity_not_exist' });
         }
-
         await post(record);
-        return new Result(false, record);
+
+        return new Result<Document<T>>({ data: record });
     }
 
     public async all(query: Partial<WithMongoID<Payload<T>>> = {}, options: Partial<IReadAllOptions<T>> = {}) {
@@ -172,19 +176,21 @@ export class CrudService<T = null> {
 
         const count = await this.repo.fetchAll().estimatedDocumentCount();
 
-        return new Result(false, {
-            list: documents,
-            length: documents.length,
-            totalCount: count,
-            pages: Math.ceil((count / readOptions.limit) || 0),
+        return new Result({
+            data: {
+                list: documents,
+                length: documents.length,
+                totalCount: count,
+                pages: Math.ceil((count / readOptions.limit) || 0),
+            }
         });
     }
 
     public async exists(query: Partial<WithMongoID<Payload<T>>>) {
         if (AppUtils.isTruthy(await this.one(query, { lean: true }))) {
-            return new Result(false, true) as any;
+            return new Result({ data: true }) as any;
         }
-        return new Result(true, 'entity_not_exist');
+        return new Result({ data: false });
     }
 
 }

@@ -187,10 +187,10 @@ async function throwIfNotExist(query: Partial<Payload<UsersSchema> & { _id: stri
         throw new Responses.BadRequest(message);
     }
     const entity = await usersService.one(query, { projection: { password: 1 } });
-    if (!!entity) {
-        return entity;
+    if (entity.hasError) {
+        throw new Responses.BadRequest(message);
     }
-    throw new Responses.BadRequest(message);
+    return entity.data;
 }
 
 scheduleJob('30 * * * *', async () => {
