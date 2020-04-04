@@ -15,11 +15,11 @@ export class Auth {
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
         const token = req.header(ApplicationConstants.authorization);
         if (AppUtils.isFalsy(device_uuid) || AppUtils.isFalsy(token)) {
+            // TODO: validate them using `validate` middleware, add parameter to throw custom http response
             return new Responses.Unauthorized();
         }
 
         try {
-            // STUB test if the request doesn't have an `authorization` header
             // STUB test if the request has an `authorization` header with invalid token
             // STUB test if the request has an `authorization` header with expired token
             await tokenService.decodeToken(token);
@@ -28,7 +28,7 @@ export class Auth {
             // STUB test if the session is not active
             const session = await sessionsService.getActiveSession({ device_uuid });
 
-            if (AppUtils.isFalsy(session.hasError)) {
+            if (session.hasError) {
                 // NOTE: not active mean that the session was disabled either by admin or the user logged out
                 return new Responses.Unauthorized();
             }
