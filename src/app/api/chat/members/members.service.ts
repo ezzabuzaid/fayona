@@ -1,10 +1,11 @@
 import { CrudService, Repo } from '@shared/crud';
-import membersModel, { GroupMemberSchema } from './members.model';
+import membersModel, { RoomMemberSchema } from './members.model';
 import sharedFolder from '@api/uploads/shared-folder/shared-folder.service';
-import { RoomSchema } from '../groups';
 import { PrimaryID } from '@lib/mongoose';
+import { RoomSchema } from '../rooms';
+import { Constants } from '@core/helpers';
 
-export class GroupMembersService extends CrudService<GroupMemberSchema> {
+export class RoomMembersService extends CrudService<RoomMemberSchema> {
     constructor() {
         super(new Repo(membersModel), {
             all: {
@@ -14,7 +15,7 @@ export class GroupMembersService extends CrudService<GroupMemberSchema> {
             },
             create: {
                 async post(member) {
-                    const populatedMember = await member.populate('group').execPopulate();
+                    const populatedMember = await member.populate('room').execPopulate();
                     await sharedFolder.create({
                         folder: (populatedMember.room as unknown as RoomSchema).folder,
                         shared: true,
@@ -25,17 +26,17 @@ export class GroupMembersService extends CrudService<GroupMemberSchema> {
         });
     }
 
-    getMemberGroups(id: PrimaryID) {
+    getMemberRooms(id: PrimaryID) {
         return this.repo.fetchAll({ user: id }, {
             populate: 'room'
         });
     }
 
-    getGroup(ids: PrimaryID[]) {
+    getRoom(ids: PrimaryID[]) {
         return this.repo.model.aggregate([
             {
                 $group: {
-                    _id: '$group',
+                    _id: '$room',
                     members: {
                         $push: {
                             $toString: '$user',
@@ -45,13 +46,13 @@ export class GroupMembersService extends CrudService<GroupMemberSchema> {
                 },
             }])
             .exec()
-            .then((groups) => {
-                return groups.find((group) => {
+            .then((rooms) => {
+                return rooms.find((room) => {
                     // TODO: check if there's a way to this check using mongo aggregate
-                    return ids.every((element) => group.members.includes(element));
+                    return ids.every((element) => room.members.includes(element));
                 }) || null;
             });
     }
 }
 
-export default new GroupMembersService();
+export default new RoomMembersService();

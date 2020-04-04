@@ -3,9 +3,9 @@ import { PortalRoutes } from '@api/portal';
 import { FeedbackRouter } from '@api/feedback';
 import { SessionRouter } from '@api/sessions';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
-import { GroupsRouter } from '@api/chat/groups';
 import { FileUploadRoutes, FoldersRoutes } from '@api/uploads';
 import { SettingRoutes } from '@api/settings';
+import { RoomsRouter } from '@api/chat/rooms';
 
 export class Wrapper {
     private static list = [];
@@ -59,7 +59,7 @@ Wrapper.registerRouter(PortalRoutes);
 Wrapper.registerRouter(UsersRouter);
 Wrapper.registerRouter(FeedbackRouter);
 Wrapper.registerRouter(SessionRouter);
-Wrapper.registerRouter(GroupsRouter);
+Wrapper.registerRouter(RoomsRouter);
 Wrapper.registerRouter(FileUploadRoutes);
 Wrapper.registerRouter(FoldersRoutes);
 Wrapper.registerRouter(SettingRoutes);
