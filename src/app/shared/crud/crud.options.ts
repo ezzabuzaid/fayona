@@ -1,24 +1,31 @@
-import { Body, Document } from '@lib/mongoose';
+import { Payload, Document } from '@lib/mongoose';
+import { DocumentQuery } from 'mongoose';
+import { Type } from '@core/utils';
 
 export interface ICrudHooks<T> {
-    pre?: (doc: Document<T>) => any;
-    post?: (doc: Document<T>) => any;
+    pre?: (document: Document<T>) => any;
+    post?: (document: Document<T>) => any;
+    result?: (document: Document<T>) => any;
 }
 
 export interface ICrudOperation<T = any> {
-    // TODO: for each write operation should have a transaction option,
-    //  so if it's true the hooks should run within a transaction
+    dto?: Type<any>;
+    bodyValidator?: Type<any>;
     create?: ICrudHooks<T>;
     update?: ICrudHooks<T>;
     delete?: ICrudHooks<T>;
-    one?: ICrudHooks<T>;
+    one?: {
+        pre?: (query: DocumentQuery<Document<T>, Document<T>>) => any;
+        post?: (doc: Document<T>) => any;
+    };
     all?: {
-        post: (docs: Array<Document<T>>) => any
+        pre?: (doc: DocumentQuery<Array<Document<T>>, Document<T>>) => any;
+        post?: (doc: Array<Document<T>>) => any;
     };
 }
 export interface ICrudOptions<T> extends ICrudOperation<T> {
     /**
      * indicate that the entity should be unique, and the check will be on the provided properties
      */
-    unique?: Array<keyof Body<T>>;
+    unique?: Array<keyof Payload<T>>;
 }

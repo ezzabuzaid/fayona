@@ -1,44 +1,107 @@
-import { Database } from '@core/database/database';
-import { stage, StageLevel } from '@core/helpers';
-import { Logger, LoggerLevel } from '@core/utils';
+import { Database } from '@core/database';
+import { StageLevel, tokenService } from '@core/helpers';
+import { Logger, LoggerLevel, AppUtils } from '@core/utils';
 import { envirnoment } from '@environment/env';
 import http = require('http');
 import { URL } from 'url';
 import { Application } from './app';
-import { OLHC, loadOHLCcsv, handleSocket } from './playground/olhc';
-import { deploy } from './playground/deploy';
-const log = new Logger('Server init');
+import socketIO from 'socket.io';
+import stage from '@core/helpers/stage';
+import messagesService from '@api/chat/messages/messages.service';
+import { IsString, IsMongoId } from 'class-validator';
+import { validatePayload } from '@shared/common';
+import { PrimaryKey } from '@lib/mongoose';
+
+const log = new Logger('Server');
+
+interface IRoom {
+        id: PrimaryKey;
+}
+
+interface IMessage {
+        id: PrimaryKey;
+        text: string;
+}
+
+class MessagePayload {
+        @IsString()
+        public text: string = null;
+        @IsMongoId()
+        public id: PrimaryKey = null;
+
+        constructor(payload: MessagePayload) {
+                AppUtils.strictAssign(this, payload);
+        }
+}
+
 export class NodeServer extends Application {
         private port = +envirnoment.get('PORT') || 8080;
         private host = envirnoment.get('HOST') || '127.0.0.1';
+        private server: http.Server = null;
         public path: URL = null;
-
-        /**
-         * Invoke this method to start the server
-         * @param port server port
-         */
-        public static async bootstrap() {
-                // SECTION server init event
-                log.debug('Start boostrapping server');
-                envirnoment.load();
-                const server = new NodeServer();
-                const httpServer = await server.populateServer();
-                // server.application.get('/socket/:name', handleSocket);
-                // server.application.get('/webhooks/github/deploy', deploy);
-                return server.init();
-        }
-
-        public static test() {
-                Logger.level = LoggerLevel.Off;
-                log.info('Start Testing');
-                envirnoment.load(StageLevel.TEST);
-                return (new NodeServer()).init();
-        }
 
         private constructor() {
                 super();
                 this.path = new URL(`http://${this.host}:${this.port}`);
-                log.info(`The env => ${stage.LEVEL}`);
+                this.populateServer();
+        }
+
+        public static async bootstrap() {
+                envirnoment.load(StageLevel.DEV);
+                const server = new NodeServer();
+                const database = await NodeServer.loadDatabase();
+                // TODO: Move this out
+                const io = socketIO(server.server);
+                io.use(async (socket, next) => {
+                        try {
+                                socket['decodedToken'] = await tokenService.decodeToken(socket.handshake.query.token);
+                        } catch (error) {
+                                next(new Error('Authentication error'));
+                        }
+                        next();
+                });
+
+                io.on('connection', (socket) => {
+                        socket.on('Join', async (room: IRoom) => {
+                                log.debug('New Joiner => ', room.id);
+                                socket.join(room.id as any);
+                        });
+                        socket.on('Leave', async (room: IRoom) => {
+                                log.debug('New Joiner => ', room.id);
+                                socket.leave(room.id as any);
+                        });
+                        socket.on('error', () => {
+                                socket.leaveAll();
+                        });
+                        socket.on('error', () => {
+                                socket.leaveAll();
+                                console.log('error');
+                        });
+                        socket.on('SendMessage', async (message: IMessage) => {
+                                const { id } = socket['decodedToken'];
+                                log.debug('New Message from => ', message);
+                                const payload = new MessagePayload(message);
+                                try {
+                                        await validatePayload(payload);
+                                        const createdMessage = await messagesService.create({
+                                                room: payload.id,
+                                                user: id,
+                                                text: payload.text
+                                        });
+                                        log.debug('New Message from => ', createdMessage);
+                                        io.sockets.in(message.id as any).emit('Message', createdMessage.data);
+                                } catch (error) {
+                                        socket.emit('MessageValidationError', message);
+                                }
+                        });
+                });
+
+                return server;
+        }
+
+        public static test() {
+                Logger.level = LoggerLevel.Off;
+                envirnoment.load(StageLevel.TEST);
         }
 
         /**
@@ -46,40 +109,31 @@ export class NodeServer extends Application {
          * Start the server and return an instance of it.
          * @returns {Promise<httpServer>}
          */
-        private populateServer(): Promise<http.Server> {
-                return Promise.resolve<http.Server>(this.startServer(this.createServer()));
+        private populateServer(): void {
+                if (AppUtils.isNullOrUndefined(this.server)) {
+                        this.server = http.createServer(this.application);
+                }
+                this.startServer();
         }
 
-        private createServer() {
-                //     key: fs.readFileSync('./key.pem'),
-                //     cert: fs.readFileSync('./cert.pem'),
-                //     passphrase: 'YOUR PASSPHRASE HERE'
-                return http.createServer(this.application);
-        }
-
-        private startServer(server: http.Server) {
-                return server.listen(this.path.port, +this.path.hostname, () => {
+        private startServer(): void {
+                this.server.listen(this.path.port, +this.path.hostname, () => {
                         log.info(`${new Date()} Server running at ${this.path.href}`);
-                        // SECTION server start event
                 });
         }
 
-        private init() {
+        public static loadDatabase() {
                 const {
                         MONGO_USER: user,
                         MONGO_PASSWORD: password,
                         MONGO_PATH: path,
                         MONGO_HOST: host
                 } = envirnoment.env;
-                log.debug(stage.LEVEL);
                 try {
-                        return Promise.all([
-                                this.populateRoutes(),
-                                Database.load({ user, password, path, host, atlas: stage.production }),
-                        ]);
+                        return Database.load({ user, password, path, host, atlas: stage.production });
                 } catch (error) {
                         throw new Error(`Faild to init the server ${error}`);
                 }
-
         }
+
 }

@@ -1,10 +1,12 @@
 import { Document as MongooseDocument, Model } from 'mongoose';
 import 'reflect-metadata';
 import { generateModelMetadataKey } from '.';
+import { Type } from '@core/utils';
 
-export function BaseModel<T>(schema: any) {
-    const model = Reflect.getMetadata(generateModelMetadataKey(schema), schema) as Model<T & MongooseDocument>;
-    Reflect.deleteMetadata(generateModelMetadataKey(schema), schema);
+export function BaseModel<T>(schema: Type<T>) {
+    const metadataKey = generateModelMetadataKey(schema);
+    const model = Reflect.getMetadata(metadataKey, schema) as Model<T & MongooseDocument>;
+    Reflect.deleteMetadata(metadataKey, schema);
     if (model) {
         return model;
     }

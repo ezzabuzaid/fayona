@@ -1,47 +1,199 @@
-import { UsersSchema, ERoles } from '@api/users';
-import { Body } from '@lib/mongoose';
-import { superAgent } from '@test/index';
-import { Constants, NetworkStatus, tokenService } from '@core/helpers';
-import { getUri, generateExpiredToken, UserUtilityFixture, sendRequest } from '@test/fixture';
-import { AppUtils } from '@core/utils';
-import { IRefreshTokenBody } from './portal.routes';
+import { Constants } from '@core/helpers';
+import {
+    UserFixture, generateUsername, generateExpiredToken,
+    prepareUserSession, generateDeviceUUIDHeader, getUri, generateToken
+} from '@test/fixture';
+import { LoginPayload, RefreshTokenPayload } from './portal.routes';
 import { PortalHelper } from './portal.helper';
+import { AppUtils } from '@core/utils';
+import * as faker from 'faker';
+import { ApplicationConstants } from '@core/constants';
 
-const ENDPOINT = (suffix: string) => getUri(`${Constants.Endpoints.PORTAL}/${suffix}`);
-const LOGIN_ENDPOINT = ENDPOINT(Constants.Endpoints.LOGIN);
-const RESET_ENDPOINT = ENDPOINT(Constants.Endpoints.RESET_PASSWORD);
-const FORGET_ENDPOINT = ENDPOINT(Constants.Endpoints.FORGET_PASSWORD);
-const REFRESH_TOKEN = ENDPOINT(Constants.Endpoints.REFRESH_TOKEN);
+const ENDPOINT = (suffix: string) => `${Constants.Endpoints.PORTAL}/${suffix}`;
+const LOGIN_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.LOGIN));
+const REFRESH_TOKEN = getUri(ENDPOINT(Constants.Endpoints.REFRESH_TOKEN));
+const RESET_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.RESET_PASSWORD));
+const FORGET_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.FORGET_PASSWORD));
+const LOGUT_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.LOGOUT));
 
-const mockUser = {
-    password: '123456789',
-    username: 'portalLogin',
-    email: 'portal@login.com',
-    mobile: '0792807794',
-    profile: null,
-    role: ERoles.SUPERADMIN
-} as Body<UsersSchema>;
+const fakeLoginPaylod: LoginPayload = {
+    password: faker.internet.password(),
+    username: generateUsername(),
+};
 
-describe('Login should fail if..', () => {
-    it('Request with non existing user', async () => {
-        const req = (await superAgent).post(LOGIN_ENDPOINT);
-        const res = await req.send(AppUtils.assignObject({}, mockUser, {
-            username: 'fakeUsername',
-            password: 'fakePassword'
-        }));
-        expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
+describe('#INTERGRATION', () => {
+    fdescribe('Login should', () => {
+        describe('fail if..', () => {
+
+            test('user not exist, aka username is wrong', async () => {
+                const response = await global.superAgent
+                    .post(LOGIN_ENDPOINT)
+                    .set(generateDeviceUUIDHeader())
+                    .send(fakeLoginPaylod);
+
+                expect(response.body.message).toMatch('Wrong credintals');
+                expect(response.badRequest).toBeTruthy();
+            });
+
+            test('password is wrong', async () => {
+                const userFixture = new UserFixture();
+                await userFixture.createUser(fakeLoginPaylod);
+                const response = await global.superAgent
+                    .post(LOGIN_ENDPOINT)
+                    .set(generateDeviceUUIDHeader())
+                    .send(AppUtils.extendObject(fakeLoginPaylod, { password: faker.internet.password() }));
+
+                expect(response.body.message).toMatch('Wrong credintals');
+                expect(response.badRequest).toBeTruthy();
+            });
+
+            test('request headers does not have a device_uuid', async () => {
+                const response = await global.superAgent
+                    .post(LOGIN_ENDPOINT);
+                expect(response.unauthorized).toBeTruthy();
+            });
+
+            test('user has more than three active session', async () => {
+                const userFixture = new UserFixture();
+                await userFixture.createUser(fakeLoginPaylod);
+
+                // NOTE prepareUserSession will make a login request
+                const session = await prepareUserSession({
+                    _id: userFixture.user.id,
+                    ...fakeLoginPaylod
+                });
+
+                await global.superAgent
+                    .post(LOGIN_ENDPOINT)
+                    .set(session.headers)
+                    .send(fakeLoginPaylod);
+
+                await global.superAgent
+                    .post(LOGIN_ENDPOINT)
+                    .set(session.headers)
+                    .send(fakeLoginPaylod);
+
+                const lastSession = await global.superAgent
+                    .post(LOGIN_ENDPOINT)
+                    .set(session.headers)
+                    .send(fakeLoginPaylod);
+
+                expect(lastSession.body.message).toMatch('exceed_allowed_sesison');
+                expect(lastSession.unauthorized).toBeTruthy();
+            });
+
+        });
+
+        describe('success if', () => {
+            test('username and password is right, request has device uuid header', async () => {
+                const userFixture = new UserFixture();
+                await userFixture.createUser(fakeLoginPaylod);
+                const response = await global.superAgent
+                    .post(LOGIN_ENDPOINT)
+                    .set(generateDeviceUUIDHeader())
+                    .send(fakeLoginPaylod);
+                expect(response.ok).toBeTruthy();
+            });
+        });
+
+        test.todo('returned Token is valid');
+        test.todo('returned Token has the appropriate schema');
     });
-    it('The Username was wrong', async () => {
-        const req = (await superAgent).post(LOGIN_ENDPOINT);
-        const res = await req.send(AppUtils.assignObject({}, mockUser, { username: 'fakeUsername' }));
-        expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
+
+    describe('Refresh Token', () => {
+        const performRequest = (refreshToken: string, token: string = null, headers = null) => {
+            return global.superAgent
+                .post(REFRESH_TOKEN)
+                .set(headers ?? generateDeviceUUIDHeader())
+                .send(new RefreshTokenPayload({ refreshToken, token }));
+        };
+
+        const INVALID_TOKEN = 'not.valid.token';
+
+        test('should be UNAUTHORIZED if the refresh token is expired', async () => {
+            const response = await performRequest(generateExpiredToken());
+            expect(response.unauthorized).toBeTruthy();
+        });
+
+        test('should be UNAUTHORIZED if the refresh token is invalid', async () => {
+            const response = await performRequest(INVALID_TOKEN);
+            expect(response.unauthorized).toBeTruthy();
+        });
+
+        test('should be UNAUTHORIZED if the token is invalid', async () => {
+            const response = await performRequest(
+                PortalHelper.generateRefreshToken(AppUtils.generateAlphabeticString()),
+                INVALID_TOKEN
+            );
+            expect(response.unauthorized).toBeTruthy();
+        });
+
+        test('should be UNAUTHORIZED if the device_uuid invalid', async () => {
+            const response = await performRequest(
+                generateToken(),
+                generateToken(),
+                {}
+            );
+            expect(response.unauthorized).toBeTruthy();
+        });
+
+        test('should return BAD_REQUEST status and `not_allowed` if the token is not expired', async () => {
+            const session = await prepareUserSession();
+
+            const response = await performRequest(session.refreshToken, session.token);
+
+            expect(response.body.message).toMatch('not_allowed');
+            expect(response.badRequest).toBeTruthy();
+        });
+
+        test('should be UNAUTHORIZED if there is no asocciated session with the device uuid and user_id', async () => {
+            const session = await prepareUserSession();
+
+            const response = await performRequest(session.refreshToken, generateExpiredToken());
+
+            expect(response.unauthorized).toBeTruthy();
+        });
+
+        test('should retrun new refresh token and access token', async () => {
+            const session = await prepareUserSession();
+
+            const response = await performRequest(session.refreshToken, generateExpiredToken(), session.headers);
+
+            expect(response.body.data).toHaveProperty('token');
+            expect(response.body.data).toHaveProperty('refreshToken');
+            expect(response.ok).toBeTruthy();
+        });
     });
-    it('The password was wrong', async () => {
-        const req = (await superAgent).post(LOGIN_ENDPOINT);
-        const res = await req.send(AppUtils.assignObject({}, mockUser, { password: 'fakePassword' }));
-        expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
+
+    describe('LOGOUT', () => {
+        test('should deactive user session', async () => {
+            const session = await prepareUserSession();
+
+            const response = await global.superAgent
+                .post(LOGUT_ENDPOINT)
+                .send({ [ApplicationConstants.deviceIdHeader]: session.headers['x-device-uuid'] });
+
+            expect(response.ok).toBeTruthy();
+        });
+        test('should return bad request if the device uuid was not specifed', async () => {
+            const response = await global.superAgent
+                .post(LOGUT_ENDPOINT);
+
+            expect(response.body.message).toMatch('cannot logout unknown users');
+            expect(response.badRequest).toBeTruthy();
+        });
+
+        test('should return bad request if the device uuid does not belong to any user', async () => {
+            const response = await global.superAgent
+                .post(LOGUT_ENDPOINT)
+                .send(generateDeviceUUIDHeader());
+
+            expect(response.body.message).toMatch('cannot logout unknown users');
+            expect(response.badRequest).toBeTruthy();
+        });
+
     });
-    it.todo('User has more than three session');
+
 });
 
 describe('Forgot password ', () => {
@@ -51,64 +203,3 @@ describe('Forgot password ', () => {
 describe('Reset password ', () => {
     it.todo('refactor');
 });
-
-describe('Refresh Token', () => {
-    const getResponse = (invalidToken: string, token: string = null) => {
-        return sendRequest(REFRESH_TOKEN, { refreshToken: invalidToken, token } as IRefreshTokenBody);
-    };
-
-    const INVALID_TOKEN = 'invalid.token.refuesed';
-    it('should throw if the refresh token is expired', async () => {
-        const res = await getResponse(generateExpiredToken());
-        expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
-    });
-    it('should throw if the refresh token is invalid', async () => {
-        const res = await getResponse(INVALID_TOKEN);
-        expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
-    });
-    it('should throw if the token is invalid', async () => {
-        const res = await getResponse(
-            PortalHelper.generateRefreshToken(null),
-            INVALID_TOKEN
-        );
-        expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
-    });
-    it('should throw if the token is not expired', async () => {
-        const res = await getResponse(
-            PortalHelper.generateRefreshToken(null),
-            PortalHelper.generateToken(null, null)
-        );
-        expect(res.status).toBe(NetworkStatus.NOT_ACCEPTABLE);
-    });
-    it('should not throw if the token is expired', async () => {
-        const userUtiltiy = new UserUtilityFixture();
-        await userUtiltiy.createUser();
-        const res = await getResponse(
-            PortalHelper.generateRefreshToken(userUtiltiy.user.id),
-            generateExpiredToken()
-        );
-        expect(res.status).toBe(NetworkStatus.OK);
-    });
-    // it.todo('should retrun with valid token and refresh token', async () => {
-    //     const userUtility = new UserUtilityFixture();
-    //     const user = await userUtility.createUser();
-    //     // TODO: Replace them with fixture function to check if it has a value
-    //     expect(user).toHaveProperty('token');
-    //     expect(user).toHaveProperty('refreshToken');
-    //     const res = await getResponse(
-    //         PortalHelper.generateRefreshToken(null),
-    //         PortalHelper.generateToken(null, null)
-    //     );
-    //     expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
-    // });
-});
-
-describe('Login should success when', () => {
-    it.todo('Token is valid');
-    it.todo('Token has the appropriate schema');
-});
-
-// TODO: Move it to fixture folder
-export function expectValueToHaveProperty<T>(value: T, property: string) {
-
-}

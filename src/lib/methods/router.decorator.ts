@@ -1,4 +1,3 @@
-import { ErrorHandling } from '@core/helpers';
 import { AppUtils, Logger } from '@core/utils';
 import { Router as expressRouter } from 'express';
 import 'reflect-metadata';
@@ -6,7 +5,8 @@ import { IExpressInternal, IRouterDecorationOption, RouterProperties } from './m
 
 const log = new Logger('Router Decorator');
 import path = require('path');
-import { IMetadata, metadata_key } from '.';
+import { IMetadata, method_metadata_key } from './index';
+import { wrapRoutes } from '@core/helpers/route';
 
 export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
     return function <T extends new (...args: any[]) => any>(constructor: T) {
@@ -15,23 +15,24 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
         const router = expressRouter(options);
         const routerUri = path.normalize(path.join('/', baseUri, '/'));
         const instance = new constructor();
+
         Reflect.getMetadataKeys(constructor)
             .forEach((key: string) => {
-                if (key.startsWith(metadata_key)) {
+                if (key.startsWith(method_metadata_key)) {
                     const metadata = Reflect.getMetadata(key, constructor) as IMetadata;
                     Reflect.deleteMetadata(key, constructor);
                     if (metadata) {
                         const { handler, method, middlewares, uri } = metadata;
                         const normalizedURI = path.normalize(path.join('/', uri));
-                        router[method](normalizedURI, ErrorHandling.wrapRoutes(...middlewares, function() {
+                        router[method](normalizedURI, wrapRoutes(...middlewares, function originalMethod() {
                             return handler.apply(instance, arguments);
                         }));
                     }
                 }
             });
 
-        if (options.middleware && options.middleware.length) {
-            router.use(`${routerUri}`, ErrorHandling.wrapRoutes(...options.middleware));
+        if (AppUtils.hasItemWithin(options.middleware)) {
+            router.use(`${routerUri}`, wrapRoutes(...options.middleware));
         }
 
         AppUtils.defineProperty(prototype, RouterProperties.RoutesPath, { get() { return routerUri; } });

@@ -93,7 +93,13 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
+# .env
 
 # next.js build output
 .next
+.js
+.qovery
+local_configuration.json
+
+uploads/**/*
+.sqlite

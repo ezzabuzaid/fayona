@@ -8,36 +8,7 @@
     </head>
 
     <body>
-        <script>
-            window.onload = function () {
-                class Socket extends WebSocket {
-                    constructor() {
-                        super(`ws://${location.href.split('//')[1]}`);
-                    }
-
-                    onOpen(evt) {
-                    }
-
-                    onClose(evt) {
-                    }
-
-                    onError(evt) {
-                    }
-                }
-                const socketList = ['cad'];
-                socketList.forEach(name => {
-                    fetch(location.href + `socket/${name}`)
-                        .then(() => {
-                            const wss = new Socket();
-                            wss.onmessage = ((message) => {
-                                console.log(JSON.parse(message.data));
-                            });
-                        });
-
-                })
-            }
-        </script>
-
+        <h1>Node Buildozer</h1>
     </body>
 
 </html>

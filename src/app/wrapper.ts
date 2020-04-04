@@ -1,10 +1,12 @@
 import { UsersRouter } from '@api/users';
-import { MealsRouter } from '@api/meals';
-import { MenusRouter } from '@api/menus';
 import { PortalRoutes } from '@api/portal';
-import { FavoritesRouter } from '@api/favorites';
 import { FeedbackRouter } from '@api/feedback';
+import { SessionRouter } from '@api/sessions';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
+import { FileUploadRoutes, FoldersRoutes } from '@api/uploads';
+import { SettingRoutes } from '@api/settings';
+import { RoomsRouter } from '@api/chat/rooms';
+
 export class Wrapper {
     private static list = [];
     public static registerRouter(router, subRouter?) {
@@ -53,9 +55,11 @@ export class Wrapper {
 
 }
 
-Wrapper.registerRouter(MealsRouter);
 Wrapper.registerRouter(PortalRoutes);
 Wrapper.registerRouter(UsersRouter);
-Wrapper.registerRouter(MenusRouter);
-Wrapper.registerRouter(FavoritesRouter);
 Wrapper.registerRouter(FeedbackRouter);
+Wrapper.registerRouter(SessionRouter);
+Wrapper.registerRouter(RoomsRouter);
+Wrapper.registerRouter(FileUploadRoutes);
+Wrapper.registerRouter(FoldersRoutes);
+Wrapper.registerRouter(SettingRoutes);

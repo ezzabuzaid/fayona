@@ -1,60 +1,49 @@
-import { CrudRouter } from './crud.router';
 import { CrudService } from './crud.service';
 import { Repo } from './crud.repo';
-import { BaseModel, Document } from '@lib/mongoose';
-import { Schema, Model, model } from 'mongoose';
-import { superAgent } from '@test/index';
-import { NetworkStatus } from '@core/helpers';
-import expressRequestMock from 'express-request-mock';
-import mockingoose from 'mockingoose';
-
-// const crud = new CrudRouter(null);
+import { ICrudOperation } from './crud.options';
+import { DocumentQuery } from 'mongoose';
 
 const MockCrudService = jest.fn<Partial<CrudService<any>>, ConstructorParameters<typeof CrudService>>(() => ({
     create: jest.fn(),
     all: jest.fn()
 }));
 
+const MockRepo = jest.fn<Partial<Repo<any>>, ConstructorParameters<typeof Repo>>(() => ({
+    fetchAll: jest.fn().mockImplementation(() => new DocumentQuery())
+}));
+
 describe('#MockService', () => {
     describe('[ALL]', () => {
-        test('verify that fetch all entites from repo method was called', () => {
-            const MockRepo = jest.fn<Partial<Repo<any>>, ConstructorParameters<typeof Repo>>(() => ({
-                fetchAll: jest.fn().mockImplementation(() => [])
-            }));
+        test('should fetch all entites from repo', () => {
             const repo = new MockRepo(null);
             const crudService = new CrudService(repo as any);
             crudService.all({}, {});
             expect(repo.fetchAll).toHaveBeenCalledWith({}, {}, {});
         });
-        test('verify that the method will not throw if no hook provided', () => {
-            const MockRepo = jest.fn<Partial<Repo<any>>, ConstructorParameters<typeof Repo>>(() => ({
-                fetchAll: jest.fn().mockImplementation(() => [])
-            }));
-            const crudService = new CrudService(new MockRepo(null) as any);
-            crudService.all();
-            expect(true).toBeTruthy();
-        });
-        test('should invoke the post hook', async () => {
-            const MockRepo = jest.fn<Partial<Repo<any>>, ConstructorParameters<typeof Repo>>(() => ({
-                fetchAll: jest.fn().mockImplementation(() => [])
-            }));
-            const options = {
+        test('should invoke the hooks', async () => {
+            const options: ICrudOperation = {
                 all: {
-                    post: jest.fn()
+                    post: () => {
+                        expect(true).toBeTruthy();
+                    },
+                    pre: () => {
+                        expect(true).toBeTruthy();
+                    },
                 }
             };
-            const crudService = new CrudService(new MockRepo(null) as any, options);
+            const documentQuery = new Object();
+            const mockRepo: Partial<Repo<any>> = { fetchAll: jest.fn().mockReturnValue(documentQuery) };
+            const crudService = new CrudService(mockRepo as any, options);
             await crudService.all();
-            expect(options.all.post).toHaveBeenCalledWith([]);
         });
-        test('should return an instance of array (list)', async () => {
-            const MockRepo = jest.fn<Partial<Repo<any>>, ConstructorParameters<typeof Repo>>(() => ({
-                fetchAll: jest.fn().mockImplementation(() => [])
-            }));
-            const crudService = new CrudService(new MockRepo(null) as any);
-            expect(await crudService.all()).toBeInstanceOf(Array);
+        test('should return the value', async () => {
+            const returnValue = [new Object()];
+            const mockRepo: Partial<Repo<any>> = {
+                fetchAll: jest.fn().mockReturnValue(Promise.resolve(returnValue))
+            };
+            const crudService = new CrudService(mockRepo as any);
+            expect(await crudService.all()).toEqual(returnValue);
         });
-
     });
 });
 
@@ -117,53 +106,53 @@ describe('#MockService', () => {
 
 // describe('DELETE BY ${id}/', () => {
 //     test('Reject request without token', async () => {
-//         const res = await (await superAgent).delete(`${ENDPOINT}/${user.id}`);
+//         const res = await superAgent.delete(`${ENDPOINT}/${user.id}`);
 //         expect(res.status).toBe(NetworkStatus.UNAUTHORIZED);
 //     });
 
 //     test('should fail if requested with id not of type ObjectId', async () => {
-//         const req = (await superAgent).delete(`${ENDPOINT}/${undefined}`);
+//         const req = superAgent.delete(`${ENDPOINT}/${undefined}`);
 //         const res = await req.set('Authorization', user.token);
 //         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
 //     });
 
 //     test('should fail if requested to non exist entity', async () => {
-//         const req = (await superAgent).delete(`${ENDPOINT}/${new Types.ObjectId()}`);
+//         const req = superAgent.delete(`${ENDPOINT}/${new Types.ObjectId()}`);
 //         const res = await req.set('Authorization', user.token);
 //         expect(res.status).toBe(NetworkStatus.NOT_ACCEPTABLE);
 //     });
 
-//     test('resposne body should equal to', async () => {
-//         const req = (await superAgent).delete(`${ENDPOINT}/${user.id}`);
+//     test('resposne payload should equal to', async () => {
+//         const req = superAgent.delete(`${ENDPOINT}/${user.id}`);
 //         const res = await req.set('Authorization', user.token);
-//         const { data } = res.body;
+//         const { data } = res.payload;
 //         expect(data).toBeNull();
 //     });
 // });
 
 // describe('GET BY ${id}/', () => {
 //     test('Reject request without token', async () => {
-//         const res = await (await superAgent).get(`${ENDPOINT}/${user.id}`);
+//         const res = await superAgent.get(`${ENDPOINT}/${user.id}`);
 //         expect(res.status).toBe(NetworkStatus.UNAUTHORIZED);
 //     });
 
 //     test('should fail if requested with id not of type ObjectId', async () => {
 //         // this will rise cast error
-//         const req = (await superAgent).get(`${ENDPOINT}/${undefined}`);
+//         const req = superAgent.get(`${ENDPOINT}/${undefined}`);
 //         const res = await req.set('Authorization', user.token);
 //         expect(res.status).toBe(NetworkStatus.BAD_REQUEST);
 //     });
 
 //     test('should fail if requested to non exist entity', async () => {
-//         const req = (await superAgent).get(`${ENDPOINT}/${new Types.ObjectId()}`);
+//         const req = superAgent.get(`${ENDPOINT}/${new Types.ObjectId()}`);
 //         const res = await req.set('Authorization', user.token);
 //         expect(res.status).toBe(NetworkStatus.NOT_ACCEPTABLE);
 //     });
 
-//     test('resposne body should equal to', async () => {
-//         const req = (await superAgent).get(`${ENDPOINT}/${user.id}`);
+//     test('resposne payload should equal to', async () => {
+//         const req = superAgent.get(`${ENDPOINT}/${user.id}`);
 //         const res = await req.set('Authorization', user.token);
-//         const { data } = res.body;
+//         const { data } = res.payload;
 //         expect(data).toHaveProperty('username');
 //         expect(data).toHaveProperty('email');
 //         expect(data).toHaveProperty('mobile');
@@ -174,3 +163,7 @@ describe('#MockService', () => {
 //         expect(data).not.toHaveProperty('password');
 //     });
 // });
+
+describe('#GET USER', () => {
+    test.todo(`user payload should contain only id`);
+});

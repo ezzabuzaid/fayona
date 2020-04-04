@@ -2,22 +2,26 @@ require("ts-node/register");
 require('tsconfig-paths/register');
 const NodeEnvironment = require('jest-environment-node');
 const { NodeServer } = require('../app/server');
+const { Application } = require('../app/app');
+const mongoose = require('mongoose');
+const request = require('supertest');
+const { MongoMemoryServer } = require('mongodb-memory-server');
+
 class CustomEnvironment extends NodeEnvironment {
-  constructor(config) {
+  constructor (config) {
+    NodeServer.test();
     super(config);
+    this.app = (new Application()).application;
   }
 
   async setup() {
-    const [app, dbConnection] = await NodeServer.test();
-    const collections = dbConnection.collections;
-    for (const key in collections) {
-        const collection = collections[key];
-        await collection.deleteMany();
-    }
+    await connectToDatabase();
+    this.global.superAgent = request(this.app);
     await super.setup();
   }
 
   async teardown() {
+    await closeDatabase();
     await super.teardown();
   }
 
@@ -27,3 +31,26 @@ class CustomEnvironment extends NodeEnvironment {
 }
 
 module.exports = CustomEnvironment;
+
+
+const mongod = new MongoMemoryServer();
+async function connectToDatabase() {
+  const uri = await mongod.getUri();
+  const mongooseOpts = {
+    useNewUrlParser: true,
+    autoReconnect: true,
+    reconnectTries: Number.MAX_VALUE,
+    reconnectInterval: 1000,
+    poolSize: 10
+  };
+
+  return mongoose.connect(uri, mongooseOpts);
+}
+
+
+async function closeDatabase() {
+  await mongoose.connection.dropDatabase();
+  await mongoose.connection.close();
+  await mongoose.disconnect();
+  await mongod.stop();
+}

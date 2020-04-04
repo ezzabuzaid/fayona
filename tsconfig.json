@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "ES2019",
     "module": "commonjs",
     "lib": [
       "es2015"
@@ -11,7 +11,7 @@
     "downlevelIteration": true,
     "strict": false,
     "moduleResolution": "node",
-    "baseUrl": "src",
+    "baseUrl": "./src",
     "noImplicitReturns": false,
     "noUnusedLocals": false,
     "sourceMap": false,
@@ -29,9 +29,6 @@
       "@api/*": [
         "app/api/*"
       ],
-      "@auth/*": [
-        "app/auth/*"
-      ],
       "@shared/*": [
         "app/shared/*"
       ],
@@ -48,6 +45,8 @@
         "test/*"
       ]
     },
+    "pretty": true,
+    "diagnostics": true,
     "noStrictGenericChecks": false,
     "typeRoots": [
       "node_modules/@types"
@@ -56,5 +55,16 @@
       "node",
       "jest"
     ]
+  },
+  "typedocOptions": {
+    "mode": "modules",
+    "out": "docs",
+    "exclude": [
+      "**/*+(index|.spec|.e2e).ts",
+      "./src/test/**/*",
+      "./global.d.ts"
+    ],
+    "excludePrivate": true,
+    "excludeProtected": true
   }
 }

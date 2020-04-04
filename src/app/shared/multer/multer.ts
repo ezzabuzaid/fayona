@@ -1,66 +1,92 @@
-import { ErrorResponse } from '@core/helpers/response.model';
-import { AppUtils, Parameter } from '@core/utils';
-import { Request } from 'express';
 import multer = require('multer');
 import path = require('path');
-import { NetworkStatus } from '../../core/helpers/network-status';
+import assert = require('assert');
 
-const upload = multer();
-const _Multer = AppUtils.getTypeOf<typeof upload>(multer);
+import { AppUtils, Parameter, cast } from '@core/utils';
+import { Request, NextFunction, Response } from 'express';
+import { Responses, ErrorResponse } from '@core/helpers';
+import { Types } from 'mongoose';
+import foldersService from '@api/uploads/folders/folders.service';
+import { UploadsHelper } from '@api/uploads/uploads.helper';
 
-type MulterParams = Parameter<typeof multer>;
-export class Multer extends _Multer {
-    private allowedTypes = [];
-    constructor(options: MulterParams = {}) {
-        super((() => this.options(options))());
+export class UploadOptions {
+    public allowedTypes: string[] = [];
+
+    /**
+     * number in kilobytes
+     */
+    public maxSize: number = 1024 * 5;
+    public maxFilesNumber: number = 1;
+    public fieldName: string = 'upload';
+}
+
+export class Multer {
+
+    private multer: ReturnType<typeof multer>;
+    constructor(public options: Partial<UploadOptions> = {}) {
+        this.options = Object.assign({}, new UploadOptions(), this.options);
+        assert(this.options.maxFilesNumber >= 1, 'Multer maxFilesNumber should be at least one');
+        assert(AppUtils.hasItemWithin(this.options.allowedTypes), 'Multer allowedTypes should at least has one allowed type');
+        this.multer = multer(this.defaultOptions());
+        this.upload = this.upload.bind(this);
     }
 
-    public options(opts: MulterParams): MulterParams {
+    public async upload(req: Request, res: Response, next: NextFunction) {
+        if (this.options.maxFilesNumber === 1) {
+            this.multer.single(this.options.fieldName)(req, res, next);
+        } else {
+            this.multer.array(this.options.fieldName, this.options.maxFilesNumber)(req, res, next);
+        }
+    }
+
+    public defaultOptions(): Parameter<typeof multer> {
         return {
-            storage: opts.storage || this.storage,
-            fileFilter: opts.fileFilter || this.fileFilter,
+            storage: this.storage,
+            fileFilter: this.fileFilter.bind(this),
             limits: {
-                fileSize: 1024 * 1024 * 5,
-                ...opts.limits
+                fileSize: 1024 * this.options.maxSize,
+                files: this.options.maxFilesNumber
             },
         };
     }
 
     private get storage() {
+        const formatFileName = (file: Express.Multer.File) => `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`;
         return multer.diskStorage({
-            destination: (req: Request, file: Express.Multer.File, cb: (error, dest) => void) => {
-                const { type = '' } = req.body;
-                if (!this.allowedTypes.some((_type) => _type === type)) {
-                    throw new ErrorResponse(`this type ${type} is not allowed`, NetworkStatus.NOT_ACCEPTABLE);
+            destination: async (
+                req: Request,
+                file: Express.Multer.File,
+                callback: (error: ErrorResponse, dest: string) => void
+            ) => {
+                const { folder } = cast(req.params);
+
+                if (folder !== 'others') {
+                    if (Types.ObjectId.isValid(folder)) {
+                        const folderExistance = await foldersService.exists({ _id: folder });
+                        if (folderExistance.hasError) {
+                            callback(new Responses.BadRequest(folderExistance.data), null);
+                        }
+                    } else {
+                        callback(new Responses.BadRequest('folder_id_not_valid'), null);
+                    }
                 }
-                // REVIEW e.g books/id
-                // the file will be saved under the books folder into id folder
-                // this mean each entity will have it's own file
-                // so when you delete an entity you'll find that easy to delete it's folder
-                // be aware to read about atomic transaction to make sure not to delete the
-                // entity images or the enity itself without the completion of the proccess
-                cb(null, path.join(process.cwd(), `uploads`, type));
+                UploadsHelper.createFolderDirectory(folder);
+                callback(null, UploadsHelper.folderPath(folder));
             },
             filename(req: Express.Request, file, cb) {
-                const name = `${file.fieldname}-${Date.now()}-${file.originalname}`;
-                file['name'] = name;
-                cb(null, name);
+                cb(null, formatFileName(file));
             }
         });
     }
 
     private fileFilter(req: Express.Request, file: Express.Multer.File, cb) {
         const type = file.mimetype;
-        if (type === 'image/jpeg' || type === 'image/png') {
-            cb(null, true);
+        const isAllowedType = this.options.allowedTypes.some((allowedType) => allowedType === type);
+        if (AppUtils.isFalsy(isAllowedType)) {
+            cb(new Responses.BadRequest(`Type ${type} not allowed`));
         } else {
-            // TODO throw an error instead
-            throw new ErrorResponse(`this type ${type} is not allowed`, NetworkStatus.NOT_ACCEPTABLE);
-            // cb(null, false);
+            cb(null, true);
         }
     }
 
 }
-
-// TODO: create class for generic upload
-// FOLDERS, ATTACHMENTS

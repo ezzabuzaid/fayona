@@ -1,8 +1,7 @@
 import { HashService, Constants } from '@core/helpers';
-import { BaseModel, Entity, Field, Body } from '@lib/mongoose';
+import { BaseModel, Entity, Field, Payload } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
-import { translate } from '@lib/translation';
+import { parsePhoneNumberFromString } from 'libphonenumber-js/max';
 import { AppUtils } from '@core/utils';
 
 export enum ERoles {
@@ -15,25 +14,29 @@ export enum ERoles {
 @Entity(Constants.Schemas.USERS)
 export class UsersSchema {
     @Field({
-        enum: Object.values(ERoles)
+        enum: [0, 1, 2, 3, 4],
+        default: ERoles.ADMIN,
+        validate: (value: ERoles) => AppUtils.isTruthy(ERoles[value])
     }) public role: ERoles;
     @Field({
         default: {},
-        set: (value) => {
+        set: (value: string) => {
             return AppUtils.isNullOrUndefined(value) ? {} : value;
         }
     }) public profile: {}; // TODO: update this field to be ProfileSchema instead
     @Field({
         pure: true,
+        // STUB test password should not return with the response
+        select: false,
         required: true,
         set: (value: string) => HashService.hashSync(value)
     }) public password: string;
     @Field({
-        match: [ValidationPatterns.NoSpecialChar, translate('no_speical_char')],
+        match: [ValidationPatterns.NoSpecialChar, 'wrong_username'],
         unique: true,
     }) public username: string;
     @Field({
-        match: [ValidationPatterns.EmailValidation, translate('wrong_email')],
+        match: [ValidationPatterns.EmailValidation, 'wrong_email'],
         unique: true,
     }) public email: string;
     @Field({
@@ -42,17 +45,20 @@ export class UsersSchema {
                 const phonenumber = parsePhoneNumberFromString(value);
                 return !!phonenumber && phonenumber.isValid();
             },
-            translate('wrong_mobile_number')
+            'wrong_mobile'
         ],
         unique: true,
     }) public mobile: string;
     @Field({
-        pure: true,
-        default: true
+        default: false,
+        set: (value: any) => {
+            if (typeof value !== 'boolean') {
+                return false;
+            }
+            return value;
+        }
     }) public verified: boolean;
-    public comparePassword(candidatePassword: string) {
-        return HashService.comparePassword(candidatePassword, this.password);
-    }
+
 }
 
 export const UsersModel = BaseModel<UsersSchema>(UsersSchema);

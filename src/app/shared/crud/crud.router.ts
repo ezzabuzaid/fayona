@@ -1,108 +1,122 @@
 import { CrudService } from './crud.service';
-import { Post, Put, Delete, Get } from '@lib/methods';
+import { Post, Put, Delete, Get, Patch } from '@lib/methods';
 import { Auth } from '@api/portal';
-import { Request, Response } from 'express';
-import { SuccessResponse, NetworkStatus, ErrorResponse } from '@core/helpers';
-import { translate } from '@lib/translation';
-import { AppUtils } from '@core/utils';
-import { Body } from '@lib/mongoose';
+import { Request } from 'express';
+import { Responses, HttpResultResponse } from '@core/helpers';
+import { AppUtils, cast } from '@core/utils';
+import { Payload } from '@lib/mongoose';
+import { Types } from 'mongoose';
+import assert from 'assert';
+import { isValidId } from '@shared/common';
 
-export class CrudRouter<T> {
+// TODO: Generic SchemaType should inherit from RepoHooks interface which
+//  will be used to fire onSave, onUpdate, onDelete, ..etc
+
+export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> = CrudService<SchemaType>> {
     constructor(
-        protected service: CrudService<T>
-    ) { }
+        protected service: ServiceType & CrudService<SchemaType>
+    ) {
+        assert(AppUtils.notNullOrUndefined(service));
+    }
 
-    @Post('', Auth.isAuthenticated)
-    public async create(req: Request, res: Response) {
+    @Post('/', Auth.isAuthenticated)
+    public async create(req: Request) {
+        // TODO: payload is not validated yet
         const result = await this.service.create(req.body);
-        if (result.exist) {
-            throw new ErrorResponse(translate('entity_exist'));
+        if (result.hasError) {
+            return new Responses.BadRequest(result.message);
         }
-        const response = new SuccessResponse(result.entity, translate('success'), NetworkStatus.CREATED);
-        res.status(response.code).json(response);
+        return new Responses.Created(result.data);
     }
 
-    @Put(':id', Auth.isAuthenticated)
-    public async update(req: Request, res: Response) {
-        const entity = await this.service.update({ body: req.body, id: req.params.id });
-        if (!entity) {
-            throw new ErrorResponse(translate('entity_not_found'));
-        }
-        const response = new SuccessResponse(null);
-        res.status(response.code).json(response);
-    }
+    @Patch(':id', Auth.isAuthenticated, isValidId())
+    public async update(req: Request) {
+        const { id } = cast(req.params);
 
-    @Delete(':id', Auth.isAuthenticated)
-    public async delete(req: Request, res: Response) {
-        const entity = await this.service.delete({ _id: req.params.id } as any);
-        if (!entity) {
-            throw new ErrorResponse(translate('entity_not_found'));
-        }
-        const response = new SuccessResponse(null);
-        res.status(response.code).json(response);
-    }
+        const result = await this.service.updateById(id, req.body);
 
-    @Delete('', Auth.isAuthenticated)
-    public async bulkDelete(req: Request, res: Response) {
-        const { ids } = req.body as { ids: string[] };
-        this._checkIfIdsIsValid(ids);
-
-        const completion = await this.service.bulkDelete(ids);
-        if (AppUtils.not(completion)) {
-            throw new ErrorResponse(translate('one_of_entities_not_exist'));
+        if (result.hasError) {
+            return new Responses.BadRequest(result.message);
         }
 
-        const response = new SuccessResponse(null);
-        res.status(response.code).json(response);
+        return new Responses.Ok(result.data);
     }
 
-    @Post('', Auth.isAuthenticated)
-    public async bulkUpdate(req: Request, res: Response) {
-        const { ids } = req.body as { ids: Array<Body<T>> };
-        this._checkIfIdsIsValid(ids);
+    @Put(':id', Auth.isAuthenticated, isValidId())
+    public async set(req: Request) {
+        const { id } = cast(req.params);
 
-        const completion = await this.service.bulkUpdate(ids);
-        if (AppUtils.not(completion)) {
-            throw new ErrorResponse(translate('one_of_entities_not_exist'));
+        const result = await this.service.updateById(id, req.body);
+
+        if (result.hasError) {
+            return new Responses.BadRequest(result.message);
         }
-        const response = new SuccessResponse(null);
-        res.status(response.code).json(response);
+
+        return new Responses.Ok(result.data);
     }
 
-    @Get(':id', Auth.isAuthenticated)
-    public async fetchEntity(req: Request, res: Response) {
-        const entity = await this.service.one({ _id: req.params.id } as any);
-        if (!entity) {
-            throw new ErrorResponse(translate('entity_not_found'));
-        }
-        const response = new SuccessResponse(entity);
-        res.status(response.code).json(response);
+    @Delete(':id', Auth.isAuthenticated, isValidId())
+    public async delete(req: Request) {
+        const { id } = req.params;
+
+        const result = await this.service.delete({ _id: id } as any);
+
+        const response = new HttpResultResponse(result.data);
+
+        return result.hasError ? response.badRequest() : response.ok();
     }
 
-    @Get('', Auth.isAuthenticated)
-    public async fetchEntities(req: Request, res: Response) {
-        let { page, size, ...sort } = req.query;
-        page = +page;
-        size = +size;
+    @Get(':id', Auth.isAuthenticated, isValidId())
+    public async fetchEntity(req: Request) {
+        const { id } = req.params;
+        const result = await this.service.one({ _id: id } as any);
+        const response = new HttpResultResponse(result.data);
+        return result.hasError ? response.badRequest() : response.ok();
+    }
+
+    @Get('/', Auth.isAuthenticated)
+    public async fetchEntities(req: Request) {
         // TODO: Check that the sort object has the same properties in <T>
-        if (size === 0) {
-            throw new ErrorResponse(translate('no_size_0'));
+        const { page, size, ...sort } = req.query;
+        const result = await this.service.all({}, { sort, size, page });
+        if (result.hasError) {
+            return new Responses.BadRequest(result.data as any);
         }
-        const entites = await this.service.all({}, {}, {
-            sort,
-            limit: size,
-            skip: page * size
-        });
+        return new Responses.Ok(result.data);
+    }
 
-        const response = new SuccessResponse(entites);
-        response.count = entites.length;
-        res.status(response.code).json(response);
+    @Delete('bulk', Auth.isAuthenticated)
+    public async bulkDelete(req: Request) {
+        const idsList = req.query.ids.split(',');
+
+        if (this._checkIfIdsIsValid(idsList)) {
+            return new Responses.BadRequest('please_provide_valid_list_of_ids');
+        }
+
+        const completion = await this.service.bulkDelete(idsList);
+        if (AppUtils.isFalsy(completion)) {
+            return new Responses.BadRequest('one_of_entities_not_exist');
+        }
+
+        return null;
+    }
+
+    @Post('bulk', Auth.isAuthenticated)
+    public async bulkUpdate(req: Request) {
+        const { entites } = req.body as { entites: Array<Payload<SchemaType>> };
+        if (this._checkIfIdsIsValid(entites)) {
+            return new Responses.BadRequest('please_provide_valid_list_of_ids');
+        }
+        const completion = await this.service.bulkUpdate(entites);
+        if (AppUtils.isFalsy(completion)) {
+            return new Responses.BadRequest('one_of_entities_not_exist');
+        }
+
+        return new Responses.Ok(null);
     }
 
     private _checkIfIdsIsValid(ids: any[]) {
-        if (AppUtils.not(ids) || AppUtils.not(AppUtils.hasItemWithin(ids))) {
-            throw new ErrorResponse(translate('please_provide_valid_list_of_ids'));
-        }
+        return AppUtils.not(AppUtils.hasItemWithin(ids));
     }
 
 }

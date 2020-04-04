@@ -21,6 +21,7 @@
         "member-ordering": false,
         "max-classes-per-file": false,
         "variable-name": false,
+        "no-return-await": true,
         "only-arrow-functions": false,
         "quotemark": [
             true,
@@ -45,11 +46,10 @@
         "no-string-throw": true,
         "no-unsafe-finally": true,
         "no-duplicate-imports": true,
-        "no-empty-interface": {
-            "severity": "warning"
-        },
+        "no-empty-interface": false,
         "ordered-imports": false,
         "forin": false,
+        "member-access": false,
         "no-import-side-effect": false,
         "no-var-keyword": {
             "severity": "warning"
@@ -60,9 +60,7 @@
         "deprecation": {
             "severity": "warning"
         },
-        "prefer-for-of": {
-            "severity": "warning"
-        },
+        "prefer-for-of": false,
         "unified-signatures": {
             "severity": "warning"
         },

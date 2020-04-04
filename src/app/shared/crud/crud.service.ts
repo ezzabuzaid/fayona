@@ -1,142 +1,219 @@
 import { ICrudOptions, ICrudHooks } from './crud.options';
-import { Body, Document } from '@lib/mongoose';
+import { Payload, WithID, WithMongoID, Document, Projection, ColumnSort, PrimaryKey } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
-import { Repo } from './crud.repo';
+import { Repo, IReadAllOptions } from './crud.repo';
+import { translate } from '@lib/translation';
 
-function getHooks<T>(options: Partial<ICrudHooks<T>>) {
+function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHooks<T>]: any } {
     return {
-        pre: !AppUtils.isNullOrUndefined(options && options.pre) ? options.pre : (...args: any) => null,
-        post: !AppUtils.isNullOrUndefined(options && options.post) ? options.post : (...args: any) => null,
+        pre: AppUtils.isFunction(options && options.pre) ? options.pre : (...args: any) => null,
+        post: AppUtils.isFunction(options && options.post) ? options.post : (...args: any) => null,
+        result: AppUtils.isFunction(options && options.result) ? options.result : null,
     };
 }
 
-export class CrudService<T> {
+class Result<T> {
+    public hasError = false;
+    public data: T = null;
+    public message: string = null;
+
+    constructor(result: Partial<Result<T>> = new Result<T>({})) {
+        this.data = result.data;
+        this.message = result.message || null;
+        this.hasError = result.hasError ?? AppUtils.isTruthy(result.message) ?? false;
+    }
+}
+
+export class CrudService<T = null> {
 
     constructor(
         protected repo: Repo<T>,
         private options: ICrudOptions<T> = {} as any
     ) { }
 
-    private async check(body) {
-        if (this.options.unique) {
-            const opertaions = this.options.unique.map(async (field) => {
-                return !!(await this.repo.fetchOne({ [field]: body[field] } as any));
-            });
-            return (await Promise.all(opertaions)).every((operation) => !!operation);
+    private async isEntityExist(payload: Payload<T>) {
+        if (AppUtils.hasItemWithin(this.options.unique)) {
+            const fetchOne = (field: keyof Payload<T>) => this.repo.fetchOne({ [field]: payload[field] } as any);
+            for (let index = 0; index < this.options.unique.length; index++) {
+                const field = this.options.unique[index];
+                if (AppUtils.isNullOrUndefined(payload[field])) {
+                    return `property${field} is missing`;
+                }
+                const record = await fetchOne(field);
+                if (AppUtils.isTruthy(record)) {
+                    return translate(`${this.options.unique[index]}_entity_exist`);
+                }
+            }
         }
         return false;
     }
 
-    public async create(body: Body<T>) {
-        // TODO: customize the return object to clarify what's exactly the error
-
-        const check = await this.check(body);
-        if (check) {
-            return {
-                exist: true,
-                entity: null
-            };
+    public async create(payload: Payload<T>): Promise<Result<WithID<T>>> {
+        const isExist = await this.isEntityExist(payload);
+        if (isExist) {
+            return new Result({ message: isExist });
         }
-        const entity = this.repo.create(body);
-        const { pre, post } = getHooks(this.options.create);
+
+        const entity = this.repo.create(payload);
+        const { pre, post, result } = getHooks(this.options.create);
         await pre(entity);
         await entity.save();
         await post(entity);
 
-        return {
-            exist: false,
-            entity
-        };
+        return result
+            ? new Result<T>({ data: result(entity) })
+            : new Result<T>({ data: { id: entity.id } as any });
     }
 
-    public async delete(query: Partial<Body<T>>) {
+    public async delete(query: Partial<WithMongoID<Payload<T>>>) {
         const entity = await this.repo.fetchOne(query);
-        if (!entity) {
-            return null;
+        if (AppUtils.isNullOrUndefined(entity)) {
+            return new Result({ message: 'entity_not_exist' });
         }
+
         const { pre, post } = getHooks(this.options.delete);
         await pre(entity);
         await entity.remove();
         await post(entity);
 
-        return entity;
+        return new Result();
     }
 
-    // NOTE: Not used, for the sake of hook in write operations
-    // public bulkDelete(ids: string[]) {
-    //     return this.repo.model.bulkWrite(ids.map((_id) => ({ deleteOne: { filter: { _id } } })));
-    // }
+    public async updateById(id: PrimaryKey, payload: Partial<Payload<T>>) {
+        return this.doUpdate(await this.repo.fetchById(id), payload);
+    }
 
-    // TODO: update is only for partials update, refactor it to agree with is
-    // TODO: do `put` is only for replace the whole document with new one
+    public async update(record: Document<T>, payload: Partial<Payload<T>>) {
+        return this.doUpdate(record, payload);
+    }
 
-    public async update(query: { body: Partial<Body<T>>, id: string }) {
-        const entity = await this.repo.fetchById(query.id);
-        if (!entity) {
-            return null;
+    private async doUpdate(record: Document<T>, payload: Partial<Payload<T>>) {
+        if (AppUtils.isNullOrUndefined(record)) {
+            return new Result({ message: 'entity_not_exist' });
         }
-        const check = await this.check(query.body);
 
-        if (check) {
-            return {
-                exist: true,
-                entity: null
-            };
+        const isExist = await this.isEntityExist(payload as any);
+        if (isExist) {
+            return new Result({ message: isExist });
         }
 
         const { pre, post } = getHooks(this.options.update);
-        await pre(entity);
-        entity.set(query.body);
-        await entity.save();
-        await post(entity);
-        return entity;
+        await pre(record);
+        await record.set(payload).save();
+        await post(record);
+
+        return new Result();
     }
 
-    public async bulkUpdate(ids: Array<Body<T>>) {
-        const entites = await Promise.all(ids.map((record) => this.repo.fetchById(record.id)));
+    public async set(id: PrimaryKey, payload: Payload<T>) {
+        return this.updateById(id, payload);
+    }
+
+    public async bulkUpdate(entites: Array<WithID<Payload<T>>>) {
+        // TODO: to be tested
+        // TODO: hooks should be called
+        // TODO: all calls should be run within transaction
+        const records = await Promise.all(entites.map((record) => this.repo.fetchById(record.id)));
         if (entites.every((item) => !!item)) {
             return null;
         }
-        for (let index = 0; !index; index++) {
+        for (let index = 0; AppUtils.isFalsy(index); index++) {
             const entity = entites[index];
-            const record = ids[index];
+            const record = records[index];
             const { pre, post } = getHooks(this.options.update);
-            await pre(entity);
-            entity.set(record);
-            await entity.save();
-            await post(entity);
+            await pre(record);
+            await record.set(entity).save();
+            await post(record);
         }
         return true;
     }
 
-    public async bulkDelete(ids: string[]) {
-        const entites = await Promise.all(ids.map((id) => this.repo.fetchById(id)));
-        if (entites.every((item) => !!item)) {
+    public async bulkCreate(payloads: Array<Payload<T>>) {
+        // TODO: to be tested
+        for (const payload of payloads) {
+            await this.create(payload);
+        }
+        return new Result();
+    }
+
+    public async bulkDelete(ids: PrimaryKey[]) {
+        // TODO: to be tested
+        // TODO: add transaction
+        const records = await Promise.all(ids.map((id) => this.repo.fetchById(id)));
+        if (records.every(AppUtils.isTruthy)) {
             return null;
         }
         const { pre, post } = getHooks(this.options.delete);
-        for (const entity of entites) {
-            await pre(entity);
-            await entity.remove();
-            await post(entity);
-        }
+        const operations = records.map((record) => {
+            return Promise.all([
+                pre(record),
+                record.remove(),
+                post(record)
+            ]);
+        });
+        await Promise.all(operations);
         return true;
     }
 
-    public async one(query: Partial<Body<T>>) {
-        const entity = await this.repo.fetchOne(query);
-        await getHooks(this.options.one).post(entity);
-        return entity;
+    public async one(query: Partial<WithMongoID<Payload<T>>>, options: Partial<IReadAllOptions<T>> = {}) {
+        const { post, pre } = getHooks(this.options.one as any);
+        const documentQuery = this.repo.fetchOne(query, options.projection, options);
+        await pre(documentQuery);
+        const record = await documentQuery.exec();
+        if (AppUtils.isNullOrUndefined(record)) {
+            return new Result<Document<T>>({ message: 'entity_not_exist' });
+        }
+        await post(record);
+
+        return new Result<Document<T>>({ data: record });
     }
 
-    public async all(query = {}, projection: Projection<T> = {}, options = {}) {
-        const entites = await this.repo.fetchAll(query, projection, options);
-        const hook = this.options.all;
-        const post = !AppUtils.isNullOrUndefined(hook) ? hook.post : () => null;
-        await post(entites);
-        return entites;
+    public async all(query: Partial<WithMongoID<Payload<T>>> = {}, options: Partial<IReadAllOptions<T>> = {}) {
+        const { pre, post } = getHooks(this.options.all as any);
+
+        const readOptions = new ReadAllOptions(options);
+        const documentQuery = this.repo.fetchAll(query, readOptions);
+        await pre(documentQuery);
+        const documents = await documentQuery.exec();
+        await post(documents);
+
+        const count = await this.repo.fetchAll().estimatedDocumentCount();
+
+        return new Result({
+            data: {
+                list: documents,
+                length: documents.length,
+                totalCount: count,
+                pages: Math.ceil((count / readOptions.limit) || 0),
+            }
+        });
+    }
+
+    public async exists(query: Partial<WithMongoID<Payload<T>>>) {
+        if (AppUtils.isTruthy(await this.one(query, { lean: true }))) {
+            return new Result({ data: true }) as any;
+        }
+        return new Result({ data: false });
     }
 
 }
 
-type Projection<T> = Partial<{ [key in keyof Body<T>]: 1 | 0 }>;
+class CrudQuery { }
+
+class ReadAllOptions<T> {
+    public skip = 0;
+    public limit = null;
+    public sort: ColumnSort<T> = null;
+    public projection: Projection<T> = {};
+    public lean = false;
+    public populate = null;
+
+    constructor({ page = 0, size = 0, sort, populate, projection, lean }: Partial<IReadAllOptions<T>>) {
+        this.skip = +page * size || null;
+        this.limit = +size || null;
+        this.sort = sort;
+        this.populate = populate;
+        this.projection = projection;
+        this.lean = lean;
+    }
+}

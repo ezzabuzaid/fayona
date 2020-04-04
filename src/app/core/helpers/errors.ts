@@ -1,14 +1,18 @@
 import { ErrorResponse } from '@core/helpers';
-import { Logger } from '@core/utils';
+import { Logger, AppUtils } from '@core/utils';
 import { translate } from '@lib/translation';
-import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { NetworkStatus } from './network-status';
+import { Responses } from './response';
+import { ApplicationConstants } from '@core/constants';
+import stage from './stage';
 
 const log = new Logger('Errors');
 
 export enum Errors {
     CastError = 'CastError',
     AssertionError = 'AssertionError',
+    ERR_AMBIGUOUS_ARGUMENT = 'ERR_AMBIGUOUS_ARGUMENT',
     MongoError = 'MongoError',
     ErrorResponse = 'ErrorResponse',
     SuccessResponse = 'SuccessResponse',
@@ -16,6 +20,9 @@ export enum Errors {
     TokenExpiredError = 'TokenExpiredError',
     NotBeforeError = 'NotBeforeError',
     ValidationError = 'ValidationError',
+    MulterError = 'MulterError',
+    PayloadTooLargeError = 'PayloadTooLargeError:',
+    StrictModeError = 'StrictModeError'
 }
 
 export class ErrorHandling {
@@ -47,7 +54,7 @@ export class ErrorHandling {
         });
     }
 
-    public static catchError(error: any, req: Request, res: Response, next: NextFunction): ErrorRequestHandler {
+    public static catchError(error: any, req: Request, res: Response, next: NextFunction) {
         const response = new ErrorResponse(error.message,
             isNaN(error.code)
                 ? NetworkStatus.INTERNAL_SERVER_ERROR
@@ -55,6 +62,13 @@ export class ErrorHandling {
         );
 
         switch (error.name) {
+            case Errors.AssertionError:
+            case Errors.ERR_AMBIGUOUS_ARGUMENT:
+                response.code = stage.production ? NetworkStatus.BAD_REQUEST : response.code;
+            case Errors.StrictModeError:
+                response.message = translate('over_posting_is_not_allowed');
+                response.code = NetworkStatus.BAD_REQUEST;
+                break;
             case Errors.CastError:
                 response.message = translate('invalid_syntax');
                 response.code = NetworkStatus.BAD_REQUEST;
@@ -63,22 +77,30 @@ export class ErrorHandling {
                 // Mongoose validation error
                 response.code = NetworkStatus.BAD_REQUEST;
                 break;
+            case ApplicationConstants.PAYLOAD_VALIDATION_ERRORS:
+                // class validator validation error
+                response.code = NetworkStatus.BAD_REQUEST;
+                break;
             case Errors.TokenExpiredError:
                 response.message = translate('jwt_expired');
-                response.code = NetworkStatus.BAD_REQUEST;
+                response.code = NetworkStatus.UNAUTHORIZED;
                 break;
             case Errors.JsonWebTokenError:
-                response.message = translate('jwt_expired');
+                response.message = translate(stage.production ? 'jwt_expired' : error.message);
+                response.code = NetworkStatus.UNAUTHORIZED;
+                break;
+            case Errors.MulterError:
                 response.code = NetworkStatus.BAD_REQUEST;
                 break;
+            case Errors.PayloadTooLargeError:
+                response.code = NetworkStatus.BAD_REQUEST;
+                response.message = 'request entity too large';
+                break;
+            default:
 
         }
+        console.log(error);
         res.status(response.code).json(response);
-        return;
-    }
-
-    public static throwError(message, code = NetworkStatus.INTERNAL_SERVER_ERROR) {
-        throw new ErrorResponse(message, code);
     }
 
     public static notFound(req: Request, res: Response, next: NextFunction) {
@@ -96,8 +118,10 @@ export class ErrorHandling {
         return;
     }
 
-    public static wrapRoutes(...func) {
-        return func.map((fn) => (...args) => fn(...args).catch(args[2]));
+    public static throwExceptionIfDeviceUUIDIsMissing(device_uuid: string) {
+        if (AppUtils.isFalsy(device_uuid)) {
+            throw new Responses.Unauthorized();
+        }
     }
 
 }
