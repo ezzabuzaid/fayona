@@ -5,18 +5,16 @@ import { GroupsSchema } from './group.model';
 import { groupsService, GroupService } from './group.service';
 import { Request } from 'express';
 import { Auth } from '@api/portal';
-import { ArrayNotEmpty, IsString } from 'class-validator';
+import { ArrayNotEmpty, IsString, ArrayMinSize } from 'class-validator';
 import { cast } from '@core/utils';
 import { validate, isValidId } from '@shared/common';
 import messagesService from '@api/chat/messages/messages.service';
 import membersService from '@api/chat/members/members.service';
 
 class GroupPayload {
-    @ArrayNotEmpty({
-        message: 'a group should consist of more than one member'
-    }) public members: string[] = null;
+    @ArrayMinSize(1, { message: 'a group should at least contain two member' }) public members: string[] = null;
     @IsString() message: string = null;
-    name: string = null;
+    @IsString() name: string = null;
 }
 
 class SearchForGroupByMemberValidator {
@@ -43,8 +41,9 @@ export class GroupsRouter extends CrudRouter<GroupsSchema, GroupService> {
             single: members.length > 1,
             name
         });
+
         if (group.hasError) {
-            throw new Responses.BadRequest(group.data);
+            throw new Responses.BadRequest(group.message);
         }
 
         await messagesService.create({
