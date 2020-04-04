@@ -50,7 +50,6 @@ export class NodeServer extends Application {
                 envirnoment.load(StageLevel.DEV);
                 const server = new NodeServer();
                 const database = await NodeServer.loadDatabase();
-
                 // TODO: Move this out
                 const io = socketIO(server.server);
                 io.use(async (socket, next) => {
@@ -66,6 +65,17 @@ export class NodeServer extends Application {
                         socket.on('Join', async (room: IRoom) => {
                                 log.debug('New Joiner => ', room.id);
                                 socket.join(room.id as any);
+                        });
+                        socket.on('Leave', async (room: IRoom) => {
+                                log.debug('New Joiner => ', room.id);
+                                socket.leave(room.id as any);
+                        });
+                        socket.on('error', () => {
+                                socket.leaveAll();
+                        });
+                        socket.on('error', () => {
+                                socket.leaveAll();
+                                console.log('error');
                         });
                         socket.on('SendMessage', async (message: IMessage) => {
                                 const { id } = socket['decodedToken'];

@@ -46,7 +46,9 @@ export class Application {
             .use(express.urlencoded({ extended: false }))
             .use(hpp())
             .use(morgan('dev'))
-            .use(helmet())
+            .use(helmet({
+                frameguard: false
+            }))
             .use(compression())
             .use(express.static(Application.staticDirectory))
             .use(express.static(Application.uploadDirectory, {

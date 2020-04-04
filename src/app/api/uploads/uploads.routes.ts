@@ -10,7 +10,7 @@ import foldersService, { FoldersService } from './folders/folders.service';
 import path from 'path';
 import { cast } from '@core/utils';
 import { IsString, IsMongoId } from 'class-validator';
-import { validate, NameValidator } from '@shared/common';
+import { validate, NameValidator, isValidId } from '@shared/common';
 import { FoldersSchema } from './folders/folders.model';
 import sharedFolderService from './shared-folder/shared-folder.service';
 
@@ -19,9 +19,8 @@ class FilesSearchPayload {
     @IsString({
         message: 'folder_id_not_valid'
     }) folder: string = null;
-
     file: string = null;
-
+    tag: string = null;
 }
 
 const allowedImageTypes = [
@@ -40,14 +39,14 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         super(uploadsService);
     }
 
-    @Post('/:folder', multer.upload)
-    public async uploadFile(req: Request, res: Response) {
-        const { folder } = req.params;
+    @Post('/:id', isValidId(), multer.upload)
+    public async uploadFile(req: Request) {
+        const { id } = cast(req.params);
         const { file } = req;
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        const filePath = path.join(folder, file.filename);
+        const filePath = path.join(id, file.filename);
         const result = await uploadsService.create({
-            folder,
+            folder: id,
             user: decodedToken.id,
             name: file.originalname,
             size: file.size,
@@ -70,6 +69,7 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         const files = await this.service.searchForFiles({
             name: payload.file,
             folder: payload.folder,
+            tag: payload.tag,
             user: user_id
         });
         return new Responses.Ok(files);
@@ -121,7 +121,7 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
     @Get('tags')
     getTags() {
         const tags = [
-            new Tag('white'),
+            new Tag('black'),
             new Tag('blue'),
             new Tag('grey'),
             new Tag('purple'),
@@ -129,7 +129,8 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
             new Tag('green'),
             new Tag('yellow'),
             new Tag('pink'),
-            new Tag('white'),
+            new Tag('aqua'),
+            new Tag('azure'),
         ];
         return new Responses.Ok(tags);
     }
