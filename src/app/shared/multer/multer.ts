@@ -6,7 +6,7 @@ import { AppUtils, Parameter } from '@core/utils';
 import { Request, NextFunction, Response } from 'express';
 import { Responses, ErrorResponse } from '@core/helpers';
 import { Types } from 'mongoose';
-import foldersService from '@api/uploads/folders.service';
+import foldersService from '@api/uploads/folders/folders.service';
 import { UploadsHelper } from '@api/uploads/uploads.helper';
 
 export class UploadOptions {

@@ -15,6 +15,11 @@ export function isValidId() {
     return validate(IdValidator, 'params');
 }
 
+export class NameValidator {
+    @IsString({ message: 'please provide valid name' })
+    name: string = null;
+}
+
 export async function validatePayload<T>(payload: T) {
     try {
         await validateOrReject(payload);
