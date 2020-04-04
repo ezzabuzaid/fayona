@@ -1,6 +1,6 @@
 import { CrudService, Repo } from '@shared/crud';
 import conversationsModel, { ConversationSchema } from './conversations.model';
-import foldersService from '@api/uploads/folders.service';
+import foldersService from '@api/uploads/folders/folders.service';
 
 export class ConversationsService extends CrudService<ConversationSchema> {
     constructor() {
@@ -22,13 +22,10 @@ export class ConversationsService extends CrudService<ConversationSchema> {
                     async pre(conversation) {
                         const folder = await foldersService.create({
                             name: conversation.id,
-                            user: conversation.user1 as any
                         });
                         conversation.folder = folder.data.id;
                     },
-                    result(document) {
-                        return document;
-                    }
+                    result: (conversation) => conversation
                 }
             }
         );

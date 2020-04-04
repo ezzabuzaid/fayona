@@ -61,7 +61,7 @@ export class ConversationRouter extends CrudRouter<ConversationSchema, Conversat
             user2: payload.user2
         });
         if (result.hasError) {
-            throw new Responses.BadRequest(result.data);
+            throw new Responses.BadRequest(result.message);
         }
         await messagesService.create({
             text: payload.message,
