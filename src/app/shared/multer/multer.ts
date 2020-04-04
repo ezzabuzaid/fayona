@@ -1,12 +1,10 @@
 import multer = require('multer');
 import path = require('path');
-import fileSystem = require('fs');
 import assert = require('assert');
 
 import { AppUtils, Parameter } from '@core/utils';
 import { Request, NextFunction, Response } from 'express';
 import { Responses, ErrorResponse } from '@core/helpers';
-import { Application } from 'app/app';
 import { Types } from 'mongoose';
 import foldersService from '@api/uploads/folders.service';
 import { UploadsHelper } from '@api/uploads/uploads.helper';
@@ -72,7 +70,6 @@ export class Multer {
                         callback(new Responses.BadRequest('folder_id_not_valid'), null);
                     }
                 }
-                // TODO: MOVE folder creation upload helper
                 UploadsHelper.createFolderDirectory(folder);
                 callback(null, UploadsHelper.folderPath(folder));
             },
