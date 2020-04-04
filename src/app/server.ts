@@ -10,15 +10,16 @@ import stage from '@core/helpers/stage';
 import messagesService from '@api/chat/messages/messages.service';
 import { IsString, IsMongoId } from 'class-validator';
 import { validatePayload } from '@shared/common';
+import { PrimaryID } from '@lib/mongoose';
 
 const log = new Logger('Server');
 
 interface IRoom {
-        id: string;
+        id: PrimaryID;
 }
 
 interface IMessage {
-        id: string;
+        id: PrimaryID;
         text: string;
 }
 
@@ -26,7 +27,7 @@ class MessagePayload {
         @IsString()
         public text: string = null;
         @IsMongoId()
-        public id: string = null;
+        public id: PrimaryID = null;
 
         constructor(payload: MessagePayload) {
                 AppUtils.strictAssign(this, payload);
@@ -64,7 +65,7 @@ export class NodeServer extends Application {
                 io.on('connection', (socket) => {
                         socket.on('Join', async (room: IRoom) => {
                                 log.debug('New Joiner => ', room.id);
-                                socket.join(room.id);
+                                socket.join(room.id as any);
                         });
                         socket.on('SendMessage', async (message: IMessage) => {
                                 const { id } = socket['decodedToken'];
@@ -73,12 +74,12 @@ export class NodeServer extends Application {
                                 try {
                                         await validatePayload(payload);
                                         const createdMessage = await messagesService.create({
-                                                conversation: payload.id,
+                                                room: payload.id,
                                                 user: id,
                                                 text: payload.text
                                         });
                                         log.debug('New Message from => ', createdMessage);
-                                        io.sockets.in(message.id).emit('Message', createdMessage);
+                                        io.sockets.in(message.id as any).emit('Message', createdMessage.data);
                                 } catch (error) {
                                         socket.emit('MessageValidationError', message);
                                 }
