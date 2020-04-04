@@ -13,7 +13,7 @@ import path from 'path';
 import cors from 'cors';
 import stage from '@core/helpers/stage';
 
-const log = new Logger('Application instance');
+const log = new Logger('Application');
 
 export class Application {
     public application = express();

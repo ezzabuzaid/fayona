@@ -10,9 +10,8 @@ import stage from '@core/helpers/stage';
 import messagesService from '@api/chat/messages/messages.service';
 import { IsString, IsMongoId } from 'class-validator';
 import { validatePayload } from '@shared/common';
-import sqlite from 'sqlite';
 
-const log = new Logger('Server init');
+const log = new Logger('Server');
 
 interface IRoom {
         id: string;
@@ -49,7 +48,7 @@ export class NodeServer extends Application {
         public static async bootstrap() {
                 envirnoment.load(StageLevel.DEV);
                 const server = new NodeServer();
-                await NodeServer.loadDatabase();
+                const database = await NodeServer.loadDatabase();
 
                 // TODO: Move this out
                 const io = socketIO(server.server);

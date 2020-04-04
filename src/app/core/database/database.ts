@@ -62,9 +62,9 @@ export class Database {
             w: 'majority',
             ...connectionOptions
         })
-            .then((connection) => {
+            .then(({ connection }) => {
                 log.info('Database Connected');
-                return connection.connection;
+                return connection;
             })
             .catch((error) => {
                 log.error('Database Not Connected', error);
