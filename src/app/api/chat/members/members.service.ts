@@ -1,7 +1,7 @@
 import { CrudService, Repo } from '@shared/crud';
 import membersModel, { GroupMemberSchema } from './members.model';
 import sharedFolder from '@api/uploads/shared-folder/shared-folder.service';
-import { GroupsSchema } from '../groups';
+import { RoomSchema } from '../groups';
 import { PrimaryID } from '@lib/mongoose';
 
 export class GroupMembersService extends CrudService<GroupMemberSchema> {
@@ -16,7 +16,7 @@ export class GroupMembersService extends CrudService<GroupMemberSchema> {
                 async post(member) {
                     const populatedMember = await member.populate('group').execPopulate();
                     await sharedFolder.create({
-                        folder: (populatedMember.group as unknown as GroupsSchema).folder,
+                        folder: (populatedMember.room as unknown as RoomSchema).folder,
                         shared: true,
                         user: member.user as any
                     });
@@ -27,7 +27,7 @@ export class GroupMembersService extends CrudService<GroupMemberSchema> {
 
     getMemberGroups(id: PrimaryID) {
         return this.repo.fetchAll({ user: id }, {
-            populate: 'group'
+            populate: 'room'
         });
     }
 

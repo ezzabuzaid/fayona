@@ -1,8 +1,8 @@
 import { CrudService, Repo } from '@shared/crud';
-import { groupModel, GroupsSchema } from './group.model';
+import groupModel, { RoomSchema } from './group.model';
 import foldersService from '@api/uploads/folders/folders.service';
 
-export class GroupService extends CrudService<GroupsSchema> {
+export class GroupService extends CrudService<RoomSchema> {
     // TODO: you can easily move the creation logic from the group router to be used here
     // in create post hook, but the problem that we need to pass the user id from the token
     constructor() {
@@ -14,15 +14,6 @@ export class GroupService extends CrudService<GroupsSchema> {
                 },
                 result: (group) => group
             },
-            // all: {
-            //     post(groups) {
-            //         groups.map((group) => {
-            //             if (group.single) {
-            //                 group.title = '';
-            //             }
-            //         });
-            //     }
-            // }
         });
     }
 }

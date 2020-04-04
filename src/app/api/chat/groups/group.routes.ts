@@ -53,7 +53,7 @@ export class GroupsRouter extends CrudRouter<RoomSchema, GroupService> {
         });
 
         await membersService.create({
-            group: room.data.id,
+            room: room.data.id,
             // TODO: find a way to pass the token to service so you don't need this method here,
             // you can move it to service
             user: decodedToken.id,
@@ -62,7 +62,7 @@ export class GroupsRouter extends CrudRouter<RoomSchema, GroupService> {
         // FIXME this will do several round trip to database server
         for (const member_id of members) {
             await membersService.create({
-                group: room.data.id,
+                room: room.data.id,
                 user: member_id,
                 isAdmin: false
             });
@@ -88,9 +88,9 @@ export class GroupsRouter extends CrudRouter<RoomSchema, GroupService> {
     @Get(':id/members', isValidId())
     public async getMembersByGroupId(req: Request) {
         const { id } = cast<{ id: PrimaryID }>(req.params);
-        const result = await membersService.all({ group: id }, {
+        const result = await membersService.all({ room: id }, {
             projection: {
-                group: 0
+                room: 0
             }
         });
         return new Responses.Ok(result.data);
