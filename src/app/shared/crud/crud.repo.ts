@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { Model } from 'mongoose';
-import { Document, Payload, Projection, WithMongoID, ColumnSort, PrimaryID, ForeignKey } from '@lib/mongoose';
+import { Document, Payload, Projection, WithMongoID, ColumnSort, PrimaryKey, ForeignKey } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 
 // TODO: Before any query or write check the body to meet the
@@ -23,7 +23,7 @@ export class Repo<T> {
         return this.model.find(query, {}, options);
     }
 
-    public fetchById(id: PrimaryID) {
+    public fetchById(id: PrimaryKey) {
         return this.fetchOne({ _id: id } as any);
     }
 

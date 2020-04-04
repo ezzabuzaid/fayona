@@ -10,16 +10,16 @@ import stage from '@core/helpers/stage';
 import messagesService from '@api/chat/messages/messages.service';
 import { IsString, IsMongoId } from 'class-validator';
 import { validatePayload } from '@shared/common';
-import { PrimaryID } from '@lib/mongoose';
+import { PrimaryKey } from '@lib/mongoose';
 
 const log = new Logger('Server');
 
 interface IRoom {
-        id: PrimaryID;
+        id: PrimaryKey;
 }
 
 interface IMessage {
-        id: PrimaryID;
+        id: PrimaryKey;
         text: string;
 }
 
@@ -27,7 +27,7 @@ class MessagePayload {
         @IsString()
         public text: string = null;
         @IsMongoId()
-        public id: PrimaryID = null;
+        public id: PrimaryKey = null;
 
         constructor(payload: MessagePayload) {
                 AppUtils.strictAssign(this, payload);

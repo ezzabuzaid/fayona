@@ -3,7 +3,7 @@ import { Post, Router } from '@lib/methods';
 import { Request, Response } from 'express';
 import usersService from '@api/users/users.service';
 import { UsersSchema } from '@api/users';
-import { Payload, WithID } from '@lib/mongoose';
+import { Payload, WithID, PrimaryKey } from '@lib/mongoose';
 import { EmailService, fakeEmail } from '@shared/email';
 import { AppUtils, cast } from '@core/utils';
 import { PortalHelper } from './portal.helper';
@@ -39,7 +39,7 @@ export class LoginDto extends RefreshTokenDto {
     public others_folder = 'others';
     constructor(
         user: ConstructorParameters<typeof RefreshTokenDto>[0],
-        public session_id: string,
+        public session_id: PrimaryKey,
     ) {
         super(user);
     }
@@ -182,7 +182,7 @@ export class PortalRoutes {
 
 }
 
-async function throwIfNotExist(query: Partial<Payload<UsersSchema> & { _id: string }>, message = 'not_exist') {
+async function throwIfNotExist(query: Partial<Payload<UsersSchema> & { _id: PrimaryKey }>, message = 'not_exist') {
     if (AppUtils.isFalsy(query)) {
         throw new Responses.BadRequest(message);
     }

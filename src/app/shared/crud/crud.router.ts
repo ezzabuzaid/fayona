@@ -3,7 +3,7 @@ import { Post, Put, Delete, Get, Patch } from '@lib/methods';
 import { Auth } from '@api/portal';
 import { Request } from 'express';
 import { Responses, HttpResultResponse } from '@core/helpers';
-import { AppUtils } from '@core/utils';
+import { AppUtils, cast } from '@core/utils';
 import { Payload } from '@lib/mongoose';
 import { Types } from 'mongoose';
 import assert from 'assert';
@@ -31,7 +31,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
 
     @Patch(':id', Auth.isAuthenticated, isValidId())
     public async update(req: Request) {
-        const { id } = req.params;
+        const { id } = cast(req.params);
 
         const result = await this.service.updateById(id, req.body);
 
@@ -44,7 +44,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
 
     @Put(':id', Auth.isAuthenticated, isValidId())
     public async set(req: Request) {
-        const { id } = req.params;
+        const { id } = cast(req.params);
 
         const result = await this.service.updateById(id, req.body);
 

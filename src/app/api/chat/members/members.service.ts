@@ -1,7 +1,7 @@
 import { CrudService, Repo } from '@shared/crud';
 import membersModel, { RoomMemberSchema } from './members.model';
 import sharedFolder from '@api/uploads/shared-folder/shared-folder.service';
-import { PrimaryID } from '@lib/mongoose';
+import { PrimaryKey } from '@lib/mongoose';
 import { RoomSchema } from '../rooms';
 import { Constants } from '@core/helpers';
 
@@ -26,13 +26,13 @@ export class RoomMembersService extends CrudService<RoomMemberSchema> {
         });
     }
 
-    getMemberRooms(id: PrimaryID) {
+    getMemberRooms(id: PrimaryKey) {
         return this.repo.fetchAll({ user: id }, {
             populate: 'room'
         });
     }
 
-    getRoom(ids: PrimaryID[]) {
+    getRoom(ids: PrimaryKey[]) {
         return this.repo.model.aggregate([
             {
                 $group: {

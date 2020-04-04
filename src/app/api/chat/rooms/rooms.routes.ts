@@ -10,10 +10,10 @@ import { cast } from '@core/utils';
 import { validate, isValidId } from '@shared/common';
 import messagesService from '@api/chat/messages/messages.service';
 import membersService from '@api/chat/members/members.service';
-import { PrimaryID } from '@lib/mongoose';
+import { PrimaryKey } from '@lib/mongoose';
 
 class RoomPayload {
-    @ArrayMinSize(1, { message: 'a room should at least contain two member' }) public members: PrimaryID[] = null;
+    @ArrayMinSize(1, { message: 'a room should at least contain two member' }) public members: PrimaryKey[] = null;
     @IsString() message: string = null;
     @IsString() name: string = null;
 }
@@ -21,7 +21,7 @@ class RoomPayload {
 class SearchForRoomByMemberValidator {
     @ArrayNotEmpty({
         message: 'a room should consist of more than one member'
-    }) public members: PrimaryID[] = null;
+    }) public members: PrimaryKey[] = null;
 }
 
 @Router(Constants.Endpoints.ROOMS, {
@@ -81,13 +81,13 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
 
     @Get('member/:id', isValidId())
     async getRoom(req: Request) {
-        const { id } = cast<{ id: PrimaryID }>(req.params);
+        const { id } = cast<{ id: PrimaryKey }>(req.params);
         return membersService.getMemberRooms(id);
     }
 
     @Get(':id/members', isValidId())
     public async getMembersByRoomId(req: Request) {
-        const { id } = cast<{ id: PrimaryID }>(req.params);
+        const { id } = cast<{ id: PrimaryKey }>(req.params);
         const result = await membersService.all({ room: id }, {
             projection: {
                 room: 0
@@ -114,7 +114,7 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
 
     @Get(':id/messages', isValidId())
     async getConversationMessages(req: Request) {
-        const { id } = cast<{ id: PrimaryID }>(req.params);
+        const { id } = cast<{ id: PrimaryKey }>(req.params);
         const result = await messagesService.all({ room: id });
         return new Responses.Ok(result.data);
     }

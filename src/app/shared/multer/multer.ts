@@ -2,7 +2,7 @@ import multer = require('multer');
 import path = require('path');
 import assert = require('assert');
 
-import { AppUtils, Parameter } from '@core/utils';
+import { AppUtils, Parameter, cast } from '@core/utils';
 import { Request, NextFunction, Response } from 'express';
 import { Responses, ErrorResponse } from '@core/helpers';
 import { Types } from 'mongoose';
@@ -58,7 +58,7 @@ export class Multer {
                 file: Express.Multer.File,
                 callback: (error: ErrorResponse, dest: string) => void
             ) => {
-                const { folder } = req.params;
+                const { folder } = cast(req.params);
 
                 if (folder !== 'others') {
                     if (Types.ObjectId.isValid(folder)) {

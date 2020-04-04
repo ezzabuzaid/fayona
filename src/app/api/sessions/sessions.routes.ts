@@ -8,14 +8,15 @@ import { sessionsService, SessionsService } from './sessions.service';
 import { validate, PayloadValidator } from '@shared/common';
 import { IsMongoId } from 'class-validator';
 import { cast } from '@core/utils';
+import { ForeignKey, PrimaryKey } from '@lib/mongoose';
 
 export class DeactivateSessionPayload extends PayloadValidator {
 
     @IsMongoId({ message: 'user must be string' })
-    public user: string = null;
+    public user: ForeignKey = null;
 
     @IsMongoId({ message: 'session_id must be string' })
-    public session_id: string = null;
+    public session_id: PrimaryKey = null;
 
 }
 

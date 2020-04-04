@@ -1,5 +1,5 @@
 import { ICrudOptions, ICrudHooks } from './crud.options';
-import { Payload, WithID, WithMongoID, Document, Projection, ColumnSort } from '@lib/mongoose';
+import { Payload, WithID, WithMongoID, Document, Projection, ColumnSort, PrimaryKey } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 import { Repo, IReadAllOptions } from './crud.repo';
 import { translate } from '@lib/translation';
@@ -79,7 +79,7 @@ export class CrudService<T = null> {
         return new Result();
     }
 
-    public async updateById(id: string, payload: Partial<Payload<T>>) {
+    public async updateById(id: PrimaryKey, payload: Partial<Payload<T>>) {
         return this.doUpdate(await this.repo.fetchById(id), payload);
     }
 
@@ -105,7 +105,7 @@ export class CrudService<T = null> {
         return new Result();
     }
 
-    public async set(id: string, payload: Payload<T>) {
+    public async set(id: PrimaryKey, payload: Payload<T>) {
         return this.updateById(id, payload);
     }
 
@@ -136,7 +136,7 @@ export class CrudService<T = null> {
         return new Result();
     }
 
-    public async bulkDelete(ids: string[]) {
+    public async bulkDelete(ids: PrimaryKey[]) {
         // TODO: to be tested
         // TODO: add transaction
         const records = await Promise.all(ids.map((id) => this.repo.fetchById(id)));

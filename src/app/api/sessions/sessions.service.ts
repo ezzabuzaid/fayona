@@ -1,6 +1,6 @@
 import { Repo, CrudService } from '@shared/crud';
 import { SessionSchema, SessionModel } from './sessions.model';
-import { Document, Payload, WithMongoID } from '@lib/mongoose';
+import { Document, Payload, WithMongoID, ForeignKey } from '@lib/mongoose';
 import { AppUtils, Omit } from '@core/utils';
 
 export class SessionsService extends CrudService<SessionSchema> {
@@ -39,7 +39,7 @@ export class SessionsService extends CrudService<SessionSchema> {
         return this.all({ active: true });
     }
 
-    public getActiveUserSession(user: string) {
+    public getActiveUserSession(user: ForeignKey) {
         return this.all({ user, active: true });
     }
 
@@ -47,7 +47,7 @@ export class SessionsService extends CrudService<SessionSchema> {
         return this.update(record, { active: false });
     }
 
-    public async deActivatedUserSessions(user: string) {
+    public async deActivatedUserSessions(user: ForeignKey) {
         const result = await this.all({ user });
         return Promise.all(result.data.list.map((record) => this.setAsDeactive(record)));
     }

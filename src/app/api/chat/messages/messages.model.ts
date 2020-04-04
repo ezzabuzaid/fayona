@@ -1,10 +1,10 @@
-import { Entity, Field, BaseModel, PrimaryID } from '@lib/mongoose';
+import { Entity, Field, BaseModel, PrimaryKey } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
 
 @Entity(Constants.Schemas.MESSAGES)
 export class MessagesSchema {
     @Field({ lowercase: false }) text: string;
-    @Field() user: PrimaryID;
-    @Field({ required: true }) room: PrimaryID;
+    @Field() user: PrimaryKey;
+    @Field({ required: true }) room: PrimaryKey;
 }
 export default BaseModel(MessagesSchema);
