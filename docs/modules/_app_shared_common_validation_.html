@@ -73,6 +73,7 @@
 						<section class="tsd-index-section ">
 							<h3>Classes</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/_app_shared_common_validation_.namevalidator.html" class="tsd-kind-icon">Name<wbr>Validator</a></li>
 								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/_app_shared_common_validation_.payloadvalidator.html" class="tsd-kind-icon">Payload<wbr>Validator</a></li>
 								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/_app_shared_common_validation_.validationpatterns.html" class="tsd-kind-icon">Validation<wbr>Patterns</a></li>
 							</ul>
@@ -80,6 +81,7 @@
 						<section class="tsd-index-section ">
 							<h3>Functions</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_app_shared_common_validation_.html#isvalidid" class="tsd-kind-icon">is<wbr>Valid<wbr>Id</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="_app_shared_common_validation_.html#validate" class="tsd-kind-icon">validate</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="_app_shared_common_validation_.html#validatepayload" class="tsd-kind-icon">validate<wbr>Payload</a></li>
 							</ul>
@@ -89,17 +91,34 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Functions</h2>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-					<a name="validate" class="tsd-anchor"></a>
-					<h3>validate</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">validate&lt;T&gt;<span class="tsd-signature-symbol">(</span>validator<span class="tsd-signature-symbol">: </span><a href="_app_core_utils_utils_service_.html#type" class="tsd-signature-type">Type</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>, type<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">"body"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"query"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"params"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"headers"</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">(Anonymous function)</span></li>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="isvalidid" class="tsd-anchor"></a>
+					<h3>is<wbr>Valid<wbr>Id</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Valid<wbr>Id<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">(Anonymous function)</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/shared/common/validation.ts#L24">src/app/shared/common/validation.ts:24</a></li>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/1f2d472/src/app/shared/common/validation.ts#L11">src/app/shared/common/validation.ts:11</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">(Anonymous function)</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+					<a name="validate" class="tsd-anchor"></a>
+					<h3>validate</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">validate&lt;T&gt;<span class="tsd-signature-symbol">(</span>validator<span class="tsd-signature-symbol">: </span><a href="_app_core_utils_utils_service_.html#type" class="tsd-signature-type">Type</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span>, type<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">"body"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"query"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"params"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"headers"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"queryPolluted"</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">(Anonymous function)</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/1f2d472/src/app/shared/common/validation.ts#L36">src/app/shared/common/validation.ts:36</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -114,7 +133,7 @@
 									<h5>validator: <a href="_app_core_utils_utils_service_.html#type" class="tsd-signature-type">Type</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> type: <span class="tsd-signature-type">"body"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"query"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"params"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"headers"</span><span class="tsd-signature-symbol"> = &quot;body&quot;</span></h5>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> type: <span class="tsd-signature-type">"body"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"query"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"params"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"headers"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"queryPolluted"</span><span class="tsd-signature-symbol"> = &quot;body&quot;</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">(Anonymous function)</span></h4>
@@ -131,7 +150,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/shared/common/validation.ts#L11">src/app/shared/common/validation.ts:11</a></li>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/1f2d472/src/app/shared/common/validation.ts#L23">src/app/shared/common/validation.ts:23</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -166,10 +185,16 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/_app_shared_common_validation_.namevalidator.html" class="tsd-kind-icon">Name<wbr>Validator</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
 						<a href="../classes/_app_shared_common_validation_.payloadvalidator.html" class="tsd-kind-icon">Payload<wbr>Validator</a>
 					</li>
 					<li class=" tsd-kind-class tsd-parent-kind-module">
 						<a href="../classes/_app_shared_common_validation_.validationpatterns.html" class="tsd-kind-icon">Validation<wbr>Patterns</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_app_shared_common_validation_.html#isvalidid" class="tsd-kind-icon">is<wbr>Valid<wbr>Id</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 						<a href="_app_shared_common_validation_.html#validate" class="tsd-kind-icon">validate</a>

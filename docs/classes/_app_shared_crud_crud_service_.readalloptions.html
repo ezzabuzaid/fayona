@@ -100,6 +100,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_app_shared_crud_crud_service_.readalloptions.html#lean" class="tsd-kind-icon">lean</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_app_shared_crud_crud_service_.readalloptions.html#limit" class="tsd-kind-icon">limit</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_app_shared_crud_crud_service_.readalloptions.html#populate" class="tsd-kind-icon">populate</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_app_shared_crud_crud_service_.readalloptions.html#projection" class="tsd-kind-icon">projection</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_app_shared_crud_crud_service_.readalloptions.html#skip" class="tsd-kind-icon">skip</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-not-exported"><a href="_app_shared_crud_crud_service_.readalloptions.html#sort" class="tsd-kind-icon">sort</a></li>
@@ -114,22 +115,33 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-not-exported">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Read<wbr>All<wbr>Options<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>page<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>size<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>sort<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_app_shared_crud_crud_service_.readalloptions.html" class="tsd-signature-type">ReadAllOptions</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Read<wbr>All<wbr>Options<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>lean<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>page<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>populate<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">{ [P in keyof T]: ObjectId extends T[P] ? P : never; }[keyof T]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">; </span>select<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>projection<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">; </span>size<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>sort<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_app_shared_crud_crud_service_.readalloptions.html" class="tsd-signature-type">ReadAllOptions</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/shared/crud/crud.service.ts#L204">src/app/shared/crud/crud.service.ts:204</a></li>
+									<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/1f2d472/src/app/shared/crud/crud.service.ts#L209">src/app/shared/crud/crud.service.ts:209</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>__namedParameters: <span class="tsd-signature-symbol">{ </span>page<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>size<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>sort<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> }</span></h5>
+									<h5>__namedParameters: <span class="tsd-signature-symbol">{ </span>lean<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>page<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>populate<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">{ [P in keyof T]: ObjectId extends T[P] ? P : never; }[keyof T]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">; </span>select<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>projection<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">; </span>size<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>sort<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> }</span></h5>
 									<ul class="tsd-parameters">
 										<li class="tsd-parameter">
+											<h5>lean<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></h5>
+										</li>
+										<li class="tsd-parameter">
 											<h5>page<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>populate<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">{ [P in keyof T]: ObjectId extends T[P] ? P : never; }[keyof T]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>path<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">; </span>select<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>projection<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span></h5>
+											<ul class="tsd-parameters">
+											</ul>
 										</li>
 										<li class="tsd-parameter">
 											<h5>size<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span></h5>
@@ -155,7 +167,7 @@
 					<div class="tsd-signature tsd-kind-icon">lean<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/shared/crud/crud.service.ts#L204">src/app/shared/crud/crud.service.ts:204</a></li>
+							<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/1f2d472/src/app/shared/crud/crud.service.ts#L208">src/app/shared/crud/crud.service.ts:208</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -165,7 +177,17 @@
 					<div class="tsd-signature tsd-kind-icon">limit<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/shared/crud/crud.service.ts#L201">src/app/shared/crud/crud.service.ts:201</a></li>
+							<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/1f2d472/src/app/shared/crud/crud.service.ts#L205">src/app/shared/crud/crud.service.ts:205</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
+					<a name="populate" class="tsd-anchor"></a>
+					<h3>populate</h3>
+					<div class="tsd-signature tsd-kind-icon">populate<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> = null</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/1f2d472/src/app/shared/crud/crud.service.ts#L209">src/app/shared/crud/crud.service.ts:209</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -175,7 +197,7 @@
 					<div class="tsd-signature tsd-kind-icon">projection<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Projection</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/shared/crud/crud.service.ts#L203">src/app/shared/crud/crud.service.ts:203</a></li>
+							<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/1f2d472/src/app/shared/crud/crud.service.ts#L207">src/app/shared/crud/crud.service.ts:207</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -185,7 +207,7 @@
 					<div class="tsd-signature tsd-kind-icon">skip<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/shared/crud/crud.service.ts#L200">src/app/shared/crud/crud.service.ts:200</a></li>
+							<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/1f2d472/src/app/shared/crud/crud.service.ts#L204">src/app/shared/crud/crud.service.ts:204</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -195,7 +217,7 @@
 					<div class="tsd-signature tsd-kind-icon">sort<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ColumnSort</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/04dff4b/src/app/shared/crud/crud.service.ts#L202">src/app/shared/crud/crud.service.ts:202</a></li>
+							<li>Defined in <a href="https://github.com/ezzabuzaid/node_buildozer/blob/1f2d472/src/app/shared/crud/crud.service.ts#L206">src/app/shared/crud/crud.service.ts:206</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -235,6 +257,9 @@
 								<a href="_app_shared_crud_crud_service_.readalloptions.html#limit" class="tsd-kind-icon">limit</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
+								<a href="_app_shared_crud_crud_service_.readalloptions.html#populate" class="tsd-kind-icon">populate</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
 								<a href="_app_shared_crud_crud_service_.readalloptions.html#projection" class="tsd-kind-icon">projection</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-not-exported">
@@ -249,12 +274,6 @@
 				<ul class="after-current">
 					<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter tsd-is-not-exported">
 						<a href="_app_shared_crud_crud_service_.result.html" class="tsd-kind-icon">Result</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter tsd-is-not-exported">
-						<a href="../interfaces/_app_shared_crud_crud_service_.ireadalloptions.html" class="tsd-kind-icon">IRead<wbr>All<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter tsd-is-not-exported">
-						<a href="../interfaces/_app_shared_crud_crud_service_.ireadoneoptions.html" class="tsd-kind-icon">IRead<wbr>One<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter tsd-is-not-exported">
 						<a href="../modules/_app_shared_crud_crud_service_.html#gethooks" class="tsd-kind-icon">get<wbr>Hooks</a>
