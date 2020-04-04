@@ -13,22 +13,20 @@ export namespace Constants {
         public static readonly RESET_PASSWORD = 'resetpassword';
         public static readonly REFRESH_TOKEN = 'refreshtoken';
         public static readonly VERIFY_ACCOUNT = 'verifyaccount';
-        public static readonly GROUPS = 'groups';
+        public static readonly ROOMS = 'rooms';
         public static readonly MEMBERS = 'members';
         public static readonly UPLOADS = 'uploads';
         public static readonly FOLDERS = 'folders';
-        public static readonly CONVERSATIONS = 'conversation';
     }
     export class Schemas {
         public static readonly Feedback = 'feedback';
         public static readonly ACCOUNTS = 'accounts';
         public static readonly SESSIONS = 'sessions';
         public static readonly USERS = 'users';
-        public static readonly GROUPS = 'groups';
+        public static readonly ROOMS = 'rooms';
         public static readonly MEMBERS = 'members';
         public static readonly UPLOADS = 'uploads';
         public static readonly FOLDERS = 'folders';
-        public static readonly CONVERSATIONS = 'conversation';
         public static readonly MESSAGES = 'messages';
     }
 }
