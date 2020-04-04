@@ -1,7 +1,7 @@
 import { Router, Post, Get } from '@lib/methods';
 import { Constants, tokenService, Responses } from '@core/helpers';
 import { CrudRouter } from '@shared/crud';
-import { GroupsSchema } from './group.model';
+import { RoomSchema } from './group.model';
 import { groupsService, GroupService } from './group.service';
 import { Request } from 'express';
 import { Auth } from '@api/portal';
@@ -24,10 +24,10 @@ class SearchForGroupByMemberValidator {
     }) public members: PrimaryID[] = null;
 }
 
-@Router(Constants.Endpoints.GROUPS, {
+@Router(Constants.Endpoints.ROOMS, {
     middleware: [Auth.isAuthenticated]
 })
-export class GroupsRouter extends CrudRouter<GroupsSchema, GroupService> {
+export class GroupsRouter extends CrudRouter<RoomSchema, GroupService> {
     constructor() {
         super(groupsService);
     }
@@ -37,23 +37,23 @@ export class GroupsRouter extends CrudRouter<GroupsSchema, GroupService> {
         // TODO: create member and group should be within transaction
         const { members, message, name } = cast<GroupPayload>(req.body);
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        const group = await this.service.create({
+        const room = await this.service.create({
             single: members.length === 1,
             name
         });
 
-        if (group.hasError) {
-            throw new Responses.BadRequest(group.message);
+        if (room.hasError) {
+            throw new Responses.BadRequest(room.message);
         }
 
         await messagesService.create({
             text: message,
             user: decodedToken.id,
-            conversation: group.data.id
+            room: room.data.id
         });
 
         await membersService.create({
-            group: group.data.id,
+            group: room.data.id,
             // TODO: find a way to pass the token to service so you don't need this method here,
             // you can move it to service
             user: decodedToken.id,
@@ -62,12 +62,12 @@ export class GroupsRouter extends CrudRouter<GroupsSchema, GroupService> {
         // FIXME this will do several round trip to database server
         for (const member_id of members) {
             await membersService.create({
-                group: group.data.id,
+                group: room.data.id,
                 user: member_id,
                 isAdmin: false
             });
         }
-        return new Responses.Created(group.data);
+        return new Responses.Created(room.data);
     }
 
     @Get('members', validate(SearchForGroupByMemberValidator, 'queryPolluted'))
@@ -93,6 +93,29 @@ export class GroupsRouter extends CrudRouter<GroupsSchema, GroupService> {
                 group: 0
             }
         });
+        return new Responses.Ok(result.data);
+    }
+
+    @Get('groups')
+    public async getGroups(req: Request) {
+        const groups = await this.service.all({
+            single: false,
+        });
+        return groups.data;
+    }
+
+    @Get('conversations')
+    public async getConversations(req: Request) {
+        const conversations = await this.service.all({
+            single: true,
+        });
+        return conversations.data;
+    }
+
+    @Get(':id/messages', isValidId())
+    async getConversationMessages(req: Request) {
+        const { id } = cast<{ id: PrimaryID }>(req.params);
+        const result = await messagesService.all({ room: id });
         return new Responses.Ok(result.data);
     }
 
