@@ -18,10 +18,9 @@ export class Repo<T> {
 
     public fetchAll(
         query: Partial<WithMongoID<Payload<T>>> = {},
-        projection: Projection<T> = {},
         options: Partial<IReadAllOptions<T>> = {}
     ) {
-        return this.model.find(query, projection, options);
+        return this.model.find(query, {}, options);
     }
 
     public fetchById(id: string) {
