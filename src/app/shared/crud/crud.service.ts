@@ -37,21 +37,21 @@ export class CrudService<T = null> {
             for (let index = 0; index < this.options.unique.length; index++) {
                 const field = this.options.unique[index];
                 if (AppUtils.isNullOrUndefined(payload[field])) {
-                    return new Result({ message: `property${field} is missing`, });
+                    return `property${field} is missing`;
                 }
                 const record = await fetchOne(field);
                 if (AppUtils.isTruthy(record)) {
-                    return new Result({ message: translate(`${this.options.unique[index]}_entity_exist`) });
+                    return translate(`${this.options.unique[index]}_entity_exist`);
                 }
             }
         }
-        return new Result();
+        return false;
     }
 
-    public async create<Y = { id: string }>(payload: Payload<T>) {
+    public async create(payload: Payload<T>): Promise<Result<WithID<T>>> {
         const isExist = await this.isEntityExist(payload);
-        if (isExist.hasError) {
-            return isExist;
+        if (isExist) {
+            return new Result({ message: isExist });
         }
 
         const entity = this.repo.create(payload);
@@ -61,8 +61,8 @@ export class CrudService<T = null> {
         await post(entity);
 
         return result
-            ? new Result<Y>({ data: result(entity) })
-            : new Result<Y>({ data: { id: entity.id } as any });
+            ? new Result<T>({ data: result(entity) })
+            : new Result<T>({ data: { id: entity.id } as any });
     }
 
     public async delete(query: Partial<WithMongoID<Payload<T>>>) {
@@ -92,9 +92,9 @@ export class CrudService<T = null> {
             return new Result({ message: 'entity_not_exist' });
         }
 
-        const isExist = await this.isEntityExist(payload as Payload<T>);
-        if (isExist.hasError) {
-            return isExist;
+        const isExist = await this.isEntityExist(payload as any);
+        if (isExist) {
+            return new Result({ message: isExist });
         }
 
         const { pre, post } = getHooks(this.options.update);
@@ -172,7 +172,7 @@ export class CrudService<T = null> {
         const { pre, post } = getHooks(this.options.all as any);
 
         const readOptions = new ReadAllOptions(options);
-        const documentQuery = this.repo.fetchAll(query, readOptions.projection, readOptions);
+        const documentQuery = this.repo.fetchAll(query, readOptions);
         await pre(documentQuery);
         const documents = await documentQuery.exec();
         await post(documents);
@@ -206,10 +206,14 @@ class ReadAllOptions<T> {
     public sort: ColumnSort<T> = null;
     public projection: Projection<T> = {};
     public lean = false;
+    public populate = null;
 
-    constructor({ page = 0, size = 0, sort }: Partial<IReadAllOptions<T>>) {
+    constructor({ page = 0, size = 0, sort, populate, projection, lean }: Partial<IReadAllOptions<T>>) {
         this.skip = +page * size || null;
         this.limit = +size || null;
         this.sort = sort;
+        this.populate = populate;
+        this.projection = projection;
+        this.lean = lean;
     }
 }

@@ -24,7 +24,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         // TODO: payload is not validated yet
         const result = await this.service.create(req.body);
         if (result.hasError) {
-            return new Responses.BadRequest(result.data);
+            return new Responses.BadRequest(result.message);
         }
         return new Responses.Created(result.data);
     }
@@ -36,7 +36,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         const result = await this.service.updateById(id, req.body);
 
         if (result.hasError) {
-            return new Responses.BadRequest(result.data);
+            return new Responses.BadRequest(result.message);
         }
 
         return new Responses.Ok(result.data);
@@ -49,7 +49,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         const result = await this.service.updateById(id, req.body);
 
         if (result.hasError) {
-            return new Responses.BadRequest(result.data);
+            return new Responses.BadRequest(result.message);
         }
 
         return new Responses.Ok(result.data);
