@@ -48,7 +48,7 @@ export class CrudService<T = null> {
         return new Result();
     }
 
-    public async create(payload: Payload<T>) {
+    public async create<Y = { id: string }>(payload: Payload<T>) {
         const isExist = await this.isEntityExist(payload);
         if (isExist.hasError) {
             return isExist;
@@ -59,7 +59,10 @@ export class CrudService<T = null> {
         await pre(entity);
         await entity.save();
         await post(entity);
-        return result ? result(entity) : new Result({ data: { id: entity.id } });
+
+        return result
+            ? new Result<Y>({ data: result(entity) })
+            : new Result<Y>({ data: { id: entity.id } as any });
     }
 
     public async delete(query: Partial<WithMongoID<Payload<T>>>) {
