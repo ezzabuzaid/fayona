@@ -1,5 +1,8 @@
 import { CrudService, Repo } from '@shared/crud';
 import membersModel, { GroupMemberSchema } from './members.model';
+import sharedFolder from '@api/uploads/shared-folder/shared-folder.service';
+import { GroupsSchema } from '../groups';
+import { PrimaryID } from '@lib/mongoose';
 
 export class GroupMembersService extends CrudService<GroupMemberSchema> {
     constructor() {
@@ -9,16 +12,26 @@ export class GroupMembersService extends CrudService<GroupMemberSchema> {
                     documents.populate('user');
                 }
             },
+            create: {
+                async post(member) {
+                    const populatedMember = await member.populate('group').execPopulate();
+                    await sharedFolder.create({
+                        folder: (populatedMember.group as unknown as GroupsSchema).folder,
+                        shared: true,
+                        user: member.user as any
+                    });
+                }
+            }
         });
     }
 
-    getMemberGroups(id: string) {
-        return this.repo.fetchAll({ user: id }, {}, {
+    getMemberGroups(id: PrimaryID) {
+        return this.repo.fetchAll({ user: id }, {
             populate: 'group'
         });
     }
 
-    getGroup(ids: string[]) {
+    getGroup(ids: PrimaryID[]) {
         return this.repo.model.aggregate([
             {
                 $group: {
