@@ -24,6 +24,17 @@ export class FoldersService extends CrudService<FoldersSchema> {
                 }
             }
         });
+        // this.repo.model.find({
+        //     owners: {
+        //         $elemMatch: id
+        //     }
+        // });
+
+        // this.repo.model.find({
+        //     owners: {
+        //         $in: [id]
+        //     }
+        // });
     }
 }
 

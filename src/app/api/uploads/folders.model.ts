@@ -4,7 +4,6 @@ import { Types } from 'mongoose';
 
 @Entity(Constants.Schemas.FOLDERS)
 export class FoldersSchema {
-    @Field({ required: true }) public user: Types.ObjectId;
     @Field({ lowercase: false }) public name: string;
 }
 

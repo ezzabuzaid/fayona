@@ -97,7 +97,9 @@ export class ErrorHandling {
                 response.message = 'request entity too large';
                 break;
             default:
+
         }
+        console.log(error);
         res.status(response.code).json(response);
     }
 
