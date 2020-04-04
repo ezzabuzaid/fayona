@@ -1,18 +1,17 @@
-import { Entity, Field, BaseModel } from '@lib/mongoose';
+import { Entity, Field, BaseModel, ForeignKey } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
-import { Types } from 'mongoose';
 
 @Entity(Constants.Schemas.CONVERSATIONS)
 export class ConversationSchema {
     @Field({
         required: true,
         ref: Constants.Schemas.USERS
-    }) user1: Types.ObjectId;
+    }) user1: ForeignKey;
     @Field({
         required: true,
         ref: Constants.Schemas.USERS
-    }) user2: Types.ObjectId;
-    @Field() folder?: string = null;
+    }) user2: ForeignKey;
+    @Field() folder?: ForeignKey = null;
 }
 export default BaseModel(ConversationSchema);
 
