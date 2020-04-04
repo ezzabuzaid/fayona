@@ -8,7 +8,7 @@ export class GroupService extends CrudService<GroupsSchema> {
     constructor() {
         super(new Repo(groupModel), {
             create: {
-                async pre(group) {
+                async post(group) {
                     const folder = await foldersService.create({ name: group.name });
                     group.folder = folder.data.id;
                 },
