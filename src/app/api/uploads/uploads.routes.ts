@@ -6,12 +6,13 @@ import { Auth } from '@api/portal';
 import { CrudRouter } from '@shared/crud';
 import { UploadsSchema } from './uploads.model';
 import uploadsService, { UploadsService } from './uploads.service';
-import foldersService, { FoldersService } from './folders.service';
+import foldersService, { FoldersService } from './folders/folders.service';
 import path from 'path';
-import { AppUtils, cast } from '@core/utils';
+import { cast } from '@core/utils';
 import { IsString, IsMongoId } from 'class-validator';
-import { validate } from '@shared/common';
-import { FoldersSchema } from './folders.model';
+import { validate, NameValidator } from '@shared/common';
+import { FoldersSchema } from './folders/folders.model';
+import sharedFolderService from './shared-folder/shared-folder.service';
 
 class FilesSearchPayload {
     @IsMongoId()
@@ -54,7 +55,7 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
             path: filePath,
         });
         if (result.hasError) {
-            return new Responses.BadRequest(result.data);
+            return new Responses.BadRequest(result.message);
         }
         return new Responses.Created({
             ...result.data,
@@ -85,28 +86,36 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
         super(foldersService);
     }
 
-    @Get('/')
-    public async getFolders(req: Request, res: Response) {
+    @Get('user')
+    public async getUserFolders(req: Request, res: Response) {
         // TODO: very important is to find a way to pass the current user to service
-        const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
+        const { id } = await tokenService.decodeToken(req.headers.authorization);
 
-        const folders = await foldersService.all({ user: user_id });
+        // const folders = await foldersService.all();
+        const folders = await sharedFolderService.all(
+            {
+                user: id,
+                shared: true
+            },
+        );
         return new Responses.Ok(folders.data);
     }
 
-    @Post('/')
+    @Post('/', validate(NameValidator))
     public async createFolder(req: Request, res: Response) {
-        // TODO: very important is to find a way to pass the current user to service
         const { name } = req.body;
-        const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
-        if (AppUtils.isEmptyString(name)) {
-            throw new Responses.BadRequest('please provide valid name');
-        } else {
-            const result = await foldersService.create({ name, user: user_id });
-            if (AppUtils.not(result.hasError)) {
-                return new Responses.Created(result.data);
-            }
+        const { id } = await tokenService.decodeToken(req.headers.authorization);
+        const result = await foldersService.create({ name });
+        // TODO: it's very important to find a way to pass the current user to service
+        await sharedFolderService.create({
+            folder: result.data.id,
+            shared: false,
+            user: id
+        });
+        if (result.hasError) {
+            return new Responses.BadRequest(result.message);
         }
+        return new Responses.Created(result.data);
     }
 
     @Get('tags')
