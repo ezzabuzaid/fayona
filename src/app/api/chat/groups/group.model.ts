@@ -9,12 +9,12 @@ import { Constants } from '@core/helpers';
 // not needed because @Entity will register it as mongose model,
 //  you can pass an option with @Entity to not to create model
 
-@Entity(Constants.Schemas.GROUPS)
-export class GroupsSchema {
+@Entity(Constants.Schemas.ROOMS)
+export class RoomSchema {
     @Field() folder?: ForeignKey = null;
     @Field({ pure: true }) public name?: string = null;
     @Field({ pure: true }) public avatar?: string = null;
     @Field() single = true;
 }
 
-export const groupModel = BaseModel(GroupsSchema);
+export default BaseModel(RoomSchema);
