@@ -102,3 +102,4 @@ typings/
 local_configuration.json
 
 uploads/**/*
+.sqlite
