@@ -1,6 +1,6 @@
 import assert from 'assert';
-import { Model, Types } from 'mongoose';
-import { Document, Payload, Projection, WithMongoID, ColumnSort } from '@lib/mongoose';
+import { Model } from 'mongoose';
+import { Document, Payload, Projection, WithMongoID, ColumnSort, PrimaryID, ForeignKey } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 
 // TODO: Before any query or write check the body to meet the
@@ -23,7 +23,7 @@ export class Repo<T> {
         return this.model.find(query, {}, options);
     }
 
-    public fetchById(id: string) {
+    public fetchById(id: PrimaryID) {
         return this.fetchOne({ _id: id } as any);
     }
 
@@ -34,11 +34,11 @@ export class Repo<T> {
 interface IReadOneOptions<T> {
     projection: Projection<T>;
     lean: boolean;
-    populate: ObjectIDOnly<T> | { path: keyof T, select: string };
+    populate: ForeignKeysOnly<T> | { path: keyof T, select: string };
 }
 
-type ObjectIDOnly<T> = {
-    [P in keyof T]: Types.ObjectId extends T[P] ? P : never
+type ForeignKeysOnly<T> = {
+    [P in keyof T]: ForeignKey extends T[P] ? P : never
 }[keyof T];
 
 export interface IReadAllOptions<T> extends IReadOneOptions<T> {
