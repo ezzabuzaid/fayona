@@ -48,9 +48,8 @@ export class GroupMembersService extends CrudService<GroupMemberSchema> {
             .then((groups) => {
                 return groups.find((group) => {
                     // TODO: check if there's a way to this check using mongo aggregate
-                    const sameMembers = group.members.every((element) => ids.includes(element));
-                    return sameMembers ? group : null;
-                });
+                    return ids.every((element) => group.members.includes(element));
+                }) || null;
             });
     }
 }
