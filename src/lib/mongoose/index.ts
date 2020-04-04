@@ -17,10 +17,11 @@ export namespace MongooseTypes {
 }
 
 export type CastObjectIDToString<T> = { [key in keyof T]: T[key] extends Types.ObjectId ? string : T[key] };
-export type WithID<T> = { id?: string } & T;
-export type WithMongoID<T> = { _id: string } & T;
+export type WithID<T> = { id?: Types.ObjectId } & T;
+export type WithMongoID<T> = { _id: Types.ObjectId } & T;
 
-export type Payload<T> = CastObjectIDToString<OmitProperties<T, (...args: any) => any>>;
+export type Payload<T> = OmitProperties<T, (...args: any) => any>;
+// export type Payload<T> = CastObjectIDToString<OmitProperties<T, (...args: any) => any>>;
 
 export function generateModelMetadataKey(target: any) {
     return `model:${target.name}`;
@@ -28,3 +29,4 @@ export function generateModelMetadataKey(target: any) {
 
 export type Projection<T> = Partial<{ [key in keyof Payload<T>]: 1 | 0 }>;
 export type ColumnSort<T> = { [ket in keyof T]: 'asc' | 'desc' | 'ascending' | 'descending' };
+export type PrimaryID = Types.ObjectId;
