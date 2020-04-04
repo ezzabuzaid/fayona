@@ -5,7 +5,6 @@ import { SessionRouter } from '@api/sessions';
 import { IExpressInternal, IExpressRouter } from '@lib/methods';
 import { GroupsRouter } from '@api/chat/groups';
 import { FileUploadRoutes, FoldersRoutes } from '@api/uploads';
-import { ConversationRouter } from '@api/chat/conversations';
 import { SettingRoutes } from '@api/settings';
 
 export class Wrapper {
@@ -63,5 +62,4 @@ Wrapper.registerRouter(SessionRouter);
 Wrapper.registerRouter(GroupsRouter);
 Wrapper.registerRouter(FileUploadRoutes);
 Wrapper.registerRouter(FoldersRoutes);
-Wrapper.registerRouter(ConversationRouter);
 Wrapper.registerRouter(SettingRoutes);
