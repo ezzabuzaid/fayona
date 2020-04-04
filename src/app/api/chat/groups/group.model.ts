@@ -1,4 +1,4 @@
-import { BaseModel, Entity, Field, Payload } from '@lib/mongoose';
+import { BaseModel, Entity, Field, ForeignKey } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
 
 // FIXME
@@ -11,7 +11,7 @@ import { Constants } from '@core/helpers';
 
 @Entity(Constants.Schemas.GROUPS)
 export class GroupsSchema {
-    @Field() folder?: string = null;
+    @Field() folder?: ForeignKey = null;
     @Field({ pure: true }) public name?: string = null;
     @Field({ pure: true }) public avatar?: string = null;
     @Field() single = true;

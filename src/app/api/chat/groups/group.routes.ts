@@ -10,9 +10,10 @@ import { cast } from '@core/utils';
 import { validate, isValidId } from '@shared/common';
 import messagesService from '@api/chat/messages/messages.service';
 import membersService from '@api/chat/members/members.service';
+import { PrimaryID } from '@lib/mongoose';
 
 class GroupPayload {
-    @ArrayMinSize(1, { message: 'a group should at least contain two member' }) public members: string[] = null;
+    @ArrayMinSize(1, { message: 'a group should at least contain two member' }) public members: PrimaryID[] = null;
     @IsString() message: string = null;
     @IsString() name: string = null;
 }
@@ -20,7 +21,7 @@ class GroupPayload {
 class SearchForGroupByMemberValidator {
     @ArrayNotEmpty({
         message: 'a group should consist of more than one member'
-    }) public members: string[] = null;
+    }) public members: PrimaryID[] = null;
 }
 
 @Router(Constants.Endpoints.GROUPS, {
@@ -36,7 +37,6 @@ export class GroupsRouter extends CrudRouter<GroupsSchema, GroupService> {
         // TODO: create member and group should be within transaction
         const { members, message, name } = cast<GroupPayload>(req.body);
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-
         const group = await this.service.create({
             single: members.length === 1,
             name
@@ -81,13 +81,13 @@ export class GroupsRouter extends CrudRouter<GroupsSchema, GroupService> {
 
     @Get('member/:id', isValidId())
     async getGroup(req: Request) {
-        const { id } = req.params;
+        const { id } = cast<{ id: PrimaryID }>(req.params);
         return membersService.getMemberGroups(id);
     }
 
     @Get(':id/members', isValidId())
     public async getMembersByGroupId(req: Request) {
-        const { id } = req.params;
+        const { id } = cast<{ id: PrimaryID }>(req.params);
         const result = await membersService.all({ group: id }, {
             projection: {
                 group: 0
