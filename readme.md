@@ -6,7 +6,7 @@ It helps in easily kick off most of the small and mid projects.
 
 DDD is the core of what it means, although not the whole concept is leveraged out, still, it looks like domain originated
 
-![Sample Crud](https://media-exp1.licdn.com/dms/image/C4D22AQFXto7aXpbAfw/feedshare-shrink_800/0?e=1583971200&v=beta&t=chjQfyxTaYaqpH4NYWJ0v_Rcns1L-QwLqYae_UK7swE)
+![Sample Crud](https://media-exp1.licdn.com/dms/image/C4D22AQFXto7aXpbAfw/feedshare-shrink_2048_1536/0?e=1588809600&v=beta&t=Hw7RYWdgfrbs8pq8Xp5OunZWVzwdfMmPBdXTkaHVyXA)
 
 #### it would be nice to put your touches
 
