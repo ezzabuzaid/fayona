@@ -1,10 +1,12 @@
 # Node Buildozer
+  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/ezzabuzaid/document-storage/pulls)  [![License](https://flat.badgen.net/npm/license/@ezzabuzaid/document-storage)](https://www.npmjs.com/package/@ezzabuzaid/document-storage) ![Typed with TypeScript](https://flat.badgen.net/badge/icon/Typed?icon=typescript&label&labelColor=blue&color=555555)
 
-### A small opinionated framework built on top of Express using Typescript with minimal 3rd party dependencies,
 
-It helps in easily kick off most of the small and mid projects.
+### A small opinionated framework built on top of Express using Typescript with minimal 3rd party dependencies that helps to easily kick off most of the small and mid projects.
+DDD is the core of what it means, although not the whole concept is leveraged out, still, it looks like domain oriented
 
-DDD is the core of what it means, although not the whole concept is leveraged out, still, it looks like domain originated
+Please consider following this project's author, [Ezz](https://github.com/ezzabuzaid), and consider starring the project to show your ❤️ and support.
+
 
 ![Sample Crud](https://media-exp1.licdn.com/dms/image/C4D22AQFXto7aXpbAfw/feedshare-shrink_2048_1536/0?e=1588809600&v=beta&t=Hw7RYWdgfrbs8pq8Xp5OunZWVzwdfMmPBdXTkaHVyXA)
 
