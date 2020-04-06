@@ -8,7 +8,7 @@ export class RoomsService extends CrudService<RoomSchema> {
     constructor() {
         super(new Repo(roomsModel), {
             create: {
-                async post(room) {
+                async pre(room) {
                     const folder = await foldersService.create({ name: room.name });
                     room.folder = folder.data.id;
                 },
