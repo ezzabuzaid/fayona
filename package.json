@@ -52,7 +52,7 @@
     "husky": "^3.0.8",
     "jsonwebtoken": "^8.5.1",
     "libphonenumber-js": "^1.7.44",
-    "mongoose": "^5.9.3",
+    "mongoose": "^5.9.7",
     "morgan": "^1.9.1",
     "multer": "^1.4.1",
     "node-cron": "^2.0.3",
