@@ -86,16 +86,29 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
         super(foldersService);
     }
 
+    @Get('user/shared')
+    public async getUserSharedolders(req: Request, res: Response) {
+        // TODO: very important is to find a way to pass the current user to service
+        const { id } = await tokenService.decodeToken(req.headers.authorization);
+
+        const folders = await sharedFolderService.all(
+            {
+                user: id,
+                shared: true
+            },
+        );
+        return new Responses.Ok(folders.data);
+    }
+
     @Get('user')
     public async getUserFolders(req: Request, res: Response) {
         // TODO: very important is to find a way to pass the current user to service
         const { id } = await tokenService.decodeToken(req.headers.authorization);
 
-        // const folders = await foldersService.all();
         const folders = await sharedFolderService.all(
             {
                 user: id,
-                shared: true
+                shared: false
             },
         );
         return new Responses.Ok(folders.data);
