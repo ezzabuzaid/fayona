@@ -1,10 +1,13 @@
 import assert from 'assert';
-import { Model } from 'mongoose';
-import { Document, Payload, Projection, WithMongoID, ColumnSort, PrimaryKey, ForeignKey } from '@lib/mongoose';
+import { Model, FilterQuery } from 'mongoose';
+import { Document, Payload, Projection, WithMongoID, ColumnSort, PrimaryKey, ForeignKey, BaseModel } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 
 // TODO: Before any query or write check the body to meet the
 //  model to avoid [injections] this should be done in the repo.
+
+export type Query<T> = Partial<WithMongoID<T>> & FilterQuery<T>;
+
 export class Repo<T> {
     constructor(
         public model: Model<Document<T>>
@@ -12,15 +15,15 @@ export class Repo<T> {
         assert(AppUtils.notNullOrUndefined(model));
     }
 
-    public fetchOne(query: Partial<WithMongoID<Payload<T>>>, projection: Projection<T> = {}, options = {}) {
-        return this.model.findOne(query, projection, options);
+    public fetchOne(query: Query<T>, projection: Projection<T> = {}, options = {}) {
+        return this.model.findOne(query as any, projection, options);
     }
 
     public fetchAll(
-        query: Partial<WithMongoID<Payload<T>>> = {},
+        query?: Query<T>,
         options: Partial<IReadAllOptions<T>> = {}
     ) {
-        return this.model.find(query, {}, options);
+        return this.model.find(query as any, {}, options);
     }
 
     public fetchById(id: PrimaryKey) {
@@ -32,9 +35,15 @@ export class Repo<T> {
     }
 }
 interface IReadOneOptions<T> {
-    projection: Projection<T>;
-    lean: boolean;
-    populate: ForeignKeysOnly<T> | { path: keyof T, select: string };
+    projection?: Projection<T>;
+    lean?: boolean;
+    populate?: ForeignKeysOnly<T> | {
+        path: keyof T,
+        select?: string,
+        match: any,
+        options?: {},
+        perDocumentLimit?: number
+    } & IReadOneOptions<any>;
 }
 
 type ForeignKeysOnly<T> = {

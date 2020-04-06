@@ -7,7 +7,12 @@ export class SharedFolderService extends CrudService<SharedFolderSchema> {
             {
                 all: {
                     pre(docs) {
-                        docs.populate('folder');
+                        docs
+                            .select('folder')
+                            .populate('folder')
+                            .distinct('folder')
+                            .lean()
+                            .exec();
                     }
                 }
             });
