@@ -97,6 +97,7 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
                 shared: true
             },
         );
+        folders.data.list = folders.data.list.map(({ folder }) => folder) as any;
         return new Responses.Ok(folders.data);
     }
 
