@@ -58,7 +58,7 @@ export class Multer {
                 file: Express.Multer.File,
                 callback: (error: ErrorResponse, dest: string) => void
             ) => {
-                const { folder } = cast(req.params);
+                const { id: folder } = cast(req.params);
 
                 if (folder !== 'others') {
                     if (Types.ObjectId.isValid(folder)) {

@@ -3,14 +3,14 @@ import membersModel, { RoomMemberSchema } from './members.model';
 import sharedFolder from '@api/uploads/shared-folder/shared-folder.service';
 import { PrimaryKey } from '@lib/mongoose';
 import { RoomSchema } from '../rooms';
-import { Constants } from '@core/helpers';
+import { AppUtils } from '@core/utils';
 
 export class RoomMembersService extends CrudService<RoomMemberSchema> {
     constructor() {
         super(new Repo(membersModel), {
             all: {
                 async pre(documents) {
-                    documents.populate('user');
+                    // documents.populate('user');
                 }
             },
             create: {
@@ -24,12 +24,37 @@ export class RoomMembersService extends CrudService<RoomMemberSchema> {
                 }
             }
         });
+        this.getMemberRooms('5e88a9e9ec796826da298870' as any, false).then(console.log);
     }
 
-    getMemberRooms(id: PrimaryKey) {
-        return this.repo.fetchAll({ user: id }, {
-            populate: 'room'
+    async getMemberRooms(id: PrimaryKey, single: boolean) {
+        const result = await this.all({
+            user: id
+        }, {
+            populate: {
+                path: 'room',
+                match: {
+                    single,
+                }
+            },
+            projection: {
+                room: 1,
+            }
         });
+        return {
+            ...result.data,
+            list: result.data.list.map(({ room }) => room).filter(AppUtils.isTruthy)
+        };
+        // return this.repo.fetchAll({
+        //     user: id
+        // }, {
+        //     populate: {
+        //         path: 'room',
+        //         match: {
+        //             single
+        //         }
+        //     }
+        // });
     }
 
     getRoom(ids: PrimaryKey[]) {

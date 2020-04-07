@@ -79,14 +79,8 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
         return new Responses.Ok(room);
     }
 
-    @Get('member/:id', isValidId())
-    async getRoom(req: Request) {
-        const { id } = cast<{ id: PrimaryKey }>(req.params);
-        return membersService.getMemberRooms(id);
-    }
-
     @Get(':id/members', isValidId())
-    public async getMembersByRoomId(req: Request) {
+    public async getRoomMembers(req: Request) {
         const { id } = cast<{ id: PrimaryKey }>(req.params);
         const result = await membersService.all({ room: id }, {
             projection: {
@@ -98,18 +92,16 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
 
     @Get('groups')
     public async getGroups(req: Request) {
-        const groups = await this.service.all({
-            single: false,
-        });
-        return groups.data;
+        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
+        const groups = await membersService.getMemberRooms(decodedToken.id, false);
+        return groups;
     }
 
     @Get('conversations')
     public async getConversations(req: Request) {
-        const conversations = await this.service.all({
-            single: true,
-        });
-        return conversations.data;
+        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
+        const conversations = await membersService.getMemberRooms(decodedToken.id, true);
+        return conversations;
     }
 
     @Get(':id/messages', isValidId())

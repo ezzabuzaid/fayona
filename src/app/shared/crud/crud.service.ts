@@ -1,7 +1,7 @@
 import { ICrudOptions, ICrudHooks } from './crud.options';
-import { Payload, WithID, WithMongoID, Document, Projection, ColumnSort, PrimaryKey } from '@lib/mongoose';
+import { Payload, WithID, Document, Projection, ColumnSort, PrimaryKey } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
-import { Repo, IReadAllOptions } from './crud.repo';
+import { Repo, IReadAllOptions, Query } from './crud.repo';
 import { translate } from '@lib/translation';
 
 function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHooks<T>]: any } {
@@ -65,7 +65,7 @@ export class CrudService<T = null> {
             : new Result<T>({ data: { id: entity.id } as any });
     }
 
-    public async delete(query: Partial<WithMongoID<Payload<T>>>) {
+    public async delete(query: Query<T>) {
         const entity = await this.repo.fetchOne(query);
         if (AppUtils.isNullOrUndefined(entity)) {
             return new Result({ message: 'entity_not_exist' });
@@ -155,7 +155,7 @@ export class CrudService<T = null> {
         return true;
     }
 
-    public async one(query: Partial<WithMongoID<Payload<T>>>, options: Partial<IReadAllOptions<T>> = {}) {
+    public async one(query: Query<T>, options: Partial<IReadAllOptions<T>> = {}) {
         const { post, pre } = getHooks(this.options.one as any);
         const documentQuery = this.repo.fetchOne(query, options.projection, options);
         await pre(documentQuery);
@@ -168,7 +168,7 @@ export class CrudService<T = null> {
         return new Result<Document<T>>({ data: record });
     }
 
-    public async all(query: Partial<WithMongoID<Payload<T>>> = {}, options: Partial<IReadAllOptions<T>> = {}) {
+    public async all(query?: Query<T>, options: Partial<IReadAllOptions<T>> = {}) {
         const { pre, post } = getHooks(this.options.all as any);
 
         const readOptions = new ReadAllOptions(options);
@@ -189,7 +189,7 @@ export class CrudService<T = null> {
         });
     }
 
-    public async exists(query: Partial<WithMongoID<Payload<T>>>) {
+    public async exists(query: Query<T>) {
         if (AppUtils.isTruthy(await this.one(query, { lean: true }))) {
             return new Result({ data: true }) as any;
         }
