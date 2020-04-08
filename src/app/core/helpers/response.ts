@@ -36,6 +36,11 @@ export namespace Responses {
             super(message, NetworkStatus.UNAUTHORIZED);
         }
     }
+    export class Forbidden extends ErrorResponse {
+        constructor(message: string = 'not_allowed') {
+            super(message, NetworkStatus.FORBIDDEN);
+        }
+    }
     export class BadRequest extends ErrorResponse {
         constructor(message: string = 'bad_request') {
             super(message, NetworkStatus.BAD_REQUEST);
