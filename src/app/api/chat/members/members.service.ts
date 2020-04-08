@@ -24,7 +24,6 @@ export class RoomMembersService extends CrudService<RoomMemberSchema> {
                 }
             }
         });
-        this.getMemberRooms('5e88a9e9ec796826da298870' as any, false).then(console.log);
     }
 
     async getMemberRooms(id: PrimaryKey, single: boolean) {

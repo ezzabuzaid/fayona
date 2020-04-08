@@ -2,7 +2,6 @@ import { Router, Post, Get } from '@lib/methods';
 import { Multer } from '@shared/multer';
 import { Request, Response } from 'express';
 import { Responses, Constants, tokenService } from '@core/helpers';
-import { Auth } from '@api/portal';
 import { CrudRouter } from '@shared/crud';
 import { UploadsSchema } from './uploads.model';
 import uploadsService, { UploadsService } from './uploads.service';
@@ -13,6 +12,7 @@ import { IsString, IsMongoId } from 'class-validator';
 import { validate, NameValidator, isValidId } from '@shared/common';
 import { FoldersSchema } from './folders/folders.model';
 import sharedFolderService from './shared-folder/shared-folder.service';
+import { identity } from '@api/portal';
 
 class FilesSearchPayload {
     @IsMongoId()
@@ -31,7 +31,7 @@ const allowedImageTypes = [
 
 const multer = new Multer({ allowedTypes: allowedImageTypes });
 @Router(Constants.Endpoints.UPLOADS, {
-    middleware: [Auth.isAuthenticated]
+    middleware: [identity.isAuthenticated]
 })
 export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> {
 
@@ -78,7 +78,7 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
 }
 
 @Router(Constants.Endpoints.FOLDERS, {
-    middleware: [Auth.isAuthenticated],
+    middleware: [identity.isAuthenticated],
 })
 export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
 

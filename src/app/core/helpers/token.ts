@@ -1,7 +1,7 @@
 import jwt = require('jsonwebtoken');
-import { ERoles } from '@api/users';
 import stage from './stage';
 import { PrimaryKey } from '@lib/mongoose';
+import { ERoles } from '@api/portal';
 
 export interface ITokenClaim {
     id: PrimaryKey;

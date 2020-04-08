@@ -1,6 +1,5 @@
 import { SessionSchema } from './sessions.model';
 import { Request } from 'express';
-import { Auth } from '../portal/auth';
 import { Get, Router, Patch } from '@lib/methods';
 import { tokenService, Constants, Responses } from '@core/helpers';
 import { CrudRouter } from '../../shared/crud';
@@ -9,6 +8,7 @@ import { validate, PayloadValidator } from '@shared/common';
 import { IsMongoId } from 'class-validator';
 import { cast } from '@core/utils';
 import { ForeignKey, PrimaryKey } from '@lib/mongoose';
+import { identity } from '@api/portal';
 
 export class DeactivateSessionPayload extends PayloadValidator {
 
@@ -21,7 +21,7 @@ export class DeactivateSessionPayload extends PayloadValidator {
 }
 
 @Router(Constants.Endpoints.SESSIONS, {
-    middleware: [Auth.isAuthenticated]
+    middleware: [identity.isAuthenticated]
 })
 export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {
     constructor() {

@@ -1,13 +1,12 @@
 import { CrudService } from './crud.service';
 import { Post, Put, Delete, Get, Patch } from '@lib/methods';
-import { Auth } from '@api/portal';
 import { Request } from 'express';
 import { Responses, HttpResultResponse } from '@core/helpers';
 import { AppUtils, cast } from '@core/utils';
 import { Payload } from '@lib/mongoose';
-import { Types } from 'mongoose';
 import assert from 'assert';
 import { isValidId } from '@shared/common';
+import { identity } from '@api/portal';
 
 // TODO: Generic SchemaType should inherit from RepoHooks interface which
 //  will be used to fire onSave, onUpdate, onDelete, ..etc
@@ -19,7 +18,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         assert(AppUtils.notNullOrUndefined(service));
     }
 
-    @Post('/', Auth.isAuthenticated)
+    @Post('/', identity.isAuthenticated)
     public async create(req: Request) {
         // TODO: payload is not validated yet
         const result = await this.service.create(req.body);
@@ -29,7 +28,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Created(result.data);
     }
 
-    @Patch(':id', Auth.isAuthenticated, isValidId())
+    @Patch(':id', identity.isAuthenticated, isValidId())
     public async update(req: Request) {
         const { id } = cast(req.params);
 
@@ -42,7 +41,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    @Put(':id', Auth.isAuthenticated, isValidId())
+    @Put(':id', identity.isAuthenticated, isValidId())
     public async set(req: Request) {
         const { id } = cast(req.params);
 
@@ -55,7 +54,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    @Delete(':id', Auth.isAuthenticated, isValidId())
+    @Delete(':id', identity.isAuthenticated, isValidId())
     public async delete(req: Request) {
         const { id } = req.params;
 
@@ -66,7 +65,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return result.hasError ? response.badRequest() : response.ok();
     }
 
-    @Get(':id', Auth.isAuthenticated, isValidId())
+    @Get(':id', identity.isAuthenticated, isValidId())
     public async fetchEntity(req: Request) {
         const { id } = req.params;
         const result = await this.service.one({ _id: id } as any);
@@ -74,7 +73,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return result.hasError ? response.badRequest() : response.ok();
     }
 
-    @Get('/', Auth.isAuthenticated)
+    @Get('/', identity.isAuthenticated)
     public async fetchEntities(req: Request) {
         // TODO: Check that the sort object has the same properties in <T>
         const { page, size, ...sort } = req.query;
@@ -85,7 +84,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    @Delete('bulk', Auth.isAuthenticated)
+    @Delete('bulk', identity.isAuthenticated)
     public async bulkDelete(req: Request) {
         const idsList = req.query.ids.split(',');
 
@@ -101,7 +100,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return null;
     }
 
-    @Post('bulk', Auth.isAuthenticated)
+    @Post('bulk', identity.isAuthenticated)
     public async bulkUpdate(req: Request) {
         const { entites } = req.body as { entites: Array<Payload<SchemaType>> };
         if (this._checkIfIdsIsValid(entites)) {

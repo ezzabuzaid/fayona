@@ -75,7 +75,6 @@ export class NodeServer extends Application {
                         });
                         socket.on('error', () => {
                                 socket.leaveAll();
-                                console.log('error');
                         });
                         socket.on('SendMessage', async (message: IMessage) => {
                                 const { id } = socket['decodedToken'];

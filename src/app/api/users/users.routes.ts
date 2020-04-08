@@ -4,7 +4,7 @@ import { Constants, Responses } from '@core/helpers';
 import { Router, Post, Get } from '@lib/methods';
 import { UsersSchema } from './users.model';
 import { Request, Response } from 'express';
-import { Auth } from '@api/portal';
+import { ERoles, identity } from '@api/portal';
 import { AppUtils } from '@core/utils';
 
 @Router(Constants.Endpoints.USERS)
@@ -18,7 +18,12 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
         return super.create(req);
     }
 
-    @Get(Constants.Endpoints.SEARCH, Auth.isAuthenticated)
+    @Get()
+    public get(req: Request) {
+        return super.fetchEntities(req);
+    }
+
+    @Get(Constants.Endpoints.SEARCH, identity.Authorize(ERoles.ADMIN))
     public async searchForUsers(req: Request, res: Response) {
         let { username } = req.query;
         if (AppUtils.isEmptyString(username)) {

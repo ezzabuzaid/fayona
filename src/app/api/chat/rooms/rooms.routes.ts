@@ -4,13 +4,13 @@ import { CrudRouter } from '@shared/crud';
 import { RoomSchema } from './rooms.model';
 import roomsService, { RoomsService } from './rooms.service';
 import { Request } from 'express';
-import { Auth } from '@api/portal';
 import { ArrayNotEmpty, IsString, ArrayMinSize } from 'class-validator';
 import { cast } from '@core/utils';
 import { validate, isValidId } from '@shared/common';
 import messagesService from '@api/chat/messages/messages.service';
 import membersService from '@api/chat/members/members.service';
 import { PrimaryKey } from '@lib/mongoose';
+import { identity } from '@api/portal';
 
 class RoomPayload {
     @ArrayMinSize(1, { message: 'a room should at least contain two member' }) public members: PrimaryKey[] = null;
@@ -25,7 +25,7 @@ class SearchForRoomByMemberValidator {
 }
 
 @Router(Constants.Endpoints.ROOMS, {
-    middleware: [Auth.isAuthenticated]
+    middleware: [identity.isAuthenticated]
 })
 export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
     constructor() {

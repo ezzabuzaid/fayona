@@ -8,13 +8,13 @@ import { EmailService, fakeEmail } from '@shared/email';
 import { AppUtils, cast } from '@core/utils';
 import { PortalHelper } from './portal.helper';
 import { TokenExpiredError } from 'jsonwebtoken';
-import { Auth } from './auth';
 import { ApplicationConstants } from '@core/constants';
 import { sessionsService } from '@api/sessions/sessions.service';
 import { IsString } from 'class-validator';
 import { translate } from '@lib/translation';
 import { scheduleJob } from 'node-schedule';
 import { validate } from '@shared/common';
+import { identity } from './identity/identity';
 
 export class LoginPayload {
     @IsString({
@@ -56,7 +56,14 @@ export class RefreshTokenPayload {
 
 @Router(Constants.Endpoints.PORTAL)
 export class PortalRoutes {
-
+    constructor() {
+        console.log('constructor');
+        // EmailService.sendEmail({
+        //     to: 'ezzabuzaid@hotmail.com',
+        //     cc: 'superadmin@test.com,admin@test.com',
+        //     text: 'A test email'
+        // }).then(console.log);
+    }
     @Post(Constants.Endpoints.LOGIN, validate(LoginPayload))
     public async login(req: Request) {
         // TODO: send an email to user to notify him about login attempt.
@@ -171,7 +178,7 @@ export class PortalRoutes {
         res.status(response.code).json(response);
     }
 
-    @Post(Constants.Endpoints.VERIFY_ACCOUNT, Auth.isAuthenticated)
+    @Post(Constants.Endpoints.VERIFY_ACCOUNT, identity.isAuthenticated)
     public async sendVerificationEmail(req: Request, res: Response) {
         const { token } = req.query;
         const decodedToken = await tokenService.decodeToken(token);
