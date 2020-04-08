@@ -6,6 +6,7 @@ import { IExpressInternal, IExpressRouter } from '@lib/methods';
 import { FileUploadRoutes, FoldersRoutes } from '@api/uploads';
 import { SettingRoutes } from '@api/settings';
 import { RoomsRouter } from '@api/chat/rooms';
+import { AppUtils } from '@core/utils';
 
 export class Wrapper {
     private static list = [];
@@ -18,14 +19,13 @@ export class Wrapper {
         }
     }
 
-    private static wrapRouter(Router: new () => IExpressInternal) {
+    private static wrapRouter(Router: IExpressInternal) {
         try {
-            const router = new Router();
-            const instance = router.__router();
-            if (!instance.id) {
+            const internal = Router.__router();
+            if (AppUtils.isNullOrUndefined(internal.id)) {
                 throw new Error('please consider add @Router to the top of class');
             }
-            this.list.push(instance);
+            this.list.push(internal);
         } catch (error) {
             throw new Error('The provided router is not constructor');
         }
