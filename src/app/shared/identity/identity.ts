@@ -13,13 +13,13 @@ const log = new Logger('Auth Module');
 
 class Identity {
 
-    public Authorize(role: ERoles) {
+    public Authorize(...roles: ERoles[]) {
         return async (req: Request, res: Response, next: NextFunction) => {
             const decodeToken = await this.isAuthenticated(req, res, next);
-            if (decodeToken.role === role) {
+            if (roles.some((role) => role === decodeToken.role)) {
                 next();
             }
-            throw new Responses.Unauthorized();
+            throw new Responses.Forbidden();
         };
     }
 
