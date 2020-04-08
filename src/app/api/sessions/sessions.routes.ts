@@ -1,14 +1,14 @@
 import { SessionSchema } from './sessions.model';
 import { Request } from 'express';
 import { Get, Router, Patch } from '@lib/methods';
-import { tokenService, Constants, Responses } from '@core/helpers';
+import { Constants, Responses } from '@core/helpers';
 import { CrudRouter } from '../../shared/crud';
 import { sessionsService, SessionsService } from './sessions.service';
 import { validate, PayloadValidator } from '@shared/common';
 import { IsMongoId } from 'class-validator';
 import { cast } from '@core/utils';
 import { ForeignKey, PrimaryKey } from '@lib/mongoose';
-import { identity } from '@api/portal';
+import { identity, tokenService } from '@shared/identity';
 
 export class DeactivateSessionPayload extends PayloadValidator {
 

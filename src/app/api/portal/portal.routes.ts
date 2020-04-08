@@ -1,4 +1,4 @@
-import { tokenService, Constants, IRefreshTokenClaim, Responses, HashService } from '@core/helpers';
+import { Constants, Responses, HashService } from '@core/helpers';
 import { Post, Router } from '@lib/methods';
 import { Request, Response } from 'express';
 import usersService from '@api/users/users.service';
@@ -14,7 +14,7 @@ import { IsString } from 'class-validator';
 import { translate } from '@lib/translation';
 import { scheduleJob } from 'node-schedule';
 import { validate } from '@shared/common';
-import { identity } from './identity/identity';
+import { tokenService, IRefreshTokenClaim } from '@shared/identity';
 
 export class LoginPayload {
     @IsString({
@@ -169,7 +169,6 @@ export class PortalRoutes {
     }
 
     // TODO: the user should verify his email and phonenumber
-    @Post(Constants.Endpoints.VERIFY_ACCOUNT)
     public async verify(req: Request, res: Response) {
         const { token } = req.query;
         const decodedToken = await tokenService.decodeToken(token);
@@ -178,7 +177,6 @@ export class PortalRoutes {
         res.status(response.code).json(response);
     }
 
-    @Post(Constants.Endpoints.VERIFY_ACCOUNT, identity.isAuthenticated)
     public async sendVerificationEmail(req: Request, res: Response) {
         const { token } = req.query;
         const decodedToken = await tokenService.decodeToken(token);

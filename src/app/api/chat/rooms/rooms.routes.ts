@@ -1,5 +1,5 @@
 import { Router, Post, Get } from '@lib/methods';
-import { Constants, tokenService, Responses } from '@core/helpers';
+import { Constants, Responses } from '@core/helpers';
 import { CrudRouter } from '@shared/crud';
 import { RoomSchema } from './rooms.model';
 import roomsService, { RoomsService } from './rooms.service';
@@ -10,7 +10,7 @@ import { validate, isValidId } from '@shared/common';
 import messagesService from '@api/chat/messages/messages.service';
 import membersService from '@api/chat/members/members.service';
 import { PrimaryKey } from '@lib/mongoose';
-import { identity } from '@api/portal';
+import { identity, tokenService } from '@shared/identity';
 
 class RoomPayload {
     @ArrayMinSize(1, { message: 'a room should at least contain two member' }) public members: PrimaryKey[] = null;

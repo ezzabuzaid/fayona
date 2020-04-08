@@ -1,7 +1,7 @@
 import { Router, Post, Get } from '@lib/methods';
 import { Multer } from '@shared/multer';
 import { Request, Response } from 'express';
-import { Responses, Constants, tokenService } from '@core/helpers';
+import { Responses, Constants } from '@core/helpers';
 import { CrudRouter } from '@shared/crud';
 import { UploadsSchema } from './uploads.model';
 import uploadsService, { UploadsService } from './uploads.service';
@@ -12,7 +12,7 @@ import { IsString, IsMongoId } from 'class-validator';
 import { validate, NameValidator, isValidId } from '@shared/common';
 import { FoldersSchema } from './folders/folders.model';
 import sharedFolderService from './shared-folder/shared-folder.service';
-import { identity } from '@api/portal';
+import { identity, tokenService } from '@shared/identity';
 
 class FilesSearchPayload {
     @IsMongoId()

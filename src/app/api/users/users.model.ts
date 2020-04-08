@@ -1,9 +1,9 @@
 import { HashService, Constants } from '@core/helpers';
-import { BaseModel, Entity, Field, Payload } from '@lib/mongoose';
+import { BaseModel, Entity, Field } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
 import { parsePhoneNumberFromString } from 'libphonenumber-js/max';
 import { AppUtils } from '@core/utils';
-import { ERoles } from '@api/portal';
+import { ERoles } from '@shared/identity';
 
 @Entity(Constants.Schemas.USERS)
 export class UsersSchema {
