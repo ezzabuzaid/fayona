@@ -68,8 +68,10 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
     public async fetchEntity(req: Request) {
         const { id } = req.params;
         const result = await this.service.one({ _id: id } as any);
-        const response = new HttpResultResponse(result.data);
-        return result.hasError ? response.badRequest() : response.ok();
+        if (result.hasError) {
+            return new Responses.BadRequest(result.message);
+        }
+        return new Responses.Ok(result.data);
     }
 
     @Get('/')
@@ -78,7 +80,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         const { page, size, ...sort } = req.query;
         const result = await this.service.all({}, { sort, size, page });
         if (result.hasError) {
-            return new Responses.BadRequest(result.data as any);
+            return new Responses.BadRequest(result.message);
         }
         return new Responses.Ok(result.data);
     }

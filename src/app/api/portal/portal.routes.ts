@@ -15,6 +15,7 @@ import { translate } from '@lib/translation';
 import { scheduleJob } from 'node-schedule';
 import { validate } from '@shared/common';
 import { tokenService, IRefreshTokenClaim } from '@shared/identity';
+import { Query } from '@shared/crud';
 
 export class LoginPayload {
     @IsString({
@@ -72,7 +73,7 @@ export class PortalRoutes {
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
 
         if (AppUtils.isFalsy(device_uuid)) {
-            throw new Responses.BadRequest();
+            return new Responses.BadRequest();
         }
 
         // STUB it should throw if username is falsy type or if it's not in database
@@ -81,24 +82,23 @@ export class PortalRoutes {
         // STUB it should pass if password is right
         const isPasswordEqual = HashService.comparePassword(password, user.password);
         if (AppUtils.isFalsy(isPasswordEqual)) {
-            throw new Responses.BadRequest('wrong_credintals');
-        } else {
-            const activeUserSessions = await sessionsService.getActiveUserSession(user.id);
-
-            if (activeUserSessions.data.length >= 10) {
-                throw new Responses.BadRequest('exceeded_allowed_sesison');
-            }
-            // STUB it should create a session entity
-            const session = await sessionsService.create({
-                device_uuid,
-                active: true,
-                user: user.id
-            });
-
-            // STUB test the refreshToken claims should have only entity id with expire time 12h
-            // STUB test token claims must have only entity id and role with 30min expire time
-            return new Responses.Ok(new LoginDto(user, session.data.id));
+            return new Responses.BadRequest('wrong_credintals');
         }
+        const activeUserSessions = await sessionsService.getActiveUserSession(user.id);
+
+        if (activeUserSessions.data.length >= 10) {
+            return new Responses.BadRequest('exceeded_allowed_sesison');
+        }
+        // STUB it should create a session entity
+        const session = await sessionsService.create({
+            device_uuid,
+            active: true,
+            user: user.id
+        });
+
+        // STUB test the refreshToken claims should have only entity id with expire time 12h
+        // STUB test token claims must have only entity id and role with 30min expire time
+        return new Responses.Ok(new LoginDto(user, session.data.id));
 
     }
 
@@ -187,7 +187,7 @@ export class PortalRoutes {
 
 }
 
-async function throwIfNotExist(query: Partial<Payload<UsersSchema> & { _id: PrimaryKey }>, message = 'not_exist') {
+async function throwIfNotExist(query: Query<UsersSchema>, message = 'not_exist') {
     if (AppUtils.isFalsy(query)) {
         throw new Responses.BadRequest(message);
     }

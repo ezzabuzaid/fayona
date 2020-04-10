@@ -25,7 +25,7 @@ class SearchForRoomByMemberValidator {
 }
 
 @Router(Constants.Endpoints.ROOMS, {
-    middleware: [identity.isAuthenticated]
+    middleware: [identity.isAuthenticated()]
 })
 export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
     constructor() {

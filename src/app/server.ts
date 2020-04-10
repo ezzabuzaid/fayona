@@ -1,5 +1,5 @@
 import { Database } from '@core/database';
-import { StageLevel, tokenService } from '@core/helpers';
+import { StageLevel } from '@core/helpers';
 import { Logger, LoggerLevel, AppUtils } from '@core/utils';
 import { envirnoment } from '@environment/env';
 import http = require('http');
@@ -11,6 +11,7 @@ import messagesService from '@api/chat/messages/messages.service';
 import { IsString, IsMongoId } from 'class-validator';
 import { validatePayload } from '@shared/common';
 import { PrimaryKey } from '@lib/mongoose';
+import { tokenService } from '@shared/identity';
 
 const log = new Logger('Server');
 

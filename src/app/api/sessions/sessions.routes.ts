@@ -21,7 +21,7 @@ export class DeactivateSessionPayload extends PayloadValidator {
 }
 
 @Router(Constants.Endpoints.SESSIONS, {
-    middleware: [identity.isAuthenticated]
+    middleware: [identity.isAuthenticated()]
 })
 export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {
     constructor() {

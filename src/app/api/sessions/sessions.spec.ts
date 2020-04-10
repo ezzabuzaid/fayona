@@ -2,6 +2,7 @@ import { Constants } from '@core/helpers';
 import { getUri, prepareUserSession } from '@test/fixture';
 import { Types } from 'mongoose';
 import { DeactivateSessionPayload } from './sessions.routes';
+import { PrimaryKey } from '@lib/mongoose';
 
 const ENDPOINT = Constants.Endpoints.SESSIONS;
 const DEACTIVATE_ENDPOINT = getUri(`${ENDPOINT}/deactivate`);
@@ -43,12 +44,12 @@ describe('#INTEGRATION', () => {
 
         test('should return bad request if there is no session', async () => {
             const userSession = await prepareUserSession();
+            const payload = new DeactivateSessionPayload();
+            payload.session_id = new PrimaryKey();
+            payload.user = userSession.user_id;
             const response = await global.superAgent.patch(DEACTIVATE_ENDPOINT)
                 .set(userSession.headers)
-                .send({
-                    user: userSession.user_id,
-                    session_id: new Types.ObjectId().toHexString(),
-                } as DeactivateSessionPayload);
+                .send(payload);
             expect(response.badRequest).toBeTruthy();
             expect(response.body.message).toBe('no session available');
         });

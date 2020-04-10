@@ -1,5 +1,5 @@
-import { tokenService, IRefreshTokenClaim } from '@core/helpers';
 import { PrimaryKey } from '@lib/mongoose';
+import { tokenService, IRefreshTokenClaim } from '@shared/identity';
 
 export class PortalHelper {
 

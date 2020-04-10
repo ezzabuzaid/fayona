@@ -8,6 +8,8 @@ import { PortalHelper } from './portal.helper';
 import { AppUtils } from '@core/utils';
 import * as faker from 'faker';
 import { ApplicationConstants } from '@core/constants';
+import { Types } from 'mongoose';
+import { PrimaryKey } from '@lib/mongoose';
 
 const ENDPOINT = (suffix: string) => `${Constants.Endpoints.PORTAL}/${suffix}`;
 const LOGIN_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.LOGIN));
@@ -102,10 +104,13 @@ describe('#INTERGRATION', () => {
 
     describe('Refresh Token', () => {
         const performRequest = (refreshToken: string, token: string = null, headers = null) => {
+            const payload = new RefreshTokenPayload();
+            payload.refreshToken = refreshToken;
+            payload.token = token;
             return global.superAgent
                 .post(REFRESH_TOKEN)
                 .set(headers ?? generateDeviceUUIDHeader())
-                .send(new RefreshTokenPayload({ refreshToken, token }));
+                .send(payload);
         };
 
         const INVALID_TOKEN = 'not.valid.token';
@@ -122,7 +127,7 @@ describe('#INTERGRATION', () => {
 
         test('should be UNAUTHORIZED if the token is invalid', async () => {
             const response = await performRequest(
-                PortalHelper.generateRefreshToken(AppUtils.generateAlphabeticString()),
+                PortalHelper.generateRefreshToken(new PrimaryKey()),
                 INVALID_TOKEN
             );
             expect(response.unauthorized).toBeTruthy();
