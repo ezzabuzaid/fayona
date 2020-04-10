@@ -63,7 +63,7 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
     }
 
     @Get(Constants.Endpoints.SEARCH, validate(FilesSearchPayload, 'query'))
-    public async searchForFolders(req: Request, res: Response) {
+    public async searchForFolders(req: Request) {
         const payload = cast<FilesSearchPayload>(req.query);
         const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
         const files = await this.service.searchForFiles({
@@ -87,7 +87,7 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
     }
 
     @Get('user/shared')
-    public async getUserSharedolders(req: Request, res: Response) {
+    public async getUserSharedolders(req: Request) {
         // TODO: very important is to find a way to pass the current user to service
         const { id } = await tokenService.decodeToken(req.headers.authorization);
 
@@ -102,7 +102,7 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
     }
 
     @Get('user')
-    public async getUserFolders(req: Request, res: Response) {
+    public async getUserFolders(req: Request) {
         // TODO: very important is to find a way to pass the current user to service
         const { id } = await tokenService.decodeToken(req.headers.authorization);
 
@@ -116,7 +116,7 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
     }
 
     @Post('/', validate(NameValidator))
-    public async createFolder(req: Request, res: Response) {
+    public async createFolder(req: Request) {
         const { name } = req.body;
         const { id } = await tokenService.decodeToken(req.headers.authorization);
         const result = await foldersService.create({ name });

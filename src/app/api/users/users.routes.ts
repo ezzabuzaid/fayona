@@ -3,12 +3,12 @@ import usersService, { UserService } from './users.service';
 import { Constants, Responses } from '@core/helpers';
 import { Router, Post, Get } from '@lib/methods';
 import { UsersSchema } from './users.model';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { AppUtils } from '@core/utils';
 import { identity, ERoles } from '@shared/identity';
 
 @Router(Constants.Endpoints.USERS, {
-    middleware: [identity.isAuthenticated.bind(identity)]
+    middleware: [identity.isAuthenticated()]
 })
 export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
     constructor() {
@@ -20,13 +20,8 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
         return super.create(req);
     }
 
-    @Get()
-    public get(req: Request) {
-        return super.fetchEntities(req);
-    }
-
-    @Get(Constants.Endpoints.SEARCH, identity.Authorize(ERoles.ADMIN))
-    public async searchForUsers(req: Request, res: Response) {
+    @Get(Constants.Endpoints.SEARCH, identity.Authorize(ERoles.ADMIN, ERoles.SUPERADMIN))
+    public async searchForUsers(req: Request) {
         let { username } = req.query;
         if (AppUtils.isEmptyString(username)) {
             username = '';

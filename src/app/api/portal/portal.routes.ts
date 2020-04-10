@@ -115,11 +115,12 @@ export class PortalRoutes {
     }
 
     @Post(Constants.Endpoints.REFRESH_TOKEN, validate(RefreshTokenPayload))
-    public async refreshToken(req: Request, res: Response) {
+    public async refreshToken(req: Request) {
         const { uuid, token, refreshToken } = cast<RefreshTokenPayload>(req.body);
 
         // NOTE: if it was invalid or expired it will implicity thrown an error
         const decodedRefreshToken = await tokenService.decodeToken<IRefreshTokenClaim>(refreshToken);
+        // TODO if refresh token was expired then deactive the user session
 
         try {
             await tokenService.decodeToken(token);

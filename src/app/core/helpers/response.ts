@@ -58,15 +58,3 @@ export namespace Responses {
     }
 
 }
-export class HttpResultResponse {
-
-    constructor(private data) { }
-
-    ok() {
-        return new SuccessResponse(this.data);
-    }
-
-    badRequest() {
-        return new ErrorResponse(this.data, NetworkStatus.BAD_REQUEST);
-    }
-}

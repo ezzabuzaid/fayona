@@ -54,7 +54,7 @@ export class ErrorHandling {
         });
     }
 
-    public static catchError(error: any, req: Request, res: Response, next: NextFunction) {
+    public static catchError(error: any, req: Request, res: Response) {
         const response = new ErrorResponse(error.message,
             isNaN(error.code)
                 ? NetworkStatus.INTERNAL_SERVER_ERROR
@@ -103,7 +103,7 @@ export class ErrorHandling {
         res.status(response.code).json(response);
     }
 
-    public static notFound(req: Request, res: Response, next: NextFunction) {
+    public static notFound(req: Request, res: Response) {
         const error = new ErrorResponse(
             `${req.originalUrl} => ${translate('endpoint_not_found')}`, NetworkStatus.NOT_FOUND
         );

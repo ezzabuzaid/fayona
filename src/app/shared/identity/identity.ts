@@ -21,20 +21,15 @@ class Identity {
             if (roles.includes(decodeToken.role)) {
                 next();
             }
-            throw new Responses.Forbidden();
+            return new Responses.Forbidden();
         };
     }
 
     public isAuthenticated() {
         return async (req: Request, res: Response, next: NextFunction) => {
             const { token, device_uuid } = this.extractToken(req);
-            try {
-                await this.verifyUserSession(token, device_uuid);
-                next();
-            } catch (error) {
-                await sessionsService.deActivate({ device_uuid });
-                throw error;
-            }
+            await this.verifyUserSession(token, device_uuid);
+            next();
         };
     }
 

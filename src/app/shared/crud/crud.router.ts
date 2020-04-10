@@ -1,14 +1,11 @@
 import { CrudService } from './crud.service';
 import { Post, Put, Delete, Get, Patch } from '@lib/methods';
 import { Request } from 'express';
-import { Responses, HttpResultResponse } from '@core/helpers';
+import { Responses } from '@core/helpers';
 import { AppUtils, cast } from '@core/utils';
 import { Payload } from '@lib/mongoose';
 import assert from 'assert';
 import { isValidId } from '@shared/common';
-
-// TODO: Generic SchemaType should inherit from RepoHooks interface which
-//  will be used to fire onSave, onUpdate, onDelete, ..etc
 
 export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> = CrudService<SchemaType>> {
     constructor(
@@ -58,10 +55,10 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         const { id } = req.params;
 
         const result = await this.service.delete({ _id: id } as any);
-
-        const response = new HttpResultResponse(result.data);
-
-        return result.hasError ? response.badRequest() : response.ok();
+        if (result.hasError) {
+            return new Responses.BadRequest(result.message);
+        }
+        return new Responses.Ok(result.data);
     }
 
     @Get(':id', isValidId())
