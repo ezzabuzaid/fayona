@@ -1,6 +1,6 @@
 import { NetworkStatus } from '@core/helpers/network-status';
 import { translate } from '@lib/translation';
-import { Response } from 'express';
+import { AppUtils } from '@core/utils';
 
 export abstract class HttpResponse extends Error {
     public status: string;
@@ -57,4 +57,16 @@ export namespace Responses {
         }
     }
 
+}
+
+export class Result<T> {
+    public hasError = false;
+    public data: T = null;
+    public message: string = null;
+
+    constructor(result: Partial<Result<T>> = new Result<T>({})) {
+        this.data = result.data;
+        this.message = result.message || null;
+        this.hasError = result.hasError ?? AppUtils.isTruthy(result.message) ?? false;
+    }
 }
