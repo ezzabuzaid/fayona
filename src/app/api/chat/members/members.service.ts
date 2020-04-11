@@ -8,11 +8,6 @@ import { AppUtils } from '@core/utils';
 export class RoomMembersService extends CrudService<RoomMemberSchema> {
     constructor() {
         super(new Repo(membersModel), {
-            all: {
-                async pre(documents) {
-                    // documents.populate('user');
-                }
-            },
             create: {
                 async post(member) {
                     const populatedMember = await member.populate('room').execPopulate();

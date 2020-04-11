@@ -18,10 +18,6 @@ export interface ICrudOperation<T = any> {
         pre?: (query: DocumentQuery<Document<T>, Document<T>>) => any;
         post?: (doc: Document<T>) => any;
     };
-    all?: {
-        pre?: (doc: DocumentQuery<Array<Document<T>>, Document<T>>) => any;
-        post?: (doc: Array<Document<T>>) => any;
-    };
 }
 export interface ICrudOptions<T> extends ICrudOperation<T> {
     /**

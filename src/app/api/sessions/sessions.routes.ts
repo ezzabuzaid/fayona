@@ -40,7 +40,7 @@ export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {
         const { session_id: _id, user } = cast<DeactivateSessionPayload>(req.body);
         const result = await this.service.deActivate({ _id, user });
         if (result.hasError) {
-            return new Responses.BadRequest(result.data);
+            return new Responses.BadRequest(result.message);
         } else {
             return new Responses.Ok(result.data);
         }

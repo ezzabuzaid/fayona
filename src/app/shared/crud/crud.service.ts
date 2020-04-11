@@ -169,13 +169,10 @@ export class CrudService<T = null> {
     }
 
     public async all(query?: Query<T>, options: Partial<IReadAllOptions<T>> = {}) {
-        const { pre, post } = getHooks(this.options.all as any);
 
         const readOptions = new ReadAllOptions(options);
         const documentQuery = this.repo.fetchAll(query, readOptions);
-        await pre(documentQuery);
         const documents = await documentQuery.exec();
-        await post(documents);
 
         const count = await this.repo.fetchAll().estimatedDocumentCount();
 

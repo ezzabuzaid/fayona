@@ -21,7 +21,6 @@ export class SharedFolderService extends CrudService<SharedFolderSchema> {
             .exec(console.log);
     }
 
-
     async getUserFolders(user: PrimaryKey, shared: boolean) {
         const result = await this.all({
             user,
