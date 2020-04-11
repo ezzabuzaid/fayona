@@ -1,20 +1,12 @@
 import { CrudService } from '@shared/crud';
 import sharedFolderModel, { SharedFolderSchema } from './shared-folder.model';
 import { Constants } from '@core/helpers';
+import { PrimaryKey } from '@lib/mongoose';
 
 export class SharedFolderService extends CrudService<SharedFolderSchema> {
-    constructor() {
-        super(sharedFolderModel,
-            {
-                all: {
-                    pre: (docs) => {
-                        docs.select('folder').populate('folder');
-                    },
-                    post(docs) {
 
-                    }
-                }
-            });
+    constructor() {
+        super(sharedFolderModel);
     }
 
     get() {
@@ -27,6 +19,21 @@ export class SharedFolderService extends CrudService<SharedFolderSchema> {
             })
             .replaceRoot({ $mergeObjects: ['$$ROOT'] })
             .exec(console.log);
+    }
+
+
+    async getUserFolders(user: PrimaryKey, shared: boolean) {
+        const result = await this.all({
+            user,
+            shared
+        }, {
+            populate: 'folder',
+            projection: {
+                folder: 1
+            }
+        });
+        result.data.list = result.data.list.map(({ folder }) => folder) as any;
+        return result;
     }
 }
 

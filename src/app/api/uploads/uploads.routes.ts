@@ -1,16 +1,15 @@
 import { Router, Post, Get } from '@lib/methods';
 import { Multer } from '@shared/multer';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { Responses, Constants } from '@core/helpers';
 import { CrudRouter } from '@shared/crud';
 import { UploadsSchema } from './uploads.model';
 import uploadsService, { UploadsService } from './uploads.service';
-import foldersService, { FoldersService } from './folders/folders.service';
+import foldersService from './folders/folders.service';
 import path from 'path';
 import { cast } from '@core/utils';
 import { IsString, IsMongoId } from 'class-validator';
 import { validate, NameValidator, isValidId } from '@shared/common';
-import { FoldersSchema } from './folders/folders.model';
 import sharedFolderService from './shared-folder/shared-folder.service';
 import { identity, tokenService } from '@shared/identity';
 
@@ -80,38 +79,19 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
 @Router(Constants.Endpoints.FOLDERS, {
     middleware: [identity.isAuthenticated()],
 })
-export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
-
-    constructor() {
-        super(foldersService);
-    }
+export class FoldersRoutes {
 
     @Get('user/shared')
     public async getUserSharedolders(req: Request) {
-        // TODO: very important is to find a way to pass the current user to service
         const { id } = await tokenService.decodeToken(req.headers.authorization);
-
-        const folders = await sharedFolderService.all(
-            {
-                user: id,
-                shared: true
-            },
-        );
-        folders.data.list = folders.data.list.map(({ folder }) => folder) as any;
+        const folders = await sharedFolderService.getUserFolders(id, true);
         return new Responses.Ok(folders.data);
     }
 
     @Get('user')
     public async getUserFolders(req: Request) {
-        // TODO: very important is to find a way to pass the current user to service
         const { id } = await tokenService.decodeToken(req.headers.authorization);
-
-        const folders = await sharedFolderService.all(
-            {
-                user: id,
-                shared: false
-            },
-        );
+        const folders = await sharedFolderService.getUserFolders(id, false);
         return new Responses.Ok(folders.data);
     }
 
