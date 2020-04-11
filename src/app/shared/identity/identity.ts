@@ -1,9 +1,9 @@
-import { Responses } from '@core/helpers';
+import { Responses, Result } from '@core/helpers';
 import { Logger, AppUtils } from '@core/utils';
 import { NextFunction, Request, Response } from 'express';
 import { sessionsService } from '@api/sessions/sessions.service';
 import { ApplicationConstants } from '@core/constants';
-import { tokenService } from './token';
+import { tokenService, ITokenClaim } from './token';
 export enum ERoles {
     SUPERADMIN,
     ADMIN,
@@ -17,9 +17,9 @@ class Identity {
     public Authorize(...roles: ERoles[]) {
         return async (req: Request, res: Response, next: NextFunction) => {
             const { token, device_uuid } = this.extractToken(req);
-            const decodeToken = await this.verifyUserSession(token, device_uuid);
-            if (roles.includes(decodeToken.role)) {
-                next();
+            const result = await this.verifyUserSession(token, device_uuid);
+            if (AppUtils.not(result.hasError) && roles.includes(result.data.role)) {
+                return next();
             }
             return new Responses.Forbidden();
         };
@@ -28,7 +28,10 @@ class Identity {
     public isAuthenticated() {
         return async (req: Request, res: Response, next: NextFunction) => {
             const { token, device_uuid } = this.extractToken(req);
-            await this.verifyUserSession(token, device_uuid);
+            const result = await this.verifyUserSession(token, device_uuid);
+            if (result.hasError) {
+                return new Responses.Unauthorized();
+            }
             next();
         };
     }
@@ -57,9 +60,10 @@ class Identity {
 
         if (session.hasError) {
             // NOTE: not active mean that the session was disabled either by admin or the user logged out
-            throw new Responses.Unauthorized();
+            return new Result<ITokenClaim>({ hasError: true });
         }
-        return decodeToken;
+
+        return new Result<ITokenClaim>({ data: decodeToken });
     }
 
 }
