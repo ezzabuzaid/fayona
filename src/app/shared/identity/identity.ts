@@ -16,7 +16,11 @@ class Identity {
 
     public Authorize(...roles: ERoles[]) {
         return async (req: Request, res: Response, next: NextFunction) => {
-            const { token, device_uuid } = this.extractToken(req);
+            const headersResult = this.extractToken(req);
+            if (headersResult.hasError) {
+                return new Responses.Unauthorized();
+            }
+            const { token, device_uuid } = headersResult.data;
             const result = await this.verifyUserSession(token, device_uuid);
             if (AppUtils.not(result.hasError) && roles.includes(result.data.role)) {
                 return next();
@@ -27,12 +31,14 @@ class Identity {
 
     public isAuthenticated() {
         return async (req: Request, res: Response, next: NextFunction) => {
-            const { token, device_uuid } = this.extractToken(req);
-            const result = await this.verifyUserSession(token, device_uuid);
-            if (result.hasError) {
-                return new Responses.Unauthorized();
+            const headersResult = this.extractToken(req);
+            if (AppUtils.not(headersResult.hasError)) {
+                const result = await this.verifyUserSession(headersResult.data.token, headersResult.data.device_uuid);
+                if (AppUtils.not(result.hasError)) {
+                    return next();
+                }
             }
-            next();
+            return new Responses.Unauthorized();
         };
     }
 
@@ -40,13 +46,14 @@ class Identity {
         // STUB test if the request doesn't have a `deviceIdHeader` header
         // STUB test if the request doesn't have an `authorization` header
         // TODO Amend the validate middleware to take custom response so you don't need the checking lines anymore
+        // Read about the context option
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
         const token = req.headers.authorization;
         if (AppUtils.isFalsy(device_uuid) || AppUtils.isFalsy(token)) {
             // TODO: validate them using `validate` middleware, add parameter to throw custom http response
-            throw new Responses.Unauthorized();
+            return new Result<{ token: string, device_uuid: string }>({ hasError: true });
         }
-        return { token, device_uuid };
+        return new Result<{ token: string, device_uuid: string }>({ data: { token, device_uuid } });
     }
 
     async verifyUserSession(token: string, device_uuid: string) {
