@@ -8,7 +8,7 @@ import { Application } from './app';
 import socketIO from 'socket.io';
 import stage from '@core/helpers/stage';
 import messagesService from '@api/chat/messages/messages.service';
-import { IsString, IsMongoId } from 'class-validator';
+import { IsString, IsMongoId, IsNotEmpty, IsInt, IsNumber } from 'class-validator';
 import { validatePayload } from '@shared/common';
 import { PrimaryKey } from '@lib/mongoose';
 import { tokenService } from '@shared/identity';
@@ -19,21 +19,25 @@ interface IRoom {
         id: PrimaryKey;
 }
 
-interface IMessage {
-        id: PrimaryKey;
-        text: string;
-}
-
 class MessagePayload {
         @IsString()
+        @IsNotEmpty()
         public text: string = null;
+
         @IsMongoId()
         public id: PrimaryKey = null;
+
+        @IsInt()
+        public order = null;
+
+        @IsNumber()
+        public timestamp = null;
 
         constructor(payload: MessagePayload) {
                 AppUtils.strictAssign(this, payload);
         }
 }
+
 
 export class NodeServer extends Application {
         private port = +envirnoment.get('PORT') || 8080;
@@ -74,23 +78,23 @@ export class NodeServer extends Application {
                         socket.on('error', () => {
                                 socket.leaveAll();
                         });
-                        socket.on('error', () => {
-                                socket.leaveAll();
-                        });
-                        socket.on('SendMessage', async (message: IMessage) => {
+                        socket.on('SendMessage', async (message: MessagePayload) => {
                                 const { id } = socket['decodedToken'];
-                                log.debug('New Message from => ', message);
+                                log.debug('New Message from => ', message, typeof message.text);
                                 const payload = new MessagePayload(message);
                                 try {
                                         await validatePayload(payload);
                                         const createdMessage = await messagesService.create({
                                                 room: payload.id,
                                                 user: id,
-                                                text: payload.text
+                                                text: payload.text,
+                                                order: message.order
                                         });
                                         log.debug('New Message from => ', createdMessage);
-                                        io.sockets.in(message.id as any).emit('Message', createdMessage.data);
+                                        socket.emit(`saved_${message.timestamp}`, message.id);
+                                        socket.broadcast.in(message.id as any).emit('Message', createdMessage.data);
                                 } catch (error) {
+                                        console.log('MessageValidationError => ', error);
                                         socket.emit('MessageValidationError', message);
                                 }
                         });
