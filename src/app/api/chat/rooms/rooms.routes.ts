@@ -49,7 +49,8 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
         await messagesService.create({
             text: message,
             user: decodedToken.id,
-            room: room.data.id
+            room: room.data.id,
+            order: 0,
         });
 
         await membersService.create({
@@ -107,7 +108,7 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
     @Get(':id/messages', isValidId())
     async getConversationMessages(req: Request) {
         const { id } = cast<{ id: PrimaryKey }>(req.params);
-        const result = await messagesService.all({ room: id });
+        const result = await messagesService.getLastMessage(id);
         return new Responses.Ok(result.data);
     }
 
