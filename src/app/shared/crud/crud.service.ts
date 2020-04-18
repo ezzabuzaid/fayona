@@ -206,8 +206,8 @@ class ReadAllOptions<T> {
     public populate = null;
 
     constructor({ page = 0, size = 0, sort, populate, projection, lean }: Partial<IReadAllOptions<T>>) {
-        this.skip = +page * size || null;
-        this.limit = +size || null;
+        this.skip = +page * size ?? null;
+        this.limit = +size ?? null;
         this.sort = sort;
         this.populate = populate;
         this.projection = projection;
