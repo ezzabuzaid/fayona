@@ -77,7 +77,6 @@ export class Application {
         this.application.use(wrapRoutes(ErrorHandling.favIcon));
         this.application.get('/api', wrapRoutes(() => ({ work: '/API hitted' })));
         this.application.use(wrapRoutes(ErrorHandling.notFound));
-        this.application.use(ErrorHandling.catchError);
     }
 
     private setupLocalization() {

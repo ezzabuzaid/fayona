@@ -38,6 +38,7 @@ export class ErrorHandling {
                     log.info(`process.on ${type}`);
                     process.exit(0);
                 } catch (_) {
+                    log.warn(`process killed because of ${type}`);
                     process.exit(1);
                 }
             });
@@ -48,6 +49,7 @@ export class ErrorHandling {
                 try {
                     log.info(`process.on ${type}`);
                 } finally {
+                    log.warn(`process killed because of ${type}`);
                     process.kill(process.pid, type);
                 }
             });
@@ -99,7 +101,6 @@ export class ErrorHandling {
             default:
 
         }
-        console.log(error);
         res.status(response.code).json(response);
     }
 
@@ -116,12 +117,6 @@ export class ErrorHandling {
         }
         next();
         return;
-    }
-
-    public static throwExceptionIfDeviceUUIDIsMissing(device_uuid: string) {
-        if (AppUtils.isFalsy(device_uuid)) {
-            throw new Responses.Unauthorized();
-        }
     }
 
 }

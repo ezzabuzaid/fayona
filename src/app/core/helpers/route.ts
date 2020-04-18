@@ -1,20 +1,23 @@
 import { HttpResponse } from './response';
 import { Request, Response, NextFunction } from 'express';
 import { AppUtils } from '@core/utils';
+import { ErrorHandling } from './errors';
 
 export function wrapRoutes(...middlewares) {
-    return middlewares.map((middleware) => async (req: Request, res: Response, next: NextFunction, ...args) => {
-        try {
-            const response = await middleware(req, res, next) as HttpResponse;
-            if (AppUtils.notNullOrUndefined(response)) {
-                if (response instanceof HttpResponse) {
-                    return res.status(response.code).json(response);
-                } else {
-                    return res.status(200).json(response);
+    return middlewares.map((middleware) => (req: Request, res: Response, next: NextFunction) => {
+        Promise.resolve(middleware(req, res, next) as HttpResponse)
+            .then((response) => {
+                console.log('response', response);
+                if (AppUtils.notNullOrUndefined(response)) {
+                    if (response instanceof HttpResponse) {
+                        return res.status(response.code).json(response);
+                    } else {
+                        return res.status(200).json(response);
+                    }
                 }
-            }
-        } catch (error) {
-            next(error);
-        }
+            })
+            .catch((error) => {
+                return ErrorHandling.catchError(error, req, res);
+            });
     });
 }
