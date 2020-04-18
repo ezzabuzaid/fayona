@@ -5,7 +5,7 @@ import { sessionsService } from '@api/sessions/sessions.service';
 import { ApplicationConstants } from '@core/constants';
 import { tokenService, ITokenClaim } from './token';
 export enum ERoles {
-    SUPERADMIN,
+    SUPERADMIN = 1,
     ADMIN,
     CLIENT,
     CUSTOMER,
