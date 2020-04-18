@@ -20,7 +20,7 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
         return super.create(req);
     }
 
-    @Get(Constants.Endpoints.SEARCH, identity.Authorize(ERoles.ADMIN, ERoles.SUPERADMIN))
+    @Get(Constants.Endpoints.SEARCH)
     public async searchForUsers(req: Request) {
         let { username } = req.query;
         if (AppUtils.isEmptyString(username)) {
