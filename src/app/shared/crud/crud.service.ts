@@ -1,7 +1,7 @@
 import { ICrudOptions, ICrudHooks } from './crud.options';
 import { Payload, WithID, Document, Projection, ColumnSort, PrimaryKey } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
-import { Repo, IReadAllOptions, Query } from './crud.repo';
+import { Repo, Query, IReadOptions } from './crud.repo';
 import { translate } from '@lib/translation';
 
 function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHooks<T>]: any } {
@@ -155,7 +155,7 @@ export class CrudService<T = null> {
         return true;
     }
 
-    public async one(query: Query<T>, options: Partial<IReadAllOptions<T>> = {}) {
+    public async one(query: Query<T>, options: IReadOptions<T> = {}) {
         const { post, pre } = getHooks(this.options.one as any);
         const documentQuery = this.repo.fetchOne(query, options.projection, options);
         await pre(documentQuery);
@@ -168,9 +168,9 @@ export class CrudService<T = null> {
         return new Result<Document<T>>({ data: record });
     }
 
-    public async all(query?: Query<T>, options: Partial<IReadAllOptions<T>> = {}) {
+    public async all(query?: Query<T>, options: IReadOptions<T> = {}) {
 
-        const readOptions = new ReadAllOptions(options);
+        const readOptions = new ReadOptions(options);
         const documentQuery = this.repo.fetchAll(query, readOptions);
         const documents = await documentQuery.exec();
 
@@ -197,7 +197,7 @@ export class CrudService<T = null> {
 
 class CrudQuery { }
 
-class ReadAllOptions<T> {
+class ReadOptions<T> {
     public skip = 0;
     public limit = null;
     public sort: ColumnSort<T> = null;
@@ -205,7 +205,7 @@ class ReadAllOptions<T> {
     public lean = false;
     public populate = null;
 
-    constructor({ page = 0, size = 0, sort, populate, projection, lean }: Partial<IReadAllOptions<T>>) {
+    constructor({ page = 0, size = 0, sort, populate, projection, lean }: IReadOptions<T>) {
         this.skip = +page * size ?? null;
         this.limit = +size ?? null;
         this.sort = sort;

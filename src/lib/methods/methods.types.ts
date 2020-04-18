@@ -5,11 +5,6 @@ export interface IRouterDecorationOption extends RouterOptions {
     middleware?: RequestHandler[] | RequestHandlerParams[];
 }
 
-export class RouterProperties {
-    static RoutesPath = 'uri';
-    static ID = 'id';
-}
-
 export type RouterMethodDecorator = Router & { uri: string };
 
 export interface IExpressRouter {

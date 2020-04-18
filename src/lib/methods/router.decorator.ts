@@ -1,9 +1,8 @@
+import 'reflect-metadata';
+import path = require('path');
 import { AppUtils, Logger } from '@core/utils';
 import { Router as expressRouter } from 'express';
-import 'reflect-metadata';
-import { IRouterDecorationOption, RouterProperties } from './methods.types';
-
-import path = require('path');
+import { IRouterDecorationOption } from './methods.types';
 import { IMetadata, method_metadata_key } from './index';
 import { wrapRoutes } from '@core/helpers/route';
 
@@ -12,10 +11,6 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
         const log = new Logger(constructor.name);
         const router = expressRouter(options);
         const instance = new constructor();
-
-        if (AppUtils.hasItemWithin(options.middleware)) {
-            router.use(wrapRoutes(...options.middleware));
-        }
 
         Reflect.getMetadataKeys(constructor)
             .forEach((key: string) => {
@@ -32,16 +27,18 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
                 }
             });
 
-        const id = AppUtils.generateHash();
+        if (AppUtils.hasItemWithin(options.middleware)) {
+            router.use(wrapRoutes(...options.middleware));
+        }
+
         return class extends constructor {
             constructor(...args) {
                 super(...args);
-                return this;
             }
             static __router() {
                 return {
                     router,
-                    id,
+                    id: AppUtils.generateHash(),
                     uri: path.normalize(path.join('/', baseUri, '/'))
                 };
             }
