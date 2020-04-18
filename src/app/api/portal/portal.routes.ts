@@ -10,7 +10,7 @@ import { PortalHelper } from './portal.helper';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { ApplicationConstants } from '@core/constants';
 import { sessionsService } from '@api/sessions/sessions.service';
-import { IsString } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 import { translate } from '@lib/translation';
 import { scheduleJob } from 'node-schedule';
 import { validate } from '@shared/common';
@@ -48,17 +48,19 @@ export class LoginDto extends RefreshTokenDto {
 
 export class RefreshTokenPayload {
     @IsString()
+    @IsNotEmpty()
     public token: string = null;
     @IsString()
+    @IsNotEmpty()
     public refreshToken: string = null;
     @IsString()
+    @IsNotEmpty()
     public uuid: string = null;
 }
 
 @Router(Constants.Endpoints.PORTAL)
 export class PortalRoutes {
     constructor() {
-        console.log('constructor');
         // EmailService.sendEmail({
         //     to: 'ezzabuzaid@hotmail.com',
         //     cc: 'superadmin@test.com,admin@test.com',
@@ -77,7 +79,7 @@ export class PortalRoutes {
         }
 
         // STUB it should throw if username is falsy type or if it's not in database
-        const user = await throwIfNotExist({ username }, 'wrong_credintals');
+        const user = await throwIfNotExist({ username });
 
         // STUB it should pass if password is right
         const isPasswordEqual = HashService.comparePassword(password, user.password);
@@ -188,15 +190,15 @@ export class PortalRoutes {
 
 }
 
-async function throwIfNotExist(query: Query<UsersSchema>, message = 'not_exist') {
+async function throwIfNotExist(query: Query<UsersSchema>, message?: string) {
     if (AppUtils.isFalsy(query)) {
         throw new Responses.BadRequest(message);
     }
-    const entity = await usersService.one(query, { projection: { password: 1 } });
-    if (entity.hasError) {
-        throw new Responses.BadRequest(message);
+    const result = await usersService.one(query, { projection: { password: 1 } });
+    if (result.hasError) {
+        throw new Responses.BadRequest(result.message);
     }
-    return entity.data;
+    return result.data;
 }
 
 scheduleJob('30 * * * *', async () => {
