@@ -7,7 +7,7 @@ import { FileUploadRoutes, FoldersRoutes } from '@api/uploads';
 import { SettingRoutes } from '@api/settings';
 import { RoomsRouter } from '@api/chat/rooms';
 import { AppUtils } from '@core/utils';
-
+import assert from 'assert';
 export class Wrapper {
     private static list = [];
     public static registerRouter(router, subRouter?) {
@@ -20,22 +20,14 @@ export class Wrapper {
     }
 
     private static wrapRouter(Router: IExpressInternal) {
-        try {
-            const internal = Router.__router();
-            if (AppUtils.isNullOrUndefined(internal.id)) {
-                throw new Error('please consider add @Router to the top of class');
-            }
-            this.list.push(internal);
-        } catch (error) {
-            throw new Error('The provided router is not constructor');
-        }
+        const internal = Router.__router();
+        assert(AppUtils.notNullOrUndefined(internal.id), 'please consider add @Router on the top of class');
+        this.list.push(internal);
     }
 
     private static assignRouterTo(subRouter, superRouter) {
         const parentRouter = this.getRouter(superRouter);
-        if (!parentRouter) {
-            throw new Error('Please register the parent router first, then try');
-        }
+        assert(AppUtils.notNullOrUndefined(parentRouter), 'Please register the parent router first, then try');
         parentRouter.use(superRouter.routesPath, subRouter.router);
     }
 

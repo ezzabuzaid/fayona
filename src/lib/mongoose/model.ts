@@ -1,16 +1,14 @@
 import { Document as MongooseDocument, Model } from 'mongoose';
 import 'reflect-metadata';
 import { generateModelMetadataKey } from '.';
-import { Type } from '@core/utils';
-
+import { Type, AppUtils } from '@core/utils';
+import assert from 'assert';
 export function BaseModel<T>(schema: Type<T>) {
     const metadataKey = generateModelMetadataKey(schema);
     const model = Reflect.getMetadata(metadataKey, schema) as Model<T & MongooseDocument>;
     Reflect.deleteMetadata(metadataKey, schema);
-    if (model) {
-        return model;
-    }
-    throw new Error('Please prvoide a class decorated with @Entity');
+    assert(AppUtils.notNullOrUndefined(model), 'Please prvoide a class decorated with @Entity');
+    return model;
 }
 
 export type Document<T> = MongooseDocument & T;

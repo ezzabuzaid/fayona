@@ -1,8 +1,5 @@
-import { StageLevel } from '@core/helpers';
-
-import { Logger } from '@core/utils';
-import stage from '@core/helpers/stage';
-const log = new Logger('Local Class');
+import { Logger, AppUtils } from '@core/utils';
+import assert from 'assert';
 
 export class Local<T> {
     /**
@@ -38,9 +35,7 @@ export class Local<T> {
      * @param value
      */
     public set(key: string, value: any) {
-        stage.test(StageLevel.DEV, () => {
-            log.warn(`a key with name ${key} is already hold a value`);
-        });
+        assert(AppUtils.not(this.language[key]), `a key with name ${key} is already hold a value`);
         this.language[key] = value;
     }
 
@@ -51,9 +46,7 @@ export class Local<T> {
 
     public get(key: string): string {
         const value = this.language[key];
-        if (!value) {
-            throw new Error(`the key { ${key} } is not found in local { ${this.name} }`);
-        }
+        assert(value, `the key { ${key} } is not found in local { ${this.name} }`);
         return value;
     }
 }
