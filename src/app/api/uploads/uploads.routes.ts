@@ -2,16 +2,17 @@ import { Router, Post, Get } from '@lib/methods';
 import { Multer } from '@shared/multer';
 import { Request } from 'express';
 import { Responses, Constants } from '@core/helpers';
-import { CrudRouter } from '@shared/crud';
+import { CrudRouter, CrudService } from '@shared/crud';
 import { UploadsSchema } from './uploads.model';
 import uploadsService, { UploadsService } from './uploads.service';
-import foldersService from './folders/folders.service';
+import foldersService, { FoldersService } from './folders/folders.service';
 import path from 'path';
 import { cast } from '@core/utils';
 import { IsString, IsMongoId } from 'class-validator';
 import { validate, NameValidator, isValidId } from '@shared/common';
 import sharedFolderService from './shared-folder/shared-folder.service';
 import { identity, tokenService } from '@shared/identity';
+import { FoldersSchema } from './folders/folders.model';
 
 class FilesSearchPayload {
     @IsMongoId()
@@ -43,7 +44,7 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         const { id } = cast(req.params);
         const { file } = req;
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        const filePath = path.join(id, file.filename);
+        const filePath = `${path.join(id, file.filename)}?name=${file.originalname}&size=${file.size}&type=${file.mimetype}`;
         const result = await uploadsService.create({
             folder: id,
             user: decodedToken.id,
@@ -79,8 +80,10 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
 @Router(Constants.Endpoints.FOLDERS, {
     middleware: [identity.isAuthenticated()],
 })
-export class FoldersRoutes {
-
+export class FoldersRoutes extends CrudRouter<FoldersSchema> {
+    constructor() {
+        super(foldersService);
+    }
     @Get('user/shared')
     public async getUserSharedolders(req: Request) {
         const { id } = await tokenService.decodeToken(req.headers.authorization);
@@ -101,14 +104,14 @@ export class FoldersRoutes {
         const { id } = await tokenService.decodeToken(req.headers.authorization);
         const result = await foldersService.create({ name });
         // TODO: it's very important to find a way to pass the current user to service
+        if (result.hasError) {
+            return new Responses.BadRequest(result.message);
+        }
         await sharedFolderService.create({
             folder: result.data.id,
             shared: false,
             user: id
         });
-        if (result.hasError) {
-            return new Responses.BadRequest(result.message);
-        }
         return new Responses.Created(result.data);
     }
 
