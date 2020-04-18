@@ -7,7 +7,6 @@ export function wrapRoutes(...middlewares) {
     return middlewares.map((middleware) => (req: Request, res: Response, next: NextFunction) => {
         Promise.resolve(middleware(req, res, next) as HttpResponse)
             .then((response) => {
-                console.log('response', response);
                 if (AppUtils.notNullOrUndefined(response)) {
                     if (response instanceof HttpResponse) {
                         return res.status(response.code).json(response);

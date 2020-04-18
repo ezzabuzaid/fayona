@@ -2,25 +2,25 @@ import { Router, Post, Get } from '@lib/methods';
 import { Multer } from '@shared/multer';
 import { Request } from 'express';
 import { Responses, Constants } from '@core/helpers';
-import { CrudRouter, CrudService } from '@shared/crud';
+import { CrudRouter, IReadAllOptions } from '@shared/crud';
 import { UploadsSchema } from './uploads.model';
 import uploadsService, { UploadsService } from './uploads.service';
-import foldersService, { FoldersService } from './folders/folders.service';
+import foldersService from './folders/folders.service';
 import path from 'path';
 import { cast } from '@core/utils';
-import { IsString, IsMongoId } from 'class-validator';
+import { IsMongoId } from 'class-validator';
 import { validate, NameValidator, isValidId } from '@shared/common';
 import sharedFolderService from './shared-folder/shared-folder.service';
 import { identity, tokenService } from '@shared/identity';
 import { FoldersSchema } from './folders/folders.model';
 
-class FilesSearchPayload {
-    @IsMongoId()
-    @IsString({
-        message: 'folder_id_not_valid'
-    }) folder: string = null;
+class FilesSearchPayload implements IReadAllOptions<UploadsSchema> {
+    @IsMongoId({ message: 'folder_id_not_valid' })
+    folder: string = null;
     file: string = null;
     tag: string = null;
+    page: number = null;
+    size: number = null;
 }
 
 const allowedImageTypes = [
@@ -64,15 +64,15 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
 
     @Get(Constants.Endpoints.SEARCH, validate(FilesSearchPayload, 'query'))
     public async searchForFolders(req: Request) {
-        const payload = cast<FilesSearchPayload>(req.query);
+        const { file, folder, tag, ...options } = cast<FilesSearchPayload>(req.query);
         const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
         const files = await this.service.searchForFiles({
-            name: payload.file,
-            folder: payload.folder,
-            tag: payload.tag,
+            folder,
+            tag,
+            name: file,
             user: user_id
-        });
-        return new Responses.Ok(files);
+        }, options);
+        return new Responses.Ok(files.data);
     }
 
 }

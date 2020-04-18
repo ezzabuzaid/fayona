@@ -5,7 +5,7 @@ import { Router, Post, Get } from '@lib/methods';
 import { UsersSchema } from './users.model';
 import { Request } from 'express';
 import { AppUtils } from '@core/utils';
-import { identity, ERoles } from '@shared/identity';
+import { identity } from '@shared/identity';
 
 @Router(Constants.Endpoints.USERS, {
     middleware: [identity.isAuthenticated()]
