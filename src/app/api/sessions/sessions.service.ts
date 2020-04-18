@@ -10,8 +10,9 @@ export class SessionsService extends CrudService<SessionSchema> {
         super(new Repo<SessionSchema>(SessionModel));
     }
 
-    all(query: Query<SessionSchema>) {
+    all(query: Query<SessionSchema>, options = {}) {
         return super.all(query, {
+            ...options,
             populate: 'user'
         });
     }
