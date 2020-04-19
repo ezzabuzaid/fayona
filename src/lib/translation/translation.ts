@@ -20,7 +20,7 @@ class Translation<T> {
      */
     public add(name: T, local: object): Local<T> {
 
-        assert(AppUtils.not(this.get(name)), `Local ${name} is already exist`)
+        assert(AppUtils.not(this.get(name)), `Local ${name} is already exist`);
 
         // create a new local
         const newLocal = new Local(name, local);

@@ -38,7 +38,6 @@ class MessagePayload {
         }
 }
 
-
 export class NodeServer extends Application {
         private port = +envirnoment.get('PORT') || 8080;
         private host = envirnoment.get('HOST') || '127.0.0.1';

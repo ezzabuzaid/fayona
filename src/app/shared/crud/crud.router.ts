@@ -6,6 +6,20 @@ import { AppUtils, cast } from '@core/utils';
 import { Payload } from '@lib/mongoose';
 import assert from 'assert';
 import { isValidId } from '@shared/common';
+import { IReadAllOptions } from './crud.repo';
+import { IsOptional, IsNumberString } from 'class-validator';
+
+export class PaginationValidator implements IReadAllOptions<any> {
+    @IsOptional()
+    @IsNumberString()
+    page: number = null;
+    @IsOptional()
+    @IsNumberString()
+    size: number = null;
+    // @IsOptional()
+    // @IsObject()
+    // sort: number = null;
+}
 
 export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> = CrudService<SchemaType>> {
     constructor(
