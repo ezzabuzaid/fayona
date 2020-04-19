@@ -38,6 +38,7 @@ export class ErrorHandling {
                     log.info(`process.on ${type}`);
                     process.exit(0);
                 } catch (_) {
+                    log.warn(`process killed because of ${type}`);
                     process.exit(1);
                 }
             });
@@ -48,13 +49,14 @@ export class ErrorHandling {
                 try {
                     log.info(`process.on ${type}`);
                 } finally {
+                    log.warn(`process killed because of ${type}`);
                     process.kill(process.pid, type);
                 }
             });
         });
     }
 
-    public static catchError(error: any, req: Request, res: Response, next: NextFunction) {
+    public static catchError(error: any, req: Request, res: Response) {
         const response = new ErrorResponse(error.message,
             isNaN(error.code)
                 ? NetworkStatus.INTERNAL_SERVER_ERROR
@@ -99,11 +101,10 @@ export class ErrorHandling {
             default:
 
         }
-        console.log(error);
         res.status(response.code).json(response);
     }
 
-    public static notFound(req: Request, res: Response, next: NextFunction) {
+    public static notFound(req: Request, res: Response) {
         const error = new ErrorResponse(
             `${req.originalUrl} => ${translate('endpoint_not_found')}`, NetworkStatus.NOT_FOUND
         );
@@ -116,12 +117,6 @@ export class ErrorHandling {
         }
         next();
         return;
-    }
-
-    public static throwExceptionIfDeviceUUIDIsMissing(device_uuid: string) {
-        if (AppUtils.isFalsy(device_uuid)) {
-            throw new Responses.Unauthorized();
-        }
     }
 
 }

@@ -1,8 +1,6 @@
-import { StageLevel } from '@core/helpers';
 import { Local } from './local';
-
-import { Logger } from '@core/utils';
-import stage from '@core/helpers/stage';
+import { Logger, AppUtils } from '@core/utils';
+import assert from 'assert';
 const log = new Logger('Localization Class');
 
 class Translation<T> {
@@ -21,13 +19,8 @@ class Translation<T> {
      * @param local the local to add
      */
     public add(name: T, local: object): Local<T> {
-        // if there's already throw an error in dev mode
 
-        stage.test(StageLevel.DEV, () => {
-            if (this.get(name)) {
-                throw new Error(`Local ${name} is already exist`);
-            }
-        });
+        assert(AppUtils.not(this.get(name)), `Local ${name} is already exist`);
 
         // create a new local
         const newLocal = new Local(name, local);

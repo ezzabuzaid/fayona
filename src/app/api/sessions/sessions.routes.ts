@@ -1,14 +1,14 @@
 import { SessionSchema } from './sessions.model';
 import { Request } from 'express';
-import { Auth } from '../portal/auth';
 import { Get, Router, Patch } from '@lib/methods';
-import { tokenService, Constants, Responses } from '@core/helpers';
+import { Constants, Responses } from '@core/helpers';
 import { CrudRouter } from '../../shared/crud';
 import { sessionsService, SessionsService } from './sessions.service';
 import { validate, PayloadValidator } from '@shared/common';
 import { IsMongoId } from 'class-validator';
 import { cast } from '@core/utils';
 import { ForeignKey, PrimaryKey } from '@lib/mongoose';
+import { identity, tokenService } from '@shared/identity';
 
 export class DeactivateSessionPayload extends PayloadValidator {
 
@@ -21,7 +21,7 @@ export class DeactivateSessionPayload extends PayloadValidator {
 }
 
 @Router(Constants.Endpoints.SESSIONS, {
-    middleware: [Auth.isAuthenticated]
+    middleware: [identity.isAuthenticated()]
 })
 export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {
     constructor() {
@@ -40,7 +40,7 @@ export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {
         const { session_id: _id, user } = cast<DeactivateSessionPayload>(req.body);
         const result = await this.service.deActivate({ _id, user });
         if (result.hasError) {
-            return new Responses.BadRequest(result.data);
+            return new Responses.BadRequest(result.message);
         } else {
             return new Responses.Ok(result.data);
         }

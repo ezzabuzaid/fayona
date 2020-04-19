@@ -3,11 +3,13 @@ import usersService, { UserService } from './users.service';
 import { Constants, Responses } from '@core/helpers';
 import { Router, Post, Get } from '@lib/methods';
 import { UsersSchema } from './users.model';
-import { Request, Response } from 'express';
-import { Auth } from '@api/portal';
+import { Request } from 'express';
 import { AppUtils } from '@core/utils';
+import { identity } from '@shared/identity';
 
-@Router(Constants.Endpoints.USERS)
+@Router(Constants.Endpoints.USERS, {
+    middleware: [identity.isAuthenticated()]
+})
 export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
     constructor() {
         super(usersService);
@@ -18,8 +20,8 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
         return super.create(req);
     }
 
-    @Get(Constants.Endpoints.SEARCH, Auth.isAuthenticated)
-    public async searchForUsers(req: Request, res: Response) {
+    @Get(Constants.Endpoints.SEARCH)
+    public async searchForUsers(req: Request) {
         let { username } = req.query;
         if (AppUtils.isEmptyString(username)) {
             username = '';

@@ -28,5 +28,6 @@ export namespace Constants {
         public static readonly UPLOADS = 'uploads';
         public static readonly FOLDERS = 'folders';
         public static readonly MESSAGES = 'messages';
+        public static readonly SharedFolders = 'SharedFolders';
     }
 }

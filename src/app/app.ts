@@ -11,6 +11,7 @@ import morgan = require('morgan');
 import { Wrapper } from './wrapper';
 import path from 'path';
 import cors from 'cors';
+import sanitize from 'express-mongo-sanitize';
 import stage from '@core/helpers/stage';
 
 const log = new Logger('Application');
@@ -50,6 +51,7 @@ export class Application {
                 frameguard: false
             }))
             .use(compression())
+            .use(sanitize())
             .use(express.static(Application.staticDirectory))
             .use(express.static(Application.uploadDirectory, {
                 index: 'index.html',
@@ -75,7 +77,6 @@ export class Application {
         this.application.use(wrapRoutes(ErrorHandling.favIcon));
         this.application.get('/api', wrapRoutes(() => ({ work: '/API hitted' })));
         this.application.use(wrapRoutes(ErrorHandling.notFound));
-        this.application.use(ErrorHandling.catchError);
     }
 
     private setupLocalization() {

@@ -1,4 +1,4 @@
-import { tokenService, Constants, IRefreshTokenClaim, Responses, HashService } from '@core/helpers';
+import { Constants, Responses, HashService } from '@core/helpers';
 import { Post, Router } from '@lib/methods';
 import { Request, Response } from 'express';
 import usersService from '@api/users/users.service';
@@ -8,13 +8,14 @@ import { EmailService, fakeEmail } from '@shared/email';
 import { AppUtils, cast } from '@core/utils';
 import { PortalHelper } from './portal.helper';
 import { TokenExpiredError } from 'jsonwebtoken';
-import { Auth } from './auth';
 import { ApplicationConstants } from '@core/constants';
 import { sessionsService } from '@api/sessions/sessions.service';
-import { IsString } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 import { translate } from '@lib/translation';
 import { scheduleJob } from 'node-schedule';
 import { validate } from '@shared/common';
+import { tokenService, IRefreshTokenClaim } from '@shared/identity';
+import { Query } from '@shared/crud';
 
 export class LoginPayload {
     @IsString({
@@ -47,16 +48,25 @@ export class LoginDto extends RefreshTokenDto {
 
 export class RefreshTokenPayload {
     @IsString()
+    @IsNotEmpty()
     public token: string = null;
     @IsString()
+    @IsNotEmpty()
     public refreshToken: string = null;
     @IsString()
+    @IsNotEmpty()
     public uuid: string = null;
 }
 
 @Router(Constants.Endpoints.PORTAL)
 export class PortalRoutes {
-
+    constructor() {
+        // EmailService.sendEmail({
+        //     to: 'ezzabuzaid@hotmail.com',
+        //     cc: 'superadmin@test.com,admin@test.com',
+        //     text: 'A test email'
+        // }).then(console.log);
+    }
     @Post(Constants.Endpoints.LOGIN, validate(LoginPayload))
     public async login(req: Request) {
         // TODO: send an email to user to notify him about login attempt.
@@ -65,33 +75,32 @@ export class PortalRoutes {
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
 
         if (AppUtils.isFalsy(device_uuid)) {
-            throw new Responses.BadRequest();
+            return new Responses.BadRequest();
         }
 
         // STUB it should throw if username is falsy type or if it's not in database
-        const user = await throwIfNotExist({ username }, 'wrong_credintals');
+        const user = await throwIfNotExist({ username });
 
         // STUB it should pass if password is right
         const isPasswordEqual = HashService.comparePassword(password, user.password);
         if (AppUtils.isFalsy(isPasswordEqual)) {
-            throw new Responses.BadRequest('wrong_credintals');
-        } else {
-            const activeUserSessions = await sessionsService.getActiveUserSession(user.id);
-
-            if (activeUserSessions.data.length >= 10) {
-                throw new Responses.BadRequest('exceeded_allowed_sesison');
-            }
-            // STUB it should create a session entity
-            const session = await sessionsService.create({
-                device_uuid,
-                active: true,
-                user: user.id
-            });
-
-            // STUB test the refreshToken claims should have only entity id with expire time 12h
-            // STUB test token claims must have only entity id and role with 30min expire time
-            return new Responses.Ok(new LoginDto(user, session.data.id));
+            return new Responses.BadRequest('wrong_credintals');
         }
+        const activeUserSessions = await sessionsService.getActiveUserSession(user.id);
+
+        if (activeUserSessions.data.length >= 10) {
+            return new Responses.BadRequest('exceeded_allowed_sesison');
+        }
+        // STUB it should create a session entity
+        const session = await sessionsService.create({
+            device_uuid,
+            active: true,
+            user: user.id
+        });
+
+        // STUB test the refreshToken claims should have only entity id with expire time 12h
+        // STUB test token claims must have only entity id and role with 30min expire time
+        return new Responses.Ok(new LoginDto(user, session.data.id));
 
     }
 
@@ -108,11 +117,12 @@ export class PortalRoutes {
     }
 
     @Post(Constants.Endpoints.REFRESH_TOKEN, validate(RefreshTokenPayload))
-    public async refreshToken(req: Request, res: Response) {
+    public async refreshToken(req: Request) {
         const { uuid, token, refreshToken } = cast<RefreshTokenPayload>(req.body);
 
         // NOTE: if it was invalid or expired it will implicity thrown an error
         const decodedRefreshToken = await tokenService.decodeToken<IRefreshTokenClaim>(refreshToken);
+        // TODO if refresh token was expired then deactive the user session
 
         try {
             await tokenService.decodeToken(token);
@@ -162,7 +172,6 @@ export class PortalRoutes {
     }
 
     // TODO: the user should verify his email and phonenumber
-    @Post(Constants.Endpoints.VERIFY_ACCOUNT)
     public async verify(req: Request, res: Response) {
         const { token } = req.query;
         const decodedToken = await tokenService.decodeToken(token);
@@ -171,7 +180,6 @@ export class PortalRoutes {
         res.status(response.code).json(response);
     }
 
-    @Post(Constants.Endpoints.VERIFY_ACCOUNT, Auth.isAuthenticated)
     public async sendVerificationEmail(req: Request, res: Response) {
         const { token } = req.query;
         const decodedToken = await tokenService.decodeToken(token);
@@ -182,15 +190,15 @@ export class PortalRoutes {
 
 }
 
-async function throwIfNotExist(query: Partial<Payload<UsersSchema> & { _id: PrimaryKey }>, message = 'not_exist') {
+async function throwIfNotExist(query: Query<UsersSchema>, message?: string) {
     if (AppUtils.isFalsy(query)) {
         throw new Responses.BadRequest(message);
     }
-    const entity = await usersService.one(query, { projection: { password: 1 } });
-    if (entity.hasError) {
-        throw new Responses.BadRequest(message);
+    const result = await usersService.one(query, { projection: { password: 1 } });
+    if (result.hasError) {
+        throw new Responses.BadRequest(result.message);
     }
-    return entity.data;
+    return result.data;
 }
 
 scheduleJob('30 * * * *', async () => {

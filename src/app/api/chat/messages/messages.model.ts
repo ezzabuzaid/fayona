@@ -4,7 +4,8 @@ import { Constants } from '@core/helpers';
 @Entity(Constants.Schemas.MESSAGES)
 export class MessagesSchema {
     @Field({ lowercase: false }) text: string;
-    @Field() user: PrimaryKey;
+    @Field({ required: true }) user: PrimaryKey;
     @Field({ required: true }) room: PrimaryKey;
+    @Field({ required: true }) order: number;
 }
 export default BaseModel(MessagesSchema);

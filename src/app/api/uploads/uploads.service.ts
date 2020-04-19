@@ -1,6 +1,5 @@
-import { CrudService, Repo } from '@shared/crud';
+import { CrudService, Repo, IReadAllOptions, Query } from '@shared/crud';
 import { UploadsSchema, UploadsModel } from './uploads.model';
-import { CastObjectIDToString } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 
 export class UploadsService extends CrudService<UploadsSchema> {
@@ -8,20 +7,18 @@ export class UploadsService extends CrudService<UploadsSchema> {
         super(new Repo(UploadsModel));
     }
 
-    public searchForFiles(query: Partial<CastObjectIDToString<UploadsSchema>>) {
+    public searchForFiles(query: Query<UploadsSchema>, options: IReadAllOptions<UploadsSchema>) {
         const extendedQuery = {
             folder: query.folder || undefined,
             user: query.user,
-            name: AppUtils.isEmptyString(query.name)
+            name: AppUtils.isEmptyString(query.name as string)
                 ? undefined
                 : {
                     $regex: query.name,
                     $options: 'i'
                 }
         };
-        return this.repo.fetchAll()
-            .merge(AppUtils.excludeEmptyKeys(extendedQuery))
-            .exec();
+        return this.all(AppUtils.excludeEmptyKeys(extendedQuery), options);
     }
 }
 

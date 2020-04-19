@@ -24,6 +24,7 @@ export async function validatePayload<T>(payload: T) {
     try {
         await validateOrReject(payload);
     } catch (validationErrors) {
+        // TODO: Add custom validation error
         const errorConstraints = (validationErrors[0] as ValidationError).constraints;
         const error = new Error(Object.values(errorConstraints)[0]);
         error.name = ApplicationConstants.PAYLOAD_VALIDATION_ERRORS;

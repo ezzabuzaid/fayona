@@ -8,11 +8,6 @@ import { AppUtils } from '@core/utils';
 export class RoomMembersService extends CrudService<RoomMemberSchema> {
     constructor() {
         super(new Repo(membersModel), {
-            all: {
-                async pre(documents) {
-                    // documents.populate('user');
-                }
-            },
             create: {
                 async post(member) {
                     const populatedMember = await member.populate('room').execPopulate();
@@ -24,7 +19,6 @@ export class RoomMembersService extends CrudService<RoomMemberSchema> {
                 }
             }
         });
-        this.getMemberRooms('5e88a9e9ec796826da298870' as any, false).then(console.log);
     }
 
     async getMemberRooms(id: PrimaryKey, single: boolean) {

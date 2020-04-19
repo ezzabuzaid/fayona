@@ -1,20 +1,14 @@
 import { HashService, Constants } from '@core/helpers';
-import { BaseModel, Entity, Field, Payload } from '@lib/mongoose';
+import { BaseModel, Entity, Field } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
 import { parsePhoneNumberFromString } from 'libphonenumber-js/max';
 import { AppUtils } from '@core/utils';
-
-export enum ERoles {
-    SUPERADMIN,
-    ADMIN,
-    CLIENT,
-    CUSTOMER,
-}
+import { ERoles } from '@shared/identity';
 
 @Entity(Constants.Schemas.USERS)
 export class UsersSchema {
     @Field({
-        enum: [0, 1, 2, 3, 4],
+        enum: [0, 1, 2, 3],
         default: ERoles.ADMIN,
         validate: (value: ERoles) => AppUtils.isTruthy(ERoles[value])
     }) public role: ERoles;

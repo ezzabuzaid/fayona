@@ -1,26 +1,26 @@
 import { Router, Post, Get } from '@lib/methods';
 import { Multer } from '@shared/multer';
-import { Request, Response } from 'express';
-import { Responses, Constants, tokenService } from '@core/helpers';
-import { Auth } from '@api/portal';
-import { CrudRouter } from '@shared/crud';
+import { Request } from 'express';
+import { Responses, Constants } from '@core/helpers';
+import { CrudRouter, IReadAllOptions } from '@shared/crud';
 import { UploadsSchema } from './uploads.model';
 import uploadsService, { UploadsService } from './uploads.service';
-import foldersService, { FoldersService } from './folders/folders.service';
+import foldersService from './folders/folders.service';
 import path from 'path';
 import { cast } from '@core/utils';
-import { IsString, IsMongoId } from 'class-validator';
+import { IsMongoId } from 'class-validator';
 import { validate, NameValidator, isValidId } from '@shared/common';
-import { FoldersSchema } from './folders/folders.model';
 import sharedFolderService from './shared-folder/shared-folder.service';
+import { identity, tokenService } from '@shared/identity';
+import { FoldersSchema } from './folders/folders.model';
 
-class FilesSearchPayload {
-    @IsMongoId()
-    @IsString({
-        message: 'folder_id_not_valid'
-    }) folder: string = null;
+class FilesSearchPayload implements IReadAllOptions<UploadsSchema> {
+    @IsMongoId({ message: 'folder_id_not_valid' })
+    folder: string = null;
     file: string = null;
     tag: string = null;
+    page: number = null;
+    size: number = null;
 }
 
 const allowedImageTypes = [
@@ -31,7 +31,7 @@ const allowedImageTypes = [
 
 const multer = new Multer({ allowedTypes: allowedImageTypes });
 @Router(Constants.Endpoints.UPLOADS, {
-    middleware: [Auth.isAuthenticated]
+    middleware: [identity.isAuthenticated()]
 })
 export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> {
 
@@ -44,7 +44,7 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         const { id } = cast(req.params);
         const { file } = req;
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        const filePath = path.join(id, file.filename);
+        const filePath = `${path.join(id, file.filename)}?name=${file.originalname}&size=${file.size}&type=${file.mimetype}`;
         const result = await uploadsService.create({
             folder: id,
             user: decodedToken.id,
@@ -63,72 +63,55 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
     }
 
     @Get(Constants.Endpoints.SEARCH, validate(FilesSearchPayload, 'query'))
-    public async searchForFolders(req: Request, res: Response) {
-        const payload = cast<FilesSearchPayload>(req.query);
+    public async searchForFolders(req: Request) {
+        const { file, folder, tag, ...options } = cast<FilesSearchPayload>(req.query);
         const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
         const files = await this.service.searchForFiles({
-            name: payload.file,
-            folder: payload.folder,
-            tag: payload.tag,
+            folder,
+            tag,
+            name: file,
             user: user_id
-        });
-        return new Responses.Ok(files);
+        }, options);
+        return new Responses.Ok(files.data);
     }
 
 }
 
 @Router(Constants.Endpoints.FOLDERS, {
-    middleware: [Auth.isAuthenticated],
+    middleware: [identity.isAuthenticated()],
 })
-export class FoldersRoutes extends CrudRouter<FoldersSchema, FoldersService> {
-
+export class FoldersRoutes extends CrudRouter<FoldersSchema> {
     constructor() {
         super(foldersService);
     }
-
     @Get('user/shared')
-    public async getUserSharedolders(req: Request, res: Response) {
-        // TODO: very important is to find a way to pass the current user to service
+    public async getUserSharedolders(req: Request) {
         const { id } = await tokenService.decodeToken(req.headers.authorization);
-
-        const folders = await sharedFolderService.all(
-            {
-                user: id,
-                shared: true
-            },
-        );
-        folders.data.list = folders.data.list.map(({ folder }) => folder) as any;
+        const folders = await sharedFolderService.getUserFolders(id, true);
         return new Responses.Ok(folders.data);
     }
 
     @Get('user')
-    public async getUserFolders(req: Request, res: Response) {
-        // TODO: very important is to find a way to pass the current user to service
+    public async getUserFolders(req: Request) {
         const { id } = await tokenService.decodeToken(req.headers.authorization);
-
-        const folders = await sharedFolderService.all(
-            {
-                user: id,
-                shared: false
-            },
-        );
+        const folders = await sharedFolderService.getUserFolders(id, false);
         return new Responses.Ok(folders.data);
     }
 
     @Post('/', validate(NameValidator))
-    public async createFolder(req: Request, res: Response) {
+    public async createFolder(req: Request) {
         const { name } = req.body;
         const { id } = await tokenService.decodeToken(req.headers.authorization);
         const result = await foldersService.create({ name });
         // TODO: it's very important to find a way to pass the current user to service
+        if (result.hasError) {
+            return new Responses.BadRequest(result.message);
+        }
         await sharedFolderService.create({
             folder: result.data.id,
             shared: false,
             user: id
         });
-        if (result.hasError) {
-            return new Responses.BadRequest(result.message);
-        }
         return new Responses.Created(result.data);
     }
 

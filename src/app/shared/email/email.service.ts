@@ -5,16 +5,17 @@ export class EmailService {
     public static async sendEmail(message: Mail.Options) {
         const account = await nodemailer.createTestAccount();
         const transporter = nodemailer.createTransport({
-            host: 'smtp.ethereal.email',
-            port: 587,
-            secure: false,
+            // host: 'smtp.ethereal.email',
+            // port: 587,
+            // secure: false,
+            service: 'gmail',
             auth: {
-                user: account.user,
-                pass: account.pass
+                user: 'ezzabuzaid',
+                pass: 'OW99bfte'
             }
         });
-        const info = await transporter.sendMail(message);
-        return nodemailer.getTestMessageUrl(info);
+        return transporter.sendMail(message);
+        // return nodemailer.getTestMessageUrl(info);
     }
 }
 

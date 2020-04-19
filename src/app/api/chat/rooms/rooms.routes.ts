@@ -1,21 +1,23 @@
 import { Router, Post, Get } from '@lib/methods';
-import { Constants, tokenService, Responses } from '@core/helpers';
-import { CrudRouter } from '@shared/crud';
+import { Constants, Responses } from '@core/helpers';
+import { CrudRouter, PaginationValidator } from '@shared/crud';
 import { RoomSchema } from './rooms.model';
 import roomsService, { RoomsService } from './rooms.service';
 import { Request } from 'express';
-import { Auth } from '@api/portal';
-import { ArrayNotEmpty, IsString, ArrayMinSize } from 'class-validator';
+import { ArrayNotEmpty, IsString, ArrayMinSize, IsNotEmpty, IsOptional } from 'class-validator';
 import { cast } from '@core/utils';
 import { validate, isValidId } from '@shared/common';
 import messagesService from '@api/chat/messages/messages.service';
 import membersService from '@api/chat/members/members.service';
 import { PrimaryKey } from '@lib/mongoose';
+import { identity, tokenService } from '@shared/identity';
 
 class RoomPayload {
     @ArrayMinSize(1, { message: 'a room should at least contain two member' }) public members: PrimaryKey[] = null;
-    @IsString() message: string = null;
-    @IsString() name: string = null;
+    @IsNotEmpty() message: string = null;
+    // @IsOptional()
+    @IsString()
+    name: string = null;
 }
 
 class SearchForRoomByMemberValidator {
@@ -25,7 +27,7 @@ class SearchForRoomByMemberValidator {
 }
 
 @Router(Constants.Endpoints.ROOMS, {
-    middleware: [Auth.isAuthenticated]
+    middleware: [identity.isAuthenticated()]
 })
 export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
     constructor() {
@@ -49,7 +51,8 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
         await messagesService.create({
             text: message,
             user: decodedToken.id,
-            room: room.data.id
+            room: room.data.id,
+            order: 0,
         });
 
         await membersService.create({
@@ -104,10 +107,11 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
         return conversations;
     }
 
-    @Get(':id/messages', isValidId())
+    @Get(':id/messages', isValidId(), validate(PaginationValidator, 'query'))
     async getConversationMessages(req: Request) {
         const { id } = cast<{ id: PrimaryKey }>(req.params);
-        const result = await messagesService.all({ room: id });
+        const options = cast<PaginationValidator>(req.query);
+        const result = await messagesService.getLastMessage(id, options);
         return new Responses.Ok(result.data);
     }
 

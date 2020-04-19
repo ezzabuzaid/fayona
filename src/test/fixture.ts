@@ -1,11 +1,12 @@
-import { Constants, tokenService } from '@core/helpers';
-import { UsersSchema, ERoles } from '@api/users';
+import { Constants } from '@core/helpers';
+import { UsersSchema } from '@api/users';
 import { Payload, WithMongoID } from '@lib/mongoose';
 import * as faker from 'faker';
 import { ValidationPatterns } from '@shared/common';
 import { ApplicationConstants } from '@core/constants';
 import { AppUtils } from '@core/utils';
 import { LoginPayload } from '@api/portal';
+import { ERoles, tokenService } from '@shared/identity';
 
 export function generateDeviceUUIDHeader() {
     return {
@@ -96,5 +97,5 @@ export function generateExpiredToken() {
 }
 
 export function generateToken() {
-    return tokenService.generateToken({ id: AppUtils.generateAlphabeticString() });
+    return tokenService.generateToken({ id: AppUtils.generateAlphabeticString() as any });
 }

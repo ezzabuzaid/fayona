@@ -1,19 +1,15 @@
+import 'reflect-metadata';
+import path = require('path');
 import { AppUtils, Logger } from '@core/utils';
 import { Router as expressRouter } from 'express';
-import 'reflect-metadata';
-import { IExpressInternal, IRouterDecorationOption, RouterProperties } from './methods.types';
-
-const log = new Logger('Router Decorator');
-import path = require('path');
+import { IRouterDecorationOption } from './methods.types';
 import { IMetadata, method_metadata_key } from './index';
 import { wrapRoutes } from '@core/helpers/route';
 
 export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
     return function <T extends new (...args: any[]) => any>(constructor: T) {
-        log.info(constructor.name);
-        const { prototype } = constructor;
+        const log = new Logger(constructor.name);
         const router = expressRouter(options);
-        const routerUri = path.normalize(path.join('/', baseUri, '/'));
         const instance = new constructor();
 
         Reflect.getMetadataKeys(constructor)
@@ -32,22 +28,18 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
             });
 
         if (AppUtils.hasItemWithin(options.middleware)) {
-            router.use(`${routerUri}`, wrapRoutes(...options.middleware));
+            router.use(wrapRoutes(...options.middleware));
         }
 
-        AppUtils.defineProperty(prototype, RouterProperties.RoutesPath, { get() { return routerUri; } });
-        const id = AppUtils.generateHash();
-        AppUtils.defineProperty(prototype, RouterProperties.ID, { get() { return id; } });
-        return class extends constructor implements IExpressInternal {
+        return class extends constructor {
             constructor(...args) {
                 super(...args);
-                return this;
             }
-            public __router() {
+            static __router() {
                 return {
                     router,
-                    id,
-                    uri: routerUri
+                    id: AppUtils.generateHash(),
+                    uri: path.normalize(path.join('/', baseUri, '/'))
                 };
             }
         };

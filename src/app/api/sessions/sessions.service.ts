@@ -1,31 +1,30 @@
-import { Repo, CrudService } from '@shared/crud';
+import { Repo, CrudService, Query } from '@shared/crud';
 import { SessionSchema, SessionModel } from './sessions.model';
 import { Document, Payload, WithMongoID, ForeignKey } from '@lib/mongoose';
-import { AppUtils, Omit } from '@core/utils';
+import { Omit } from '@core/utils';
+import { Result } from '@core/helpers';
 
 export class SessionsService extends CrudService<SessionSchema> {
 
     constructor() {
-        super(new Repo<SessionSchema>(SessionModel), {
-            all: {
-                pre(documentsQuery) {
-                    documentsQuery.populate('user');
-                }
-            }
+        super(new Repo<SessionSchema>(SessionModel));
+    }
+
+    all(query: Query<SessionSchema>, options = {}) {
+        return super.all(query, {
+            ...options,
+            populate: 'user'
         });
     }
 
-    public async deActivate(query: Partial<Omit<WithMongoID<Payload<SessionSchema>>, 'active'>>) {
+    public async deActivate(query: Partial<WithMongoID<Payload<Omit<SessionSchema, 'active'>>>>) {
         const record = await this.getActiveSession(query);
         if (record.hasError) {
-            return {
-                hasError: true,
-                data: 'no session available'
-            };
+            return new Result({ message: 'No session available' });
         }
         await this.setAsDeactive(record.data);
-        // TODO: use Result class instead
-        return { hasError: false, data: 'Session deactivated' };
+        return new Result({ message: 'Session deactivated' });
+
     }
 
     public getActiveSession(query: Partial<Payload<SessionSchema>>) {

@@ -1,12 +1,12 @@
 import assert from 'assert';
 import { Model, FilterQuery } from 'mongoose';
-import { Document, Payload, Projection, WithMongoID, ColumnSort, PrimaryKey, ForeignKey, BaseModel } from '@lib/mongoose';
+import { Document, Payload, Projection, ColumnSort, PrimaryKey, ForeignKey, BaseModel } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 
 // TODO: Before any query or write check the body to meet the
 //  model to avoid [injections] this should be done in the repo.
 
-export type Query<T> = Partial<WithMongoID<T>> & FilterQuery<T>;
+export type Query<T> = FilterQuery<T>;
 
 export class Repo<T> {
     constructor(
@@ -21,7 +21,7 @@ export class Repo<T> {
 
     public fetchAll(
         query?: Query<T>,
-        options: Partial<IReadAllOptions<T>> = {}
+        options: Partial<IReadOptions<T>> = {}
     ) {
         return this.model.find(query as any, {}, options);
     }
@@ -50,8 +50,10 @@ type ForeignKeysOnly<T> = {
     [P in keyof T]: ForeignKey extends T[P] ? P : never
 }[keyof T];
 
-export interface IReadAllOptions<T> extends IReadOneOptions<T> {
-    sort: ColumnSort<T>;
-    page: number;
-    size: number;
+export interface IReadAllOptions<T> {
+    sort?: ColumnSort<T>;
+    page?: number;
+    size?: number;
 }
+
+export interface IReadOptions<T> extends IReadOneOptions<T>, IReadAllOptions<T> { }
