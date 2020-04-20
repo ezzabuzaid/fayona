@@ -15,7 +15,7 @@ export class FoldersService extends CrudService<FoldersSchema> {
             },
             update: {
                 async pre(folder) {
-                    const sharedFolder = await sharedFolderService.one({ _id: folder.id });
+                    const sharedFolder = await sharedFolderService.one({ folder: folder.id });
                     if (sharedFolder.data.shared) {
                         throw new Error('Shared folder cannot updated');
                     }
@@ -23,7 +23,7 @@ export class FoldersService extends CrudService<FoldersSchema> {
             },
             delete: {
                 async pre(folder) {
-                    const sharedFolder = await sharedFolderService.one({ _id: folder.id });
+                    const sharedFolder = await sharedFolderService.one({ folder: folder.id });
                     if (sharedFolder.data.shared) {
                         throw new Error('Shared folder cannot deleted');
                     }
