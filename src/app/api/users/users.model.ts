@@ -1,10 +1,9 @@
 import { HashService, Constants } from '@core/helpers';
 import { BaseModel, Entity, Field } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
-import { parsePhoneNumberFromString } from 'libphonenumber-js/max';
 import { AppUtils } from '@core/utils';
 import { ERoles } from '@shared/identity';
-
+import phone from 'phone';
 @Entity(Constants.Schemas.USERS)
 export class UsersSchema {
     @Field({
@@ -35,10 +34,7 @@ export class UsersSchema {
     }) public email: string;
     @Field({
         validate: [
-            (value) => {
-                const phonenumber = parsePhoneNumberFromString(value);
-                return !!phonenumber && phonenumber.isValid();
-            },
+            AppUtils.compose(AppUtils.hasItemWithin, phone),
             'wrong_mobile'
         ],
         unique: true,

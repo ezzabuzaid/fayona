@@ -20,7 +20,6 @@ export class UserService extends CrudService<UsersSchema> {
     }
 
     async create(payload: Payload<UsersSchema>) {
-        // TODO: normalize the mobile number in order to ensure the uniqueness
         const user = await super.create(payload);
         // TODO: send a verification email
         // EmailService.sendEmail(fakeEmail());
