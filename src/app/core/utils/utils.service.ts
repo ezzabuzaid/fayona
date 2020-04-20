@@ -7,6 +7,24 @@ export type Parameter<T extends (args: any) => any> = T extends (args: infer P) 
 
 export class AppUtils {
 
+    /**
+     *
+     * @param functions Accept array of function to invoke in inverse order,
+     *  so that each function will accept tha value from last invoked function as argument
+     */
+    static compose<T, Y>(...functions) {
+        return (args: T | Y) => functions.reduceRight((acc, fn) => fn(acc), args);
+    }
+
+    /**
+     *
+     * @param functions Accept array of function to invoke in order,
+     * so that each function will accept tha value of last invoked function as argument
+     */
+    static pipe<T, Y>(...functions) {
+        return (args: T | Y) => functions.reduce((acc, fn) => fn(acc), args);
+    }
+
     static isTruthy(value: any) {
         return !!value;
     }
