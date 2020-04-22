@@ -7,7 +7,7 @@
     "wrong_credintals": "Wrong credintals",
     "internal_server_error": "internal_server_error",
     "deleted_success": "delete_user",
-    "invalid_syntax": "invalid path syntax, please make sure that the requested valid entity, the id is wrong, it's not mongoose like id",
+    "invalid_syntax": "invalid path syntax, please make sure that the requested valid entity, the path of {name} is wrong",
     "endpoint_not_found": "endpoint_not_found",
     "updated": "{name} updated successfully",
     "string_constraint": "{name} must be string",

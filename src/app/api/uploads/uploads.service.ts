@@ -11,6 +11,7 @@ export class UploadsService extends CrudService<UploadsSchema> {
         const extendedQuery = {
             folder: query.folder || undefined,
             user: query.user,
+            tag: query.tag,
             name: AppUtils.isEmptyString(query.name as string)
                 ? undefined
                 : {

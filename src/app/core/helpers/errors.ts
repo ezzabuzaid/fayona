@@ -72,7 +72,7 @@ export class ErrorHandling {
                 response.code = NetworkStatus.BAD_REQUEST;
                 break;
             case Errors.CastError:
-                response.message = translate('invalid_syntax');
+                response.message = translate('invalid_syntax', { name: error.path });
                 response.code = NetworkStatus.BAD_REQUEST;
                 break;
             case Errors.ValidationError:

@@ -8,18 +8,27 @@ import uploadsService, { UploadsService } from './uploads.service';
 import foldersService from './folders/folders.service';
 import path from 'path';
 import { cast } from '@core/utils';
-import { IsMongoId } from 'class-validator';
+import { IsMongoId, IsOptional, IsString, IsNumberString } from 'class-validator';
 import { validate, NameValidator, isValidId } from '@shared/common';
 import sharedFolderService from './shared-folder/shared-folder.service';
 import { identity, tokenService } from '@shared/identity';
 import { FoldersSchema } from './folders/folders.model';
 
 class FilesSearchPayload implements IReadAllOptions<UploadsSchema> {
-    @IsMongoId({ message: 'folder_id_not_valid' })
+    @IsOptional()
+    @IsMongoId()
     folder: string = null;
-    file: string = null;
+    @IsOptional()
+    @IsNumberString()
     tag: string = null;
+    @IsOptional()
+    @IsString()
+    file: string = null;
+    @IsOptional()
+    @IsNumberString()
     page: number = null;
+    @IsOptional()
+    @IsNumberString()
     size: number = null;
 }
 
@@ -117,6 +126,13 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema> {
 
     @Get('tags')
     getTags() {
+        class Tag {
+            static count = -1;
+            id = ++Tag.count;
+            constructor(
+                public color: string = null,
+            ) { }
+        }
         const tags = [
             new Tag('black'),
             new Tag('blue'),
@@ -127,16 +143,8 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema> {
             new Tag('yellow'),
             new Tag('pink'),
             new Tag('aqua'),
-            new Tag('azure'),
+            new Tag('#6c757c'),
         ];
         return new Responses.Ok(tags);
     }
-}
-
-class Tag {
-    static count = -1;
-    id = ++Tag.count;
-    constructor(
-        public color: string = null,
-    ) { }
 }
