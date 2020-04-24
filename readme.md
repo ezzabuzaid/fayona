@@ -11,13 +11,11 @@ Please consider following this project's author, [Ezz](https://github.com/ezzabu
 ![Sample Crud](https://media-exp1.licdn.com/dms/image/C4D22AQFXto7aXpbAfw/feedshare-shrink_2048_1536/0?e=1588809600&v=beta&t=Hw7RYWdgfrbs8pq8Xp5OunZWVzwdfMmPBdXTkaHVyXA)
 
 
-| Package                   | Description                                                                         | Docs             |
+| Package                   | Description                                                                         
 | ------------------------- | ----------------------------------------------------------------------------------- | ---------------- |
-| `@lib/translate`            | Translation library used to manage json translation files | [Docs][cdk-docs] |
+| `@lib/translation`            | Translation library used to manage json translation files | [Docs][cdk-docs] |
 | `@lib/restful`       | Set of typescript decorator that aims to easily register HTTP route handler  | [Docs][mat-docs] |
-| `@angular/google-maps`    | Angular components built on top of the [Google Maps JavaScript API][]               | [Docs][map-docs] |
-| `@angular/youtube-player` | Angular component built on top of the [YouTube Player API][]                        | [Docs][ytp-docs] |
-
+| `@lib/mongoose`    | Angular components built on top of the [Google Maps JavaScript API][] 
 
 
 
@@ -44,6 +42,6 @@ Don't hesitate to open issues and make a pull request to help improve code
 ##### Built with love <3
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEyNDQ1MDY4MjEsLTg4MjA5MTk0MSwtMT
-Q3OTk1NjU5OCwtODQyNTMyODY1XX0=
+eyJoaXN0b3J5IjpbNTQ3NDYzMTgyLC04ODIwOTE5NDEsLTE0Nz
+k5NTY1OTgsLTg0MjUzMjg2NV19
 -->
