@@ -14,7 +14,7 @@ Please consider following this project's author, [Ezz](https://github.com/ezzabu
 | Package                   | Description                                                                         | Docs             |
 | ------------------------- | ----------------------------------------------------------------------------------- | ---------------- |
 | `@lib/translate`            | Translation library used to manage json translation files | [Docs][cdk-docs] |
-| `@lib/restfull`       | [Material Design][] UI components for Angular applications                          | [Docs][mat-docs] |
+| `@lib/restful`       | Set of typescript decorator that aims to easily register HTTP route handler  | [Docs][mat-docs] |
 | `@angular/google-maps`    | Angular components built on top of the [Google Maps JavaScript API][]               | [Docs][map-docs] |
 | `@angular/youtube-player` | Angular component built on top of the [YouTube Player API][]                        | [Docs][ytp-docs] |
 
@@ -44,6 +44,6 @@ Don't hesitate to open issues and make a pull request to help improve code
 ##### Built with love <3
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTE4NDA3ODAzNiwtODgyMDkxOTQxLC0xND
-c5OTU2NTk4LC04NDI1MzI4NjVdfQ==
+eyJoaXN0b3J5IjpbLTEyNDQ1MDY4MjEsLTg4MjA5MTk0MSwtMT
+Q3OTk1NjU5OCwtODQyNTMyODY1XX0=
 -->
