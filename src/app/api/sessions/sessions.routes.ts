@@ -1,6 +1,6 @@
 import { SessionSchema } from './sessions.model';
 import { Request } from 'express';
-import { Get, Router, Patch } from '@lib/methods';
+import { Get, Router, Patch } from '@lib/restful';
 import { Constants, Responses } from '@core/helpers';
 import { CrudRouter } from '../../shared/crud';
 import { sessionsService, SessionsService } from './sessions.service';

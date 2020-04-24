@@ -3,9 +3,9 @@ import { define, METHODS } from '.';
 
 export function Delete(uri = '/', ...middlewares: RequestHandler[]): any {
     return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
-        const _method = descriptor.value;
+        const originalMethod = descriptor.value;
         descriptor.value = function() {
-            return _method.apply(target, arguments);
+            return originalMethod.apply(target, arguments);
         };
         define({ method: METHODS.DELETE, uri, middlewares, target, propertyKey });
     };

@@ -10,7 +10,7 @@ import {
     Get,
     define,
     Router,
-} from '@lib/methods';
+} from '@lib/restful';
 import 'reflect-metadata';
 
 describe('Define route', () => {

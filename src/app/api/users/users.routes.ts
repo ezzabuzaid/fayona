@@ -1,7 +1,7 @@
 import { CrudRouter } from '@shared/crud';
 import usersService, { UserService } from './users.service';
 import { Constants, Responses } from '@core/helpers';
-import { Router, Post, Get } from '@lib/methods';
+import { Router, Post, Get } from '@lib/restful';
 import { UsersSchema } from './users.model';
 import { Request } from 'express';
 import { AppUtils } from '@core/utils';

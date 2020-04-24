@@ -2,7 +2,7 @@ import { UsersRouter } from '@api/users';
 import { PortalRoutes } from '@api/portal';
 import { FeedbackRouter } from '@api/feedback';
 import { SessionRouter } from '@api/sessions';
-import { IExpressInternal, IExpressRouter } from '@lib/methods';
+import { IExpressInternal, IExpressRouter } from '@lib/restful';
 import { FileUploadRoutes, FoldersRoutes } from '@api/uploads';
 import { SettingRoutes } from '@api/settings';
 import { RoomsRouter } from '@api/chat/rooms';

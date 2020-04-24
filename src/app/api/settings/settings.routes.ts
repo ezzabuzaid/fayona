@@ -1,4 +1,4 @@
-import { Router, Get, Post } from '@lib/methods';
+import { Router, Get, Post } from '@lib/restful';
 import { Request } from 'express';
 import settingsModel from './settings.model';
 

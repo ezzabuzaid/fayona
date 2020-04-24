@@ -1,16 +1,12 @@
-import { define } from './index';
 import { RequestHandler } from 'express';
+import { define, METHODS } from '.';
 
-/**
- * intercept the incoming request and invoked the hooked function
- *
- */
-export function Intercept(...middlewares: RequestHandler[]) {
+export function Patch(uri = '/', ...middlewares: RequestHandler[]) {
     return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
         const originalMethod = descriptor.value;
         descriptor.value = function(...args: any[]) {
             return originalMethod.apply(this, args);
         };
-        define({ method: 'use' as any, uri: '/', middlewares, target, propertyKey });
+        define({ method: METHODS.PATCH, uri, middlewares, target, propertyKey });
     };
 }

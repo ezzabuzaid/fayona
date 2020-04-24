@@ -1,4 +1,4 @@
-import { Router, Post, Get } from '@lib/methods';
+import { Router, Post, Get } from '@lib/restful';
 import { Constants, Responses } from '@core/helpers';
 import { CrudRouter, PaginationValidator } from '@shared/crud';
 import { RoomSchema } from './rooms.model';

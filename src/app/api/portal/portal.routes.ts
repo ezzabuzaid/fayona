@@ -1,5 +1,5 @@
 import { Constants, Responses, HashService } from '@core/helpers';
-import { Post, Router } from '@lib/methods';
+import { Post, Router } from '@lib/restful';
 import { Request, Response } from 'express';
 import usersService from '@api/users/users.service';
 import { UsersSchema } from '@api/users';

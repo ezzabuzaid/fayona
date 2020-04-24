@@ -1,5 +1,5 @@
 import { CrudService } from './crud.service';
-import { Post, Put, Delete, Get, Patch } from '@lib/methods';
+import { Post, Put, Delete, Get, Patch } from '@lib/restful';
 import { Request } from 'express';
 import { Responses } from '@core/helpers';
 import { AppUtils, cast } from '@core/utils';

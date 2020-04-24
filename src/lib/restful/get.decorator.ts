@@ -5,8 +5,7 @@ export function Get(uri = '/', ...middlewares: RequestHandler[]) {
     return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
         const originalMethod = descriptor.value;
         descriptor.value = function(...args: any[]) {
-            const result = originalMethod.apply(this, args);
-            return result;
+            return originalMethod.apply(this, args);
         };
         define({ method: METHODS.GET, uri, middlewares, target, propertyKey });
     };

@@ -1,4 +1,4 @@
-import { Router } from '@lib/methods';
+import { Router } from '@lib/restful';
 import { FeedbackSchema, FeedbackModel } from './feedback.model';
 import { Repo, CrudRouter, CrudService } from '@shared/crud';
 import { Constants } from '@core/helpers';

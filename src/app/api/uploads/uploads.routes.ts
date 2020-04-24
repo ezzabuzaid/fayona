@@ -1,4 +1,4 @@
-import { Router, Post, Get } from '@lib/methods';
+import { Router, Post, Get } from '@lib/restful';
 import { Multer } from '@shared/multer';
 import { Request } from 'express';
 import { Responses, Constants } from '@core/helpers';

@@ -28,6 +28,7 @@ export interface IMetadataDto {
     };
     propertyKey: string;
 }
+
 export interface IMetadata {
     uri: string;
     middlewares: RequestHandler[];
