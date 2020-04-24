@@ -10,7 +10,13 @@ Please consider following this project's author, [Ezz](https://github.com/ezzabu
 
 ![Sample Crud](https://media-exp1.licdn.com/dms/image/C4D22AQFXto7aXpbAfw/feedshare-shrink_2048_1536/0?e=1588809600&v=beta&t=Hw7RYWdgfrbs8pq8Xp5OunZWVzwdfMmPBdXTkaHVyXA)
 
-#### it would be nice to put your touches
+
+| Package                   | Description                                                                         
+| ------------------------- | ----------------------------------------------------------------------------------- | ---------------- |
+| `@lib/translation`            | Translation library used to manage json translation files
+| `@lib/restful`       | Set of typescript decorator for easily register HTTP route handler 
+| `@lib/mongoose`    | Set of typescript decorator for mapping fields and schema in more OOP way
+
 
 ## Contributing
 Don't hesitate to open issues and make a pull request to help improve code
@@ -19,13 +25,8 @@ Don't hesitate to open issues and make a pull request to help improve code
 3.  Commit your changes: `git commit -m 'Add some feature'`
 4.  Push to the branch: `git push origin my-new-feature`
 5.  Submit a pull request :D
-  
-## Versioning
+#### it would be nice to put your touches
 
-This library will be maintained under the semantic versioning guidelines.
-Releases will be numbered with the following format:
-`<major>.<minor>.<patch>`
-For more information on SemVer, please visit http://semver.org.
 
 ## Developer
 ##### [Ezzabuzaid](mailto:ezzabuzaid@hotmail.com)
@@ -33,15 +34,12 @@ For more information on SemVer, please visit http://semver.org.
 - [GitHub](https://github.com/ezzabuzaid)
 - [Linkedin](https://www.linkedin.com/in/ezzabuzaid)
 
-## Maintainers
- [**ezzabuzaid**](https://github.com/ezzabuzaid) - (author) - ezzabuzaid@hotmail.com
-
-
 ## License
 ##### The MIT License (MIT)
 
 ##### Built with love <3
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTg0MjUzMjg2NV19
+eyJoaXN0b3J5IjpbMTE4OTE0ODMxMiwtODgyMDkxOTQxLC0xND
+c5OTU2NTk4LC04NDI1MzI4NjVdfQ==
 -->
