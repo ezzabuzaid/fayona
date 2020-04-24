@@ -13,13 +13,10 @@ Please consider following this project's author, [Ezz](https://github.com/ezzabu
 
 | Package                   | Description                                                                         
 | ------------------------- | ----------------------------------------------------------------------------------- | ---------------- |
-| `@lib/translation`            | Translation library used to manage json translation files | [Docs][cdk-docs] |
-| `@lib/restful`       | Set of typescript decorator that aims to easily register HTTP route handler  | [Docs][mat-docs] |
-| `@lib/mongoose`    | Angular components built on top of the [Google Maps JavaScript API][] 
+| `@lib/translation`            | Translation library used to manage json translation files
+| `@lib/restful`       | Set of typescript decorator for easily register HTTP route handler 
+| `@lib/mongoose`    | Set of typescript decorator for mapping fields and schema in more OOP way
 
-
-
-#### it would be nice to put your touches
 
 ## Contributing
 Don't hesitate to open issues and make a pull request to help improve code
@@ -28,6 +25,7 @@ Don't hesitate to open issues and make a pull request to help improve code
 3.  Commit your changes: `git commit -m 'Add some feature'`
 4.  Push to the branch: `git push origin my-new-feature`
 5.  Submit a pull request :D
+#### it would be nice to put your touches
 
 
 ## Developer
@@ -42,6 +40,6 @@ Don't hesitate to open issues and make a pull request to help improve code
 ##### Built with love <3
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNTQ3NDYzMTgyLC04ODIwOTE5NDEsLTE0Nz
-k5NTY1OTgsLTg0MjUzMjg2NV19
+eyJoaXN0b3J5IjpbMTE4OTE0ODMxMiwtODgyMDkxOTQxLC0xND
+c5OTU2NTk4LC04NDI1MzI4NjVdfQ==
 -->
