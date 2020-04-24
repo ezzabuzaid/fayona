@@ -13,7 +13,7 @@ Please consider following this project's author, [Ezz](https://github.com/ezzabu
 
 | Package                   | Description                                                                         | Docs             |
 | ------------------------- | ----------------------------------------------------------------------------------- | ---------------- |
-| `@lib/translate`            | Library that helps you at | [Docs][cdk-docs] |
+| `@lib/translate`            | Translation library used for  | [Docs][cdk-docs] |
 | `@angular/material`       | [Material Design][] UI components for Angular applications                          | [Docs][mat-docs] |
 | `@angular/google-maps`    | Angular components built on top of the [Google Maps JavaScript API][]               | [Docs][map-docs] |
 | `@angular/youtube-player` | Angular component built on top of the [YouTube Player API][]                        | [Docs][ytp-docs] |
@@ -44,5 +44,5 @@ Don't hesitate to open issues and make a pull request to help improve code
 ##### Built with love <3
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTYyMjQxNTcxOCwtODQyNTMyODY1XX0=
+eyJoaXN0b3J5IjpbLTE0Nzk5NTY1OTgsLTg0MjUzMjg2NV19
 -->
