@@ -1,6 +1,6 @@
 import { Router, Post, Get } from '@lib/restful';
 import { Constants, Responses } from '@core/helpers';
-import { CrudRouter, PaginationValidator } from '@shared/crud';
+import { CrudRouter, Pagination } from '@shared/crud';
 import { RoomSchema } from './rooms.model';
 import roomsService, { RoomsService } from './rooms.service';
 import { Request } from 'express';
@@ -107,10 +107,10 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
         return conversations;
     }
 
-    @Get(':id/messages', isValidId(), validate(PaginationValidator, 'query'))
+    @Get(':id/messages', isValidId(), validate(Pagination, 'query'))
     async getConversationMessages(req: Request) {
         const { id } = cast<{ id: PrimaryKey }>(req.params);
-        const options = cast<PaginationValidator>(req.query);
+        const options = cast<Pagination>(req.query);
         const result = await messagesService.getLastMessage(id, options);
         return new Responses.Ok(result.data);
     }

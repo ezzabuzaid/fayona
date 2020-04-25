@@ -9,7 +9,7 @@ import { isValidId } from '@shared/common';
 import { IReadAllOptions } from './crud.repo';
 import { IsOptional, IsNumberString } from 'class-validator';
 
-export class PaginationValidator implements IReadAllOptions<any> {
+export class Pagination implements IReadAllOptions<any> {
     @IsOptional()
     @IsNumberString()
     page: number = null;
