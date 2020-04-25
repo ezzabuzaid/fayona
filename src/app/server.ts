@@ -89,7 +89,6 @@ export class NodeServer extends Application {
                                                 text: payload.text,
                                                 order: message.order
                                         });
-                                        log.debug('New Message from => ', createdMessage);
                                         socket.emit(`saved_${message.timestamp}`, message.id);
                                         socket.broadcast.in(message.id as any).emit('Message', createdMessage.data);
                                 } catch (error) {
@@ -98,7 +97,6 @@ export class NodeServer extends Application {
                                 }
                         });
                 });
-
                 return server;
         }
 

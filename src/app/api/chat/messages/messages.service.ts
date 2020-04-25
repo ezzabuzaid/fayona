@@ -18,7 +18,7 @@ export class MessagesService extends CrudService<MessagesSchema> {
         return super.all({ room }, {
             ...options,
             sort: {
-                order: 1 as any
+                order: 'descending'
             }
         });
     }
