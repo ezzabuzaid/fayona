@@ -1,4 +1,4 @@
-import { AppUtils, Type } from '@core/utils';
+import { AppUtils } from '@core/utils';
 import 'reflect-metadata';
 import { MongooseTypes, generateModelMetadataKey } from '.';
 
@@ -8,7 +8,7 @@ export function Field(options: MongooseTypes.FieldOptions = {}) {
         const metadataKey = generateModelMetadataKey(constructor);
 
         let fields = Reflect.getMetadata(metadataKey, constructor);
-        if (AppUtils.isFalsy(fields)) {
+        if (AppUtils.isNullOrUndefined(fields)) {
             Reflect.defineMetadata(metadataKey, {}, constructor);
             fields = Reflect.getMetadata(metadataKey, constructor);
         }
@@ -19,16 +19,14 @@ export function Field(options: MongooseTypes.FieldOptions = {}) {
             defaults = {
                 lowercase: true,
                 trim: true,
-                // TODO: mark all fields as required unless explicty sitted as false
                 required: true
             };
         }
         fields[propertyKey] = {
             type: propertyType.name,
-            default: instance[propertyKey] || null,
+            default: instance[propertyKey] ?? null,
             ...defaults,
             ...options,
-
         };
     };
 }
