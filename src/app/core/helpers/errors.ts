@@ -56,7 +56,7 @@ export class ErrorHandling {
         });
     }
 
-    public static catchError(error: any, req: Request, res: Response) {
+    public static catchError(error: any) {
         const response = new ErrorResponse(error.message,
             isNaN(error.code)
                 ? NetworkStatus.INTERNAL_SERVER_ERROR
@@ -99,9 +99,8 @@ export class ErrorHandling {
                 response.message = 'request entity too large';
                 break;
             default:
-
         }
-        res.status(response.code).json(response);
+        return response;
     }
 
     public static notFound(req: Request, res: Response) {

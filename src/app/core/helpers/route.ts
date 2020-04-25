@@ -16,7 +16,9 @@ export function wrapRoutes(...middlewares) {
                 }
             })
             .catch((error) => {
-                return ErrorHandling.catchError(error, req, res);
+                const response = ErrorHandling.catchError(error);
+                res.status(response.code).json(response);
+                return;
             });
     });
 }
