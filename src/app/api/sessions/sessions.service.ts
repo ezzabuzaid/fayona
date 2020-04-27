@@ -23,7 +23,7 @@ export class SessionsService extends CrudService<SessionSchema> {
             return new Result({ message: 'No session available' });
         }
         await this.setAsDeactive(record.data);
-        return new Result({ message: 'Session deactivated' });
+        return new Result({ data: 'Session deactivated' });
 
     }
 

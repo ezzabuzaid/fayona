@@ -1,16 +1,18 @@
 import jwt = require('jsonwebtoken');
 import stage from '../../core/helpers/stage';
 import { PrimaryKey } from '@lib/mongoose';
-import { ERoles } from '@shared/identity';
+import { Roles } from '@shared/identity';
 
-export interface ITokenClaim {
+export interface IClaim {
     id: PrimaryKey;
-    role?: ERoles;
     readonly iat?: number;
     readonly exp?: number;
 }
+export interface ITokenClaim extends IClaim {
+    role?: Roles;
+}
 
-export interface IRefreshTokenClaim extends ITokenClaim { }
+export interface IRefreshTokenClaim extends IClaim { }
 
 class TokenService {
 

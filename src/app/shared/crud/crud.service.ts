@@ -156,15 +156,11 @@ export class CrudService<T = null> {
     }
 
     public async one(query: Query<T>, options: IReadOptions<T> = {}) {
-        const { post, pre } = getHooks(this.options.one as any);
         const documentQuery = this.repo.fetchOne(query, options.projection, options);
-        await pre(documentQuery);
         const record = await documentQuery.exec();
         if (AppUtils.isNullOrUndefined(record)) {
             return new Result<Document<T>>({ message: 'entity_not_exist' });
         }
-        await post(record);
-
         return new Result<Document<T>>({ data: record });
     }
 
@@ -173,7 +169,6 @@ export class CrudService<T = null> {
         const readOptions = new ReadOptions(options);
         const documentQuery = this.repo.fetchAll(query, readOptions);
         const documents = await documentQuery.exec();
-
         const count = await this.repo.fetchAll().estimatedDocumentCount();
 
         return new Result({
@@ -181,7 +176,7 @@ export class CrudService<T = null> {
                 list: documents,
                 length: documents.length,
                 totalCount: count,
-                pages: Math.ceil((count / readOptions.limit) || 0),
+                pages: Math.ceil((count / readOptions.limit) ?? 0),
             }
         });
     }

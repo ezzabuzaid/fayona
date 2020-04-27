@@ -4,17 +4,18 @@ import { NextFunction, Request, Response } from 'express';
 import { sessionsService } from '@api/sessions/sessions.service';
 import { ApplicationConstants } from '@core/constants';
 import { tokenService, ITokenClaim } from './token';
-export enum ERoles {
-    SUPERADMIN = 1,
-    ADMIN,
-    CLIENT,
-    CUSTOMER,
+export class Roles {
+    static SUPERADMIN = 'SUPERADMIN';
+    static ADMIN = 'ADMIN';
+    static CLIENT = 'CLIENT';
+    static CUSTOMER = 'CUSTOMER';
 }
+
 const log = new Logger('Auth Module');
 
 class Identity {
 
-    public Authorize(...roles: ERoles[]) {
+    public Authorize(...roles: Roles[]) {
         return async (req: Request, res: Response, next: NextFunction) => {
             const headersResult = this.extractToken(req);
             if (headersResult.hasError) {

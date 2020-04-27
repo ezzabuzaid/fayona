@@ -216,6 +216,10 @@ export class AppUtils {
         return data.reduce((a, b) => a.concat(b), []);
     }
 
+    public static lastElement(array: any[]) {
+        return array[array.length - 1];
+    }
+
 }
 
 // NOTE  Utility class to be extended, so when you call build it will construct an instance from that class

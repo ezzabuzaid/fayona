@@ -8,7 +8,7 @@ const ENDPOINT = Constants.Endpoints.SESSIONS;
 const DEACTIVATE_ENDPOINT = getUri(`${ENDPOINT}/deactivate`);
 const USER_SESSION_ENDPOINT = getUri(`${ENDPOINT}/${Constants.Endpoints.USERS_SESSIONS}`);
 
-describe('#INTEGRATION', () => {
+xdescribe('#INTEGRATION', () => {
 
     describe('[getUserSessions]', () => {
 

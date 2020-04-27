@@ -9,15 +9,9 @@ export interface ICrudHooks<T> {
 }
 
 export interface ICrudOperation<T = any> {
-    dto?: Type<any>;
-    bodyValidator?: Type<any>;
     create?: ICrudHooks<T>;
     update?: ICrudHooks<T>;
     delete?: ICrudHooks<T>;
-    one?: {
-        pre?: (query: DocumentQuery<Document<T>, Document<T>>) => any;
-        post?: (doc: Document<T>) => any;
-    };
 }
 export interface ICrudOptions<T> extends ICrudOperation<T> {
     /**

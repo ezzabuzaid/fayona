@@ -2,29 +2,18 @@ import { HashService, Constants } from '@core/helpers';
 import { BaseModel, Entity, Field } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
 import { AppUtils } from '@core/utils';
-import { ERoles } from '@shared/identity';
+import { Roles } from '@shared/identity';
 import phone from 'phone';
-import { isBoolean } from 'class-validator';
+import { isBoolean, isNumber } from 'class-validator';
 @Entity(Constants.Schemas.USERS)
 export class UsersSchema {
+    @Field({ validate: isBoolean, default: false }) public verified?: boolean;
     @Field({
-        enum: [0, 1, 2, 3],
-        validate: (value: ERoles) => AppUtils.isTruthy(ERoles[value])
-    }) public role?: ERoles = ERoles.ADMIN;
-    @Field({
-        validate: isBoolean,
-        set: (value: any) => {
-            if (typeof value !== 'boolean') {
-                return false;
-            }
-            return value;
-        }
-    }) public verified?: boolean = false;
-    @Field({
-        set: (value: string) => {
-            return AppUtils.isNullOrUndefined(value) ? {} : value;
-        }
-    }) public profile?: {}; // TODO: update this field to be ProfileSchema instead
+        enum: Object.values(Roles),
+        default: Roles.ADMIN,
+        pure: true
+    }) public role?: string;
+    @Field() public profile = null; // TODO: update this field to be ProfileSchema instead
     @Field({
         pure: true,
         // STUB test password should not return with the response

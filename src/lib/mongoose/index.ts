@@ -20,7 +20,10 @@ export type CastObjectIDToString<T> = { [key in keyof T]: T[key] extends Types.O
 export type WithID<T> = { id?: Types.ObjectId } & T;
 export type WithMongoID<T> = { _id: Types.ObjectId } & T;
 
-export type Payload<T> = OmitProperties<T, (...args: any) => any>;
+export type Payload<T> = OmitProperties<T, (...args: any) => any> & {
+    updatedAt?: string;
+    createdAt?: string;
+};
 
 export function generateModelMetadataKey(target: any) {
     return `model:${target.name}`;

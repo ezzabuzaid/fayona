@@ -1,6 +1,6 @@
 import fileSystem = require('fs');
 import path = require('path');
-import { Application } from 'app/app';
+import { Application } from '../../../app/app';
 
 export class UploadsHelper {
     static folderPath(id: string) {

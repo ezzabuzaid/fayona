@@ -10,56 +10,49 @@ import { PortalHelper } from './portal.helper';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { ApplicationConstants } from '@core/constants';
 import { sessionsService } from '@api/sessions/sessions.service';
-import { IsString, IsNotEmpty } from 'class-validator';
-import { translate } from '@lib/translation';
+import { IsString, IsNotEmpty, IsJWT, isJWT } from 'class-validator';
 import { scheduleJob } from 'node-schedule';
 import { validate } from '@shared/common';
 import { tokenService, IRefreshTokenClaim } from '@shared/identity';
 import { Query } from '@shared/crud';
 
-export class LoginPayload {
-    @IsString({
-        message: translate('string_constraint', { name: 'username' })
-    }) public username: string = null;
+export class CredentialsPayload {
+    @IsString()
+    @IsNotEmpty()
+    public username: string = null;
+    @IsString()
+    @IsNotEmpty()
+    public password: string = null;
+}
 
-    @IsString({
-        message: translate('string_constraint', { name: 'password' })
-    }) public password: string = null;
+export class RefreshTokenPayload {
+    @IsString()
+    @IsJWT()
+    public token: string = null;
+    @IsString()
+    @IsJWT()
+    public refreshToken: string = null;
+}
+
+export class DeviceUUIDHeaderValidator {
+    @IsString()
+    public [ApplicationConstants.deviceIdHeader] = null;
 }
 
 export class RefreshTokenDto {
     public token: string;
     public refreshToken: string;
-    constructor(user: Payload<WithID<UsersSchema>>) {
-        this.token = PortalHelper.generateToken(user.id, user.role);
-        this.refreshToken = PortalHelper.generateRefreshToken(user.id);
+    constructor(user_id: PrimaryKey, role: string) {
+        this.token = PortalHelper.generateToken(user_id, role);
+        this.refreshToken = PortalHelper.generateRefreshToken(user_id);
     }
 }
 
-export class LoginDto extends RefreshTokenDto {
-    public others_folder = 'others';
-    constructor(
-        user: ConstructorParameters<typeof RefreshTokenDto>[0],
-        public session_id: PrimaryKey,
-    ) {
-        super(user);
-    }
-}
-
-export class RefreshTokenPayload {
-    @IsString()
-    @IsNotEmpty()
-    public token: string = null;
-    @IsString()
-    @IsNotEmpty()
-    public refreshToken: string = null;
-    @IsString()
-    @IsNotEmpty()
-    public uuid: string = null;
-}
+export class LoginDto extends RefreshTokenDto { }
 
 @Router(Constants.Endpoints.PORTAL)
 export class PortalRoutes {
+
     constructor() {
         // EmailService.sendEmail({
         //     to: 'ezzabuzaid@hotmail.com',
@@ -67,84 +60,82 @@ export class PortalRoutes {
         //     text: 'A test email'
         // }).then(console.log);
     }
-    @Post(Constants.Endpoints.LOGIN, validate(LoginPayload))
+
+    @Post(Constants.Endpoints.LOGIN, validate(CredentialsPayload), validate(DeviceUUIDHeaderValidator, 'headers'))
     public async login(req: Request) {
         // TODO: send an email to user to notify him about login attempt.
 
-        const { username, password } = cast<LoginPayload>(req.body);
+        const { username, password } = cast<CredentialsPayload>(req.body);
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
 
-        if (AppUtils.isFalsy(device_uuid)) {
-            return new Responses.BadRequest();
+        const { data: user, ...result } = await usersService.one({ username }, {
+            projection: {
+                password: 1,
+                role: 1
+            }
+        });
+        if (result.hasError) {
+            return new Responses.BadRequest(result.message);
         }
-
-        // STUB it should throw if username is falsy type or if it's not in database
-        const user = await throwIfNotExist({ username });
-
-        // STUB it should pass if password is right
         const isPasswordEqual = HashService.comparePassword(password, user.password);
         if (AppUtils.isFalsy(isPasswordEqual)) {
             return new Responses.BadRequest('wrong_credintals');
         }
         const activeUserSessions = await sessionsService.getActiveUserSession(user.id);
-
-        if (activeUserSessions.data.length >= 10) {
+        if (activeUserSessions.data.length >= 3) {
             return new Responses.BadRequest('exceeded_allowed_sesison');
         }
-        // STUB it should create a session entity
         const session = await sessionsService.create({
             device_uuid,
             active: true,
             user: user.id
         });
-
-        // STUB test the refreshToken claims should have only entity id with expire time 12h
-        // STUB test token claims must have only entity id and role with 30min expire time
-        return new Responses.Ok(new LoginDto(user, session.data.id));
+        return new Responses.Ok(new LoginDto(user.id, user.role));
 
     }
 
-    @Post(Constants.Endpoints.LOGOUT + '/:uuid')
+    @Post(Constants.Endpoints.LOGOUT, validate(DeviceUUIDHeaderValidator, 'headers'))
     public async logout(req: Request) {
-        const device_uuid = req.params.uuid;
-        if (device_uuid) {
-            const result = await sessionsService.deActivate({ device_uuid });
-            if (AppUtils.not(result.hasError)) {
-                return new Responses.Ok(result.data);
-            }
+        const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
+        const result = await sessionsService.deActivate({ device_uuid });
+        if (result.hasError) {
+            return new Responses.BadRequest();
         }
-        return new Responses.BadRequest('logout_wrong_device_uuid');
+        return new Responses.Ok(result.data);
     }
 
-    @Post(Constants.Endpoints.REFRESH_TOKEN, validate(RefreshTokenPayload))
+    @Post(
+        Constants.Endpoints.REFRESH_TOKEN,
+        validate(DeviceUUIDHeaderValidator, 'headers'),
+        validate(RefreshTokenPayload)
+    )
     public async refreshToken(req: Request) {
-        const { uuid, token, refreshToken } = cast<RefreshTokenPayload>(req.body);
-
-        // NOTE: if it was invalid or expired it will implicity thrown an error
-        const decodedRefreshToken = await tokenService.decodeToken<IRefreshTokenClaim>(refreshToken);
-        // TODO if refresh token was expired then deactive the user session
-
+        const { token, refreshToken } = cast<RefreshTokenPayload>(req.body);
+        const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
         try {
-            await tokenService.decodeToken(token);
-        } catch (error) {
-            if (error instanceof TokenExpiredError) {
+            const decodedRefreshToken = await tokenService.decodeToken<IRefreshTokenClaim>(refreshToken);
+            try {
+                await tokenService.decodeToken(token);
+            } catch (error) {
+                if (error instanceof TokenExpiredError) {
+                    const session = await sessionsService.getActiveSession({
+                        device_uuid,
+                        user: decodedRefreshToken.id
+                    });
 
-                const session = await sessionsService.getActiveSession({
-                    device_uuid: uuid,
-                    user: decodedRefreshToken.id
-                });
+                    if (session.hasError) {
+                        return new Responses.BadRequest();
+                    }
 
-                if (AppUtils.isFalsy(session)) {
-                    throw new Responses.Unauthorized('not_allowed');
+                    await sessionsService.updateById(session.data.id, { updatedAt: new Date().toISOString() });
+                    // TODO: Assign id
+                    return new Responses.Ok(new RefreshTokenDto(decodedRefreshToken.id, null));
                 }
-
-                const user = await throwIfNotExist({ _id: decodedRefreshToken.id });
-                return new RefreshTokenDto(user);
-            } else {
-                throw error;
             }
+        } catch (error) {
+            await sessionsService.deActivate({ device_uuid });
         }
-        throw new Responses.BadRequest('not_allowed');
+        return new Responses.BadRequest();
     }
 
     @Post(Constants.Endpoints.FORGET_PASSWORD)
@@ -204,7 +195,9 @@ async function throwIfNotExist(query: Query<UsersSchema>, message?: string) {
 scheduleJob('30 * * * *', async () => {
     const sessions = await sessionsService.getAllActiveSession();
     sessions.data.list.forEach((session) => {
-        // TODO deActivate usless sessions
+        // if the active session updatedAt is late by 12 that's means that this session is no
+        // longer used and should be turned of
+        // TODO deActivate useless sessions
     });
 });
 
@@ -214,10 +207,3 @@ scheduleJob('30 * * * *', async () => {
 // send an email with generated number to be entered later on in page 3
 // Lock the account after 3 times of trying
 // send an email to notify the user that the email is changed
-
-// TODO: The admin should be able to end opened user session
-
-// TODO: use black listed jwt and make a function
-// to remove them when any expired (use redies),
-// or just fetch the sessions again on each request
-// to check if certin

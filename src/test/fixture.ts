@@ -5,8 +5,9 @@ import * as faker from 'faker';
 import { ValidationPatterns } from '@shared/common';
 import { ApplicationConstants } from '@core/constants';
 import { AppUtils } from '@core/utils';
-import { LoginPayload } from '@api/portal';
-import { ERoles, tokenService } from '@shared/identity';
+import { CredentialsPayload } from '@api/portal';
+import { tokenService } from '@shared/identity';
+import { SignOptions } from 'jsonwebtoken';
 
 export function generateDeviceUUIDHeader() {
     return {
@@ -18,7 +19,7 @@ export function getUri(value: string) {
     return `/api/${value}`;
 }
 
-export async function prepareUserSession(user?: WithMongoID<LoginPayload>) {
+export async function prepareUserSession(user?: WithMongoID<CredentialsPayload>) {
     const payload = user ?? {
         email: faker.internet.email(),
         username: generateUsername(),
@@ -59,24 +60,20 @@ export class UserFixture {
         id: null,
         token: null
     };
-    private usersEndpoint = getUri(Constants.Endpoints.USERS);
 
     public async createUser(paylod: Partial<Payload<UsersSchema>> = {}) {
-        const response = await global.superAgent.post(this.usersEndpoint)
+        const response = await global
+            .superAgent
+            .post(getUri(Constants.Endpoints.USERS))
             .set(generateDeviceUUIDHeader())
             .send({
                 email: faker.internet.email(),
                 username: generateUsername(),
                 mobile: generatePhoneNumber(),
                 password: faker.internet.password(),
-                verified: false,
-                role: ERoles.ADMIN,
-                profile: null,
                 ...paylod
             });
-        try {
-            this.user.id = response.body.data.id;
-        } catch (error) { }
+        this.user.id = response.body.data.id;
         return response;
     }
 
@@ -93,9 +90,39 @@ export function generateUsername() {
 }
 
 export function generateExpiredToken() {
-    return tokenService.generateToken({ id: AppUtils.generateRandomString() }, { expiresIn: '-10s' });
+    return tokenService.generateToken({ id: AppUtils.generateRandomString() }, { expiresIn: -10 });
 }
 
-export function generateToken() {
-    return tokenService.generateToken({ id: AppUtils.generateAlphabeticString() as any });
+export function generateToken(options: SignOptions = {}) {
+    return tokenService.generateToken({ id: AppUtils.generateAlphabeticString() as any }, options);
+}
+export async function createApplicationUser(payload: Partial<UsersSchema> = null) {
+    const response = await global
+        .superAgent
+        .post(getUri(Constants.Endpoints.USERS))
+        .set(generateDeviceUUIDHeader())
+        .send({
+            email: faker.internet.email(),
+            username: generateUsername(),
+            mobile: generatePhoneNumber(),
+            password: faker.internet.password(),
+            ...payload
+        });
+    return response.body.data as UsersSchema;
+}
+
+export async function login(credentials: CredentialsPayload) {
+
+    const deviceUUIDHeader = generateDeviceUUIDHeader();
+    const { body: { data } } = await global.superAgent
+        .post(getUri(`${Constants.Endpoints.PORTAL}/${Constants.Endpoints.LOGIN}`))
+        .set(deviceUUIDHeader)
+        .send(credentials);
+
+    return {
+        headers: Object.assign(deviceUUIDHeader, { authorization: data.token }),
+        session_id: data.session_id,
+        token: data.token,
+        refreshToken: data.refreshToken
+    };
 }

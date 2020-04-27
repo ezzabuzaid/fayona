@@ -1,5 +1,5 @@
 import { PrimaryKey } from '@lib/mongoose';
-import { tokenService, IRefreshTokenClaim, ERoles } from '@shared/identity';
+import { tokenService, IRefreshTokenClaim, Roles } from '@shared/identity';
 
 export class PortalHelper {
 
@@ -7,7 +7,7 @@ export class PortalHelper {
         return tokenService.generateToken<IRefreshTokenClaim>({ id }, { expiresIn: '12h' });
     }
 
-    public static generateToken(id: PrimaryKey, role: ERoles) {
+    public static generateToken(id: PrimaryKey, role: string) {
         return tokenService.generateToken({ id, role }, { expiresIn: '6h' });
     }
 

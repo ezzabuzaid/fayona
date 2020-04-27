@@ -59,9 +59,7 @@ export class Logger {
     Logger.level = LoggerLevel.Warning;
   }
 
-  constructor(private source?: string) {
-    this.log(console.log, LoggerLevel.Info, [colors.bold(source)]);
-  }
+  constructor(private source: string) { }
 
   public debug(...objects: any[]) {
     this.colorizeText(objects, 'cyan');

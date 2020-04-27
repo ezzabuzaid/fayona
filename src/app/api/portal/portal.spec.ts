@@ -1,15 +1,9 @@
 import { Constants } from '@core/helpers';
-import {
-    UserFixture, generateUsername, generateExpiredToken,
-    prepareUserSession, generateDeviceUUIDHeader, getUri, generateToken
-} from '@test/fixture';
-import { LoginPayload, RefreshTokenPayload } from './portal.routes';
-import { PortalHelper } from './portal.helper';
+import { generateExpiredToken, generateDeviceUUIDHeader, getUri, generateToken, createApplicationUser, login } from '@test/fixture';
+import { CredentialsPayload, RefreshTokenPayload } from './portal.routes';
 import { AppUtils } from '@core/utils';
-import * as faker from 'faker';
-import { ApplicationConstants } from '@core/constants';
-import { Types } from 'mongoose';
-import { PrimaryKey } from '@lib/mongoose';
+import { tokenService, ITokenClaim, IClaim } from '@shared/identity';
+import { isMongoId } from 'class-validator';
 
 const ENDPOINT = (suffix: string) => `${Constants.Endpoints.PORTAL}/${suffix}`;
 const LOGIN_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.LOGIN));
@@ -18,193 +12,401 @@ const RESET_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.RESET_PASSWORD));
 const FORGET_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.FORGET_PASSWORD));
 const LOGUT_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.LOGOUT));
 
-const fakeLoginPaylod: LoginPayload = {
-    password: faker.internet.password(),
-    username: generateUsername(),
-};
+async function getLastSession(headers) {
+    const sessionResponse = await global.superAgent
+        .get(getUri(`${Constants.Endpoints.SESSIONS}/${Constants.Endpoints.USERS_SESSIONS}`))
+        .set(headers);
+    return AppUtils.lastElement(sessionResponse.body.data.list);
+}
+
+function createCredentials(username = 'fakeUsername', password = 'fakePassword') {
+    const credentials = new CredentialsPayload();
+    credentials.password = password;
+    credentials.username = username;
+    return credentials;
+}
+
+function createRefreshToken(token: string = generateToken(), refreshToken: string = generateToken()) {
+    const payload = new RefreshTokenPayload();
+    payload.refreshToken = refreshToken;
+    payload.token = token;
+    return payload;
+}
+
+function extractExpFromToken(token: IClaim) {
+    return (token.exp - token.iat) / 60 / 60;
+}
 
 describe('#INTERGRATION', () => {
-    fdescribe('Login should', () => {
-        describe('fail if..', () => {
+    describe('Login', () => {
+        describe('WILL return failure results, WHEN...', () => {
+            test('Request headers does not have a device_uuid', async () => {
+                // Arrange
+                const credentials = createCredentials();
 
-            test('user not exist, aka username is wrong', async () => {
-                const response = await global.superAgent
+                // Act
+                const response = await global
+                    .superAgent
                     .post(LOGIN_ENDPOINT)
-                    .set(generateDeviceUUIDHeader())
-                    .send(fakeLoginPaylod);
+                    .send(credentials);
 
-                expect(response.body.message).toMatch('Wrong credintals');
+                // Assert
                 expect(response.badRequest).toBeTruthy();
             });
+            describe.each
+                ([
+                    { desc: 'not belong to any user', value: 'fakeUsername' },
+                    { desc: 'null', value: null },
+                    { desc: 'undefined', value: undefined },
+                ])
+                ('username is ', async (object) => {
+                    test(`${object.desc}`, async () => {
+                        // Arrange
+                        const credentials = createCredentials(object.value);
 
-            test('password is wrong', async () => {
-                const userFixture = new UserFixture();
-                await userFixture.createUser(fakeLoginPaylod);
-                const response = await global.superAgent
-                    .post(LOGIN_ENDPOINT)
-                    .set(generateDeviceUUIDHeader())
-                    .send(AppUtils.extendObject(fakeLoginPaylod, { password: faker.internet.password() }));
+                        // Act
+                        const response = await global.superAgent
+                            .post(LOGIN_ENDPOINT)
+                            .set(generateDeviceUUIDHeader())
+                            .send(credentials);
 
-                expect(response.body.message).toMatch('Wrong credintals');
-                expect(response.badRequest).toBeTruthy();
-            });
+                        // Assert
+                        expect(response.badRequest).toBeTruthy();
+                    });
+                });
+            describe.each
+                ([
+                    { desc: 'wrong password', value: 'fakePassword' },
+                    { desc: 'null', value: null },
+                    { desc: 'undefined', value: undefined },
+                ])
+                ('username is ', async (object) => {
+                    test(`${object.desc}`, async () => {
+                        // Arrange
+                        const credentials = createCredentials('fakeUseranme', object.value);
+                        await createApplicationUser(credentials);
 
-            test('request headers does not have a device_uuid', async () => {
-                const response = await global.superAgent
-                    .post(LOGIN_ENDPOINT);
-                expect(response.unauthorized).toBeTruthy();
-            });
+                        // Act
+                        credentials.password = 'shitPassword';
+                        const response = await global.superAgent
+                            .post(LOGIN_ENDPOINT)
+                            .set(generateDeviceUUIDHeader())
+                            .send(credentials);
 
-            test('user has more than three active session', async () => {
-                const userFixture = new UserFixture();
-                await userFixture.createUser(fakeLoginPaylod);
-
-                // NOTE prepareUserSession will make a login request
-                const session = await prepareUserSession({
-                    _id: userFixture.user.id,
-                    ...fakeLoginPaylod
+                        // Assert
+                        expect(response.badRequest).toBeTruthy();
+                    });
                 });
 
+            test('user has more than three active session', async () => {
+                // Arrange
+                const credentials = createCredentials('fakeUserName', 'fakePassword');
+                await createApplicationUser(credentials);
+
+                const session = await login(credentials);
+
+                // Act
                 await global.superAgent
                     .post(LOGIN_ENDPOINT)
                     .set(session.headers)
-                    .send(fakeLoginPaylod);
+                    .send(credentials);
 
                 await global.superAgent
                     .post(LOGIN_ENDPOINT)
                     .set(session.headers)
-                    .send(fakeLoginPaylod);
+                    .send(credentials);
 
                 const lastSession = await global.superAgent
                     .post(LOGIN_ENDPOINT)
                     .set(session.headers)
-                    .send(fakeLoginPaylod);
+                    .send(credentials);
 
-                expect(lastSession.body.message).toMatch('exceed_allowed_sesison');
-                expect(lastSession.unauthorized).toBeTruthy();
+                // Assert
+                expect(lastSession.body.message).toMatch('exceeded_allowed_sesison');
+                expect(lastSession.badRequest).toBeTruthy();
             });
-
         });
-
-        describe('success if', () => {
-            test('username and password is right, request has device uuid header', async () => {
-                const userFixture = new UserFixture();
-                await userFixture.createUser(fakeLoginPaylod);
+        test(
+            'WILL success WHEN username is belong to a user, password is correct and request has device uuid header',
+            async () => {
+                // Arrange
+                const credentials = createCredentials();
+                await createApplicationUser(credentials);
+                // Act
                 const response = await global.superAgent
                     .post(LOGIN_ENDPOINT)
                     .set(generateDeviceUUIDHeader())
-                    .send(fakeLoginPaylod);
+                    .send(credentials);
+
+                // Assert
                 expect(response.ok).toBeTruthy();
             });
-        });
+        describe('WHEN succeed', () => {
+            test('WILL return valid token and refresh token ', async () => {
+                // Arrange
+                const credentials = createCredentials();
+                await createApplicationUser(credentials);
 
-        test.todo('returned Token is valid');
-        test.todo('returned Token has the appropriate schema');
+                // Act
+                const response = await global.superAgent
+                    .post(LOGIN_ENDPOINT)
+                    .set(generateDeviceUUIDHeader())
+                    .send(credentials);
+
+                // Assert
+                expect(await tokenService.decodeToken(response.body.data.token)).toBeDefined();
+                expect(await tokenService.decodeToken(response.body.data.refreshToken)).toBeDefined();
+                expect(response.ok).toBeTruthy();
+            });
+            test('WILL return a refresh token that contains exp date set to 12 hours', async () => {
+                // Arrange
+                const credentials = createCredentials();
+                await createApplicationUser(credentials);
+
+                // Act
+                const response = await global.superAgent
+                    .post(LOGIN_ENDPOINT)
+                    .set(generateDeviceUUIDHeader())
+                    .send(credentials);
+                const decodeToken = await tokenService.decodeToken(response.body.data.refreshToken);
+
+                // Assert
+                expect(extractExpFromToken(decodeToken)).toEqual(12);
+            });
+
+            describe('WILL return a token that contains the following claims', () => {
+                let decodeToken: ITokenClaim;
+                beforeEach(async () => {
+                    // Arrange
+                    const credentials = createCredentials();
+                    await createApplicationUser(credentials);
+
+                    // Act
+                    const response = await global.superAgent
+                        .post(LOGIN_ENDPOINT)
+                        .set(generateDeviceUUIDHeader())
+                        .send(credentials);
+                    decodeToken = await tokenService.decodeToken(response.body.data.token);
+
+                });
+                test('role', async () => {
+                    expect(decodeToken.role).toMatch('ADMIN');
+                });
+                test('id of type mongo object ID', async () => {
+                    expect(isMongoId(decodeToken.id)).toBeTruthy();
+                });
+
+                test('expiration date set to 6 hours', async () => {
+                    expect((decodeToken.exp - decodeToken.iat) / 60 / 60).toEqual(6);
+                });
+            });
+            test('WILL create session entity', async () => {
+                // Arrange
+                const credentials = createCredentials();
+                await createApplicationUser(credentials);
+                const loginResponse = await login(credentials);
+
+                // Act
+                const response = await global.superAgent
+                    .get(getUri(`${Constants.Endpoints.SESSIONS}/${Constants.Endpoints.USERS_SESSIONS}`))
+                    .set(loginResponse.headers)
+                    .send(credentials);
+
+                // Assert
+                expect(AppUtils.lastElement(response.body.data.list)).toBeDefined();
+            });
+        });
+    });
+
+    describe('Logout', () => {
+        function logout(headers) {
+            return global.superAgent
+                .post(LOGUT_ENDPOINT)
+                .set(headers);
+        }
+        it('WILL return failure result WHEN device uuid is not exist in the request headers', async () => {
+            // Act
+            const response = await logout({});
+
+            // Assert
+            expect(response.badRequest).toBeTruthy();
+        });
+        it('WILL return failure result WHEN device uuid is not associated with any session', async () => {
+            // Act
+            const response = await logout(generateDeviceUUIDHeader());
+
+            // Assert
+            expect(response.badRequest).toBeTruthy();
+        });
+        it('WILL deactive the associated session with device uuid WHEN there is one available', async () => {
+            // Arrange
+            const credentials = createCredentials();
+            await createApplicationUser(credentials);
+            const loginResponse = await login(credentials);
+
+            // Act
+            const response = await logout(loginResponse.headers);
+
+            // Assert
+            const sessions = await global.superAgent
+                .get(getUri(`${Constants.Endpoints.SESSIONS}/${Constants.Endpoints.USERS_SESSIONS}`))
+                .set(loginResponse.headers)
+                .send(credentials);
+            expect(AppUtils.lastElement(sessions.body.data.list).active).toBeFalsy();
+            expect(response.ok).toBeTruthy();
+        });
     });
 
     describe('Refresh Token', () => {
-        const performRequest = (refreshToken: string, token: string = null, headers = null) => {
-            const payload = new RefreshTokenPayload();
-            payload.refreshToken = refreshToken;
-            payload.token = token;
+        function refreshToken(payload, headers) {
             return global.superAgent
                 .post(REFRESH_TOKEN)
-                .set(headers ?? generateDeviceUUIDHeader())
+                .set(headers)
                 .send(payload);
-        };
+        }
+        test('WILL return failure bad request result WHEN device uuid is missing from the request header', async () => {
+            // Arrange
+            const payload = createRefreshToken('token.token.token', 'token.token.token');
 
-        const INVALID_TOKEN = 'not.valid.token';
+            // Act
+            const response = await global.superAgent
+                .post(REFRESH_TOKEN)
+                .set({})
+                .send(payload);
 
-        test('should be UNAUTHORIZED if the refresh token is expired', async () => {
-            const response = await performRequest(generateExpiredToken());
-            expect(response.unauthorized).toBeTruthy();
-        });
-
-        test('should be UNAUTHORIZED if the refresh token is invalid', async () => {
-            const response = await performRequest(INVALID_TOKEN);
-            expect(response.unauthorized).toBeTruthy();
-        });
-
-        test('should be UNAUTHORIZED if the token is invalid', async () => {
-            const response = await performRequest(
-                PortalHelper.generateRefreshToken(new PrimaryKey()),
-                INVALID_TOKEN
-            );
-            expect(response.unauthorized).toBeTruthy();
-        });
-
-        test('should be UNAUTHORIZED if the device_uuid invalid', async () => {
-            const response = await performRequest(
-                generateToken(),
-                generateToken(),
-                {}
-            );
-            expect(response.unauthorized).toBeTruthy();
-        });
-
-        test('should return BAD_REQUEST status and `not_allowed` if the token is not expired', async () => {
-            const session = await prepareUserSession();
-
-            const response = await performRequest(session.refreshToken, session.token);
-
-            expect(response.body.message).toMatch('not_allowed');
+            // Assert
             expect(response.badRequest).toBeTruthy();
         });
 
-        test('should be UNAUTHORIZED if there is no asocciated session with the device uuid and user_id', async () => {
-            const session = await prepareUserSession();
+        describe.each
+            ([
+                { desc: null, token: null, refreshToken: 'token.token.token', type: 'token' },
+                { desc: null, token: 'token.token.token', refreshToken: null, type: 'refresh token' },
+                { desc: 'empty string', token: '', refreshToken: 'token.token.token', type: 'token' },
+                { desc: 'empty string', token: 'token.token.token', refreshToken: '', type: 'refresh token' },
+                { desc: undefined, token: undefined, refreshToken: 'token.token.token', type: 'token' },
+                { desc: undefined, token: 'token.token.token', refreshToken: undefined, type: 'refresh token' },
+            ])
+            ('WILL return failure bad request result WHEN...', (object) => {
+                test(`the ${object.type} has wrong format like ${object.desc}`, async () => {
+                    // Arrange
+                    const payload = createRefreshToken(object.token);
 
-            const response = await performRequest(session.refreshToken, generateExpiredToken());
+                    // Act
+                    const response = await refreshToken(payload, generateDeviceUUIDHeader());
 
-            expect(response.unauthorized).toBeTruthy();
+                    // Assert
+                    expect(response.badRequest).toBeTruthy();
+                });
+            });
+        test('WILL return failure bad request result WHEN the token is not yet expired', async () => {
+            // Arrange
+            const payload = createRefreshToken();
+
+            // Act
+            const response = await global.superAgent
+                .post(REFRESH_TOKEN)
+                .set(generateDeviceUUIDHeader())
+                .send(payload);
+
+            // Assert
+            expect(response.badRequest).toBeTruthy();
         });
+        test(
+            'WILL deactivate the associated session WHEN the refresh token is expired, not valid or wrong in general',
+            async () => {
+                // Arrange
+                const credentials = createCredentials();
+                await createApplicationUser(credentials);
+                const loginResponse = await login(credentials);
+                const payload = createRefreshToken(
+                    generateToken(),
+                    generateExpiredToken()
+                );
 
-        test('should retrun new refresh token and access token', async () => {
-            const session = await prepareUserSession();
+                // Act
+                const response = await global.superAgent
+                    .post(REFRESH_TOKEN)
+                    .set(loginResponse.headers)
+                    .send(payload);
 
-            const response = await performRequest(session.refreshToken, generateExpiredToken(), session.headers);
+                const sessionResponse = await global.superAgent
+                    .get(getUri(`${Constants.Endpoints.SESSIONS}/${Constants.Endpoints.USERS_SESSIONS}`))
+                    .set(loginResponse.headers)
+                    .send(credentials);
 
-            expect(response.body.data).toHaveProperty('token');
-            expect(response.body.data).toHaveProperty('refreshToken');
+                // Assert
+                expect(AppUtils.lastElement(sessionResponse.body.data.list).active).toBeFalsy();
+                expect(response.badRequest).toBeTruthy();
+            }
+        );
+
+        describe.each
+            ([{ type: 'token', exp: 6 }, { type: 'refreshToken', exp: 12 }])
+            ('WILL return WHEN request succeed', (value) => {
+                test(`New ${value.type}`, async () => {
+                    // Arrange
+                    const credentials = createCredentials();
+                    await createApplicationUser(credentials);
+                    const loginResponse = await login(credentials);
+                    const payload = createRefreshToken(generateExpiredToken(), loginResponse[value.type]);
+
+                    // Act
+                    const response = await refreshToken(payload, loginResponse.headers);
+
+                    // Asssert
+                    expect(await tokenService.decodeToken(response.body.data[value.type])).toBeDefined();
+                    expect(response.ok).toBeTruthy();
+                });
+                test(`with ${value.exp} hours exp time`, async () => {
+                    // Arrange
+                    const credentials = createCredentials();
+                    await createApplicationUser(credentials);
+                    const loginResponse = await login(credentials);
+                    const payload = createRefreshToken(generateExpiredToken(), loginResponse[value.type]);
+
+                    // Act
+                    const response = await refreshToken(payload, loginResponse.headers);
+
+                    // Assert
+                    const decodeToken = await tokenService.decodeToken(response.body.data[value.type]);
+                    expect(extractExpFromToken(decodeToken)).toEqual(value.exp);
+                    expect(response.ok).toBeTruthy();
+                });
+            });
+        test(
+            'WILL return failure bad requrest result WHEN there is no associated session with the device_uuid',
+            async () => {
+                // Arrange
+                const payload = createRefreshToken(generateExpiredToken());
+
+                // Act
+                const response = await refreshToken(payload, generateDeviceUUIDHeader());
+
+                // Arrange
+                expect(response.badRequest).toBeTruthy();
+            });
+        test('WILL update associated session updatedAt column WHEN there is available session', async () => {
+            // Arrange
+            const credentials = createCredentials();
+            await createApplicationUser(credentials);
+            const loginResponse = await login(credentials);
+            const updatedAt = (await getLastSession(loginResponse.headers)).updatedAt;
+            const payload = createRefreshToken(generateExpiredToken(), loginResponse.refreshToken);
+
+            // Act
+            const response = await refreshToken(payload, loginResponse.headers);
+
+            // Assert
+            expect((await getLastSession(loginResponse.headers)).updatedAt).not.toEqual(updatedAt);
             expect(response.ok).toBeTruthy();
         });
     });
-
-    describe('LOGOUT', () => {
-        test('should deactive user session', async () => {
-            const session = await prepareUserSession();
-
-            const response = await global.superAgent
-                .post(LOGUT_ENDPOINT)
-                .send({ [ApplicationConstants.deviceIdHeader]: session.headers['x-device-uuid'] });
-
-            expect(response.ok).toBeTruthy();
-        });
-        test('should return bad request if the device uuid was not specifed', async () => {
-            const response = await global.superAgent
-                .post(LOGUT_ENDPOINT);
-
-            expect(response.body.message).toMatch('cannot logout unknown users');
-            expect(response.badRequest).toBeTruthy();
-        });
-
-        test('should return bad request if the device uuid does not belong to any user', async () => {
-            const response = await global.superAgent
-                .post(LOGUT_ENDPOINT)
-                .send(generateDeviceUUIDHeader());
-
-            expect(response.body.message).toMatch('cannot logout unknown users');
-            expect(response.badRequest).toBeTruthy();
-        });
-
+    xdescribe('Forgot password ', () => {
+        test.todo('refactor');
     });
 
-});
-
-describe('Forgot password ', () => {
-    it.todo('refactor');
-});
-
-describe('Reset password ', () => {
-    it.todo('refactor');
+    xdescribe('Reset password ', () => {
+        test.todo('refactor');
+    });
 });
