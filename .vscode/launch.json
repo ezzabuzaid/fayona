@@ -5,35 +5,9 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug",
             "type": "node",
             "request": "launch",
-            "args": [
-                "-r",
-                "ts-node/register",
-                "src/main.ts"
-            ],
-            "cwd": "${workspaceFolder}",
-            "protocol": "inspector",
-            "sourceMaps": true,
-            "outFiles": [
-                ".ts-node/**"
-            ],
-            "outputCapture": "std",
-            "env": {
-                "P2P_PORT": "9991",
-                "MAX_PEERS": "5",
-                "HTTP_HOST": "0.0.0.0",
-                "HTTP_PORT": "8081",
-                "MINER_PUB_KEY": "04b7f6906a3f2beba46a838e2b3d5a716801b641b2c36814e85a1abb8634561a7731305d8cb608702fa972a0e8b40fc31c2f37a01139a675cdf9d3191ee4202dd0",
-                "MINER_PRIV_KEY": "0203667637ec97bcb83efa336f7b3352afca52e67852cef432961cc7a699239c",
-                "KNOWN_PEERS": "localhost:9990"
-            }
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Debug Application",
+            "name": "Run nodeJs",
             "trace": "verpose",
             "preLaunchTask": "Serve node",
             "program": "${workspaceFolder}/src/main.ts",

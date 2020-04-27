@@ -12,11 +12,11 @@ class CustomEnvironment extends NodeEnvironment {
     NodeServer.test();
     super(config);
     this.app = (new Application()).application;
+    this.global.superAgent = request(this.app);
   }
 
   async setup() {
     await connectToDatabase();
-    this.global.superAgent = request(this.app);
     await super.setup();
   }
 

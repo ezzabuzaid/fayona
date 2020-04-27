@@ -8,7 +8,7 @@ module.exports = {
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
   moduleFileExtensions: ["ts", "js", "json", "node"],
   moduleNameMapper,
-  testEnvironment: "<rootDir>/src/test/custom-test-env.js",
-  // globalSetup: "<rootDir>/test/setup.ts",
-  // globalTeardown: "<rootDir>/test/teardown.ts",
+  testEnvironment: "node",
+  setupFilesAfterEnv: ['<rootDir>/src/test/setupTests.ts'],
+  bail: true
 }
