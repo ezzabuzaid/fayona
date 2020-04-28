@@ -11,8 +11,7 @@ export class RoomsService extends CrudService<RoomSchema> {
                 async pre(room) {
                     const folder = await foldersService.create({ name: room.name, _id: room.id } as any);
                     room.folder = folder.data.id;
-                },
-                result: (room) => room
+                }
             },
         });
     }

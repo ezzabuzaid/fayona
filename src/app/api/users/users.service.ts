@@ -1,15 +1,13 @@
 import { UsersSchema, UsersModel } from './users.model';
-import { CrudService } from '@shared/crud/crud.service';
+import { CrudService, WriteResult } from '@shared/crud/crud.service';
 import { Repo, Pagination } from '@shared/crud';
 import { Payload, PrimaryKey } from '@lib/mongoose';
+import { Result } from '@core/helpers';
 
 export class UserService extends CrudService<UsersSchema> {
     constructor() {
-        super(new Repo<UsersSchema>(UsersModel), {
-            unique: ['username', 'email', 'mobile'],
-            create: {
-                result: (user) => user
-            }
+        super(new Repo(UsersModel), {
+            unique: ['username', 'email', 'mobile']
         });
     }
 

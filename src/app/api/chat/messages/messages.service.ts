@@ -1,17 +1,11 @@
-import { CrudService, Repo, IReadAllOptions } from '@shared/crud';
+import { CrudService, Repo, IReadAllOptions, WriteResult } from '@shared/crud';
 import messagesModel, { MessagesSchema } from './messages.model';
-import { PrimaryKey } from '@lib/mongoose';
+import { PrimaryKey, Payload } from '@lib/mongoose';
+import { Result } from '@core/helpers';
 
 export class MessagesService extends CrudService<MessagesSchema> {
     constructor() {
-        super(
-            new Repo(messagesModel),
-            {
-                create: {
-                    result: (document) => document
-                }
-            }
-        );
+        super(new Repo(messagesModel));
     }
 
     getLastMessage(room: PrimaryKey, options: IReadAllOptions<MessagesSchema>) {
@@ -21,6 +15,12 @@ export class MessagesService extends CrudService<MessagesSchema> {
                 order: 'descending'
             }
         });
+    }
+
+    async createMessage(payload: Payload<MessagesSchema>) {
+        const message = await super.create(payload);
+        const result = new Result<WriteResult & Partial<MessagesSchema>>({ ...message, ...payload });
+        return result;
     }
 }
 

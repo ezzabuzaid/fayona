@@ -111,17 +111,15 @@ export async function createApplicationUser(payload: Partial<UsersSchema> = null
     return response.body.data as UsersSchema;
 }
 
-export async function login(credentials: CredentialsPayload) {
+export async function login(credentials: CredentialsPayload, headers = generateDeviceUUIDHeader()) {
 
-    const deviceUUIDHeader = generateDeviceUUIDHeader();
     const { body: { data } } = await global.superAgent
         .post(getUri(`${Constants.Endpoints.PORTAL}/${Constants.Endpoints.LOGIN}`))
-        .set(deviceUUIDHeader)
+        .set(headers)
         .send(credentials);
 
     return {
-        headers: Object.assign(deviceUUIDHeader, { authorization: data.token }),
-        session_id: data.session_id,
+        headers: Object.assign(headers, { authorization: data.token }),
         token: data.token,
         refreshToken: data.refreshToken
     };

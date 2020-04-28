@@ -83,7 +83,7 @@ export class NodeServer extends Application {
                                 const payload = new MessagePayload(message);
                                 try {
                                         await validatePayload(payload);
-                                        const createdMessage = await messagesService.create({
+                                        const createdMessage = await messagesService.createMessage({
                                                 room: payload.id,
                                                 user: id,
                                                 text: payload.text,

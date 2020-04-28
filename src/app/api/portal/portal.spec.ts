@@ -217,7 +217,6 @@ describe('#INTERGRATION', () => {
             });
         });
     });
-
     describe('Logout', () => {
         function logout(headers) {
             return global.superAgent
@@ -256,7 +255,6 @@ describe('#INTERGRATION', () => {
             expect(response.ok).toBeTruthy();
         });
     });
-
     describe('Refresh Token', () => {
         function refreshToken(payload, headers) {
             return global.superAgent
@@ -405,7 +403,6 @@ describe('#INTERGRATION', () => {
     xdescribe('Forgot password ', () => {
         test.todo('refactor');
     });
-
     xdescribe('Reset password ', () => {
         test.todo('refactor');
     });

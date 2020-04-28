@@ -3,14 +3,14 @@ import { Post, Router } from '@lib/restful';
 import { Request, Response } from 'express';
 import usersService from '@api/users/users.service';
 import { UsersSchema } from '@api/users';
-import { Payload, WithID, PrimaryKey } from '@lib/mongoose';
+import { Payload, PrimaryKey } from '@lib/mongoose';
 import { EmailService, fakeEmail } from '@shared/email';
 import { AppUtils, cast } from '@core/utils';
 import { PortalHelper } from './portal.helper';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { ApplicationConstants } from '@core/constants';
 import { sessionsService } from '@api/sessions/sessions.service';
-import { IsString, IsNotEmpty, IsJWT, isJWT } from 'class-validator';
+import { IsString, IsNotEmpty, IsJWT } from 'class-validator';
 import { scheduleJob } from 'node-schedule';
 import { validate } from '@shared/common';
 import { tokenService, IRefreshTokenClaim } from '@shared/identity';
@@ -85,7 +85,7 @@ export class PortalRoutes {
         if (activeUserSessions.data.length >= 3) {
             return new Responses.BadRequest('exceeded_allowed_sesison');
         }
-        const session = await sessionsService.create({
+        await sessionsService.create({
             device_uuid,
             active: true,
             user: user.id

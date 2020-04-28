@@ -6,9 +6,8 @@ import { translate } from '@lib/translation';
 
 function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHooks<T>]: any } {
     return {
-        pre: AppUtils.isFunction(options && options.pre) ? options.pre : (...args: any) => null,
-        post: AppUtils.isFunction(options && options.post) ? options.post : (...args: any) => null,
-        result: AppUtils.isFunction(options && options.result) ? options.result : null,
+        pre: (options && options.pre) ?? (() => { }),
+        post: (options && options.post) ?? (() => { })
     };
 }
 
@@ -17,10 +16,23 @@ class Result<T> {
     public data: T = null;
     public message: string = null;
 
-    constructor(result: Partial<Result<T>> = new Result<T>({})) {
-        this.data = result.data;
-        this.message = result.message || null;
+    constructor(result?: Partial<Result<T>>) {
+        this.data = result.data ?? null;
+        this.message = result.message ?? null;
         this.hasError = result.hasError ?? AppUtils.isTruthy(result.message) ?? false;
+    }
+}
+
+export class WriteResult {
+    updatedAt: string;
+    createdAt: string;
+    readonly id: PrimaryKey;
+    _id: PrimaryKey;
+    constructor(entity) {
+        this.id = entity.id;
+        this._id = entity.id;
+        this.updatedAt = entity.updatedAt;
+        this.createdAt = entity.createdAt;
     }
 }
 
@@ -48,24 +60,22 @@ export class CrudService<T = null> {
         return false;
     }
 
-    public async create(payload: Payload<T>): Promise<Result<WithID<T>>> {
+    public async create(payload: Payload<T>): Promise<Result<WriteResult>> {
         const isExist = await this.isEntityExist(payload);
         if (isExist) {
             return new Result({ message: isExist });
         }
 
         const entity = this.repo.create(payload);
-        const { pre, post, result } = getHooks(this.options.create);
+        const { pre, post } = getHooks(this.options.create);
         await pre(entity);
         await entity.save();
         await post(entity);
 
-        return result
-            ? new Result<T>({ data: result(entity) })
-            : new Result<T>({ data: { id: entity.id } as any });
+        return new Result({ data: new WriteResult(entity) });
     }
 
-    public async delete(query: Query<T>) {
+    public async delete(query: Query<T>): Promise<Result<WriteResult>> {
         const entity = await this.repo.fetchOne(query);
         if (AppUtils.isNullOrUndefined(entity)) {
             return new Result({ message: 'entity_not_exist' });
@@ -76,7 +86,7 @@ export class CrudService<T = null> {
         await entity.remove();
         await post(entity);
 
-        return new Result();
+        return new Result({ data: new WriteResult(entity) });
     }
 
     public async updateById(id: PrimaryKey, payload: Partial<Payload<T>>) {
@@ -87,7 +97,7 @@ export class CrudService<T = null> {
         return this.doUpdate(record, payload);
     }
 
-    private async doUpdate(record: Document<T>, payload: Partial<Payload<T>>) {
+    private async doUpdate(record: Document<T>, payload: Partial<Payload<T>>): Promise<Result<WriteResult>> {
         if (AppUtils.isNullOrUndefined(record)) {
             return new Result({ message: 'entity_not_exist' });
         }
@@ -102,7 +112,7 @@ export class CrudService<T = null> {
         await record.set(payload).save();
         await post(record);
 
-        return new Result();
+        return new Result({ data: new WriteResult(record) });
     }
 
     public async set(id: PrimaryKey, payload: Payload<T>) {
@@ -202,7 +212,7 @@ class ReadOptions<T> {
 
     constructor({ page = 0, size = 0, sort, populate, projection, lean }: IReadOptions<T>) {
         this.skip = +page * size ?? null;
-        this.limit = +size ?? null;
+        this.limit = +size ?? 20;
         this.sort = sort;
         this.populate = populate;
         this.projection = projection;

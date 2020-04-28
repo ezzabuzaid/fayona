@@ -45,7 +45,7 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
         });
 
         if (room.hasError) {
-            throw new Responses.BadRequest(room.message);
+            return new Responses.BadRequest(room.message);
         }
 
         await messagesService.create({

@@ -15,13 +15,12 @@ export interface ITokenClaim extends IClaim {
 export interface IRefreshTokenClaim extends IClaim { }
 
 class TokenService {
-
     /**
      *
      * @param token
-     * @returns decoded of the token
+     * @returns {Promise<T extends ITokenClaim>}
      */
-    public decodeToken<T = ITokenClaim>(token: string) {
+    public decodeToken<T extends ITokenClaim>(token: string): Promise<T> {
         return new Promise<T>((resolve, reject) => {
             jwt.verify(token, this.secretKey, (error, decodedToken) => {
                 if (error) {
