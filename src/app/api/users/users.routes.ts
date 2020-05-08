@@ -9,7 +9,7 @@ import { identity } from '@shared/identity';
 import { validate } from '@shared/common';
 import { IsString, IsOptional } from 'class-validator';
 
-class SearchForUserQueryValidator extends Pagination {
+class UsernameValidator extends Pagination {
     @IsOptional()
     @IsString()
     public username: string = null;
@@ -28,11 +28,21 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
         return super.create(req);
     }
 
-    @Get(Constants.Endpoints.SEARCH, validate(SearchForUserQueryValidator, 'query'))
+    @Get(Constants.Endpoints.SEARCH, validate(UsernameValidator, 'query'))
     public async searchForUsers(req: Request) {
-        const { username, ...options } = cast<SearchForUserQueryValidator>(req.query);
+        const { username, ...options } = cast<UsernameValidator>(req.query);
         const users = await this.service.searchForUser(username, options);
         return new Responses.Ok(users.data);
+    }
+
+    @Get('username', validate(UsernameValidator, 'query'))
+    public async isUsernameExist(req: Request, ) {
+        const { username } = cast<UsernameValidator>(req.query);
+        const result = await this.service.one({ username });
+        if (result.hasError) {
+            return new Responses.BadRequest(result.message);
+        }
+        return new Responses.Ok(result.data);
     }
 
 }
