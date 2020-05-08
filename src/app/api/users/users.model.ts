@@ -4,7 +4,7 @@ import { ValidationPatterns } from '@shared/common';
 import { AppUtils } from '@core/utils';
 import { Roles } from '@shared/identity';
 import phone from 'phone';
-import { isBoolean, isNumber } from 'class-validator';
+import { isBoolean } from 'class-validator';
 @Entity(Constants.Schemas.USERS)
 export class UsersSchema {
     @Field({ validate: isBoolean, default: false }) public verified?: boolean;
@@ -19,6 +19,7 @@ export class UsersSchema {
         // STUB test password should not return with the response
         select: false,
         required: true,
+        match: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,10}$/, 'wrong_password'],
         set: (value: string) => HashService.hashSync(value)
     }) public password: string;
     @Field({
@@ -31,10 +32,7 @@ export class UsersSchema {
         unique: true,
     }) public email: string;
     @Field({
-        validate: [
-            AppUtils.compose(AppUtils.hasItemWithin, phone),
-            'wrong_mobile'
-        ],
+        validate: [AppUtils.compose(AppUtils.hasItemWithin, phone), 'wrong_mobile'],
         unique: true,
     }) public mobile: string = null;
 
