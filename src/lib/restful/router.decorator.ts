@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import path = require('path');
-import { AppUtils, Logger } from '@core/utils';
+import { AppUtils } from '@core/utils';
 import { Router as expressRouter } from 'express';
 import { IRouterDecorationOption } from './methods.types';
 import { IMetadata, method_metadata_key } from './index';
@@ -8,9 +8,15 @@ import { wrapRoutes } from '@core/helpers/route';
 
 export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
     return function <T extends new (...args: any[]) => any>(constructor: T) {
-        const log = new Logger(constructor.name);
         const router = expressRouter(options);
         const instance = new constructor();
+
+        if (AppUtils.hasItemWithin(options.children)) {
+            options.children.forEach((child) => {
+                const internal = child.__router();
+                router.use(internal.uri, internal.router);
+            });
+        }
 
         Reflect.getMetadataKeys(constructor)
             .forEach((key: string) => {
