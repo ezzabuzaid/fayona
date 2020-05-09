@@ -35,7 +35,7 @@ class FilesSearchPayload implements IReadAllOptions<UploadsSchema> {
 const allowedImageTypes = [
     'image/jpg', 'image/JPG', 'image/jpeg', 'image/JPEG',
     'image/png', 'image/PNG', 'image/gif', 'image/GIF',
-    'application/pdf'
+    'application/pdf', 'audio/mpeg', 'application/zip'
 ];
 
 const multer = new Multer({ allowedTypes: allowedImageTypes });

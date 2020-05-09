@@ -31,18 +31,18 @@ export class Multer {
         this.upload = this.upload.bind(this);
     }
 
-    public async upload(req: Request, res: Response, next: NextFunction) {
+    public upload(req: Request, res: Response, next: NextFunction) {
         if (this.options.maxFilesNumber === 1) {
-            this.multer.single(this.options.fieldName)(req, res, next);
+            return this.multer.single(this.options.fieldName);
         } else {
-            this.multer.array(this.options.fieldName, this.options.maxFilesNumber)(req, res, next);
+            return this.multer.array(this.options.fieldName, this.options.maxFilesNumber);
         }
     }
 
     public defaultOptions(): Parameter<typeof multer> {
         return {
             storage: this.storage,
-            fileFilter: this.fileFilter.bind(this),
+            fileFilter: (req, file, callback) => this.fileFilter(file, callback),
             limits: {
                 fileSize: 1024 * this.options.maxSize,
                 files: this.options.maxFilesNumber
@@ -79,13 +79,13 @@ export class Multer {
         });
     }
 
-    private fileFilter(req: Express.Request, file: Express.Multer.File, cb) {
-        const type = file.mimetype;
-        const isAllowedType = this.options.allowedTypes.some((allowedType) => allowedType === type);
+    private fileFilter(file: Express.Multer.File, callback) {
+        const type = file.mimetype.toLowerCase();
+        const isAllowedType = this.options.allowedTypes.some((allowedType) => allowedType.toLowerCase() === type);
         if (AppUtils.isFalsy(isAllowedType)) {
-            cb(new Responses.BadRequest(`Type ${type} not allowed`));
+            callback(new Responses.BadRequest(`Type ${type} not allowed`));
         } else {
-            cb(null, true);
+            callback(null, true);
         }
     }
 
