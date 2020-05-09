@@ -8,6 +8,7 @@ import { cast } from '@core/utils';
 import { identity } from '@shared/identity';
 import { validate } from '@shared/common';
 import { IsString, IsOptional } from 'class-validator';
+import { AccountsRouter } from '@api/accounts';
 
 class UsernameValidator extends Pagination {
     @IsOptional()
@@ -16,7 +17,8 @@ class UsernameValidator extends Pagination {
 }
 
 @Router(Constants.Endpoints.USERS, {
-    middleware: [identity.isAuthenticated()]
+    middleware: [identity.isAuthenticated()],
+    children: [AccountsRouter]
 })
 export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
     constructor() {

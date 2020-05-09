@@ -1,8 +1,9 @@
-import { Field, Entity } from '@lib/mongoose';
+import { Field, Entity, BaseModel } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
 
+// FIXME should be subddocument within user schema
 @Entity(Constants.Schemas.ACCOUNTS)
-export class AccountsModel {
+export class AccountsSchema {
     @Field() firstName: string;
     @Field() lastName: string;
     @Field() city: string;
@@ -13,3 +14,5 @@ export class AccountsModel {
     @Field() gender: string;
     @Field() occupation: string;
 }
+
+export default BaseModel(AccountsSchema);

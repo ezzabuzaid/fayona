@@ -8,27 +8,29 @@ import { SettingRoutes } from '@api/settings';
 import { RoomsRouter } from '@api/chat/rooms';
 import { AppUtils } from '@core/utils';
 import assert from 'assert';
+
 export class Wrapper {
     private static list = [];
     public static registerRouter(router, subRouter?) {
         if (!!subRouter) {
-            this.wrapRouter(subRouter);
-            this.assignRouterTo(subRouter, router);
+            this.assignRouterTo(subRouter, this.wrapRouter(router));
         } else {
             this.wrapRouter(router);
         }
     }
 
     private static wrapRouter(Router: IExpressInternal) {
+        assert(AppUtils.notNullOrUndefined(Router.__router), 'please consider add @Router on the top of class');
         const internal = Router.__router();
-        assert(AppUtils.notNullOrUndefined(internal.id), 'please consider add @Router on the top of class');
         this.list.push(internal);
+        return internal;
     }
 
-    private static assignRouterTo(subRouter, superRouter) {
+    private static assignRouterTo(subRouter, superRouter: IExpressRouter) {
+        const internal = (subRouter as IExpressInternal).__router();
         const parentRouter = this.getRouter(superRouter);
         assert(AppUtils.notNullOrUndefined(parentRouter), 'Please register the parent router first, then try');
-        parentRouter.use(superRouter.routesPath, subRouter.router);
+        parentRouter.use(internal.uri, internal.router);
     }
 
     static get routers(): IExpressRouter[] {
@@ -36,7 +38,7 @@ export class Wrapper {
     }
 
     public static getRouter({ id }) {
-        const { router } = this.list.find(({ _router }) => _router.id === id);
+        const { router } = this.routers.find((routeMetadata) => routeMetadata.id === id);
         return router;
     }
 

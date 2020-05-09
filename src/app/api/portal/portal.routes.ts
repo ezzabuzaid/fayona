@@ -53,6 +53,7 @@ export class LoginDto extends RefreshTokenDto { }
 @Router(Constants.Endpoints.PORTAL)
 export class PortalRoutes {
 
+    static MAX_SESSION_SIZE = 10;
     constructor() {
         // EmailService.sendEmail({
         //     to: 'ezzabuzaid@hotmail.com',
@@ -82,7 +83,7 @@ export class PortalRoutes {
             return new Responses.BadRequest('wrong_credintals');
         }
         const activeUserSessions = await sessionsService.getActiveUserSession(user.id);
-        if (activeUserSessions.data.length >= 3) {
+        if (activeUserSessions.data.length >= PortalRoutes.MAX_SESSION_SIZE) {
             return new Responses.BadRequest('exceeded_allowed_sesison');
         }
         await sessionsService.create({

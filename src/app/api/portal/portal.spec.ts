@@ -1,6 +1,6 @@
 import { Constants } from '@core/helpers';
 import { generateExpiredToken, generateDeviceUUIDHeader, getUri, generateToken, createApplicationUser, login } from '@test/fixture';
-import { CredentialsPayload, RefreshTokenPayload } from './portal.routes';
+import { CredentialsPayload, RefreshTokenPayload, PortalRoutes } from './portal.routes';
 import { AppUtils } from '@core/utils';
 import { tokenService, ITokenClaim, IClaim } from '@shared/identity';
 import { isMongoId } from 'class-validator';
@@ -80,7 +80,7 @@ describe('#INTERGRATION', () => {
                     { desc: 'null', value: null },
                     { desc: 'undefined', value: undefined },
                 ])
-                ('username is ', async (object) => {
+                ('password is ', async (object) => {
                     test(`${object.desc}`, async () => {
                         // Arrange
                         const credentials = createCredentials('fakeUseranme', object.value);
@@ -104,17 +104,18 @@ describe('#INTERGRATION', () => {
                 await createApplicationUser(credentials);
 
                 const session = await login(credentials);
+                for (let index = 0; index < PortalRoutes.MAX_SESSION_SIZE - 1; index++) {
+                    // Act
+                    await global.superAgent
+                        .post(LOGIN_ENDPOINT)
+                        .set(session.headers)
+                        .send(credentials);
 
-                // Act
-                await global.superAgent
-                    .post(LOGIN_ENDPOINT)
-                    .set(session.headers)
-                    .send(credentials);
-
-                await global.superAgent
-                    .post(LOGIN_ENDPOINT)
-                    .set(session.headers)
-                    .send(credentials);
+                    await global.superAgent
+                        .post(LOGIN_ENDPOINT)
+                        .set(session.headers)
+                        .send(credentials);
+                }
 
                 const lastSession = await global.superAgent
                     .post(LOGIN_ENDPOINT)
