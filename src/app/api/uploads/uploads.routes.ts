@@ -2,19 +2,17 @@ import { Router, Post, Get } from '@lib/restful';
 import { Multer } from '@shared/multer';
 import { Request } from 'express';
 import { Responses, Constants } from '@core/helpers';
-import { CrudRouter, IReadAllOptions } from '@shared/crud';
+import { CrudRouter, Pagination } from '@shared/crud';
 import { UploadsSchema } from './uploads.model';
 import uploadsService, { UploadsService } from './uploads.service';
-import foldersService from './folders/folders.service';
 import path from 'path';
 import { cast } from '@core/utils';
 import { IsMongoId, IsOptional, IsString, IsNumberString } from 'class-validator';
-import { validate, NameValidator, isValidId } from '@shared/common';
-import sharedFolderService from './shared-folder/shared-folder.service';
+import { validate, isValidId } from '@shared/common';
 import { identity, tokenService } from '@shared/identity';
-import { FoldersSchema } from './folders/folders.model';
+import { FoldersRoutes } from './folders/folders.routes';
 
-class FilesSearchPayload implements IReadAllOptions<UploadsSchema> {
+class FilesSearchPayload extends Pagination {
     @IsOptional()
     @IsMongoId()
     folder: string = null;
@@ -24,12 +22,6 @@ class FilesSearchPayload implements IReadAllOptions<UploadsSchema> {
     @IsOptional()
     @IsString()
     file: string = null;
-    @IsOptional()
-    @IsNumberString()
-    page: number = null;
-    @IsOptional()
-    @IsNumberString()
-    size: number = null;
 }
 
 const allowedImageTypes = [
@@ -40,7 +32,8 @@ const allowedImageTypes = [
 
 const multer = new Multer({ allowedTypes: allowedImageTypes });
 @Router(Constants.Endpoints.UPLOADS, {
-    middleware: [identity.isAuthenticated()]
+    middleware: [identity.isAuthenticated()],
+    children: [FoldersRoutes]
 })
 export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> {
 
