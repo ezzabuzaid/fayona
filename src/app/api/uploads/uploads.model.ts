@@ -13,4 +13,4 @@ export class UploadsSchema {
     @Field({ required: true, ref: Constants.Schemas.FOLDERS }) public folder: Types.ObjectId;
 }
 
-export const UploadsModel = BaseModel(UploadsSchema);
+export default BaseModel(UploadsSchema);

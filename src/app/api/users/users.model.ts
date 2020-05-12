@@ -5,6 +5,7 @@ import { AppUtils } from '@core/utils';
 import { Roles } from '@shared/identity';
 import phone from 'phone';
 import { isBoolean } from 'class-validator';
+import { AccountsSchema } from '@api/accounts';
 @Entity(Constants.Schemas.USERS)
 export class UsersSchema {
     @Field({ validate: isBoolean, default: false }) public verified?: boolean;
@@ -13,13 +14,13 @@ export class UsersSchema {
         default: Roles.ADMIN,
         pure: true
     }) public role?: string;
-    @Field() public profile = null; // TODO: update this field to be ProfileSchema instead
+    @Field({ subdocument: true }) public profile: AccountsSchema = null;
     @Field({
         pure: true,
         // STUB test password should not return with the response
         select: false,
         required: true,
-        match: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,10}$/, 'wrong_password'],
+        validate: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/, 'wrong_password'],
         set: (value: string) => HashService.hashSync(value)
     }) public password: string;
     @Field({
@@ -38,4 +39,4 @@ export class UsersSchema {
 
 }
 
-export const UsersModel = BaseModel<UsersSchema>(UsersSchema);
+export default BaseModel(UsersSchema);

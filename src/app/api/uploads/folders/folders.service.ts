@@ -1,12 +1,12 @@
 import { CrudService, Repo } from '@shared/crud';
-import { FoldersSchema, FoldersModel } from './folders.model';
+import foldersModel, { FoldersSchema, } from './folders.model';
 import { UploadsHelper } from '../uploads.helper';
 import sharedFolderService from '../shared-folder/shared-folder.service';
 
 export class FoldersService extends CrudService<FoldersSchema> {
 
     constructor() {
-        super(new Repo(FoldersModel), {
+        super(new Repo(foldersModel), {
             unique: ['name'],
             create: {
                 post(folder) {

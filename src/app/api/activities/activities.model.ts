@@ -9,4 +9,4 @@ export class ActivitesSchema {
     @Field() public field: string;
 }
 
-export const ActivitesModel = BaseModel(ActivitesSchema);
+export default BaseModel(ActivitesSchema);

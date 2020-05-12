@@ -1,10 +1,10 @@
 import { CrudService, Repo, IReadAllOptions, Query } from '@shared/crud';
-import { UploadsSchema, UploadsModel } from './uploads.model';
+import uploadsModel, { UploadsSchema } from './uploads.model';
 import { AppUtils } from '@core/utils';
 
 export class UploadsService extends CrudService<UploadsSchema> {
     constructor() {
-        super(new Repo(UploadsModel));
+        super(new Repo(uploadsModel));
     }
 
     public searchForFiles(query: Query<UploadsSchema>, options: IReadAllOptions<UploadsSchema>) {

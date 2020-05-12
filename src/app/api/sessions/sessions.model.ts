@@ -14,4 +14,4 @@ export class SessionSchema {
     // TODO: presist device info and user location
 }
 
-export const SessionModel = BaseModel<SessionSchema>(SessionSchema);
+export default BaseModel<SessionSchema>(SessionSchema);

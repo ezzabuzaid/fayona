@@ -8,4 +8,4 @@ export class FeedbackSchema {
     @Field() public type: string;
 }
 
-export const FeedbackModel = BaseModel<FeedbackSchema>(FeedbackSchema);
+export default BaseModel<FeedbackSchema>(FeedbackSchema);

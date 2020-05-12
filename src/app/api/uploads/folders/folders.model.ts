@@ -6,4 +6,4 @@ export class FoldersSchema {
     @Field({ lowercase: false }) public name: string;
 }
 
-export const FoldersModel = BaseModel(FoldersSchema);
+export default BaseModel(FoldersSchema);
