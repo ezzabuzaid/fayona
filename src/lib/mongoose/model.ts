@@ -1,8 +1,8 @@
-import { Document as MongooseDocument, Model } from 'mongoose';
 import 'reflect-metadata';
+import assert from 'assert';
+import { Document as MongooseDocument, Model } from 'mongoose';
 import { generateModelMetadataKey } from '.';
 import { Type, AppUtils } from '@core/utils';
-import assert from 'assert';
 export function BaseModel<T>(schema: Type<T>) {
     const metadataKey = generateModelMetadataKey(schema);
     const model = Reflect.getMetadata(metadataKey, schema) as Model<T & MongooseDocument>;
