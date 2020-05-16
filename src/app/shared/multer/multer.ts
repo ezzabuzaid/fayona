@@ -64,7 +64,7 @@ export class Multer {
                     if (Types.ObjectId.isValid(folder)) {
                         const folderExistance = await foldersService.exists({ _id: folder });
                         if (folderExistance.hasError) {
-                            callback(new Responses.BadRequest(folderExistance.data), null);
+                            callback(new Responses.BadRequest(String(folderExistance.data)), null);
                         }
                     } else {
                         callback(new Responses.BadRequest('folder_id_not_valid'), null);

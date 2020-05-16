@@ -10,6 +10,7 @@ export interface IClaim {
 }
 export interface ITokenClaim extends IClaim {
     role?: Roles;
+    verified?: boolean;
 }
 
 export interface IRefreshTokenClaim extends IClaim { }

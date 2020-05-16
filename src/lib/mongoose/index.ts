@@ -7,7 +7,7 @@ import { OmitProperties } from '@core/utils';
 
 export namespace MongooseTypes {
 
-    export type FieldOptions = SchemaTypeOpts<any> & Schema & SchemaType & {
+    export type FieldOptions = SchemaTypeOpts<any> | Schema | SchemaType & {
         pure?: boolean;
         subdocument: boolean;
     };
