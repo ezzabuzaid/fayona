@@ -20,13 +20,13 @@ export class NameValidator {
     name: string = null;
 }
 
-export async function validatePayload<T>(payload: T) {
+export async function validatePayload<T>(payload: T, message?: string) {
     try {
         await validateOrReject(payload);
     } catch (validationErrors) {
         // TODO: Add custom validation error
         const errorConstraints = (validationErrors[0] as ValidationError).constraints;
-        const error = new Error(Object.values(errorConstraints)[0]);
+        const error = new Error(message ?? Object.values(errorConstraints)[0]);
         error.name = ApplicationConstants.PAYLOAD_VALIDATION_ERRORS;
         throw error;
     }
@@ -34,11 +34,11 @@ export async function validatePayload<T>(payload: T) {
 
 export abstract class PayloadValidator { }
 
-export function validate<T extends PayloadValidator>(validator: Type<T>, type: 'body' | 'query' | 'params' | 'headers' | 'queryPolluted' = 'body') {
+export function validate<T extends PayloadValidator>(validator: Type<T>, type: 'body' | 'query' | 'params' | 'headers' | 'queryPolluted' = 'body', message?: string) {
     return async (req: Request, res: Response, next: NextFunction) => {
         const validatee = new validator();
         AppUtils.strictAssign(validatee, req[type]);
-        await validatePayload(validatee);
+        await validatePayload(validatee, message);
         next();
     };
 }
