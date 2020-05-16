@@ -22,6 +22,7 @@
         "max-classes-per-file": false,
         "variable-name": false,
         "no-return-await": true,
+        "arrow-parens": false,
         "only-arrow-functions": false,
         "quotemark": [
             true,
