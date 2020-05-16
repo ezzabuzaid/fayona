@@ -8,7 +8,7 @@ import { cast } from '@core/utils';
 import { identity } from '@shared/identity';
 import { validate } from '@shared/common';
 import { IsString, IsOptional } from 'class-validator';
-import { AccountsRouter } from '@api/accounts';
+import { AccountsRouter } from '@api/profiles';
 
 class UsernameValidator extends Pagination {
     @IsOptional()
@@ -27,6 +27,7 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
 
     @Post()
     public create(req: Request) {
+        req.body.city = req.ip || req.connection.remoteAddress;
         return super.create(req);
     }
 
