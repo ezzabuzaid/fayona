@@ -1,6 +1,5 @@
 import { Local } from './local';
-import { Logger, AppUtils } from '@core/utils';
-import assert from 'assert';
+import { Logger } from '@core/utils';
 const log = new Logger('Localization Class');
 
 class Translation<T> {

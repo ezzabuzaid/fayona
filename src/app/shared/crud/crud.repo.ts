@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { Model, FilterQuery } from 'mongoose';
-import { Document, Payload, Projection, ColumnSort, PrimaryKey, ForeignKey, BaseModel } from '@lib/mongoose';
+import { Document, Payload, Projection, ColumnSort, PrimaryKey, ForeignKey } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 
 // TODO: Before any query or write check the body to meet the

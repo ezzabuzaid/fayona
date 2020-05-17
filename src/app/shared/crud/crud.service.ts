@@ -191,11 +191,8 @@ export class CrudService<T = null> {
         });
     }
 
-    public async exists(query: Query<T>) {
-        if (AppUtils.isTruthy(await this.one(query, { lean: true }))) {
-            return new Result({ data: true }) as any;
-        }
-        return new Result({ data: false });
+    public exists(query: Query<T>) {
+        return this.one(query, { lean: true });
     }
 
 }
