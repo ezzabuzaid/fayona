@@ -96,6 +96,9 @@ export class NodeServer extends Application {
                                         socket.emit('MessageValidationError', message);
                                 }
                         });
+                        socket.on('StreamOffer', ({ negotiation, id }: { id: string, negotiation }) => {
+                                socket.broadcast.in(id as any).emit('StreamAnswer', negotiation);
+                        });
                 });
                 return server;
         }

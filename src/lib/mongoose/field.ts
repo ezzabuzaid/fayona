@@ -25,9 +25,9 @@ export function Field(options: Partial<MongooseTypes.FieldOptions> = {}) {
             };
         }
         fields[propertyKey] = {
-            type: options['subdocument'] ? model(propertyType.SCHEMA_NAME).schema : propertyType.name,
             ...defaults,
             ...options,
+            type: options['subdocument'] ? model(options['type'].SCHEMA_NAME).schema : propertyType.name,
         };
 
     };
