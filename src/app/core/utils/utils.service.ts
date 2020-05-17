@@ -1,8 +1,7 @@
 import { randomBytes } from 'crypto';
+import { Directories } from '@shared/common';
 
 export type Type<T> = new (...args: any[]) => T;
-// export type Type<T> = new (...args: any) => T;
-
 export type Parameter<T extends (args: any) => any> = T extends (args: infer P) => any ? P : never;
 
 export class AppUtils {
@@ -220,14 +219,14 @@ export class AppUtils {
         return array[array.length - 1];
     }
 
-}
-
-// NOTE  Utility class to be extended, so when you call build it will construct an instance from that class
-export class Singelton {
-    private static instance = null;
-    public static build() {
-        return this.instance || (this.instance = new this());
+    public static renderHTML(templatePath: string, object) {
+        const template = Directories.getTemplate(templatePath);
+        return template.match(/\{{(.*?)\}}/ig).reduce((acc, binding) => {
+            const property = binding.substring(2, binding.length - 2);
+            return `${acc}${template.replace(/\{{(.*?)\}}/, object[property])}`;
+        }, '');
     }
+
 }
 
 export type OmitProperties<T, P> = Pick<T, { [key in keyof T]: T[key] extends P ? never : key }[keyof T]>;
@@ -238,3 +237,9 @@ export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export function cast<T>(arg: any) {
     return arg as T;
 }
+export type DeepPartial<T> =
+    T extends (Type<any> | Date)
+    ? T
+    : (T extends object
+        ? { [P in keyof T]?: DeepPartial<T[P]>; }
+        : T);
