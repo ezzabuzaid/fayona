@@ -1,7 +1,7 @@
 import { CrudService, Repo } from '@shared/crud';
 import foldersModel, { FoldersSchema, } from './folders.model';
-import { UploadsHelper } from '../uploads.helper';
 import sharedFolderService from '../shared-folder/shared-folder.service';
+import { Directories } from '@shared/common';
 
 export class FoldersService extends CrudService<FoldersSchema> {
 
@@ -10,7 +10,7 @@ export class FoldersService extends CrudService<FoldersSchema> {
             unique: ['name'],
             create: {
                 post(folder) {
-                    UploadsHelper.createFolderDirectory(folder.id);
+                    Directories.createFolderDirectory(folder.id);
                 }
             },
             update: {
@@ -29,7 +29,7 @@ export class FoldersService extends CrudService<FoldersSchema> {
                     }
                 },
                 post(folder) {
-                    UploadsHelper.removeFolder(folder.id);
+                    Directories.removeFolder(folder.id);
                 }
             }
         });

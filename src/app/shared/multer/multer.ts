@@ -7,7 +7,7 @@ import { Request, NextFunction, Response } from 'express';
 import { Responses, ErrorResponse } from '@core/helpers';
 import { Types } from 'mongoose';
 import foldersService from '@api/uploads/folders/folders.service';
-import { UploadsHelper } from '@api/uploads/uploads.helper';
+import { Directories } from '@shared/common';
 
 export class UploadOptions {
     public allowedTypes: string[] = [];
@@ -70,8 +70,8 @@ export class Multer {
                         callback(new Responses.BadRequest('folder_id_not_valid'), null);
                     }
                 }
-                UploadsHelper.createFolderDirectory(folder);
-                callback(null, UploadsHelper.folderPath(folder));
+                Directories.createFolderDirectory(folder);
+                callback(null, Directories.folderPath(folder));
             },
             filename(req: Express.Request, file, cb) {
                 cb(null, formatFileName(file));

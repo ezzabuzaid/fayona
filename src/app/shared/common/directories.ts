@@ -1,10 +1,17 @@
 import fileSystem = require('fs');
 import path = require('path');
-import { Application } from '../../../app/app';
 
-export class UploadsHelper {
+export class Directories {
+    static getTemplate(templatePath: string) {
+        const fullPath = path.join(Directories.staticDirectory, templatePath + '.html');
+        return fileSystem.readFileSync(fullPath, 'utf8');
+    }
+
+    public static staticDirectory = path.join(process.cwd(), 'src', 'public');
+    public static uploadDirectory = path.join(process.cwd(), 'uploads');
+
     static folderPath(id: string) {
-        return path.join(Application.uploadDirectory, id);
+        return path.join(Directories.uploadDirectory, id);
     }
 
     static removeFolder(id: string) {

@@ -13,13 +13,12 @@ import path from 'path';
 import cors from 'cors';
 import sanitize from 'express-mongo-sanitize';
 import stage from '@core/helpers/stage';
+import { Directories } from '@shared/common';
 
 const log = new Logger('Application');
 
 export class Application {
     public application = express();
-    public static staticDirectory = path.join(process.cwd(), 'src', 'public');
-    public static uploadDirectory = path.join(process.cwd(), 'uploads');
 
     constructor() {
         this.configure();
@@ -52,8 +51,8 @@ export class Application {
             }))
             .use(compression())
             .use(sanitize())
-            .use(express.static(Application.staticDirectory))
-            .use(express.static(Application.uploadDirectory, {
+            .use(express.static(Directories.staticDirectory))
+            .use(express.static(Directories.uploadDirectory, {
                 index: 'index.html',
                 maxAge: '10weeks',
             }));
