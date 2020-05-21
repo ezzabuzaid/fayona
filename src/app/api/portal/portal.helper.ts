@@ -11,4 +11,9 @@ export class PortalHelper {
         return tokenService.generateToken({ id, role, verified }, { expiresIn: '6h' });
     }
 
+    public static generatePinCode(length = 6) {
+        const digits = '0123456789';
+        return Array.from({ length }).reduce((pin) => pin + digits[Math.floor(Math.random() * 10)], '');
+    }
+
 }
