@@ -1,7 +1,7 @@
 import usersModel, { UsersSchema, } from './users.model';
 import { CrudService, } from '@shared/crud/crud.service';
 import { Repo, Pagination } from '@shared/crud';
-import { Payload, } from '@lib/mongoose';
+import { EmailService } from '@shared/email';
 
 export class UserService extends CrudService<UsersSchema> {
     constructor() {
@@ -18,13 +18,5 @@ export class UserService extends CrudService<UsersSchema> {
             }
         }, options);
     }
-
-    async create(payload: Payload<UsersSchema>) {
-        const user = await super.create(payload);
-        // TODO: send a verification email
-        // EmailService.sendEmail(fakeEmail());
-        return user;
-    }
-
 }
 export default new UserService();

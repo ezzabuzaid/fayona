@@ -1,7 +1,7 @@
 export namespace Constants {
     export class Endpoints {
         public static readonly FEEDBACK = 'feedback';
-        public static readonly ACCOUNTS = 'accounts';
+        public static readonly PROFILES = 'profiles';
         public static readonly PORTAL = 'portal';
         public static readonly SESSIONS = 'sessions';
         public static readonly USERS = 'users';
@@ -13,6 +13,7 @@ export namespace Constants {
         public static readonly RESET_PASSWORD = 'resetpassword';
         public static readonly REFRESH_TOKEN = 'refreshtoken';
         public static readonly VERIFY_ACCOUNT = 'verifyaccount';
+        public static readonly VERIFY_EMAIL = 'verifyemail';
         public static readonly ROOMS = 'rooms';
         public static readonly MEMBERS = 'members';
         public static readonly UPLOADS = 'uploads';
@@ -20,7 +21,7 @@ export namespace Constants {
     }
     export class Schemas {
         public static readonly Feedback = 'feedback';
-        public static readonly ACCOUNTS = 'accounts';
+        public static readonly PROFILES = 'profiles';
         public static readonly SESSIONS = 'sessions';
         public static readonly USERS = 'users';
         public static readonly ROOMS = 'rooms';

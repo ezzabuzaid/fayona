@@ -1,6 +1,6 @@
 import { CrudRouter, Pagination } from '@shared/crud';
 import usersService, { UserService } from './users.service';
-import { Constants, Responses } from '@core/helpers';
+import { Constants, Responses, SuccessResponse } from '@core/helpers';
 import { Router, Post, Get } from '@lib/restful';
 import { UsersSchema } from './users.model';
 import { Request } from 'express';
@@ -9,7 +9,8 @@ import { identity } from '@shared/identity';
 import { validate } from '@shared/common';
 import { IsString, IsOptional } from 'class-validator';
 import { AccountsRouter } from '@api/profiles';
-
+import { EmailService } from '@shared/email';
+import { NodeServer } from 'app/server';
 class UsernameValidator extends Pagination {
     @IsOptional()
     @IsString()
@@ -26,9 +27,16 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
     }
 
     @Post()
-    public create(req: Request) {
+    public async create(req: Request) {
+        const payload = cast<UsersSchema>(req.body);
         req.body.city = req.ip || req.connection.remoteAddress;
-        return super.create(req);
+        const result = await this.service.create(payload);
+
+        if (result.hasError) {
+            return new Responses.BadRequest(result.message);
+        }
+        await EmailService.sendVerificationEmail(NodeServer.serverUrl(req), payload.email);
+        return new SuccessResponse(result.data, 'An e-mail has been sent to your email in order to verify the account');
     }
 
     @Get(Constants.Endpoints.SEARCH, validate(UsernameValidator, 'query'))
