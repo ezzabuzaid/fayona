@@ -1,9 +1,8 @@
 import { ErrorResponse } from '@core/helpers';
-import { Logger, AppUtils } from '@core/utils';
+import { Logger } from '@core/utils';
 import { translate } from '@lib/translation';
 import { NextFunction, Request, Response } from 'express';
 import { NetworkStatus } from './network-status';
-import { Responses } from './response';
 import { ApplicationConstants } from '@core/constants';
 import stage from './stage';
 

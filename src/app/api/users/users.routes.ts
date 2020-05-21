@@ -29,14 +29,12 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
     @Post()
     public async create(req: Request) {
         const payload = cast<UsersSchema>(req.body);
-        req.body.city = req.ip || req.connection.remoteAddress;
         const result = await this.service.create(payload);
-
         if (result.hasError) {
             return new Responses.BadRequest(result.message);
         }
-        await EmailService.sendVerificationEmail(NodeServer.serverUrl(req), payload.email);
-        return new SuccessResponse(result.data, 'An e-mail has been sent to your email in order to verify the account');
+        EmailService.sendVerificationEmail(NodeServer.serverUrl(req), payload.email, result.data._id);
+        return new SuccessResponse(result.data, 'An e-mail has been sent to your email inbox in order to verify the account');
     }
 
     @Get(Constants.Endpoints.SEARCH, validate(UsernameValidator, 'query'))
