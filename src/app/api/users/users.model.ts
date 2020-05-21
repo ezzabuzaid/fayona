@@ -8,13 +8,17 @@ import { isBoolean } from 'class-validator';
 import { ProfilesSchema } from '@api/profiles';
 @Entity(Constants.Schemas.USERS)
 export class UsersSchema {
-    @Field({ validate: isBoolean, default: false }) public verified?: boolean;
+    @Field({ validate: isBoolean, default: false }) public emailVerified?: boolean;
+    @Field({ validate: isBoolean, default: false }) public mobileVerified?: boolean;
     @Field({
         enum: Object.values(Roles),
         default: Roles.ADMIN,
         pure: true
     }) public role?: string;
-    @Field({ subdocument: true }) public profile: ProfilesSchema = null;
+    @Field({
+        subdocument: true,
+        type: ProfilesSchema
+    }) public profile: Partial<ProfilesSchema> = null;
     @Field({
         pure: true,
         select: false,
@@ -40,6 +44,10 @@ export class UsersSchema {
         validate: [AppUtils.compose(AppUtils.hasItemWithin, phone), 'wrong_mobile'],
         unique: true,
     }) public mobile: string = null;
+
+    get verified() {
+        return this.emailVerified;
+    }
 
 }
 
