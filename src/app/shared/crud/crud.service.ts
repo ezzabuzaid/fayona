@@ -48,12 +48,11 @@ export class CrudService<T = null> {
             const fetchOne = (field: keyof Payload<T>) => this.repo.fetchOne({ [field]: payload[field] } as any);
             for (let index = 0; index < this.options.unique.length; index++) {
                 const field = this.options.unique[index];
-                if (AppUtils.isNullOrUndefined(payload[field])) {
-                    return `property${field} is missing`;
-                }
-                const record = await fetchOne(field);
-                if (AppUtils.isTruthy(record)) {
-                    return translate(`${this.options.unique[index]}_entity_exist`);
+                if (AppUtils.notNullOrUndefined(payload[field])) {
+                    const record = await fetchOne(field);
+                    if (AppUtils.isTruthy(record)) {
+                        return translate(`${this.options.unique[index]}_entity_exist`);
+                    }
                 }
             }
         }
