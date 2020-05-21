@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 import { Constants } from '@core/helpers';
 import { AppUtils } from '@core/utils';
+import { tokenService } from '@shared/identity';
 
 export class EmailService {
     public static async sendEmail(message: Mail.Options) {
@@ -16,12 +17,13 @@ export class EmailService {
         return transporter.sendMail(message);
     }
 
-    public static sendVerificationEmail(url, userEmail) {
+    public static sendVerificationEmail(url, userEmail, userId) {
+        const token = tokenService.generateToken({ id: userId }, { expiresIn: '15m' });
         return EmailService.sendEmail({
             from: 'test@test.com',
             to: userEmail,
             subject: 'Verify Email',
-            html: AppUtils.renderHTML('verification-template', { link: `${url}/${Constants.Endpoints.PORTAL}/${Constants.Endpoints.VERIFY_EMAIL}` })
+            html: AppUtils.renderHTML('verification-template', { link: `${url}/${Constants.Endpoints.PORTAL}/${Constants.Endpoints.VERIFY_EMAIL}?token=${token}` })
         });
     }
 }
