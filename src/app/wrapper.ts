@@ -58,4 +58,3 @@ Wrapper.registerRouter(RoomsRouter);
 Wrapper.registerRouter(FileUploadRoutes);
 Wrapper.registerRouter(SettingRoutes);
 Wrapper.registerRouter(LookupsRoutes);
-

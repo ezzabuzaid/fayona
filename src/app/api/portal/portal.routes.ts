@@ -1,5 +1,5 @@
 import { Constants, Responses, HashService } from '@core/helpers';
-import { Post, Router } from '@lib/restful';
+import { Post, Router, Get } from '@lib/restful';
 import { Request, Response } from 'express';
 import usersService from '@api/users/users.service';
 import { UsersSchema } from '@api/users';
@@ -14,7 +14,21 @@ import { IsString, IsNotEmpty, IsJWT } from 'class-validator';
 import { scheduleJob } from 'node-schedule';
 import { validate } from '@shared/common';
 import { tokenService, IRefreshTokenClaim } from '@shared/identity';
-import { Query } from '@shared/crud';
+
+export class VerifyAccountPayload {
+    @IsNotEmpty()
+    @IsString()
+    username: string = null;
+    @IsNotEmpty()
+    @IsString()
+    firstName: string = null;
+    @IsNotEmpty()
+    @IsString()
+    lastName: string = null;
+    @IsNotEmpty()
+    @IsString()
+    placeOfBirth: string = null;
+}
 
 export class CredentialsPayload {
     @IsString()
@@ -42,8 +56,8 @@ export class DeviceUUIDHeaderValidator {
 export class RefreshTokenDto {
     public token: string;
     public refreshToken: string;
-    constructor(user_id: PrimaryKey, role: string) {
-        this.token = PortalHelper.generateToken(user_id, role);
+    constructor(user_id: PrimaryKey, role: string, verified: boolean) {
+        this.token = PortalHelper.generateToken(user_id, role, verified);
         this.refreshToken = PortalHelper.generateRefreshToken(user_id);
     }
 }
@@ -54,13 +68,7 @@ export class LoginDto extends RefreshTokenDto { }
 export class PortalRoutes {
 
     static MAX_SESSION_SIZE = 10;
-    constructor() {
-        // EmailService.sendEmail({
-        //     to: 'ezzabuzaid@hotmail.com',
-        //     cc: 'superadmin@test.com,admin@test.com',
-        //     text: 'A test email'
-        // }).then(console.log);
-    }
+    constructor() { }
 
     @Post(Constants.Endpoints.LOGIN, validate(CredentialsPayload), validate(DeviceUUIDHeaderValidator, 'headers'))
     public async login(req: Request) {
@@ -91,7 +99,7 @@ export class PortalRoutes {
             active: true,
             user: user.id
         });
-        return new Responses.Ok(new LoginDto(user.id, user.role));
+        return new Responses.Ok(new LoginDto(user.id, user.role, user.verified));
 
     }
 
@@ -127,10 +135,10 @@ export class PortalRoutes {
                     if (session.hasError) {
                         return new Responses.BadRequest();
                     }
+                    const { data: user } = await usersService.one({ _id: decodedRefreshToken.id });
 
                     await sessionsService.updateById(session.data.id, { updatedAt: new Date().toISOString() });
-                    // TODO: Assign id
-                    return new Responses.Ok(new RefreshTokenDto(decodedRefreshToken.id, null));
+                    return new Responses.Ok(new RefreshTokenDto(user.id, user.role, user.verified));
                 }
             }
         } catch (error) {
@@ -139,14 +147,27 @@ export class PortalRoutes {
         return new Responses.BadRequest();
     }
 
-    @Post(Constants.Endpoints.FORGET_PASSWORD)
-    public async forgotPassword(req: Request, res: Response) {
-        const { username } = req.body as Payload<UsersSchema>;
-        const entity = await throwIfNotExist({ username }, 'Error sending the password reset message. Please try again shortly.');
-        const token = tokenService.generateToken({ id: entity.id, role: entity.role }, { expiresIn: '1h' });
-        await EmailService.sendEmail(fakeEmail(token));
-        const response = new Responses.Ok('An e-mail has been sent to ${user.email} with further instructions');
-        res.status(response.code).json(response);
+    @Post(
+        Constants.Endpoints.ACCOUNT_VERIFIED,
+        validate(VerifyAccountPayload, 'body', 'Please make sure you have entered the correct information payload.')
+    )
+    public async accountVerifed(req: Request) {
+        const payload = cast<VerifyAccountPayload>(req.body);
+        const result = await usersService.one({
+            'username': payload.username,
+            'profile.firstName': payload.firstName,
+            'profile.lastName': payload.lastName,
+            'profile.placeOfBirth': payload.placeOfBirth,
+        });
+        if (result.hasError) {
+            return new Responses.BadRequest('Please make sure you have entered the correct information.');
+        }
+        const { emailVerified, mobileVerified } = result.data;
+        if (emailVerified) {
+            return new Responses.Ok({ emailVerified, mobileVerified });
+        } else {
+            return new Responses.BadRequest('You cannot reset you password because your account it not verified yet, please contact the adminstration for further actions');
+        }
     }
 
     @Post(Constants.Endpoints.RESET_PASSWORD)
@@ -163,34 +184,17 @@ export class PortalRoutes {
         res.status(response.code).json(response);
     }
 
-    // TODO: the user should verify his email and phonenumber
-    public async verify(req: Request, res: Response) {
+    @Get(Constants.Endpoints.VERIFY_EMAIL)
+    public async verifyEmail(req: Request, res: Response) {
         const { token } = req.query;
         const decodedToken = await tokenService.decodeToken(token);
-        await usersService.updateById(decodedToken.id, { verified: true });
-        const response = new Responses.Ok(null);
-        res.status(response.code).json(response);
+        const result = await usersService.updateById(decodedToken.id, { emailVerified: true });
+        if (result.hasError) {
+            return new Responses.BadRequest('Please try again later');
+        }
+        res.redirect('http://localhost:4200/portal/login');
     }
 
-    public async sendVerificationEmail(req: Request, res: Response) {
-        const { token } = req.query;
-        const decodedToken = await tokenService.decodeToken(token);
-        await usersService.updateById(decodedToken.id, { verified: true });
-        const response = new Responses.Ok(null);
-        res.status(response.code).json(response);
-    }
-
-}
-
-async function throwIfNotExist(query: Query<UsersSchema>, message?: string) {
-    if (AppUtils.isFalsy(query)) {
-        throw new Responses.BadRequest(message);
-    }
-    const result = await usersService.one(query, { projection: { password: 1 } });
-    if (result.hasError) {
-        throw new Responses.BadRequest(result.message);
-    }
-    return result.data;
 }
 
 scheduleJob('30 * * * *', async () => {
@@ -208,3 +212,4 @@ scheduleJob('30 * * * *', async () => {
 // send an email with generated number to be entered later on in page 3
 // Lock the account after 3 times of trying
 // send an email to notify the user that the email is changed
+// Only previous registerd devices can be used to do forgot password;

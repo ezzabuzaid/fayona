@@ -12,6 +12,7 @@ import { IsString, IsMongoId, IsNotEmpty, IsInt, IsNumber } from 'class-validato
 import { validatePayload } from '@shared/common';
 import { PrimaryKey } from '@lib/mongoose';
 import { tokenService } from '@shared/identity';
+import { Request } from 'express';
 
 const log = new Logger('Server');
 
@@ -50,10 +51,15 @@ export class NodeServer extends Application {
                 this.populateServer();
         }
 
+        public static serverUrl(req: Request) {
+                return req.protocol + '://' + req.get('host') + '/api';
+        }
+
         public static async bootstrap() {
                 envirnoment.load(StageLevel.DEV);
                 const server = new NodeServer();
                 const database = await NodeServer.loadDatabase();
+
                 // TODO: Move this out
                 const io = socketIO(server.server);
                 io.use(async (socket, next) => {
