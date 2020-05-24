@@ -1,4 +1,4 @@
-import { validateOrReject, ValidationError, IsString, IsMongoId } from 'class-validator';
+import { validateOrReject, ValidationError, IsString, IsMongoId, isEmail, IsEmail } from 'class-validator';
 import { ApplicationConstants } from '@core/constants';
 import { Type, AppUtils } from '@core/utils';
 import { NextFunction, Response, Request } from 'express';
@@ -18,6 +18,11 @@ export function isValidId() {
 export class NameValidator {
     @IsString({ message: 'please provide valid name' })
     name: string = null;
+}
+
+export class EmailValidator {
+    @IsEmail()
+    email: string = null;
 }
 
 export async function validatePayload<T>(payload: T, message?: string) {

@@ -1,4 +1,4 @@
-import { Constants, Responses, HashService } from '@core/helpers';
+import { Constants, Responses, HashService, SuccessResponse } from '@core/helpers';
 import { Post, Router, Get } from '@lib/restful';
 import { Request, Response } from 'express';
 import usersService from '@api/users/users.service';
@@ -12,10 +12,10 @@ import { ApplicationConstants } from '@core/constants';
 import { sessionsService } from '@api/sessions/sessions.service';
 import { IsString, IsNotEmpty, IsJWT } from 'class-validator';
 import { scheduleJob } from 'node-schedule';
-import { validate } from '@shared/common';
+import { validate, EmailValidator } from '@shared/common';
 import { tokenService, IRefreshTokenClaim } from '@shared/identity';
 
-export class VerifyAccountPayload {
+export class AccountVerifiedPayload {
     @IsNotEmpty()
     @IsString()
     username: string = null;
@@ -149,10 +149,10 @@ export class PortalRoutes {
 
     @Post(
         Constants.Endpoints.ACCOUNT_VERIFIED,
-        validate(VerifyAccountPayload, 'body', 'Please make sure you have entered the correct information payload.')
+        validate(AccountVerifiedPayload, 'body', 'Please make sure you have entered the correct information payload.')
     )
     public async accountVerifed(req: Request) {
-        const payload = cast<VerifyAccountPayload>(req.body);
+        const payload = cast<AccountVerifiedPayload>(req.body);
         const result = await usersService.one({
             'username': payload.username,
             'profile.firstName': payload.firstName,
@@ -172,10 +172,6 @@ export class PortalRoutes {
 
     @Post(Constants.Endpoints.RESET_PASSWORD)
     public async resetPassword(req: Request, res: Response) {
-        // REVIEW if anyone get the token can change the user password,
-        // so we need to know that the user who really did that by answering a specifc questions, doing 2FA
-        // the attempts should be limited to 3 times, after that he need to re do the process again,
-        // if the procces faild 3 times, the account should be locked, and he need to call the support for that
         const { password } = req.body as Payload<UsersSchema>;
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
         await usersService.updateById(decodedToken.id, { password });
@@ -184,8 +180,24 @@ export class PortalRoutes {
         res.status(response.code).json(response);
     }
 
+    @Post('sendresetpasswordemail', validate(EmailValidator))
+    public async sendResetPasswordEmail(req: Request) {
+        const { email } = req.body;
+        const result = await usersService.one({ email });
+        if (result.hasError) {
+            return new Responses.BadRequest('It appears the email is not registerd before');
+        }
+        EmailService.sendPincodeEmail(
+            process.env.CLIENT_RESETPASSWORD_URL,
+            result.data.email,
+            result.data.id,
+            PortalHelper.generatePinCode()
+        );
+        return new SuccessResponse('An e-mail sent to your inbox with additional information');
+    }
+
     @Get(Constants.Endpoints.VERIFY_EMAIL)
-    public async verifyEmail(req: Request, res: Response) {
+    public async updateUserEmailVerification(req: Request, res: Response) {
         const { token } = req.query;
         const decodedToken = await tokenService.decodeToken(token);
         const result = await usersService.updateById(decodedToken.id, { emailVerified: true });
@@ -213,3 +225,10 @@ scheduleJob('30 * * * *', async () => {
 // Lock the account after 3 times of trying
 // send an email to notify the user that the email is changed
 // Only previous registerd devices can be used to do forgot password;
+
+// REVIEW if anyone get the token can change the user password,
+// so we need to know that the user who really did that by answering a specifc questions, doing 2FA
+// the attempts should be limited to 3 times, after that he need to re do the process again,
+// if the procces faild 3 times, the account should be locked, and he need to call the support for that
+
+// TODO already used refresh token shouldn't be used again

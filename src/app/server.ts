@@ -59,7 +59,7 @@ export class NodeServer extends Application {
                 envirnoment.load(StageLevel.DEV);
                 const server = new NodeServer();
                 const database = await NodeServer.loadDatabase();
-
+                // await database.dropDatabase();
                 // TODO: Move this out
                 const io = socketIO(server.server);
                 io.use(async (socket, next) => {

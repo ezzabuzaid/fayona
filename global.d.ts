@@ -12,6 +12,7 @@ declare global {
             MONGO_PATH: string
             JWT_SECRET_KEY: string
             NODE_STAGE: string;
+            CLIENT_RESETPASSWORD_URL: string;
         }
     }
 }

@@ -13,7 +13,8 @@ export class PortalHelper {
 
     public static generatePinCode(length = 6) {
         const digits = '0123456789';
-        return Array.from({ length }).reduce((pin) => pin + digits[Math.floor(Math.random() * 10)], '');
+        return (Array.from({ length }).reduce((pin) => pin + digits[Math.floor(Math.random() * 10)], '') as string[])
+            .join('');
     }
 
 }
