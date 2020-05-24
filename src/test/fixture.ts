@@ -63,8 +63,7 @@ export class UserFixture {
     };
 
     public async createUser(paylod: Partial<Payload<UsersSchema>> = {}) {
-        const response = await global
-            .superAgent
+        const response = await global.superAgent
             .post(getUri(Constants.Endpoints.USERS))
             .set(generateDeviceUUIDHeader())
             .send({

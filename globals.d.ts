@@ -1,10 +1,10 @@
 import request = require('supertest');
-
+declare var global: NodeJS.Global;
 
 declare global {
     namespace NodeJS {
-        interface Global {
-            superAgent: request.SuperTest<request.Test>
+        export interface Global {
+            superAgent: request.SuperTest<request.Test>;
         }
         export interface ProcessEnv {
             MONGO_USER: string
@@ -16,3 +16,4 @@ declare global {
         }
     }
 }
+

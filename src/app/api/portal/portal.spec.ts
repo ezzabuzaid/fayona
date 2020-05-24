@@ -4,8 +4,9 @@ import { CredentialsPayload, RefreshTokenPayload, PortalRoutes } from './portal.
 import { AppUtils } from '@core/utils';
 import { tokenService, ITokenClaim, IClaim } from '@shared/identity';
 import { isMongoId } from 'class-validator';
+import superAgent from '@test/superAgent';
 
-const ENDPOINT = (suffix: string) => `${Constants.Endpoints.PORTAL}/${suffix}`;
+const ENDPOINT = (suffix: string) => `${ Constants.Endpoints.PORTAL }/${ suffix }`;
 const LOGIN_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.LOGIN));
 const REFRESH_TOKEN = getUri(ENDPOINT(Constants.Endpoints.REFRESH_TOKEN));
 const RESET_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.RESET_PASSWORD));
@@ -13,8 +14,8 @@ const FORGET_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.FORGET_PASSWORD));
 const LOGUT_ENDPOINT = getUri(ENDPOINT(Constants.Endpoints.LOGOUT));
 
 async function getLastSession(headers) {
-    const sessionResponse = await global.superAgent
-        .get(getUri(`${Constants.Endpoints.SESSIONS}/${Constants.Endpoints.USERS_SESSIONS}`))
+    const sessionResponse = await superAgent
+        .get(getUri(`${ Constants.Endpoints.SESSIONS }/${ Constants.Endpoints.USERS_SESSIONS }`))
         .set(headers);
     return AppUtils.lastElement(sessionResponse.body.data.list);
 }
@@ -45,8 +46,7 @@ describe('#INTERGRATION', () => {
                 const credentials = createCredentials();
 
                 // Act
-                const response = await global
-                    .superAgent
+                const response = await superAgent
                     .post(LOGIN_ENDPOINT)
                     .send(credentials);
 
@@ -60,12 +60,12 @@ describe('#INTERGRATION', () => {
                     { desc: 'undefined', value: undefined },
                 ])
                 ('username is ', async (object) => {
-                    test(`${object.desc}`, async () => {
+                    test(`${ object.desc }`, async () => {
                         // Arrange
                         const credentials = createCredentials(object.value);
 
                         // Act
-                        const response = await global.superAgent
+                        const response = await superAgent
                             .post(LOGIN_ENDPOINT)
                             .set(generateDeviceUUIDHeader())
                             .send(credentials);
@@ -81,14 +81,14 @@ describe('#INTERGRATION', () => {
                     { desc: 'undefined', value: undefined },
                 ])
                 ('password is ', async (object) => {
-                    test(`${object.desc}`, async () => {
+                    test(`${ object.desc }`, async () => {
                         // Arrange
                         const credentials = createCredentials('fakeUseranme', object.value);
                         await createApplicationUser(credentials);
 
                         // Act
                         credentials.password = 'shitPassword';
-                        const response = await global.superAgent
+                        const response = await superAgent
                             .post(LOGIN_ENDPOINT)
                             .set(generateDeviceUUIDHeader())
                             .send(credentials);
@@ -106,18 +106,18 @@ describe('#INTERGRATION', () => {
                 const session = await login(credentials);
                 for (let index = 0; index < PortalRoutes.MAX_SESSION_SIZE - 1; index++) {
                     // Act
-                    await global.superAgent
+                    await superAgent
                         .post(LOGIN_ENDPOINT)
                         .set(session.headers)
                         .send(credentials);
 
-                    await global.superAgent
+                    await superAgent
                         .post(LOGIN_ENDPOINT)
                         .set(session.headers)
                         .send(credentials);
                 }
 
-                const lastSession = await global.superAgent
+                const lastSession = await superAgent
                     .post(LOGIN_ENDPOINT)
                     .set(session.headers)
                     .send(credentials);
@@ -134,7 +134,7 @@ describe('#INTERGRATION', () => {
                 const credentials = createCredentials();
                 await createApplicationUser(credentials);
                 // Act
-                const response = await global.superAgent
+                const response = await superAgent
                     .post(LOGIN_ENDPOINT)
                     .set(generateDeviceUUIDHeader())
                     .send(credentials);
@@ -149,7 +149,7 @@ describe('#INTERGRATION', () => {
                 await createApplicationUser(credentials);
 
                 // Act
-                const response = await global.superAgent
+                const response = await superAgent
                     .post(LOGIN_ENDPOINT)
                     .set(generateDeviceUUIDHeader())
                     .send(credentials);
@@ -165,7 +165,7 @@ describe('#INTERGRATION', () => {
                 await createApplicationUser(credentials);
 
                 // Act
-                const response = await global.superAgent
+                const response = await superAgent
                     .post(LOGIN_ENDPOINT)
                     .set(generateDeviceUUIDHeader())
                     .send(credentials);
@@ -183,7 +183,7 @@ describe('#INTERGRATION', () => {
                     await createApplicationUser(credentials);
 
                     // Act
-                    const response = await global.superAgent
+                    const response = await superAgent
                         .post(LOGIN_ENDPOINT)
                         .set(generateDeviceUUIDHeader())
                         .send(credentials);
@@ -208,8 +208,8 @@ describe('#INTERGRATION', () => {
                 const loginResponse = await login(credentials);
 
                 // Act
-                const response = await global.superAgent
-                    .get(getUri(`${Constants.Endpoints.SESSIONS}/${Constants.Endpoints.USERS_SESSIONS}`))
+                const response = await superAgent
+                    .get(getUri(`${ Constants.Endpoints.SESSIONS }/${ Constants.Endpoints.USERS_SESSIONS }`))
                     .set(loginResponse.headers)
                     .send(credentials);
 
@@ -220,7 +220,7 @@ describe('#INTERGRATION', () => {
     });
     describe('Logout', () => {
         function logout(headers) {
-            return global.superAgent
+            return superAgent
                 .post(LOGUT_ENDPOINT)
                 .set(headers);
         }
@@ -248,8 +248,8 @@ describe('#INTERGRATION', () => {
             const response = await logout(loginResponse.headers);
 
             // Assert
-            const sessions = await global.superAgent
-                .get(getUri(`${Constants.Endpoints.SESSIONS}/${Constants.Endpoints.USERS_SESSIONS}`))
+            const sessions = await superAgent
+                .get(getUri(`${ Constants.Endpoints.SESSIONS }/${ Constants.Endpoints.USERS_SESSIONS }`))
                 .set(loginResponse.headers)
                 .send(credentials);
             expect(AppUtils.lastElement(sessions.body.data.list).active).toBeFalsy();
@@ -258,7 +258,7 @@ describe('#INTERGRATION', () => {
     });
     describe('Refresh Token', () => {
         function refreshToken(payload, headers) {
-            return global.superAgent
+            return superAgent
                 .post(REFRESH_TOKEN)
                 .set(headers)
                 .send(payload);
@@ -268,7 +268,7 @@ describe('#INTERGRATION', () => {
             const payload = createRefreshToken('token.token.token', 'token.token.token');
 
             // Act
-            const response = await global.superAgent
+            const response = await superAgent
                 .post(REFRESH_TOKEN)
                 .set({})
                 .send(payload);
@@ -287,7 +287,7 @@ describe('#INTERGRATION', () => {
                 { desc: undefined, token: 'token.token.token', refreshToken: undefined, type: 'refresh token' },
             ])
             ('WILL return failure bad request result WHEN...', (object) => {
-                test(`the ${object.type} has wrong format like ${object.desc}`, async () => {
+                test(`the ${ object.type } has wrong format like ${ object.desc }`, async () => {
                     // Arrange
                     const payload = createRefreshToken(object.token);
 
@@ -303,7 +303,7 @@ describe('#INTERGRATION', () => {
             const payload = createRefreshToken();
 
             // Act
-            const response = await global.superAgent
+            const response = await superAgent
                 .post(REFRESH_TOKEN)
                 .set(generateDeviceUUIDHeader())
                 .send(payload);
@@ -324,13 +324,13 @@ describe('#INTERGRATION', () => {
                 );
 
                 // Act
-                const response = await global.superAgent
+                const response = await superAgent
                     .post(REFRESH_TOKEN)
                     .set(loginResponse.headers)
                     .send(payload);
 
-                const sessionResponse = await global.superAgent
-                    .get(getUri(`${Constants.Endpoints.SESSIONS}/${Constants.Endpoints.USERS_SESSIONS}`))
+                const sessionResponse = await superAgent
+                    .get(getUri(`${ Constants.Endpoints.SESSIONS }/${ Constants.Endpoints.USERS_SESSIONS }`))
                     .set(loginResponse.headers)
                     .send(credentials);
 
@@ -343,7 +343,7 @@ describe('#INTERGRATION', () => {
         describe.each
             ([{ type: 'token', exp: 6 }, { type: 'refreshToken', exp: 12 }])
             ('WILL return WHEN request succeed', (value) => {
-                test(`New ${value.type}`, async () => {
+                test(`New ${ value.type }`, async () => {
                     // Arrange
                     const credentials = createCredentials();
                     await createApplicationUser(credentials);
@@ -357,7 +357,7 @@ describe('#INTERGRATION', () => {
                     expect(await tokenService.decodeToken(response.body.data[value.type])).toBeDefined();
                     expect(response.ok).toBeTruthy();
                 });
-                test(`with ${value.exp} hours exp time`, async () => {
+                test(`with ${ value.exp } hours exp time`, async () => {
                     // Arrange
                     const credentials = createCredentials();
                     await createApplicationUser(credentials);
