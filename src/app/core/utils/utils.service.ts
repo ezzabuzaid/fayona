@@ -6,6 +6,45 @@ export type Parameter<T extends (args: any) => any> = T extends (args: infer P) 
 
 export class AppUtils {
 
+    static duration(minutes: number) {
+        const date = new Date();
+        date.setMinutes(date.getMinutes() + minutes);
+        return date.getTime();
+    }
+
+    /**
+     * Convert numeric days to seconds
+     *
+     * @param days number of days to convert
+     */
+    static daysToSeconds(days: number) {
+        const d = new Date();
+        const a = new Date();
+        a.setDate(a.getDate() + days);
+        return a.getTime() - d.getTime();
+    }
+
+    /**
+     * Check if the specicifed date elapsed the {maxAge}
+     *
+     * If max age not provided the current date will be used instead
+     *
+     * @param date the date to check
+     * @param maxAge default to current date
+     */
+    static isDateElapsed(date: number, maxAge = Date.now()) {
+        return date < Date.now() - maxAge;
+    }
+
+    /**
+     * check if the givin value is object literal
+     * 
+     * @param value the predecited value
+     */
+    static isObject(value: any): boolean {
+        return new Object(value) === value;
+    }
+
     /**
      *
      * @param functions Accept array of function to invoke in inverse order,
@@ -223,7 +262,7 @@ export class AppUtils {
         const template = Directories.getTemplate(templatePath);
         return template.match(/\{{(.*?)\}}/ig).reduce((acc, binding) => {
             const property = binding.substring(2, binding.length - 2);
-            return `${acc}${template.replace(/\{{(.*?)\}}/, object[property])}`;
+            return `${ acc }${ template.replace(/\{{(.*?)\}}/, object[property]) }`;
         }, '');
     }
 
