@@ -10,9 +10,9 @@ import { PortalHelper } from './portal.helper';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { ApplicationConstants } from '@core/constants';
 import { sessionsService } from '@api/sessions/sessions.service';
-import { IsString, IsNotEmpty, IsJWT, IsInt, isString } from 'class-validator';
+import { IsString, IsNotEmpty, IsJWT } from 'class-validator';
 import { scheduleJob } from 'node-schedule';
-import { validate, EmailValidator } from '@shared/common';
+import { validate, EmailValidator, TokenValidator } from '@shared/common';
 import { tokenService, IRefreshTokenClaim } from '@shared/identity';
 import { Responses, SuccessResponse } from '@core/response';
 
@@ -226,9 +226,9 @@ export class PortalRoutes {
         res.status(response.code).json(response);
     }
 
-    @Get(Constants.Endpoints.VERIFY_EMAIL)
+    @Get(Constants.Endpoints.VERIFY_EMAIL, validate(TokenValidator, 'query'))
     public async updateUserEmailVerification(req: Request, res: Response) {
-        const { token } = req.query;
+        const { token } = cast<TokenValidator>(req.query);
         const decodedToken = await tokenService.decodeToken(token);
         const result = await usersService.updateById(decodedToken.id, { emailVerified: true });
         if (result.hasError) {

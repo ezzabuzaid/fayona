@@ -23,7 +23,7 @@ export class Repo<T> {
         query?: Query<T>,
         options: Partial<IReadOptions<T>> = {}
     ) {
-        return this.model.find(query as any, {}, options);
+        return this.model.find(query as any, {}, options as any);
     }
 
     public fetchById(id: PrimaryKey) {
