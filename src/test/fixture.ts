@@ -16,7 +16,7 @@ export function generateDeviceUUIDHeader() {
 }
 
 export function getUri(value: string) {
-    return `/api/${value}`;
+    return `/api/${ value }`;
 }
 
 export async function prepareUserSession(user?: WithMongoID<CredentialsPayload>) {
@@ -39,7 +39,7 @@ export async function prepareUserSession(user?: WithMongoID<CredentialsPayload>)
 
     const deviceUUIDHeader = generateDeviceUUIDHeader();
     const loginResponse = await global.superAgent
-        .post(getUri(`${Constants.Endpoints.PORTAL}/${Constants.Endpoints.LOGIN}`))
+        .post(getUri(`${ Constants.Endpoints.PORTAL }/${ Constants.Endpoints.LOGIN }`))
         .set(deviceUUIDHeader)
         .send(payload);
 
@@ -80,7 +80,7 @@ export class UserFixture {
 }
 
 export function generatePhoneNumber(dialCode = 962) {
-    return `+${dialCode}792${Math.floor(Math.random() * 899999 + 100000)}`;
+    return `+${ dialCode }792${ Math.floor(Math.random() * 899999 + 100000) }`;
 }
 
 export function generateUsername() {
@@ -114,7 +114,7 @@ export async function createApplicationUser(payload: Partial<UsersSchema> = null
 export async function login(credentials: CredentialsPayload, headers = generateDeviceUUIDHeader()) {
 
     const { body: { data } } = await global.superAgent
-        .post(getUri(`${Constants.Endpoints.PORTAL}/${Constants.Endpoints.LOGIN}`))
+        .post(getUri(`${ Constants.Endpoints.PORTAL }/${ Constants.Endpoints.LOGIN }`))
         .set(headers)
         .send(credentials);
 
