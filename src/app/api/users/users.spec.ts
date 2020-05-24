@@ -1,4 +1,4 @@
-import { generatePhoneNumber, generateUsername, UserFixture, getUri, prepareUserSession } from '@test/fixture';
+import { generatePhoneNumber, generateUsername, UserFixture, getUri } from '@test/fixture';
 import { NetworkStatus, Constants } from '@core/helpers';
 import * as faker from 'faker';
 import { Roles } from '@shared/identity';

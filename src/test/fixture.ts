@@ -1,13 +1,14 @@
 import { Constants } from '@core/helpers';
 import { UsersSchema } from '@api/users';
 import { Payload, WithMongoID } from '@lib/mongoose';
-import * as faker from 'faker';
 import { ValidationPatterns } from '@shared/common';
 import { ApplicationConstants } from '@core/constants';
 import { AppUtils } from '@core/utils';
 import { CredentialsPayload } from '@api/portal';
 import { tokenService } from '@shared/identity';
+import * as faker from 'faker';
 import { SignOptions } from 'jsonwebtoken';
+import { Types } from 'mongoose';
 
 export function generateDeviceUUIDHeader() {
     return {
@@ -94,11 +95,10 @@ export function generateExpiredToken() {
 }
 
 export function generateToken(options: SignOptions = {}) {
-    return tokenService.generateToken({ id: AppUtils.generateAlphabeticString() as any }, options);
+    return tokenService.generateToken({ id: new Types.ObjectId() }, options);
 }
 export async function createApplicationUser(payload: Partial<UsersSchema> = null) {
-    const response = await global
-        .superAgent
+    const response = await global.superAgent
         .post(getUri(Constants.Endpoints.USERS))
         .set(generateDeviceUUIDHeader())
         .send({
