@@ -1,4 +1,4 @@
-import { Constants, Responses } from '@core/helpers';
+import { Constants } from '@core/helpers';
 import { identity, tokenService } from '@shared/identity';
 import { CrudRouter } from '@shared/crud';
 import { FoldersSchema } from '..';
@@ -7,6 +7,7 @@ import { Get, Post, Router } from '@lib/restful';
 import sharedFolderService from '../shared-folder/shared-folder.service';
 import { NameValidator, validate } from '@shared/common';
 import { Request } from 'express';
+import { Responses } from '@core/response';
 
 @Router(Constants.Endpoints.FOLDERS, {
     middleware: [identity.isAuthenticated()],

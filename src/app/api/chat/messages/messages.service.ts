@@ -1,7 +1,7 @@
 import { CrudService, Repo, IReadAllOptions, WriteResult } from '@shared/crud';
 import messagesModel, { MessagesSchema } from './messages.model';
 import { PrimaryKey, Payload } from '@lib/mongoose';
-import { Result } from '@core/helpers';
+import { Result } from '@core/response';
 
 export class MessagesService extends CrudService<MessagesSchema> {
     constructor() {

@@ -11,7 +11,7 @@ class Envirnoment {
     public load(env?: StageLevel) {
         let envPath = '.env';
         if (AppUtils.not(stage.production) && AppUtils.notNullOrUndefined(env)) {
-            envPath = `${envPath}.${env}`;
+            envPath = `${ envPath }.${ env }`;
         }
         log.warn(envPath);
         const { error, parsed } = envConfig({ path: join(__dirname, envPath) });
@@ -29,8 +29,8 @@ class Envirnoment {
 
     public set(envKey: string, value: string) {
         const key = this.env[envKey];
-        if (!key) {
-            log.warn(`you're about adding a new key to the environment ${envKey}`);
+        if (AppUtils.notNullOrUndefined(key)) {
+            log.warn(`you're about adding a new key to the environment ${ envKey }`);
         }
         this.env[envKey] = value;
         return value;

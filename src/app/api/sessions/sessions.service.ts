@@ -2,7 +2,7 @@ import { Repo, CrudService, Query } from '@shared/crud';
 import sessionsModel, { SessionSchema, } from './sessions.model';
 import { Document, Payload, WithMongoID, ForeignKey } from '@lib/mongoose';
 import { Omit } from '@core/utils';
-import { Result } from '@core/helpers';
+import { Result } from '@core/response';
 
 export class SessionsService extends CrudService<SessionSchema> {
 

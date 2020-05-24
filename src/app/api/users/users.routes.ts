@@ -1,16 +1,17 @@
 import { CrudRouter, Pagination } from '@shared/crud';
 import usersService, { UserService } from './users.service';
-import { Constants, Responses, SuccessResponse } from '@core/helpers';
+import { Constants } from '@core/helpers';
 import { Router, Post, Get } from '@lib/restful';
 import { UsersSchema } from './users.model';
 import { Request } from 'express';
-import { cast } from '@core/utils';
+import { cast, StopWatch } from '@core/utils';
 import { identity } from '@shared/identity';
 import { validate } from '@shared/common';
 import { IsString, IsOptional } from 'class-validator';
 import { AccountsRouter } from '@api/profiles';
 import { EmailService } from '@shared/email';
 import { NodeServer } from 'app/server';
+import { Responses, SuccessResponse } from '@core/response';
 class UsernameValidator extends Pagination {
     @IsOptional()
     @IsString()
@@ -28,12 +29,16 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
 
     @Post()
     public async create(req: Request) {
+        const stopwatch = new StopWatch();
+        stopwatch.start();
         const payload = cast<UsersSchema>(req.body);
         const result = await this.service.create(payload);
         if (result.hasError) {
             return new Responses.BadRequest(result.message);
         }
         EmailService.sendVerificationEmail(NodeServer.serverUrl(req), payload.email, result.data._id);
+        stopwatch.start();
+        stopwatch.printElapsed();
         return new SuccessResponse(result.data, 'An e-mail has been sent to your email inbox in order to verify the account');
     }
 

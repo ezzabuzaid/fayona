@@ -1,4 +1,4 @@
-import { Constants, Responses, HashService, SuccessResponse } from '@core/helpers';
+import { Constants, HashService } from '@core/helpers';
 import { Post, Router, Get } from '@lib/restful';
 import { Request, Response } from 'express';
 import usersService from '@api/users/users.service';
@@ -14,6 +14,7 @@ import { IsString, IsNotEmpty, IsJWT, IsInt, isString } from 'class-validator';
 import { scheduleJob } from 'node-schedule';
 import { validate, EmailValidator } from '@shared/common';
 import { tokenService, IRefreshTokenClaim } from '@shared/identity';
+import { Responses, SuccessResponse } from '@core/response';
 
 class Pincode {
     public ttl = AppUtils.duration(5);

@@ -1,5 +1,5 @@
 import { Router, Post, Get } from '@lib/restful';
-import { Constants, Responses } from '@core/helpers';
+import { Constants } from '@core/helpers';
 import { CrudRouter, Pagination } from '@shared/crud';
 import { RoomSchema } from './rooms.model';
 import roomsService, { RoomsService } from './rooms.service';
@@ -11,6 +11,7 @@ import messagesService from '@api/chat/messages/messages.service';
 import membersService from '@api/chat/members/members.service';
 import { PrimaryKey } from '@lib/mongoose';
 import { identity, tokenService } from '@shared/identity';
+import { Responses } from '@core/response';
 
 class RoomPayload {
     @ArrayMinSize(1, { message: 'a room should at least contain two member' }) public members: PrimaryKey[] = null;

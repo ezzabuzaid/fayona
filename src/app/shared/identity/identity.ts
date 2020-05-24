@@ -1,4 +1,4 @@
-import { Responses, Result } from '@core/helpers';
+import { Responses, Result } from '@core/response';
 import { Logger, AppUtils } from '@core/utils';
 import { NextFunction, Request, Response } from 'express';
 import { sessionsService } from '@api/sessions/sessions.service';

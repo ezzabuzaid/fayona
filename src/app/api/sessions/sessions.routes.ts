@@ -1,7 +1,7 @@
 import { SessionSchema } from './sessions.model';
 import { Request } from 'express';
 import { Get, Router, Patch } from '@lib/restful';
-import { Constants, Responses } from '@core/helpers';
+import { Constants } from '@core/helpers';
 import { CrudRouter } from '../../shared/crud';
 import { sessionsService, SessionsService } from './sessions.service';
 import { validate, PayloadValidator } from '@shared/common';
@@ -9,6 +9,7 @@ import { IsMongoId } from 'class-validator';
 import { cast } from '@core/utils';
 import { ForeignKey, PrimaryKey } from '@lib/mongoose';
 import { identity, tokenService } from '@shared/identity';
+import { Responses } from '@core/response';
 
 export class DeactivateSessionPayload extends PayloadValidator {
 

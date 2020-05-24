@@ -1,4 +1,4 @@
-import { ErrorResponse } from '@core/helpers';
+import { ErrorResponse } from '@core/response';
 import { Logger } from '@core/utils';
 import { translate } from '@lib/translation';
 import { NextFunction, Request, Response } from 'express';
@@ -34,10 +34,10 @@ export class ErrorHandling {
         errorTypes.map((type: any) => {
             process.on(type, async () => {
                 try {
-                    log.info(`process.on ${type}`);
+                    log.info(`process.on ${ type }`);
                     process.exit(0);
                 } catch (_) {
-                    log.warn(`process killed because of ${type}`);
+                    log.warn(`process killed because of ${ type }`);
                     process.exit(1);
                 }
             });
@@ -46,9 +46,9 @@ export class ErrorHandling {
         signalTraps.map((type: any) => {
             process.once(type, async () => {
                 try {
-                    log.info(`process.on ${type}`);
+                    log.info(`process.on ${ type }`);
                 } finally {
-                    log.warn(`process killed because of ${type}`);
+                    log.warn(`process killed because of ${ type }`);
                     process.kill(process.pid, type);
                 }
             });
@@ -104,7 +104,7 @@ export class ErrorHandling {
 
     public static notFound(req: Request, res: Response) {
         const error = new ErrorResponse(
-            `${req.originalUrl} => ${translate('endpoint_not_found')}`, NetworkStatus.NOT_FOUND
+            `${ req.originalUrl } => ${ translate('endpoint_not_found') }`, NetworkStatus.NOT_FOUND
         );
         return res.status(error.code).json(error);
     }
