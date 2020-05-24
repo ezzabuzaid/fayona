@@ -10,10 +10,22 @@ import { PortalHelper } from './portal.helper';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { ApplicationConstants } from '@core/constants';
 import { sessionsService } from '@api/sessions/sessions.service';
-import { IsString, IsNotEmpty, IsJWT } from 'class-validator';
+import { IsString, IsNotEmpty, IsJWT, IsInt, isString } from 'class-validator';
 import { scheduleJob } from 'node-schedule';
 import { validate, EmailValidator } from '@shared/common';
 import { tokenService, IRefreshTokenClaim } from '@shared/identity';
+
+class Pincode {
+    public ttl = AppUtils.duration(5);
+    constructor(
+        public pincode: string
+    ) { }
+}
+
+/**
+ * a Map consist of key-value pair of user id and pincode
+ */
+const pincodes = new Map<string, Pincode>();
 
 export class AccountVerifiedPayload {
     @IsNotEmpty()
@@ -46,6 +58,12 @@ export class RefreshTokenPayload {
     @IsString()
     @IsJWT()
     public refreshToken: string = null;
+}
+
+export class PincodeValidator extends EmailValidator {
+    @IsNotEmpty()
+    @IsString()
+    pincode: string = null;
 }
 
 export class DeviceUUIDHeaderValidator {
@@ -170,6 +188,33 @@ export class PortalRoutes {
         }
     }
 
+    @Post(Constants.Endpoints.SEND_RESET_PINCODE_EMAIL, validate(EmailValidator))
+    public async sendResetPasswordEmail(req: Request) {
+        const { email } = req.body;
+        const result = await usersService.one({ email });
+        if (result.hasError) {
+            return new Responses.BadRequest('It appears the email is not registerd before');
+        }
+        const pincode = PortalHelper.generatePinCode();
+        pincodes.set(email, new Pincode(pincode));
+        EmailService.sendPincodeEmail(result.data.email, pincode);
+        return new SuccessResponse('An e-mail sent to your inbox with additional information');
+    }
+
+    @Post(Constants.Endpoints.CHECK_PINCODE, validate(PincodeValidator))
+    public async checkPincode(req: Request) {
+        const payload = cast<PincodeValidator>(req.body);
+        const expectedPincode = pincodes.get(payload.email);
+        if (
+            expectedPincode &&
+            !AppUtils.isDateElapsed(expectedPincode.ttl)
+            && payload.pincode === expectedPincode.pincode
+        ) {
+            return new Responses.Ok(null);
+        }
+        return new Responses.BadRequest('Wrong pincode, please try again');
+    }
+
     @Post(Constants.Endpoints.RESET_PASSWORD)
     public async resetPassword(req: Request, res: Response) {
         const { password } = req.body as Payload<UsersSchema>;
@@ -178,22 +223,6 @@ export class PortalRoutes {
         const response = new Responses.Ok(null);
         await EmailService.sendEmail(fakeEmail());
         res.status(response.code).json(response);
-    }
-
-    @Post('sendresetpasswordemail', validate(EmailValidator))
-    public async sendResetPasswordEmail(req: Request) {
-        const { email } = req.body;
-        const result = await usersService.one({ email });
-        if (result.hasError) {
-            return new Responses.BadRequest('It appears the email is not registerd before');
-        }
-        EmailService.sendPincodeEmail(
-            process.env.CLIENT_RESETPASSWORD_URL,
-            result.data.email,
-            result.data.id,
-            PortalHelper.generatePinCode()
-        );
-        return new SuccessResponse('An e-mail sent to your inbox with additional information');
     }
 
     @Get(Constants.Endpoints.VERIFY_EMAIL)
@@ -209,6 +238,7 @@ export class PortalRoutes {
 
 }
 
+// TODO remove expired pincodes
 scheduleJob('30 * * * *', async () => {
     const sessions = await sessionsService.getAllActiveSession();
     sessions.data.list.forEach((session) => {

@@ -12,8 +12,10 @@ export namespace Constants {
         public static readonly FORGET_PASSWORD = 'forgetpassword';
         public static readonly RESET_PASSWORD = 'resetpassword';
         public static readonly REFRESH_TOKEN = 'refreshtoken';
-        public static readonly ACCOUNT_VERIFIED = 'accountverified';
+        public static readonly SEND_RESET_PINCODE_EMAIL = 'sendresetpasswordemail';
+        public static readonly ACCOUNT_VERIFIED = 'checkaccountverification';
         public static readonly VERIFY_EMAIL = 'verifyemail';
+        public static readonly CHECK_PINCODE = 'checkpincode';
         public static readonly ROOMS = 'rooms';
         public static readonly MEMBERS = 'members';
         public static readonly UPLOADS = 'uploads';

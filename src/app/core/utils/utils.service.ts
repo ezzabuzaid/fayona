@@ -38,7 +38,7 @@ export class AppUtils {
 
     /**
      * check if the givin value is object literal
-     * 
+     *
      * @param value the predecited value
      */
     static isObject(value: any): boolean {
