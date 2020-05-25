@@ -21,6 +21,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "importHelpers": true,
+    "strictBindCallApply": true,
     "noEmitHelpers": true,
     "resolveJsonModule": true,
     "paths": {
@@ -57,6 +58,12 @@
       "jest"
     ]
   },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "src/**/*.spec.ts"
+  ],
   "typedocOptions": {
     "mode": "modules",
     "out": "docs",

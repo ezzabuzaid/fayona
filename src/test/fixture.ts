@@ -30,7 +30,7 @@ export async function prepareUserSession(user?: WithMongoID<CredentialsPayload>)
 
     let user_id = null;
     if (AppUtils.isFalsy(user)) {
-        const { body: { data: { id } } } = await global.superAgent
+        const { body: { data: { id } } } = await global['superAgent']
             .post(getUri(Constants.Endpoints.USERS))
             .send(payload);
         user_id = id;
@@ -39,7 +39,7 @@ export async function prepareUserSession(user?: WithMongoID<CredentialsPayload>)
     }
 
     const deviceUUIDHeader = generateDeviceUUIDHeader();
-    const loginResponse = await global.superAgent
+    const loginResponse = await global['superAgent']
         .post(getUri(`${ Constants.Endpoints.PORTAL }/${ Constants.Endpoints.LOGIN }`))
         .set(deviceUUIDHeader)
         .send(payload);
@@ -63,7 +63,7 @@ export class UserFixture {
     };
 
     public async createUser(paylod: Partial<Payload<UsersSchema>> = {}) {
-        const response = await global.superAgent
+        const response = await global['superAgent']
             .post(getUri(Constants.Endpoints.USERS))
             .set(generateDeviceUUIDHeader())
             .send({
@@ -97,7 +97,7 @@ export function generateToken(options: SignOptions = {}) {
     return tokenService.generateToken({ id: new Types.ObjectId() }, options);
 }
 export async function createApplicationUser(payload: Partial<UsersSchema> = null) {
-    const response = await global.superAgent
+    const response = await global['superAgent']
         .post(getUri(Constants.Endpoints.USERS))
         .set(generateDeviceUUIDHeader())
         .send({
@@ -112,7 +112,7 @@ export async function createApplicationUser(payload: Partial<UsersSchema> = null
 
 export async function login(credentials: CredentialsPayload, headers = generateDeviceUUIDHeader()) {
 
-    const { body: { data } } = await global.superAgent
+    const { body: { data } } = await global['superAgent']
         .post(getUri(`${ Constants.Endpoints.PORTAL }/${ Constants.Endpoints.LOGIN }`))
         .set(headers)
         .send(credentials);

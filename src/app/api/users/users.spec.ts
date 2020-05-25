@@ -4,7 +4,7 @@ import * as faker from 'faker';
 import { Roles } from '@shared/identity';
 const USER_SESSION_ENDPOINT = getUri(`${ Constants.Endpoints.USERS }/${ Constants.Endpoints.SEARCH }`);
 
-xdescribe('[INTERGRATION]', () => {
+describe('[INTERGRATION]', () => {
 
     describe('#CREATE USER', () => {
 

@@ -10,7 +10,7 @@ import { validate } from '@shared/common';
 import { IsString, IsOptional } from 'class-validator';
 import { AccountsRouter } from '@api/profiles';
 import { EmailService } from '@shared/email';
-import { NodeServer } from 'app/server';
+import { NodeServer } from '../../server';
 import { Responses, SuccessResponse } from '@core/response';
 class UsernameValidator extends Pagination {
     @IsOptional()
