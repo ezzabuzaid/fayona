@@ -6,6 +6,10 @@ export type Parameter<T extends (args: any) => any> = T extends (args: infer P) 
 
 export class AppUtils {
 
+    static enumValues(enums) {
+        return Object.keys(enums).filter(_ => !isNaN(+_)).map(_ => +_);
+    }
+
     static duration(minutes: number) {
         const date = new Date();
         date.setMinutes(date.getMinutes() + minutes);

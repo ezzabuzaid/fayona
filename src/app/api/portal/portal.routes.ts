@@ -1,20 +1,20 @@
-import { Constants, HashService } from '@core/helpers';
-import { Post, Router, Get } from '@lib/restful';
-import { Request, Response } from 'express';
-import usersService from '@api/users/users.service';
-import { UsersSchema } from '@api/users';
-import { Payload, PrimaryKey } from '@lib/mongoose';
-import { EmailService, fakeEmail } from '@shared/email';
-import { AppUtils, cast } from '@core/utils';
-import { PortalHelper } from './portal.helper';
-import { TokenExpiredError } from 'jsonwebtoken';
-import { ApplicationConstants } from '@core/constants';
 import { sessionsService } from '@api/sessions/sessions.service';
-import { IsString, IsNotEmpty, IsJWT } from 'class-validator';
-import { scheduleJob } from 'node-schedule';
-import { validate, EmailValidator, TokenValidator } from '@shared/common';
-import { tokenService, IRefreshTokenClaim } from '@shared/identity';
+import { UsersSchema } from '@api/users';
+import usersService from '@api/users/users.service';
+import { ApplicationConstants } from '@core/constants';
+import { Constants, HashService } from '@core/helpers';
 import { Responses, SuccessResponse } from '@core/response';
+import { AppUtils, cast } from '@core/utils';
+import { Payload, PrimaryKey } from '@lib/mongoose';
+import { Get, Post, Router } from '@lib/restful';
+import { TokenValidator, validate } from '@shared/common';
+import { EmailService, fakeEmail } from '@shared/email';
+import { IRefreshTokenClaim, tokenService } from '@shared/identity';
+import { IsEmail, IsIn, IsJWT, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Request, Response } from 'express';
+import { TokenExpiredError } from 'jsonwebtoken';
+import { scheduleJob } from 'node-schedule';
+import { PortalHelper } from './portal.helper';
 
 class Pincode {
     public ttl = AppUtils.duration(5);
@@ -28,7 +28,29 @@ class Pincode {
  */
 const pincodes = new Map<string, Pincode>();
 
-export class AccountVerifiedPayload {
+export class SendPincodeValidator {
+    @IsString()
+    @IsNotEmpty()
+    @IsOptional()
+    mobile: string = null;
+
+    @IsEmail()
+    @IsOptional()
+    email: string = null;
+
+    @IsString()
+    @IsNotEmpty()
+    @IsIn(['email', 'sms'])
+    type: 'email' | 'sms' = null;
+}
+
+export class CheckPincodeValidator extends SendPincodeValidator {
+    @IsNotEmpty()
+    @IsString()
+    pincode: string = null;
+}
+
+export class AccountVerificationPayload {
     @IsNotEmpty()
     @IsString()
     username: string = null;
@@ -60,13 +82,6 @@ export class RefreshTokenPayload {
     @IsJWT()
     public refreshToken: string = null;
 }
-
-export class PincodeValidator extends EmailValidator {
-    @IsNotEmpty()
-    @IsString()
-    pincode: string = null;
-}
-
 export class DeviceUUIDHeaderValidator {
     @IsString()
     public [ApplicationConstants.deviceIdHeader] = null;
@@ -168,10 +183,10 @@ export class PortalRoutes {
 
     @Post(
         Constants.Endpoints.ACCOUNT_VERIFIED,
-        validate(AccountVerifiedPayload, 'body', 'Please make sure you have entered the correct information payload.')
+        validate(AccountVerificationPayload, 'body', 'Please make sure you have entered the correct information payload.')
     )
     public async accountVerifed(req: Request) {
-        const payload = cast<AccountVerifiedPayload>(req.body);
+        const payload = cast<AccountVerificationPayload>(req.body);
         const result = await usersService.one({
             'username': payload.username,
             'profile.firstName': payload.firstName,
@@ -189,28 +204,44 @@ export class PortalRoutes {
         }
     }
 
-    @Post(Constants.Endpoints.SEND_RESET_PINCODE_EMAIL, validate(EmailValidator))
-    public async sendResetPasswordEmail(req: Request) {
-        const { email } = req.body;
-        const result = await usersService.one({ email });
-        if (result.hasError) {
-            return new Responses.BadRequest('It appears the email is not registerd before');
-        }
+    @Post(Constants.Endpoints.SEND_PINCODE, validate(SendPincodeValidator))
+    public async sendPincode(req: Request) {
+        const { email, mobile, type } = cast<SendPincodeValidator>(req.body);
         const pincode = PortalHelper.generatePinCode();
-        pincodes.set(email, new Pincode(pincode));
-        EmailService.sendPincodeEmail(result.data.email, pincode);
-        return new SuccessResponse('An e-mail sent to your inbox with additional information');
+        if (type === 'email') {
+            const result = await usersService.one({ email });
+            if (AppUtils.not(result.hasError)) {
+                pincodes.set(email, new Pincode(pincode));
+                EmailService.sendPincodeEmail(email, pincode);
+            }
+            return new SuccessResponse('An e-mail sent to your inbox with additional information');
+        } else {
+            const result = await usersService.one({ mobile });
+            if (AppUtils.not(result.hasError)) {
+                pincodes.set(mobile, new Pincode(pincode));
+                // Send sms
+            }
+            return new SuccessResponse('A SMS message sent to your mobile with additional information');
+        }
+
+        // No error handling if the user is not exist
     }
 
-    @Post(Constants.Endpoints.CHECK_PINCODE, validate(PincodeValidator))
+    @Post(Constants.Endpoints.CHECK_PINCODE, validate(CheckPincodeValidator))
     public async checkPincode(req: Request) {
-        const payload = cast<PincodeValidator>(req.body);
-        const expectedPincode = pincodes.get(payload.email);
+        const payload = cast<CheckPincodeValidator>(req.body);
+        let expectedPincode: Pincode = null;
+        if (payload.type === 'email') {
+            expectedPincode = pincodes.get(payload.email);
+        } else {
+            expectedPincode = pincodes.get(payload.mobile);
+        }
         if (
-            expectedPincode &&
-            !AppUtils.isDateElapsed(expectedPincode.ttl)
+            expectedPincode
+            && !AppUtils.isDateElapsed(expectedPincode.ttl)
             && payload.pincode === expectedPincode.pincode
         ) {
+            pincodes.delete(payload.type === 'email' ? payload.email : payload.mobile);
             return new Responses.Ok(null);
         }
         return new Responses.BadRequest('Wrong pincode, please try again');

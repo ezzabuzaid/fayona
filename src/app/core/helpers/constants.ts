@@ -12,14 +12,15 @@ export namespace Constants {
         public static readonly FORGET_PASSWORD = 'forgetpassword';
         public static readonly RESET_PASSWORD = 'resetpassword';
         public static readonly REFRESH_TOKEN = 'refreshtoken';
-        public static readonly SEND_RESET_PINCODE_EMAIL = 'sendresetpasswordemail';
+        public static readonly SEND_PINCODE = 'sendpincode';
+        public static readonly CHECK_PINCODE = 'checkpincode';
         public static readonly ACCOUNT_VERIFIED = 'checkaccountverification';
         public static readonly VERIFY_EMAIL = 'verifyemail';
-        public static readonly CHECK_PINCODE = 'checkpincode';
         public static readonly ROOMS = 'rooms';
         public static readonly MEMBERS = 'members';
         public static readonly UPLOADS = 'uploads';
         public static readonly FOLDERS = 'folders';
+        public static readonly advertisement = 'advertisement';
     }
     export class Schemas {
         public static readonly Feedback = 'feedback';
@@ -32,5 +33,6 @@ export namespace Constants {
         public static readonly FOLDERS = 'folders';
         public static readonly MESSAGES = 'messages';
         public static readonly SharedFolders = 'SharedFolders';
+        public static readonly advertisement = 'advertisement';
     }
 }

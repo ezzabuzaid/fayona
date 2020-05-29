@@ -11,6 +11,10 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
         const router = expressRouter(options);
         const instance = new constructor();
 
+        if (AppUtils.hasItemWithin(options.middleware)) {
+            router.use(wrapRoutes(...options.middleware));
+        }
+
         if (AppUtils.hasItemWithin(options.children)) {
             options.children.forEach((child) => {
                 const internal = child.__router();
@@ -32,10 +36,6 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
                     }
                 }
             });
-
-        if (AppUtils.hasItemWithin(options.middleware)) {
-            router.use(wrapRoutes(...options.middleware));
-        }
 
         return class extends constructor {
             constructor(...args) {
