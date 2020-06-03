@@ -7,10 +7,10 @@ import { Responses, SuccessResponse } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
 import { Payload, PrimaryKey } from '@lib/mongoose';
 import { Get, Post, Router } from '@lib/restful';
-import { TokenValidator, validate } from '@shared/common';
+import { TokenValidator, validate, PasswordValidator, PrimaryIDValidator } from '@shared/common';
 import { EmailService, fakeEmail } from '@shared/email';
 import { IRefreshTokenClaim, tokenService } from '@shared/identity';
-import { IsEmail, IsIn, IsJWT, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsIn, IsJWT, IsNotEmpty, IsOptional, IsString, IsMongoId } from 'class-validator';
 import { Request, Response } from 'express';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { scheduleJob } from 'node-schedule';
@@ -26,7 +26,7 @@ class Pincode {
 /**
  * a Map consist of key-value pair of user id and pincode
  */
-const pincodes = new Map<string, Pincode>();
+const pincodes = new Map<PrimaryKey, Pincode>();
 
 export class SendPincodeValidator {
     @IsString()
@@ -38,17 +38,25 @@ export class SendPincodeValidator {
     @IsOptional()
     email: string = null;
 
+    @IsMongoId() id: PrimaryKey = null;
+
     @IsString()
     @IsNotEmpty()
     @IsIn(['email', 'sms'])
     type: 'email' | 'sms' = null;
 }
 
-export class CheckPincodeValidator extends SendPincodeValidator {
+export class CheckPincodeValidator extends PrimaryIDValidator {
     @IsNotEmpty()
     @IsString()
     pincode: string = null;
 }
+
+// export class ResetPasswordValidator extends PrimaryIDValidator {
+//     @IsNotEmpty()
+//     @IsString()
+//     pincode: string = null;
+// }
 
 export class AccountVerificationPayload {
     @IsNotEmpty()
@@ -196,9 +204,9 @@ export class PortalRoutes {
         if (result.hasError) {
             return new Responses.BadRequest('Please make sure you have entered the correct information.');
         }
-        const { emailVerified, mobileVerified } = result.data;
+        const { emailVerified, mobileVerified, id } = result.data;
         if (emailVerified) {
-            return new Responses.Ok({ emailVerified, mobileVerified });
+            return new Responses.Ok({ emailVerified, mobileVerified, id });
         } else {
             return new Responses.BadRequest('You cannot reset you password because your account it not verified yet, please contact the adminstration for further actions');
         }
@@ -206,55 +214,66 @@ export class PortalRoutes {
 
     @Post(Constants.Endpoints.SEND_PINCODE, validate(SendPincodeValidator))
     public async sendPincode(req: Request) {
-        const { email, mobile, type } = cast<SendPincodeValidator>(req.body);
+        const { email, mobile, type, id } = cast<SendPincodeValidator>(req.body);
         const pincode = PortalHelper.generatePinCode();
         if (type === 'email') {
             const result = await usersService.one({ email });
             if (AppUtils.not(result.hasError)) {
-                pincodes.set(email, new Pincode(pincode));
                 EmailService.sendPincodeEmail(email, pincode);
             }
-            return new SuccessResponse('An e-mail sent to your inbox with additional information');
         } else {
             const result = await usersService.one({ mobile });
             if (AppUtils.not(result.hasError)) {
-                pincodes.set(mobile, new Pincode(pincode));
                 // Send sms
             }
-            return new SuccessResponse('A SMS message sent to your mobile with additional information');
         }
-
+        pincodes.set(id, new Pincode(pincode));
+        return new SuccessResponse(`${ type === 'email' ? 'An e-mail' : 'A SMS ' } message sent to your mobile with additional information`);
         // No error handling if the user is not exist
     }
 
     @Post(Constants.Endpoints.CHECK_PINCODE, validate(CheckPincodeValidator))
     public async checkPincode(req: Request) {
         const payload = cast<CheckPincodeValidator>(req.body);
-        let expectedPincode: Pincode = null;
-        if (payload.type === 'email') {
-            expectedPincode = pincodes.get(payload.email);
-        } else {
-            expectedPincode = pincodes.get(payload.mobile);
+        const expectedPincode = pincodes.get(payload.id);
+        const { wrong, expired } = this.comparePincode(payload.pincode, expectedPincode);
+        if (expired) {
+            return new Responses.BadRequest('Pincode is not valid anymore, please try again latter');
+        } else if (wrong) {
+            return new Responses.BadRequest('Wrong pincode, please try again');
         }
-        if (
-            expectedPincode
-            && !AppUtils.isDateElapsed(expectedPincode.ttl)
-            && payload.pincode === expectedPincode.pincode
-        ) {
-            pincodes.delete(payload.type === 'email' ? payload.email : payload.mobile);
-            return new Responses.Ok(null);
-        }
-        return new Responses.BadRequest('Wrong pincode, please try again');
+        return new Responses.Ok(null);
     }
 
-    @Post(Constants.Endpoints.RESET_PASSWORD)
+    private comparePincode(actuallPincode: string, expectedPincode: Pincode) {
+        return {
+            expired: AppUtils.isDateElapsed(expectedPincode?.ttl),
+            wrong: actuallPincode !== expectedPincode.pincode
+        };
+    }
+
+    @Post(
+        Constants.Endpoints.RESET_PASSWORD,
+        validate(PasswordValidator),
+        validate(CheckPincodeValidator),
+    )
     public async resetPassword(req: Request, res: Response) {
-        const { password } = req.body as Payload<UsersSchema>;
-        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        await usersService.updateById(decodedToken.id, { password });
-        const response = new Responses.Ok(null);
-        await EmailService.sendEmail(fakeEmail());
-        res.status(response.code).json(response);
+        const payload = cast<PasswordValidator & CheckPincodeValidator>(req.body);
+        const expectedPincode = pincodes.get(payload.id);
+        const { wrong, expired } = this.comparePincode(payload.pincode, expectedPincode);
+        if (expired) {
+            return new Responses.BadRequest('Pincode is not valid anymore, please try again later');
+        } else if (wrong) {
+            // if the pincode was wrong so he in wrong place so we need to redirect him away
+            this.redirectToLogin(res);
+        }
+        pincodes.delete(payload.id);
+        const result = await usersService.updateById(payload.id, { password: payload.password });
+        if (result.hasError) {
+            return new Responses.BadRequest('Please try again later');
+        }
+        await EmailService.sendResetPasswordEmail('user@email.com');
+        return new Responses.Ok(null);
     }
 
     @Get(Constants.Endpoints.VERIFY_EMAIL, validate(TokenValidator, 'query'))
@@ -265,6 +284,10 @@ export class PortalRoutes {
         if (result.hasError) {
             return new Responses.BadRequest('Please try again later');
         }
+        this.redirectToLogin(res);
+    }
+
+    private redirectToLogin(res) {
         res.redirect('http://localhost:4200/portal/login');
     }
 
@@ -281,16 +304,7 @@ scheduleJob('30 * * * *', async () => {
 });
 
 // TODO: Forget and reset password scenario
-// Enter a unique info like partial of profile info page 1
-// Security questions page 2
-// send an email with generated number to be entered later on in page 3
 // Lock the account after 3 times of trying
-// send an email to notify the user that the email is changed
 // Only previous registerd devices can be used to do forgot password;
-
-// REVIEW if anyone get the token can change the user password,
-// so we need to know that the user who really did that by answering a specifc questions, doing 2FA
-// the attempts should be limited to 3 times, after that he need to re do the process again,
-// if the procces faild 3 times, the account should be locked, and he need to call the support for that
 
 // TODO already used refresh token shouldn't be used again

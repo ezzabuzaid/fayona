@@ -24,7 +24,7 @@ export class UsersSchema {
         select: false,
         required: true,
         set(value: string) {
-            if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/.test(value)) {
+            if (ValidationPatterns.Password.test(value)) {
                 return HashService.hashSync(value);
             } else {
                 throw new Error('wrong_password');

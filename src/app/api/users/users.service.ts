@@ -1,7 +1,6 @@
 import usersModel, { UsersSchema, } from './users.model';
 import { CrudService, } from '@shared/crud/crud.service';
 import { Repo, Pagination } from '@shared/crud';
-import { EmailService } from '@shared/email';
 
 export class UserService extends CrudService<UsersSchema> {
     constructor() {

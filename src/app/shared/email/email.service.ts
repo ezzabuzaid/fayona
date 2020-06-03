@@ -32,8 +32,17 @@ export class EmailService {
         return EmailService.sendEmail({
             from: 'test@test.com',
             to: userEmail,
-            subject: 'Verify Email',
+            subject: 'Pincode Email',
             html: AppUtils.renderHTML('pincode-template', { pincode })
+        });
+    }
+
+    public static sendResetPasswordEmail(userEmail: string) {
+        return EmailService.sendEmail({
+            from: 'test@test.com',
+            to: userEmail,
+            subject: 'Reset password Email',
+            html: AppUtils.renderHTML('reset-password-template', { date: new Date().toLocaleDateString() })
         });
     }
 }
