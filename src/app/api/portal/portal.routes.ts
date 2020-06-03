@@ -1,16 +1,16 @@
 import { sessionsService } from '@api/sessions/sessions.service';
-import { UsersSchema } from '@api/users';
 import usersService from '@api/users/users.service';
 import { ApplicationConstants } from '@core/constants';
 import { Constants, HashService } from '@core/helpers';
 import { Responses, SuccessResponse } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
-import { Payload, PrimaryKey } from '@lib/mongoose';
+import { PrimaryKey } from '@lib/mongoose';
 import { Get, Post, Router } from '@lib/restful';
-import { TokenValidator, validate, PasswordValidator, PrimaryIDValidator } from '@shared/common';
-import { EmailService, fakeEmail } from '@shared/email';
-import { IRefreshTokenClaim, tokenService } from '@shared/identity';
-import { IsEmail, IsIn, IsJWT, IsNotEmpty, IsOptional, IsString, IsMongoId } from 'class-validator';
+import { PasswordValidator, PrimaryIDValidator, TokenValidator, validate } from '@shared/common';
+import { EmailService } from '@shared/email';
+import { identity, IRefreshTokenClaim, tokenService } from '@shared/identity';
+import { NodeServer } from 'app/server';
+import { IsEmail, IsIn, IsJWT, IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Request, Response } from 'express';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { scheduleJob } from 'node-schedule';
@@ -141,7 +141,7 @@ export class PortalRoutes {
             active: true,
             user: user.id
         });
-        return new Responses.Ok(new LoginDto(user.id, user.role, user.verified));
+        return new Responses.Ok(new LoginDto(user.id, user.role, user.emailVerified));
 
     }
 
@@ -180,7 +180,7 @@ export class PortalRoutes {
                     const { data: user } = await usersService.one({ _id: decodedRefreshToken.id });
 
                     await sessionsService.updateById(session.data.id, { updatedAt: new Date().toISOString() });
-                    return new Responses.Ok(new RefreshTokenDto(user.id, user.role, user.verified));
+                    return new Responses.Ok(new RefreshTokenDto(user.id, user.role, user.emailVerified));
                 }
             }
         } catch (error) {
@@ -265,7 +265,7 @@ export class PortalRoutes {
             return new Responses.BadRequest('Pincode is not valid anymore, please try again later');
         } else if (wrong) {
             // if the pincode was wrong so he in wrong place so we need to redirect him away
-            this.redirectToLogin(res);
+            res.redirect('http://localhost:4200/portal/login');
         }
         pincodes.delete(payload.id);
         const result = await usersService.updateById(payload.id, { password: payload.password });
@@ -284,11 +284,18 @@ export class PortalRoutes {
         if (result.hasError) {
             return new Responses.BadRequest('Please try again later');
         }
-        this.redirectToLogin(res);
+        res.redirect('http://localhost:4200/');
     }
 
-    private redirectToLogin(res) {
-        res.redirect('http://localhost:4200/portal/login');
+    @Get(Constants.Endpoints.SEND_Verification_EMAIL, identity.isAuthenticated())
+    public async sendVerificationEmail(req: Request) {
+        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
+        const result = await usersService.one({ _id: decodedToken.id });
+        if (result.hasError) {
+            return new Responses.BadRequest('Please try again later');
+        }
+        EmailService.sendVerificationEmail(NodeServer.serverUrl(req), result.data.email, result.data.id);
+        return new Responses.Ok('Email has been sent successfully');
     }
 
 }

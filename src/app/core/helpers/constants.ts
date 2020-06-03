@@ -16,6 +16,7 @@ export namespace Constants {
         public static readonly CHECK_PINCODE = 'checkpincode';
         public static readonly ACCOUNT_VERIFIED = 'checkaccountverification';
         public static readonly VERIFY_EMAIL = 'verifyemail';
+        public static readonly SEND_Verification_EMAIL = 'sendverificationemail';
         public static readonly ROOMS = 'rooms';
         public static readonly MEMBERS = 'members';
         public static readonly UPLOADS = 'uploads';

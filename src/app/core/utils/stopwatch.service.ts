@@ -29,7 +29,7 @@ export class StopWatch extends AppUtils.getTypeOf<typeof performance>(performanc
 
     public printElapsed(name?: string) {
         const currentName = name || 'Elapsed:';
-        console.log(currentName, '[' + this.getElapsedMilliseconds() + 'ms]', '[' + this.getElapsedSeconds() + 's]');
+        console.log(currentName, `[ ${ this.getElapsedMilliseconds() } ]`);
     }
 
 }
