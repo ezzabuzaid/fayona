@@ -21,6 +21,18 @@ class Pincode {
     constructor(
         public pincode: string
     ) { }
+
+    expired() {
+        return AppUtils.isDateElapsed(this.ttl);
+    }
+
+    notEqual(pincode: string) {
+        return !this.equal(pincode);
+    }
+
+    equal(pincode: string) {
+        return this.pincode === pincode;
+    }
 }
 
 /**
@@ -51,12 +63,6 @@ export class CheckPincodeValidator extends PrimaryIDValidator {
     @IsString()
     pincode: string = null;
 }
-
-// export class ResetPasswordValidator extends PrimaryIDValidator {
-//     @IsNotEmpty()
-//     @IsString()
-//     pincode: string = null;
-// }
 
 export class AccountVerificationPayload {
     @IsNotEmpty()
@@ -217,12 +223,12 @@ export class PortalRoutes {
         const { email, mobile, type, id } = cast<SendPincodeValidator>(req.body);
         const pincode = PortalHelper.generatePinCode();
         if (type === 'email') {
-            const result = await usersService.one({ email });
+            const result = await usersService.one({ email, _id: id });
             if (AppUtils.not(result.hasError)) {
                 EmailService.sendPincodeEmail(email, pincode);
             }
         } else {
-            const result = await usersService.one({ mobile });
+            const result = await usersService.one({ mobile, _id: id });
             if (AppUtils.not(result.hasError)) {
                 // Send sms
             }
@@ -236,20 +242,12 @@ export class PortalRoutes {
     public async checkPincode(req: Request) {
         const payload = cast<CheckPincodeValidator>(req.body);
         const expectedPincode = pincodes.get(payload.id);
-        const { wrong, expired } = this.comparePincode(payload.pincode, expectedPincode);
-        if (expired) {
-            return new Responses.BadRequest('Pincode is not valid anymore, please try again latter');
-        } else if (wrong) {
+        if (expectedPincode.expired()) {
+            return new Responses.BadRequest('Pincode is not valid anymore, please try again later');
+        } else if (expectedPincode.notEqual(payload.pincode)) {
             return new Responses.BadRequest('Wrong pincode, please try again');
         }
         return new Responses.Ok(null);
-    }
-
-    private comparePincode(actuallPincode: string, expectedPincode: Pincode) {
-        return {
-            expired: AppUtils.isDateElapsed(expectedPincode?.ttl),
-            wrong: actuallPincode !== expectedPincode.pincode
-        };
     }
 
     @Post(
@@ -260,10 +258,9 @@ export class PortalRoutes {
     public async resetPassword(req: Request, res: Response) {
         const payload = cast<PasswordValidator & CheckPincodeValidator>(req.body);
         const expectedPincode = pincodes.get(payload.id);
-        const { wrong, expired } = this.comparePincode(payload.pincode, expectedPincode);
-        if (expired) {
+        if (expectedPincode.expired()) {
             return new Responses.BadRequest('Pincode is not valid anymore, please try again later');
-        } else if (wrong) {
+        } else if (expectedPincode.notEqual(payload.pincode)) {
             // if the pincode was wrong so he in wrong place so we need to redirect him away
             res.redirect('http://localhost:4200/portal/login');
         }
