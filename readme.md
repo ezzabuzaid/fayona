@@ -5,7 +5,7 @@
 ### A small opinionated framework built on top of Express using Typescript with minimal 3rd party dependencies that helps to easily kick off most of the small and mid projects.
 DDD is the core of what it means, although not the whole concept is leveraged out, still, it looks like domain oriented
 
-Please consider following this project's author, [Ezz](https://github.com/ezzabuzaid), and consider starring the project to show your ❤️ and support.
+Don't forget to follow the project's author, [Ezz](https://github.com/ezzabuzaid), and consider starring the project to show your ❤️ and support.
 
 
 ![Sample Crud](https://media-exp1.licdn.com/dms/image/C4D22AQFXto7aXpbAfw/feedshare-shrink_2048_1536/0?e=1588809600&v=beta&t=Hw7RYWdgfrbs8pq8Xp5OunZWVzwdfMmPBdXTkaHVyXA)
@@ -40,6 +40,6 @@ Don't hesitate to open issues and make a pull request to help improve code
 ##### Built with love <3
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTE4OTE0ODMxMiwtODgyMDkxOTQxLC0xND
-c5OTU2NTk4LC04NDI1MzI4NjVdfQ==
+eyJoaXN0b3J5IjpbLTEzNTM4MTY0NjIsMTE4OTE0ODMxMiwtOD
+gyMDkxOTQxLC0xNDc5OTU2NTk4LC04NDI1MzI4NjVdfQ==
 -->
