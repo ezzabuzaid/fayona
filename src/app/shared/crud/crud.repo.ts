@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { Model, FilterQuery } from 'mongoose';
-import { Document, Payload, Projection, ColumnSort, PrimaryKey, ForeignKey } from '@lib/mongoose';
-import { AppUtils } from '@core/utils';
+import { Document, Payload, Projection, ColumnSort, PrimaryKey, ForeignKey, locateModel } from '@lib/mongoose';
+import { AppUtils, Type } from '@core/utils';
 
 // TODO: Before any query or write check the body to meet the
 //  model to avoid [injections] this should be done in the repo.
@@ -9,10 +9,10 @@ import { AppUtils } from '@core/utils';
 export type Query<T> = FilterQuery<T>;
 
 export class Repo<T> {
-    constructor(
-        public model: Model<Document<T>>
-    ) {
+    public model: Model<Document<T>>;
+    constructor(model: Type<any>) {
         assert(AppUtils.notNullOrUndefined(model));
+        this.model = locateModel(model);
     }
 
     public fetchOne(query: Query<T>, projection: Projection<T> = {}, options = {}) {

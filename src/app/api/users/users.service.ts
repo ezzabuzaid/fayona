@@ -1,10 +1,10 @@
-import usersModel, { UsersSchema, } from './users.model';
+import { UsersSchema, } from './users.model';
 import { CrudService, } from '@shared/crud/crud.service';
 import { Repo, Pagination } from '@shared/crud';
 
 export class UserService extends CrudService<UsersSchema> {
     constructor() {
-        super(new Repo(usersModel), {
+        super(new Repo(UsersSchema), {
             unique: ['username', 'email', 'mobile']
         });
     }

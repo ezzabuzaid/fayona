@@ -15,4 +15,3 @@ export class AdvertisementModel {
     @Field() dueDate?: Date;
 }
 
-export default BaseModel(AdvertisementModel);

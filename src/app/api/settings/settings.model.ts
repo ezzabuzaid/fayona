@@ -5,4 +5,3 @@ export class SettingSchema {
     @Field() settings = {};
 }
 
-export default BaseModel(SettingSchema);

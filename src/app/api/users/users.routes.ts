@@ -46,7 +46,7 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
     }
 
     @Get('username', validate(UsernameValidator, 'query'))
-    public async isUsernameExist(req: Request, ) {
+    public async isUsernameExist(req: Request) {
         const { username } = cast<UsernameValidator>(req.query);
         const result = await this.service.one({ username });
         if (result.hasError) {

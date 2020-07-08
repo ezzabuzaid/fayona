@@ -8,4 +8,3 @@ export class MessagesSchema {
     @Field({ required: true }) room: PrimaryKey;
     @Field({ required: true }) order: number;
 }
-export default BaseModel(MessagesSchema);

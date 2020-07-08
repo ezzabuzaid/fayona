@@ -16,5 +16,3 @@ export class RoomSchema {
     @Field({ pure: true }) public avatar?: string = null;
     @Field() single = true;
 }
-
-export default BaseModel(RoomSchema);

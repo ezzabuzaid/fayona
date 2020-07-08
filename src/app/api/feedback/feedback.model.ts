@@ -8,4 +8,3 @@ export class FeedbackSchema {
     @Field() public type: string;
 }
 
-export default BaseModel<FeedbackSchema>(FeedbackSchema);

@@ -1,11 +1,11 @@
-import { HashService, Constants } from '@core/helpers';
-import { BaseModel, Entity, Field } from '@lib/mongoose';
-import { ValidationPatterns } from '@shared/common';
-import { AppUtils } from '@core/utils';
-import { Roles } from '@shared/identity';
-import phone from 'phone';
-import { isBoolean } from 'class-validator';
 import { ProfilesSchema } from '@api/profiles';
+import { Constants, HashService } from '@core/helpers';
+import { AppUtils } from '@core/utils';
+import { Entity, Field } from '@lib/mongoose';
+import { ValidationPatterns } from '@shared/common';
+import { Roles } from '@shared/identity';
+import { isBoolean } from 'class-validator';
+import phone from 'phone';
 @Entity(Constants.Schemas.USERS)
 export class UsersSchema {
     @Field({ validate: isBoolean, default: false }) public emailVerified?: boolean;
@@ -52,4 +52,3 @@ export class UsersSchema {
 
 }
 
-export default BaseModel(UsersSchema);

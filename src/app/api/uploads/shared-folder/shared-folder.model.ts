@@ -11,4 +11,3 @@ export class SharedFolderSchema {
     @Field() shared = false;
 }
 
-export default new Repo(BaseModel(SharedFolderSchema));

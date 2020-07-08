@@ -7,4 +7,3 @@ export class RoomMemberSchema {
     @Field() public isAdmin: boolean = false;
     @Field({ ref: Constants.Schemas.ROOMS, required: true }) public room: ForeignKey;
 }
-export default BaseModel(RoomMemberSchema);

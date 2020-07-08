@@ -6,4 +6,3 @@ export class FoldersSchema {
     @Field({ lowercase: false }) public name: string;
 }
 
-export default BaseModel(FoldersSchema);

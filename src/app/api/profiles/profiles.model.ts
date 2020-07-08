@@ -20,4 +20,3 @@ export class ProfilesSchema {
     @Field({ required: false }) occupation: string;
 }
 
-export default BaseModel(ProfilesSchema);
