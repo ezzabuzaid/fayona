@@ -1,4 +1,3 @@
-export * from './model';
 export * from './field';
 export * from './entity';
 
@@ -27,7 +26,7 @@ export type Payload<T> = OmitProperties<T, (...args: any) => any> & {
 };
 
 export function generateModelMetadataKey(target: any) {
-    return `model:${target.name}`;
+    return `model:${ target.name }`;
 }
 
 export type Projection<T> = Partial<{ [key in keyof Payload<T>]: 1 | 0 }>;

@@ -1,6 +1,6 @@
-import { Field, BaseModel, Entity } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
 import { AppUtils } from '@core/utils';
+import { Entity, Field } from '@lib/mongoose';
 
 export enum EAdvertisementType {
     normal,
@@ -14,4 +14,3 @@ export class AdvertisementModel {
     @Field({ enum: AppUtils.enumValues(EAdvertisementType) }) type: string;
     @Field() dueDate?: Date;
 }
-

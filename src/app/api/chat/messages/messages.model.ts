@@ -1,5 +1,5 @@
-import { Entity, Field, BaseModel, PrimaryKey } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
+import { Entity, Field, PrimaryKey } from '@lib/mongoose';
 
 @Entity(Constants.Schemas.MESSAGES)
 export class MessagesSchema {

@@ -13,4 +13,3 @@ export class SessionSchema {
     // TODO: create a collection for device info
     // TODO: presist device info and user location
 }
-

@@ -1,4 +1,4 @@
-import { Field, Entity, BaseModel } from '@lib/mongoose';
+import { Field, Entity } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
 
 export enum EGender {
@@ -19,4 +19,3 @@ export class ProfilesSchema {
     @Field({ required: false }) city: string;
     @Field({ required: false }) occupation: string;
 }
-

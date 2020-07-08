@@ -1,5 +1,5 @@
-import { Entity, Field, BaseModel } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
+import { Entity, Field } from '@lib/mongoose';
 import { Types } from 'mongoose';
 
 @Entity(Constants.Schemas.UPLOADS)
@@ -12,4 +12,3 @@ export class UploadsSchema {
     @Field({ required: true }) public user: Types.ObjectId;
     @Field({ required: true, ref: Constants.Schemas.FOLDERS }) public folder: Types.ObjectId;
 }
-

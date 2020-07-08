@@ -6,7 +6,7 @@ import 'reflect-metadata';
 import { generateModelMetadataKey } from '.';
 
 export function Entity(name?: string, options: SchemaOptions = {}) {
-    return function (constructor) {
+    return function(constructor) {
         const metadataKey = generateModelMetadataKey(constructor);
         const fields = Reflect.getMetadata(metadataKey, constructor);
         Reflect.deleteMetadata(metadataKey, constructor);
@@ -18,6 +18,6 @@ export function Entity(name?: string, options: SchemaOptions = {}) {
     };
 }
 
-export function locateModel<T>(Model: Type<T>) {
-    return locate<Model<T & MongooseDocument>>(Model as any);
+export function locateModel<T>(modelType: Type<T>) {
+    return locate<Model<T & MongooseDocument>>(modelType as any);
 }

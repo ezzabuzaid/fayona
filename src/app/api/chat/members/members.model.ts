@@ -1,5 +1,5 @@
-import { Entity, Field, BaseModel, ForeignKey } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
+import { Entity, Field, ForeignKey } from '@lib/mongoose';
 
 @Entity(Constants.Schemas.MEMBERS)
 export class RoomMemberSchema {

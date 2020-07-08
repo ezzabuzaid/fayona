@@ -1,4 +1,4 @@
-import { Type, AppUtils } from "@core/utils";
+import { Type, AppUtils } from '@core/utils';
 
 export class Locator {
     private static _instance: Locator;
@@ -13,10 +13,10 @@ export class Locator {
         return this;
     }
 
-    locate<T>(Type: Type<T>): T {
-        const entry = this.registry.get(Type);
+    locate<T>(type: Type<T>): T {
+        const entry = this.registry.get(type);
         if (AppUtils.isNullOrUndefined(entry)) {
-            throw new Error(`${ Type.name } is not registered in the locator`);
+            throw new Error(`${ type.name } is not registered in the locator`);
         }
         return entry();
     }
@@ -26,9 +26,9 @@ export class Locator {
 export function Singelton() {
     return function <T extends new (...args: any[]) => any>(constructor: T) {
         Locator.instance.registerSingelton(new constructor());
-    }
+    };
 }
 
-export function locate<T>(Type: Type<T>): T {
-    return Locator.instance.locate(Type);
+export function locate<T>(type: Type<T>): T {
+    return Locator.instance.locate(type);
 }

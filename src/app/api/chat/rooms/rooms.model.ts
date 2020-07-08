@@ -1,5 +1,5 @@
-import { BaseModel, Entity, Field, ForeignKey } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
+import { Entity, Field, ForeignKey } from '@lib/mongoose';
 
 // FIXME
 // cannot use RoomMemberSchema as submodel for single or mutliple mode,
