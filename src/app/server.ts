@@ -47,7 +47,7 @@ export class NodeServer extends Application {
 
         private constructor() {
                 super();
-                this.path = new URL(`http://${this.host}:${this.port}`);
+                this.path = new URL(`http://${ this.host }:${ this.port }`);
                 this.populateServer();
         }
 
@@ -95,7 +95,7 @@ export class NodeServer extends Application {
                                                 text: payload.text,
                                                 order: message.order
                                         });
-                                        socket.emit(`saved_${message.timestamp}`, message.id);
+                                        socket.emit(`saved_${ message.timestamp }`, message.id);
                                         socket.broadcast.in(message.id as any).emit('Message', createdMessage.data);
                                 } catch (error) {
                                         console.log('MessageValidationError => ', error);
@@ -128,7 +128,7 @@ export class NodeServer extends Application {
 
         private startServer(): void {
                 this.server.listen(this.path.port, +this.path.hostname, () => {
-                        log.info(`${new Date()} Server running at ${this.path.href}`);
+                        log.info(`${ new Date() } Server running at ${ this.path.href }`);
                 });
         }
 
@@ -142,7 +142,7 @@ export class NodeServer extends Application {
                 try {
                         return Database.load({ user, password, path, host, atlas: stage.production });
                 } catch (error) {
-                        throw new Error(`Faild to init the server ${error}`);
+                        throw new Error(`Faild to init the server ${ error }`);
                 }
         }
 

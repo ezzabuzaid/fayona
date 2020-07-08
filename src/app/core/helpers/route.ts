@@ -1,4 +1,4 @@
-import { HttpResponse } from './response';
+import { HttpResponse } from '../response/response';
 import { Request, Response, NextFunction } from 'express';
 import { AppUtils } from '@core/utils';
 import { ErrorHandling } from './errors';

@@ -51,7 +51,7 @@ export class CrudService<T = null> {
                 if (AppUtils.notNullOrUndefined(payload[field])) {
                     const record = await fetchOne(field);
                     if (AppUtils.isTruthy(record)) {
-                        return translate(`${this.options.unique[index]}_entity_exist`);
+                        return translate(`${ this.options.unique[index] }_entity_exist`);
                     }
                 }
             }

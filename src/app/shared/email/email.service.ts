@@ -24,20 +24,25 @@ export class EmailService {
             from: 'test@test.com',
             to: userEmail,
             subject: 'Verify Email',
-            html: AppUtils.renderHTML('verification-template', { link: `${url}/${Constants.Endpoints.PORTAL}/${Constants.Endpoints.VERIFY_EMAIL}?token=${token}` })
+            html: AppUtils.renderHTML('verification-template', { link: `${ url }/${ Constants.Endpoints.PORTAL }/${ Constants.Endpoints.VERIFY_EMAIL }?token=${ token }` })
         });
     }
 
-    public static sendPincodeEmail(url: string, userEmail: string, userId: PrimaryKey, pincode: string) {
-        const token = tokenService.generateToken({ id: userId, pincode }, { expiresIn: '15m' });
+    public static sendPincodeEmail(userEmail: string, pincode: string) {
         return EmailService.sendEmail({
             from: 'test@test.com',
             to: userEmail,
-            subject: 'Verify Email',
-            html: AppUtils.renderHTML('pincode-template', {
-                link: `${url}/${Constants.Endpoints.PORTAL}/${Constants.Endpoints.VERIFY_EMAIL}?token=${token}`,
-                pincode
-            })
+            subject: 'Pincode Email',
+            html: AppUtils.renderHTML('pincode-template', { pincode })
+        });
+    }
+
+    public static sendResetPasswordEmail(userEmail: string) {
+        return EmailService.sendEmail({
+            from: 'test@test.com',
+            to: userEmail,
+            subject: 'Reset password Email',
+            html: AppUtils.renderHTML('reset-password-template', { date: new Date().toLocaleDateString() })
         });
     }
 }
@@ -48,7 +53,7 @@ export function fakeEmail(token = ''): Mail.Options {
         to: 'ezzabuzaid@hotmail.com',
         subject: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
         Please click on the following link, or paste this into your browser to complete the process:\n\n
-        http://website.com/reset/${token}\n\n
+        http://website.com/reset/${token }\n\n
         If you did not request this, please ignore this email and your password will remain unchanged.\n`,
         text: 'Hello to myself!',
         html: `Password rest successfully`

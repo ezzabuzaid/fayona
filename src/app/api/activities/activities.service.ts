@@ -1,10 +1,11 @@
 import { CrudService, Repo } from '@shared/crud';
-import activitiesModel, { ActivitesSchema } from './activities.model';
+import { ActivitesSchema } from './activities.model';
+import { locateModel } from '@lib/mongoose';
 
 export class ActivitesService extends CrudService<ActivitesSchema> {
 
     constructor() {
-        super(new Repo(activitiesModel));
+        super(new Repo(ActivitesSchema));
     }
 
 }

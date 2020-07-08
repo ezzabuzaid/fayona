@@ -1,7 +1,7 @@
 import { Router, Post, Get } from '@lib/restful';
 import { Multer } from '@shared/multer';
 import { Request } from 'express';
-import { Responses, Constants } from '@core/helpers';
+import { Constants } from '@core/helpers';
 import { CrudRouter, Pagination } from '@shared/crud';
 import { UploadsSchema } from './uploads.model';
 import uploadsService, { UploadsService } from './uploads.service';
@@ -11,6 +11,7 @@ import { IsMongoId, IsOptional, IsString, IsNumberString } from 'class-validator
 import { validate, isValidId } from '@shared/common';
 import { identity, tokenService } from '@shared/identity';
 import { FoldersRoutes } from './folders/folders.routes';
+import { Responses } from '@core/response';
 
 class FilesSearchPayload extends Pagination {
     @IsOptional()
@@ -46,7 +47,7 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         const { id } = cast(req.params);
         const { file } = req;
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        const filePath = `${path.join(id, file.filename)}?name=${file.originalname}&size=${file.size}&type=${file.mimetype}`;
+        const filePath = `${ path.join(id, file.filename) }?name=${ file.originalname }&size=${ file.size }&type=${ file.mimetype }`;
         const result = await uploadsService.create({
             folder: id,
             user: decodedToken.id,

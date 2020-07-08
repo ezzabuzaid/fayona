@@ -7,6 +7,18 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Launch Program",
+            "runtimeArgs": [
+                "-r",
+                "ts-node/register"
+            ],
+            "args": [
+                "${workspaceFolder}/main.ts"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Run nodeJs",
             "trace": "verpose",
             "preLaunchTask": "Serve node",
@@ -65,6 +77,6 @@
             "windows": {
                 "program": "${workspaceFolder}/node_modules/jest/bin/jest",
             }
-        }
+        },
     ]
 }

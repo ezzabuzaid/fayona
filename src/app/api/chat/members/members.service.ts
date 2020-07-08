@@ -1,5 +1,5 @@
 import { CrudService, Repo } from '@shared/crud';
-import membersModel, { RoomMemberSchema } from './members.model';
+import { RoomMemberSchema } from './members.model';
 import sharedFolder from '@api/uploads/shared-folder/shared-folder.service';
 import { PrimaryKey } from '@lib/mongoose';
 import { RoomSchema } from '../rooms';
@@ -7,7 +7,7 @@ import { AppUtils } from '@core/utils';
 
 export class RoomMembersService extends CrudService<RoomMemberSchema> {
     constructor() {
-        super(new Repo(membersModel), {
+        super(new Repo(RoomMemberSchema), {
             create: {
                 async post(member) {
                     const populatedMember = await member.populate('room').execPopulate();

@@ -1,13 +1,13 @@
-import { Repo, CrudService, Query } from '@shared/crud';
-import sessionsModel, { SessionSchema, } from './sessions.model';
-import { Document, Payload, WithMongoID, ForeignKey } from '@lib/mongoose';
+import { Result } from '@core/response';
 import { Omit } from '@core/utils';
-import { Result } from '@core/helpers';
+import { Document, ForeignKey, Payload, WithMongoID } from '@lib/mongoose';
+import { CrudService, Query, Repo } from '@shared/crud';
+import { SessionSchema } from './sessions.model';
 
 export class SessionsService extends CrudService<SessionSchema> {
 
     constructor() {
-        super(new Repo<SessionSchema>(sessionsModel));
+        super(new Repo(SessionSchema));
     }
 
     all(query: Query<SessionSchema>, options = {}) {

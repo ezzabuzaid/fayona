@@ -1,21 +1,71 @@
-import { Constants, Responses, HashService, SuccessResponse } from '@core/helpers';
-import { Post, Router, Get } from '@lib/restful';
-import { Request, Response } from 'express';
-import usersService from '@api/users/users.service';
-import { UsersSchema } from '@api/users';
-import { Payload, PrimaryKey } from '@lib/mongoose';
-import { EmailService, fakeEmail } from '@shared/email';
-import { AppUtils, cast } from '@core/utils';
-import { PortalHelper } from './portal.helper';
-import { TokenExpiredError } from 'jsonwebtoken';
-import { ApplicationConstants } from '@core/constants';
 import { sessionsService } from '@api/sessions/sessions.service';
-import { IsString, IsNotEmpty, IsJWT } from 'class-validator';
+import usersService from '@api/users/users.service';
+import { ApplicationConstants } from '@core/constants';
+import { Constants, HashService } from '@core/helpers';
+import { Responses, SuccessResponse } from '@core/response';
+import { AppUtils, cast } from '@core/utils';
+import { locate } from '@lib/locator';
+import { PrimaryKey } from '@lib/mongoose';
+import { Get, Post, Router } from '@lib/restful';
+import { PasswordValidator, PrimaryIDValidator, TokenValidator, validate } from '@shared/common';
+import { EmailService } from '@shared/email';
+import { identity, IRefreshTokenClaim, tokenService } from '@shared/identity';
+import { NodeServer } from 'app/server';
+import { IsEmail, IsIn, IsJWT, IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Request, Response } from 'express';
+import { TokenExpiredError } from 'jsonwebtoken';
 import { scheduleJob } from 'node-schedule';
-import { validate, EmailValidator } from '@shared/common';
-import { tokenService, IRefreshTokenClaim } from '@shared/identity';
+import { PortalHelper } from './portal.helper';
 
-export class AccountVerifiedPayload {
+class Pincode {
+    public ttl = AppUtils.duration(5);
+    constructor(
+        public pincode: string
+    ) { }
+
+    expired() {
+        return AppUtils.isDateElapsed(this.ttl);
+    }
+
+    notEqual(pincode: string) {
+        return !this.equal(pincode);
+    }
+
+    equal(pincode: string) {
+        return this.pincode === pincode;
+    }
+}
+
+/**
+ * a Map consist of key-value pair of user id and pincode
+ */
+const pincodes = new Map<PrimaryKey, Pincode>();
+
+export class SendPincodeValidator {
+    @IsString()
+    @IsNotEmpty()
+    @IsOptional()
+    mobile: string = null;
+
+    @IsEmail()
+    @IsOptional()
+    email: string = null;
+
+    @IsMongoId() id: PrimaryKey = null;
+
+    @IsString()
+    @IsNotEmpty()
+    @IsIn(['email', 'sms'])
+    type: 'email' | 'sms' = null;
+}
+
+export class CheckPincodeValidator extends PrimaryIDValidator {
+    @IsNotEmpty()
+    @IsString()
+    pincode: string = null;
+}
+
+export class AccountVerificationPayload {
     @IsNotEmpty()
     @IsString()
     username: string = null;
@@ -47,7 +97,6 @@ export class RefreshTokenPayload {
     @IsJWT()
     public refreshToken: string = null;
 }
-
 export class DeviceUUIDHeaderValidator {
     @IsString()
     public [ApplicationConstants.deviceIdHeader] = null;
@@ -57,8 +106,9 @@ export class RefreshTokenDto {
     public token: string;
     public refreshToken: string;
     constructor(user_id: PrimaryKey, role: string, verified: boolean) {
-        this.token = PortalHelper.generateToken(user_id, role, verified);
-        this.refreshToken = PortalHelper.generateRefreshToken(user_id);
+        const portalHelper = locate(PortalHelper);
+        this.token = portalHelper.generateToken(user_id, role, verified);
+        this.refreshToken = portalHelper.generateRefreshToken(user_id);
     }
 }
 
@@ -99,7 +149,7 @@ export class PortalRoutes {
             active: true,
             user: user.id
         });
-        return new Responses.Ok(new LoginDto(user.id, user.role, user.verified));
+        return new Responses.Ok(new LoginDto(user.id, user.role, user.emailVerified));
 
     }
 
@@ -138,7 +188,7 @@ export class PortalRoutes {
                     const { data: user } = await usersService.one({ _id: decodedRefreshToken.id });
 
                     await sessionsService.updateById(session.data.id, { updatedAt: new Date().toISOString() });
-                    return new Responses.Ok(new RefreshTokenDto(user.id, user.role, user.verified));
+                    return new Responses.Ok(new RefreshTokenDto(user.id, user.role, user.emailVerified));
                 }
             }
         } catch (error) {
@@ -149,10 +199,10 @@ export class PortalRoutes {
 
     @Post(
         Constants.Endpoints.ACCOUNT_VERIFIED,
-        validate(AccountVerifiedPayload, 'body', 'Please make sure you have entered the correct information payload.')
+        validate(AccountVerificationPayload, 'body', 'Please make sure you have entered the correct information payload.')
     )
     public async accountVerifed(req: Request) {
-        const payload = cast<AccountVerifiedPayload>(req.body);
+        const payload = cast<AccountVerificationPayload>(req.body);
         const result = await usersService.one({
             'username': payload.username,
             'profile.firstName': payload.firstName,
@@ -162,53 +212,94 @@ export class PortalRoutes {
         if (result.hasError) {
             return new Responses.BadRequest('Please make sure you have entered the correct information.');
         }
-        const { emailVerified, mobileVerified } = result.data;
+        const { emailVerified, mobileVerified, id } = result.data;
         if (emailVerified) {
-            return new Responses.Ok({ emailVerified, mobileVerified });
+            return new Responses.Ok({ emailVerified, mobileVerified, id });
         } else {
             return new Responses.BadRequest('You cannot reset you password because your account it not verified yet, please contact the adminstration for further actions');
         }
     }
 
-    @Post(Constants.Endpoints.RESET_PASSWORD)
-    public async resetPassword(req: Request, res: Response) {
-        const { password } = req.body as Payload<UsersSchema>;
-        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        await usersService.updateById(decodedToken.id, { password });
-        const response = new Responses.Ok(null);
-        await EmailService.sendEmail(fakeEmail());
-        res.status(response.code).json(response);
-    }
-
-    @Post('sendresetpasswordemail', validate(EmailValidator))
-    public async sendResetPasswordEmail(req: Request) {
-        const { email } = req.body;
-        const result = await usersService.one({ email });
-        if (result.hasError) {
-            return new Responses.BadRequest('It appears the email is not registerd before');
+    @Post(Constants.Endpoints.SEND_PINCODE, validate(SendPincodeValidator))
+    public async sendPincode(req: Request) {
+        const { email, mobile, type, id } = cast<SendPincodeValidator>(req.body);
+        const pincode = locate(PortalHelper).generatePinCode();
+        if (type === 'email') {
+            const result = await usersService.one({ email, _id: id });
+            if (AppUtils.not(result.hasError)) {
+                EmailService.sendPincodeEmail(email, pincode);
+            }
+        } else {
+            const result = await usersService.one({ mobile, _id: id });
+            if (AppUtils.not(result.hasError)) {
+                // Send sms
+            }
         }
-        EmailService.sendPincodeEmail(
-            process.env.CLIENT_RESETPASSWORD_URL,
-            result.data.email,
-            result.data.id,
-            PortalHelper.generatePinCode()
-        );
-        return new SuccessResponse('An e-mail sent to your inbox with additional information');
+        pincodes.set(id, new Pincode(pincode));
+        return new SuccessResponse(`${ type === 'email' ? 'An e-mail' : 'A SMS ' } message sent to your mobile with additional information`);
+        // No error handling if the user is not exist
     }
 
-    @Get(Constants.Endpoints.VERIFY_EMAIL)
+    @Post(Constants.Endpoints.CHECK_PINCODE, validate(CheckPincodeValidator))
+    public async checkPincode(req: Request) {
+        const payload = cast<CheckPincodeValidator>(req.body);
+        const expectedPincode = pincodes.get(payload.id);
+        if (expectedPincode.expired()) {
+            return new Responses.BadRequest('Pincode is not valid anymore, please try again later');
+        } else if (expectedPincode.notEqual(payload.pincode)) {
+            return new Responses.BadRequest('Wrong pincode, please try again');
+        }
+        return new Responses.Ok(null);
+    }
+
+    @Post(
+        Constants.Endpoints.RESET_PASSWORD,
+        validate(PasswordValidator),
+        validate(CheckPincodeValidator),
+    )
+    public async resetPassword(req: Request, res: Response) {
+        const payload = cast<PasswordValidator & CheckPincodeValidator>(req.body);
+        const expectedPincode = pincodes.get(payload.id);
+        if (expectedPincode.expired()) {
+            return new Responses.BadRequest('Pincode is not valid anymore, please try again later');
+        } else if (expectedPincode.notEqual(payload.pincode)) {
+            // if the pincode was wrong so he in wrong place so we need to redirect him away
+            res.redirect('http://localhost:4200/portal/login');
+        }
+        pincodes.delete(payload.id);
+        const result = await usersService.updateById(payload.id, { password: payload.password });
+        if (result.hasError) {
+            return new Responses.BadRequest('Please try again later');
+        }
+        await EmailService.sendResetPasswordEmail('user@email.com');
+        return new Responses.Ok(null);
+    }
+
+    @Get(Constants.Endpoints.VERIFY_EMAIL, validate(TokenValidator, 'query'))
     public async updateUserEmailVerification(req: Request, res: Response) {
-        const { token } = req.query;
+        const { token } = cast<TokenValidator>(req.query);
         const decodedToken = await tokenService.decodeToken(token);
         const result = await usersService.updateById(decodedToken.id, { emailVerified: true });
         if (result.hasError) {
             return new Responses.BadRequest('Please try again later');
         }
-        res.redirect('http://localhost:4200/portal/login');
+        res.redirect('http://localhost:4200/');
+    }
+
+    @Get(Constants.Endpoints.SEND_Verification_EMAIL, identity.isAuthenticated())
+    public async sendVerificationEmail(req: Request) {
+        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
+        const result = await usersService.one({ _id: decodedToken.id });
+        if (result.hasError) {
+            return new Responses.BadRequest('Please try again later');
+        }
+        EmailService.sendVerificationEmail(NodeServer.serverUrl(req), result.data.email, result.data.id);
+        return new Responses.Ok('Email has been sent successfully');
     }
 
 }
 
+// TODO remove expired pincodes
 scheduleJob('30 * * * *', async () => {
     const sessions = await sessionsService.getAllActiveSession();
     sessions.data.list.forEach((session) => {
@@ -219,16 +310,7 @@ scheduleJob('30 * * * *', async () => {
 });
 
 // TODO: Forget and reset password scenario
-// Enter a unique info like partial of profile info page 1
-// Security questions page 2
-// send an email with generated number to be entered later on in page 3
 // Lock the account after 3 times of trying
-// send an email to notify the user that the email is changed
 // Only previous registerd devices can be used to do forgot password;
-
-// REVIEW if anyone get the token can change the user password,
-// so we need to know that the user who really did that by answering a specifc questions, doing 2FA
-// the attempts should be limited to 3 times, after that he need to re do the process again,
-// if the procces faild 3 times, the account should be locked, and he need to call the support for that
 
 // TODO already used refresh token shouldn't be used again

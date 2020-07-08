@@ -4,7 +4,7 @@ import assert = require('assert');
 
 import { AppUtils, Parameter, cast } from '@core/utils';
 import { Request, NextFunction, Response } from 'express';
-import { Responses, ErrorResponse } from '@core/helpers';
+import { Responses, ErrorResponse } from '@core/response';
 import { Types } from 'mongoose';
 import foldersService from '@api/uploads/folders/folders.service';
 import { Directories } from '@shared/common';
@@ -51,7 +51,7 @@ export class Multer {
     }
 
     private get storage() {
-        const formatFileName = (file: Express.Multer.File) => `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`;
+        const formatFileName = (file: Express.Multer.File) => `${ file.fieldname }-${ Date.now() }${ path.extname(file.originalname) }`;
         return multer.diskStorage({
             destination: async (
                 req: Request,
@@ -83,7 +83,7 @@ export class Multer {
         const type = file.mimetype.toLowerCase();
         const isAllowedType = this.options.allowedTypes.some((allowedType) => allowedType.toLowerCase() === type);
         if (AppUtils.isFalsy(isAllowedType)) {
-            callback(new Responses.BadRequest(`Type ${type} not allowed`));
+            callback(new Responses.BadRequest(`Type ${ type } not allowed`));
         } else {
             callback(null, true);
         }

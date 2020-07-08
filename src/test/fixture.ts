@@ -1,13 +1,14 @@
 import { Constants } from '@core/helpers';
 import { UsersSchema } from '@api/users';
 import { Payload, WithMongoID } from '@lib/mongoose';
-import * as faker from 'faker';
 import { ValidationPatterns } from '@shared/common';
 import { ApplicationConstants } from '@core/constants';
 import { AppUtils } from '@core/utils';
 import { CredentialsPayload } from '@api/portal';
 import { tokenService } from '@shared/identity';
+import * as faker from 'faker';
 import { SignOptions } from 'jsonwebtoken';
+import { Types } from 'mongoose';
 
 export function generateDeviceUUIDHeader() {
     return {
@@ -16,7 +17,7 @@ export function generateDeviceUUIDHeader() {
 }
 
 export function getUri(value: string) {
-    return `/api/${value}`;
+    return `/api/${ value }`;
 }
 
 export async function prepareUserSession(user?: WithMongoID<CredentialsPayload>) {
@@ -29,7 +30,7 @@ export async function prepareUserSession(user?: WithMongoID<CredentialsPayload>)
 
     let user_id = null;
     if (AppUtils.isFalsy(user)) {
-        const { body: { data: { id } } } = await global.superAgent
+        const { body: { data: { id } } } = await global['superAgent']
             .post(getUri(Constants.Endpoints.USERS))
             .send(payload);
         user_id = id;
@@ -38,8 +39,8 @@ export async function prepareUserSession(user?: WithMongoID<CredentialsPayload>)
     }
 
     const deviceUUIDHeader = generateDeviceUUIDHeader();
-    const loginResponse = await global.superAgent
-        .post(getUri(`${Constants.Endpoints.PORTAL}/${Constants.Endpoints.LOGIN}`))
+    const loginResponse = await global['superAgent']
+        .post(getUri(`${ Constants.Endpoints.PORTAL }/${ Constants.Endpoints.LOGIN }`))
         .set(deviceUUIDHeader)
         .send(payload);
 
@@ -62,8 +63,7 @@ export class UserFixture {
     };
 
     public async createUser(paylod: Partial<Payload<UsersSchema>> = {}) {
-        const response = await global
-            .superAgent
+        const response = await global['superAgent']
             .post(getUri(Constants.Endpoints.USERS))
             .set(generateDeviceUUIDHeader())
             .send({
@@ -80,7 +80,7 @@ export class UserFixture {
 }
 
 export function generatePhoneNumber(dialCode = 962) {
-    return `+${dialCode}792${Math.floor(Math.random() * 899999 + 100000)}`;
+    return `+${ dialCode }792${ Math.floor(Math.random() * 899999 + 100000) }`;
 }
 
 export function generateUsername() {
@@ -94,11 +94,10 @@ export function generateExpiredToken() {
 }
 
 export function generateToken(options: SignOptions = {}) {
-    return tokenService.generateToken({ id: AppUtils.generateAlphabeticString() as any }, options);
+    return tokenService.generateToken({ id: new Types.ObjectId() }, options);
 }
 export async function createApplicationUser(payload: Partial<UsersSchema> = null) {
-    const response = await global
-        .superAgent
+    const response = await global['superAgent']
         .post(getUri(Constants.Endpoints.USERS))
         .set(generateDeviceUUIDHeader())
         .send({
@@ -113,8 +112,8 @@ export async function createApplicationUser(payload: Partial<UsersSchema> = null
 
 export async function login(credentials: CredentialsPayload, headers = generateDeviceUUIDHeader()) {
 
-    const { body: { data } } = await global.superAgent
-        .post(getUri(`${Constants.Endpoints.PORTAL}/${Constants.Endpoints.LOGIN}`))
+    const { body: { data } } = await global['superAgent']
+        .post(getUri(`${ Constants.Endpoints.PORTAL }/${ Constants.Endpoints.LOGIN }`))
         .set(headers)
         .send(credentials);
 

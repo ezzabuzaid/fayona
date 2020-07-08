@@ -1,11 +1,9 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
-import { Application } from '../app/app';
-import request from 'supertest';
 import { NodeServer } from '../app/server';
 
 NodeServer.test();
-global.superAgent = request((new Application()).application);
+
 let mongoServer;
 
 beforeEach(async () => {

@@ -1,16 +1,17 @@
-import { CrudRouter, Pagination } from '@shared/crud';
-import usersService, { UserService } from './users.service';
-import { Constants, Responses, SuccessResponse } from '@core/helpers';
-import { Router, Post, Get } from '@lib/restful';
-import { UsersSchema } from './users.model';
-import { Request } from 'express';
-import { cast } from '@core/utils';
-import { identity } from '@shared/identity';
-import { validate } from '@shared/common';
-import { IsString, IsOptional } from 'class-validator';
 import { AccountsRouter } from '@api/profiles';
+import { Constants } from '@core/helpers';
+import { Responses, SuccessResponse } from '@core/response';
+import { cast } from '@core/utils';
+import { Get, Post, Router } from '@lib/restful';
+import { validate } from '@shared/common';
+import { CrudRouter, Pagination } from '@shared/crud';
 import { EmailService } from '@shared/email';
-import { NodeServer } from 'app/server';
+import { identity } from '@shared/identity';
+import { IsOptional, IsString } from 'class-validator';
+import { Request } from 'express';
+import { NodeServer } from '../../server';
+import { UsersSchema } from './users.model';
+import usersService, { UserService } from './users.service';
 class UsernameValidator extends Pagination {
     @IsOptional()
     @IsString()
@@ -45,7 +46,7 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
     }
 
     @Get('username', validate(UsernameValidator, 'query'))
-    public async isUsernameExist(req: Request, ) {
+    public async isUsernameExist(req: Request) {
         const { username } = cast<UsernameValidator>(req.query);
         const result = await this.service.one({ username });
         if (result.hasError) {

@@ -1,12 +1,12 @@
-import { CrudService } from '@shared/crud';
-import sharedFolderModel, { SharedFolderSchema } from './shared-folder.model';
+import { CrudService, Repo } from '@shared/crud';
+import { SharedFolderSchema } from './shared-folder.model';
 import { Constants } from '@core/helpers';
 import { PrimaryKey } from '@lib/mongoose';
 
 export class SharedFolderService extends CrudService<SharedFolderSchema> {
 
     constructor() {
-        super(sharedFolderModel);
+        super(new Repo(SharedFolderSchema));
     }
 
     get() {

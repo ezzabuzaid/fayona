@@ -1,5 +1,5 @@
-import { BaseModel, Entity, Field } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
+import { Entity, Field } from '@lib/mongoose';
 import { Types } from 'mongoose';
 
 @Entity(Constants.Schemas.SESSIONS)
@@ -13,5 +13,3 @@ export class SessionSchema {
     // TODO: create a collection for device info
     // TODO: presist device info and user location
 }
-
-export default BaseModel<SessionSchema>(SessionSchema);

@@ -21,6 +21,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "importHelpers": true,
+    "strictBindCallApply": true,
     "noEmitHelpers": true,
     "resolveJsonModule": true,
     "paths": {

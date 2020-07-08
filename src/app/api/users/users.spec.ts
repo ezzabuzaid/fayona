@@ -1,10 +1,10 @@
-import { generatePhoneNumber, generateUsername, UserFixture, getUri, prepareUserSession } from '@test/fixture';
+import { generatePhoneNumber, generateUsername, UserFixture, getUri } from '@test/fixture';
 import { NetworkStatus, Constants } from '@core/helpers';
 import * as faker from 'faker';
 import { Roles } from '@shared/identity';
-const USER_SESSION_ENDPOINT = getUri(`${Constants.Endpoints.USERS}/${Constants.Endpoints.SEARCH}`);
+const USER_SESSION_ENDPOINT = getUri(`${ Constants.Endpoints.USERS }/${ Constants.Endpoints.SEARCH }`);
 
-xdescribe('[INTERGRATION]', () => {
+describe('[INTERGRATION]', () => {
 
     describe('#CREATE USER', () => {
 
@@ -98,22 +98,22 @@ xdescribe('[INTERGRATION]', () => {
             });
         });
 
-        test('should be unverified by default', async () => {
-            const { body: { data: { id } } } = await userFixture.createUser({ verified: null });
-            const { headers } = await prepareUserSession();
-            const response = await global.superAgent
-                .get(`${getUri(Constants.Endpoints.USERS)}/${id}`)
-                .set(headers);
-            expect(response.body.data.verified).toEqual(false);
-        });
+        // test('should be unverified by default', async () => {
+        // const { body: { data: { id } } } = await userFixture.createUser({ verified: null });
+        // const { headers } = await prepareUserSession();
+        // const response = await superAgent
+        //     .get(`${ getUri(Constants.Endpoints.USERS) }/${ id }`)
+        //     .set(headers);
+        // expect(response.body.data.verified).toEqual(false);
+        // });
 
         test.todo('user should have a defualt profile equal to empty {}');
     });
 
     describe('#SEARCH FOR USES', () => {
-        test.skip('should return list of users depends on the provided name', () => {
-            global.superAgent.get(USER_SESSION_ENDPOINT);
-        });
+        // test.skip('should return list of users depends on the provided name', () => {
+        //     superAgent.get(USER_SESSION_ENDPOINT);
+        // });
     });
 
 });

@@ -1,10 +1,12 @@
-import { validateOrReject, ValidationError, IsString, IsMongoId, isEmail, IsEmail } from 'class-validator';
+import { validateOrReject, ValidationError, IsString, IsMongoId, Matches, IsEmail, IsJWT } from 'class-validator';
 import { ApplicationConstants } from '@core/constants';
 import { Type, AppUtils } from '@core/utils';
 import { NextFunction, Response, Request } from 'express';
+import { PrimaryKey } from '@lib/mongoose';
 
 export class ValidationPatterns {
     public static EmailValidation = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    public static Password = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/;
     public static NoSpecialChar = /^[a-zA-z0-9_.]+$/;
 }
 
@@ -23,6 +25,20 @@ export class NameValidator {
 export class EmailValidator {
     @IsEmail()
     email: string = null;
+}
+
+export class PasswordValidator {
+    @Matches(ValidationPatterns.Password, { message: 'wrong_password' })
+    password: string = null;
+}
+
+export class TokenValidator {
+    @IsJWT()
+    token: string = null;
+}
+
+export class PrimaryIDValidator {
+    @IsMongoId() id: PrimaryKey = null;
 }
 
 export async function validatePayload<T>(payload: T, message?: string) {

@@ -9,6 +9,7 @@ import { RoomsRouter } from '@api/chat/rooms';
 import { AppUtils } from '@core/utils';
 import assert from 'assert';
 import { LookupsRoutes } from '@api/lookups';
+import { AdvertisementRouter } from '@api/advertisement';
 
 export class Wrapper {
     private static list = [];
@@ -43,11 +44,6 @@ export class Wrapper {
         return router;
     }
 
-    private static dispatchRouter({ router }: any) {
-        this.getRouter(router);
-        this.list.splice(router);
-    }
-
 }
 
 Wrapper.registerRouter(PortalRoutes);
@@ -57,4 +53,5 @@ Wrapper.registerRouter(SessionRouter);
 Wrapper.registerRouter(RoomsRouter);
 Wrapper.registerRouter(FileUploadRoutes);
 Wrapper.registerRouter(SettingRoutes);
+Wrapper.registerRouter(AdvertisementRouter);
 Wrapper.registerRouter(LookupsRoutes);

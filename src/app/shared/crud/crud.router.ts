@@ -1,24 +1,23 @@
 import { CrudService } from './crud.service';
 import { Post, Put, Delete, Get, Patch } from '@lib/restful';
 import { Request } from 'express';
-import { Responses } from '@core/helpers';
+import { Responses } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
 import { Payload } from '@lib/mongoose';
 import assert from 'assert';
-import { isValidId } from '@shared/common';
-import { IReadAllOptions } from './crud.repo';
-import { IsOptional, IsNumberString } from 'class-validator';
+import { isValidId, validate } from '@shared/common';
+import { IsOptional, IsNumberString, IsObject } from 'class-validator';
 
-export class Pagination implements IReadAllOptions<any> {
+export class Pagination {
     @IsOptional()
     @IsNumberString()
-    page: number = null;
+    page?: number = null;
     @IsOptional()
     @IsNumberString()
-    size: number = null;
-    // @IsOptional()
-    // @IsObject()
-    // sort: number = null;
+    size?: number = null;
+    @IsOptional()
+    @IsObject()
+    sort?: any = null;
 }
 
 export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> = CrudService<SchemaType>> {
@@ -85,10 +84,10 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    @Get('/')
+    @Get('/', validate(Pagination, 'query'))
     public async fetchEntities(req: Request) {
         // TODO: Check that the sort object has the same properties in <T>
-        const { page, size, ...sort } = req.query;
+        const { page, size, ...sort } = cast<Pagination>(req.query);
         const result = await this.service.all({}, { sort, size, page });
         if (result.hasError) {
             return new Responses.BadRequest(result.message);
@@ -99,16 +98,16 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
     @Delete('bulk')
     public async bulkDelete(req: Request) {
         // FIXME will not work, the query array will be in queryPolluted
-        const idsList = req.query.ids.split(',');
+        // const idsList = req.query.ids.split(',');
 
-        if (AppUtils.isEmpty(idsList)) {
-            return new Responses.BadRequest('please_provide_valid_list_of_ids');
-        }
+        // if (AppUtils.isEmpty(idsList)) {
+        //     return new Responses.BadRequest('please_provide_valid_list_of_ids');
+        // }
 
-        const completion = await this.service.bulkDelete(idsList);
-        if (AppUtils.isFalsy(completion)) {
-            return new Responses.BadRequest('one_of_entities_not_exist');
-        }
+        // const completion = await this.service.bulkDelete(idsList);
+        // if (AppUtils.isFalsy(completion)) {
+        //     return new Responses.BadRequest('one_of_entities_not_exist');
+        // }
 
         return null;
     }

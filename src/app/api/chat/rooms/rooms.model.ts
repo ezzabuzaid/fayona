@@ -1,5 +1,5 @@
-import { BaseModel, Entity, Field, ForeignKey } from '@lib/mongoose';
 import { Constants } from '@core/helpers';
+import { Entity, Field, ForeignKey } from '@lib/mongoose';
 
 // FIXME
 // cannot use RoomMemberSchema as submodel for single or mutliple mode,
@@ -16,5 +16,3 @@ export class RoomSchema {
     @Field({ pure: true }) public avatar?: string = null;
     @Field() single = true;
 }
-
-export default BaseModel(RoomSchema);
