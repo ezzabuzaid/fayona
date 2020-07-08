@@ -44,11 +44,6 @@ export class Wrapper {
         return router;
     }
 
-    private static dispatchRouter({ router }: any) {
-        this.getRouter(router);
-        this.list.splice(router);
-    }
-
 }
 
 Wrapper.registerRouter(PortalRoutes);

@@ -4,6 +4,7 @@ import { ApplicationConstants } from '@core/constants';
 import { Constants, HashService } from '@core/helpers';
 import { Responses, SuccessResponse } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
+import { locate } from '@lib/locator';
 import { PrimaryKey } from '@lib/mongoose';
 import { Get, Post, Router } from '@lib/restful';
 import { PasswordValidator, PrimaryIDValidator, TokenValidator, validate } from '@shared/common';
@@ -105,8 +106,9 @@ export class RefreshTokenDto {
     public token: string;
     public refreshToken: string;
     constructor(user_id: PrimaryKey, role: string, verified: boolean) {
-        this.token = PortalHelper.generateToken(user_id, role, verified);
-        this.refreshToken = PortalHelper.generateRefreshToken(user_id);
+        const portalHelper = locate(PortalHelper);
+        this.token = portalHelper.generateToken(user_id, role, verified);
+        this.refreshToken = portalHelper.generateRefreshToken(user_id);
     }
 }
 
@@ -221,7 +223,7 @@ export class PortalRoutes {
     @Post(Constants.Endpoints.SEND_PINCODE, validate(SendPincodeValidator))
     public async sendPincode(req: Request) {
         const { email, mobile, type, id } = cast<SendPincodeValidator>(req.body);
-        const pincode = PortalHelper.generatePinCode();
+        const pincode = locate(PortalHelper).generatePinCode();
         if (type === 'email') {
             const result = await usersService.one({ email, _id: id });
             if (AppUtils.not(result.hasError)) {
