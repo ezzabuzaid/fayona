@@ -1,5 +1,5 @@
 import { CrudService } from './crud.service';
-import { Post, Put, Delete, HttpGet, Patch } from '@lib/restful';
+import { Post, Put, HttpDelete, HttpGet, Patch } from '@lib/restful';
 import { Request } from 'express';
 import { Responses } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
@@ -63,7 +63,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    @Delete(':id', isValidId())
+    @HttpDelete(':id', isValidId())
     public async delete(req: Request) {
         const { id } = req.params;
 
@@ -95,7 +95,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    @Delete('bulk')
+    @HttpDelete('bulk')
     public async bulkDelete(req: Request) {
         // FIXME will not work, the query array will be in queryPolluted
         // const idsList = req.query.ids.split(',');

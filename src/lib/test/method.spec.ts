@@ -4,7 +4,7 @@ import {
     IMetadata,
     generateMetadataKey,
     Post,
-    Delete,
+    HttpDelete,
     Put,
     Patch,
     HttpGet,
@@ -64,7 +64,7 @@ describe('Decoration', () => {
     it('DELETE', () => {
         const metaDto = generateMeta({ method: METHODS.DELETE, uri: '/delete' });
 
-        const decoration = Delete(metaDto.uri);
+        const decoration = HttpDelete(metaDto.uri);
         decoration(metaDto.target, metaDto.propertyKey, { value: null });
 
         const key = generateMetadataKey(metaDto.method, metaDto.uri);
