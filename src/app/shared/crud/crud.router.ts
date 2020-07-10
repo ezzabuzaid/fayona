@@ -1,5 +1,5 @@
 import { CrudService } from './crud.service';
-import { HttpPost, HttpPut, HttpDelete, HttpGet, Patch } from '@lib/restful';
+import { HttpPost, HttpPut, HttpDelete, HttpGet, HttpPatch } from '@lib/restful';
 import { Request } from 'express';
 import { Responses } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
@@ -37,7 +37,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Created(result.data);
     }
 
-    @Patch(':id', isValidId())
+    @HttpPatch(':id', isValidId())
     public async update(req: Request) {
         const { id } = cast(req.params);
 

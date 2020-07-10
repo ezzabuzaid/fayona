@@ -6,7 +6,7 @@ import {
     HttpPost,
     HttpDelete,
     HttpPut,
-    Patch,
+    HttpPatch,
     HttpGet,
     define,
     Route,
@@ -86,7 +86,7 @@ describe('Decoration', () => {
     it('PATCH', () => {
         const metaDto = generateMeta({ method: METHODS.PATCH, uri: '/patch' });
 
-        const decoration = Patch(metaDto.uri);
+        const decoration = HttpPatch(metaDto.uri);
         decoration(metaDto.target, metaDto.propertyKey, { value: null });
 
         const key = generateMetadataKey(metaDto.method, metaDto.uri);

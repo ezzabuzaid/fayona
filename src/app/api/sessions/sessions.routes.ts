@@ -1,6 +1,6 @@
 import { SessionSchema } from './sessions.model';
 import { Request } from 'express';
-import { HttpGet, Route, Patch } from '@lib/restful';
+import { HttpGet, Route, HttpPatch } from '@lib/restful';
 import { Constants } from '@core/helpers';
 import { CrudRouter } from '../../shared/crud';
 import { sessionsService, SessionsService } from './sessions.service';
@@ -36,7 +36,7 @@ export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {
         return new Responses.Ok(records.data);
     }
 
-    @Patch('deactivate', validate(DeactivateSessionPayload))
+    @HttpPatch('deactivate', validate(DeactivateSessionPayload))
     public async deActivateSession(req: Request) {
         const { session_id: _id, user } = cast<DeactivateSessionPayload>(req.body);
         const result = await this.service.deActivate({ _id, user });
