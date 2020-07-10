@@ -11,7 +11,7 @@ import assert from 'assert';
 import { LookupsRoutes } from '@api/lookups';
 import { AdvertisementRouter } from '@api/advertisement';
 
-export class Wrapper {
+export class ApiFactory {
     private static list = [];
     public static registerRouter(router, subRouter?) {
         if (!!subRouter) {
@@ -46,12 +46,12 @@ export class Wrapper {
 
 }
 
-Wrapper.registerRouter(PortalRoutes);
-Wrapper.registerRouter(UsersRouter);
-Wrapper.registerRouter(FeedbackRouter);
-Wrapper.registerRouter(SessionRouter);
-Wrapper.registerRouter(RoomsRouter);
-Wrapper.registerRouter(FileUploadRoutes);
-Wrapper.registerRouter(SettingRoutes);
-Wrapper.registerRouter(AdvertisementRouter);
-Wrapper.registerRouter(LookupsRoutes);
+ApiFactory.registerRouter(PortalRoutes);
+ApiFactory.registerRouter(UsersRouter);
+ApiFactory.registerRouter(FeedbackRouter);
+ApiFactory.registerRouter(SessionRouter);
+ApiFactory.registerRouter(RoomsRouter);
+ApiFactory.registerRouter(FileUploadRoutes);
+ApiFactory.registerRouter(SettingRoutes);
+ApiFactory.registerRouter(AdvertisementRouter);
+ApiFactory.registerRouter(LookupsRoutes);

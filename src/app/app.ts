@@ -8,7 +8,7 @@ import express = require('express');
 import helmet = require('helmet');
 import hpp = require('hpp');
 import morgan = require('morgan');
-import { Wrapper } from './wrapper';
+import { ApiFactory } from './wrapper';
 import path from 'path';
 import cors from 'cors';
 import sanitize from 'express-mongo-sanitize';
@@ -69,7 +69,7 @@ export class Application {
             next();
         });
 
-        Wrapper.routers.forEach(({ router, uri }) => {
+        ApiFactory.routers.forEach(({ router, uri }) => {
             this.application.use(path.join('/api', uri), router);
         });
 
