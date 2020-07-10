@@ -6,7 +6,13 @@ import { IRouterDecorationOption } from './methods.types';
 import { IMetadata, method_metadata_key } from './index';
 import { wrapRoutes } from '@core/helpers/route';
 
-export function Route(baseUri: string, options: IRouterDecorationOption = {}) {
+/**
+ * When no name is provided the name will autamatically be the name of the route,
+ * which by convention is the route class name minus the "Route" suffix.
+ * ex., the Route class name is ExampleRoute, so the Route name is "example".
+ * @param path
+ */
+export function Route(baseUri?: string, options: IRouterDecorationOption = {}) {
     return function <T extends new (...args: any[]) => any>(constructor: T) {
         const router = expressRouter(options);
         const instance = new constructor();
@@ -45,9 +51,17 @@ export function Route(baseUri: string, options: IRouterDecorationOption = {}) {
                 return {
                     router,
                     id: AppUtils.generateHash(),
-                    uri: path.normalize(path.join('/', baseUri, '/'))
+                    uri: formatUri(constructor, baseUri)
                 };
             }
         };
     };
+}
+
+function formatUri(target, baseUri?: string) {
+    let uri = baseUri;
+    if (AppUtils.isEmptyString(baseUri)) {
+        uri = target.name.substring(target.name.lastIndexOf(Route.name), -target.name.length);
+    }
+    return path.normalize(path.join('/', uri, '/'));
 }
