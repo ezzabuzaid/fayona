@@ -5,7 +5,7 @@ import {
     generateMetadataKey,
     Post,
     HttpDelete,
-    Put,
+    HttpPut,
     Patch,
     HttpGet,
     define,
@@ -75,7 +75,7 @@ describe('Decoration', () => {
     it('PUT', () => {
         const metaDto = generateMeta({ method: METHODS.PUT, uri: '/put' });
 
-        const decoration = Put(metaDto.uri);
+        const decoration = HttpPut(metaDto.uri);
         decoration(metaDto.target, metaDto.propertyKey, { value: null });
 
         const key = generateMetadataKey(metaDto.method, metaDto.uri);
