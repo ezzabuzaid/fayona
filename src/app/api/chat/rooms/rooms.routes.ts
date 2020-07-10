@@ -1,4 +1,4 @@
-import { Route, Post, HttpGet } from '@lib/restful';
+import { Route, HttpPost, HttpGet } from '@lib/restful';
 import { Constants } from '@core/helpers';
 import { CrudRouter, Pagination } from '@shared/crud';
 import { RoomSchema } from './rooms.model';
@@ -35,7 +35,7 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
         super(roomsService);
     }
 
-    @Post('/', validate(RoomPayload))
+    @HttpPost('/', validate(RoomPayload))
     public async create(req: Request) {
         // TODO: create member and group should be within transaction
         const { members, message, name } = cast<RoomPayload>(req.body);

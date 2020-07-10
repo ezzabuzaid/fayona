@@ -3,7 +3,7 @@ import {
     IMetadataDto,
     IMetadata,
     generateMetadataKey,
-    Post,
+    HttpPost,
     HttpDelete,
     HttpPut,
     Patch,
@@ -53,7 +53,7 @@ describe('Decoration', () => {
     it('POST', () => {
         const metaDto = generateMeta({ method: METHODS.POST, uri: '/post' });
 
-        const decoration = Post(metaDto.uri);
+        const decoration = HttpPost(metaDto.uri);
         decoration(metaDto.target, metaDto.propertyKey, { value: null });
 
         const key = generateMetadataKey(metaDto.method, metaDto.uri);

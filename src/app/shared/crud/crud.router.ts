@@ -1,5 +1,5 @@
 import { CrudService } from './crud.service';
-import { Post, HttpPut, HttpDelete, HttpGet, Patch } from '@lib/restful';
+import { HttpPost, HttpPut, HttpDelete, HttpGet, Patch } from '@lib/restful';
 import { Request } from 'express';
 import { Responses } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
@@ -27,7 +27,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         assert(AppUtils.notNullOrUndefined(service));
     }
 
-    @Post('/')
+    @HttpPost('/')
     public async create(req: Request) {
         // TODO: payload is not validated yet
         const result = await this.service.create(req.body);
@@ -112,7 +112,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return null;
     }
 
-    @Post('bulk')
+    @HttpPost('bulk')
     public async bulkUpdate(req: Request) {
         const { entites } = req.body as { entites: Array<Payload<SchemaType>> };
         if (AppUtils.isEmpty(entites)) {

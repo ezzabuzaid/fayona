@@ -6,7 +6,7 @@ import { Responses, SuccessResponse } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
 import { locate } from '@lib/locator';
 import { PrimaryKey } from '@lib/mongoose';
-import { HttpGet, Post, Route } from '@lib/restful';
+import { HttpGet, HttpPost, Route } from '@lib/restful';
 import { PasswordValidator, PrimaryIDValidator, TokenValidator, validate } from '@shared/common';
 import { EmailService } from '@shared/email';
 import { identity, IRefreshTokenClaim, tokenService } from '@shared/identity';
@@ -120,7 +120,7 @@ export class PortalRoutes {
     static MAX_SESSION_SIZE = 10;
     constructor() { }
 
-    @Post(Constants.Endpoints.LOGIN, validate(CredentialsPayload), validate(DeviceUUIDHeaderValidator, 'headers'))
+    @HttpPost(Constants.Endpoints.LOGIN, validate(CredentialsPayload), validate(DeviceUUIDHeaderValidator, 'headers'))
     public async login(req: Request) {
         // TODO: send an email to user to notify him about login attempt.
 
@@ -153,7 +153,7 @@ export class PortalRoutes {
 
     }
 
-    @Post(Constants.Endpoints.LOGOUT, validate(DeviceUUIDHeaderValidator, 'headers'))
+    @HttpPost(Constants.Endpoints.LOGOUT, validate(DeviceUUIDHeaderValidator, 'headers'))
     public async logout(req: Request) {
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
         const result = await sessionsService.deActivate({ device_uuid });
@@ -163,7 +163,7 @@ export class PortalRoutes {
         return new Responses.Ok(result.data);
     }
 
-    @Post(
+    @HttpPost(
         Constants.Endpoints.REFRESH_TOKEN,
         validate(DeviceUUIDHeaderValidator, 'headers'),
         validate(RefreshTokenPayload)
@@ -197,7 +197,7 @@ export class PortalRoutes {
         return new Responses.BadRequest();
     }
 
-    @Post(
+    @HttpPost(
         Constants.Endpoints.ACCOUNT_VERIFIED,
         validate(AccountVerificationPayload, 'body', 'Please make sure you have entered the correct information payload.')
     )
@@ -220,7 +220,7 @@ export class PortalRoutes {
         }
     }
 
-    @Post(Constants.Endpoints.SEND_PINCODE, validate(SendPincodeValidator))
+    @HttpPost(Constants.Endpoints.SEND_PINCODE, validate(SendPincodeValidator))
     public async sendPincode(req: Request) {
         const { email, mobile, type, id } = cast<SendPincodeValidator>(req.body);
         const pincode = locate(PortalHelper).generatePinCode();
@@ -240,7 +240,7 @@ export class PortalRoutes {
         // No error handling if the user is not exist
     }
 
-    @Post(Constants.Endpoints.CHECK_PINCODE, validate(CheckPincodeValidator))
+    @HttpPost(Constants.Endpoints.CHECK_PINCODE, validate(CheckPincodeValidator))
     public async checkPincode(req: Request) {
         const payload = cast<CheckPincodeValidator>(req.body);
         const expectedPincode = pincodes.get(payload.id);
@@ -252,7 +252,7 @@ export class PortalRoutes {
         return new Responses.Ok(null);
     }
 
-    @Post(
+    @HttpPost(
         Constants.Endpoints.RESET_PASSWORD,
         validate(PasswordValidator),
         validate(CheckPincodeValidator),

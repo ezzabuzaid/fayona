@@ -1,4 +1,4 @@
-import { Route, Post, HttpGet } from '@lib/restful';
+import { Route, HttpPost, HttpGet } from '@lib/restful';
 import { Multer } from '@shared/multer';
 import { Request } from 'express';
 import { Constants } from '@core/helpers';
@@ -42,7 +42,7 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         super(uploadsService);
     }
 
-    @Post('/:id', isValidId(), multer.upload)
+    @HttpPost('/:id', isValidId(), multer.upload)
     public async uploadFile(req: Request) {
         const { id } = cast(req.params);
         const { file } = req;

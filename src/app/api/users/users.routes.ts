@@ -2,7 +2,7 @@ import { AccountsRouter } from '@api/profiles';
 import { Constants } from '@core/helpers';
 import { Responses, SuccessResponse } from '@core/response';
 import { cast } from '@core/utils';
-import { HttpGet, Post, Route } from '@lib/restful';
+import { HttpGet, HttpPost, Route } from '@lib/restful';
 import { validate } from '@shared/common';
 import { CrudRouter, Pagination } from '@shared/crud';
 import { EmailService } from '@shared/email';
@@ -27,7 +27,7 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
         super(usersService);
     }
 
-    @Post()
+    @HttpPost()
     public async create(req: Request) {
         const payload = cast<UsersSchema>(req.body);
         const result = await this.service.create(payload);

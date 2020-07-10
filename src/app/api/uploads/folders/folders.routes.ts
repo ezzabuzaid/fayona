@@ -3,7 +3,7 @@ import { identity, tokenService } from '@shared/identity';
 import { CrudRouter } from '@shared/crud';
 import { FoldersSchema } from '..';
 import foldersService from './folders.service';
-import { HttpGet, Post, Route } from '@lib/restful';
+import { HttpGet, HttpPost, Route } from '@lib/restful';
 import sharedFolderService from '../shared-folder/shared-folder.service';
 import { NameValidator, validate } from '@shared/common';
 import { Request } from 'express';
@@ -31,7 +31,7 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema> {
         return new Responses.Ok(folders.data);
     }
 
-    @Post('/', validate(NameValidator))
+    @HttpPost('/', validate(NameValidator))
     public async createFolder(req: Request) {
         const { name } = req.body;
         const { id } = await tokenService.decodeToken(req.headers.authorization);
