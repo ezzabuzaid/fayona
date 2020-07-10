@@ -1,5 +1,5 @@
 import { CrudService } from './crud.service';
-import { Post, Put, Delete, Get, Patch } from '@lib/restful';
+import { Post, Put, Delete, HttpGet, Patch } from '@lib/restful';
 import { Request } from 'express';
 import { Responses } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
@@ -74,7 +74,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    @Get(':id', isValidId())
+    @HttpGet(':id', isValidId())
     public async fetchEntity(req: Request) {
         const { id } = req.params;
         const result = await this.service.one({ _id: id } as any);
@@ -84,7 +84,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    @Get('/', validate(Pagination, 'query'))
+    @HttpGet('/', validate(Pagination, 'query'))
     public async fetchEntities(req: Request) {
         // TODO: Check that the sort object has the same properties in <T>
         const { page, size, ...sort } = cast<Pagination>(req.query);

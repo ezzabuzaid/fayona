@@ -1,4 +1,4 @@
-import { Router, Post, Get } from '@lib/restful';
+import { Router, Post, HttpGet } from '@lib/restful';
 import { Constants } from '@core/helpers';
 import { CrudRouter, Pagination } from '@shared/crud';
 import { RoomSchema } from './rooms.model';
@@ -74,7 +74,7 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
         return new Responses.Created(room.data);
     }
 
-    @Get('members', validate(SearchForRoomByMemberValidator, 'queryPolluted'))
+    @HttpGet('members', validate(SearchForRoomByMemberValidator, 'queryPolluted'))
     async getRoomByMemebers(req: Request) {
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
         const { members } = cast<SearchForRoomByMemberValidator>(req['queryPolluted']);
@@ -83,7 +83,7 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
         return new Responses.Ok(room);
     }
 
-    @Get(':id/members', isValidId())
+    @HttpGet(':id/members', isValidId())
     public async getRoomMembers(req: Request) {
         const { id } = cast<{ id: PrimaryKey }>(req.params);
         const result = await membersService.all({ room: id }, {
@@ -94,21 +94,21 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
         return new Responses.Ok(result.data);
     }
 
-    @Get('groups')
+    @HttpGet('groups')
     public async getGroups(req: Request) {
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
         const groups = await membersService.getMemberRooms(decodedToken.id, false);
         return groups;
     }
 
-    @Get('conversations')
+    @HttpGet('conversations')
     public async getConversations(req: Request) {
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
         const conversations = await membersService.getMemberRooms(decodedToken.id, true);
         return conversations;
     }
 
-    @Get(':id/messages', isValidId(), validate(Pagination, 'query'))
+    @HttpGet(':id/messages', isValidId(), validate(Pagination, 'query'))
     async getConversationMessages(req: Request) {
         const { id } = cast<{ id: PrimaryKey }>(req.params);
         const options = cast<Pagination>(req.query);

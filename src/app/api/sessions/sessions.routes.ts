@@ -1,6 +1,6 @@
 import { SessionSchema } from './sessions.model';
 import { Request } from 'express';
-import { Get, Router, Patch } from '@lib/restful';
+import { HttpGet, Router, Patch } from '@lib/restful';
 import { Constants } from '@core/helpers';
 import { CrudRouter } from '../../shared/crud';
 import { sessionsService, SessionsService } from './sessions.service';
@@ -29,7 +29,7 @@ export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {
         super(sessionsService);
     }
 
-    @Get(Constants.Endpoints.USERS_SESSIONS)
+    @HttpGet(Constants.Endpoints.USERS_SESSIONS)
     public async getUserSessions(req: Request) {
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
         const records = await this.service.all({ user: decodedToken.id });

@@ -1,4 +1,4 @@
-import { Router, Get, Post } from '@lib/restful';
+import { Router, HttpGet, Post } from '@lib/restful';
 import { Request } from 'express';
 import { locateModel } from '@lib/mongoose';
 import { SettingSchema } from './settings.model';
@@ -6,7 +6,7 @@ import { SettingSchema } from './settings.model';
 @Router('settings')
 export class SettingRoutes {
 
-    @Get()
+    @HttpGet()
     async getSettings() {
         const document = await locateModel(SettingSchema).findOne();
         return document.settings || {};
@@ -21,7 +21,7 @@ export class SettingRoutes {
         return name;
     }
 
-    @Get('/:name')
+    @HttpGet('/:name')
     async getSetting(req: Request) {
         const { name } = req.params;
         const document = await locateModel(SettingSchema).findOne();

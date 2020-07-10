@@ -1,4 +1,4 @@
-import { Router, Post, Get } from '@lib/restful';
+import { Router, Post, HttpGet } from '@lib/restful';
 import { Multer } from '@shared/multer';
 import { Request } from 'express';
 import { Constants } from '@core/helpers';
@@ -65,7 +65,7 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         });
     }
 
-    @Get(Constants.Endpoints.SEARCH, validate(FilesSearchPayload, 'query'))
+    @HttpGet(Constants.Endpoints.SEARCH, validate(FilesSearchPayload, 'query'))
     public async searchForFolders(req: Request) {
         const { file, folder, tag, ...options } = cast<FilesSearchPayload>(req.query);
         const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);

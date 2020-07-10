@@ -6,7 +6,7 @@ import { Responses, SuccessResponse } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
 import { locate } from '@lib/locator';
 import { PrimaryKey } from '@lib/mongoose';
-import { Get, Post, Router } from '@lib/restful';
+import { HttpGet, Post, Router } from '@lib/restful';
 import { PasswordValidator, PrimaryIDValidator, TokenValidator, validate } from '@shared/common';
 import { EmailService } from '@shared/email';
 import { identity, IRefreshTokenClaim, tokenService } from '@shared/identity';
@@ -275,7 +275,7 @@ export class PortalRoutes {
         return new Responses.Ok(null);
     }
 
-    @Get(Constants.Endpoints.VERIFY_EMAIL, validate(TokenValidator, 'query'))
+    @HttpGet(Constants.Endpoints.VERIFY_EMAIL, validate(TokenValidator, 'query'))
     public async updateUserEmailVerification(req: Request, res: Response) {
         const { token } = cast<TokenValidator>(req.query);
         const decodedToken = await tokenService.decodeToken(token);
@@ -286,7 +286,7 @@ export class PortalRoutes {
         res.redirect('http://localhost:4200/');
     }
 
-    @Get(Constants.Endpoints.SEND_Verification_EMAIL, identity.isAuthenticated())
+    @HttpGet(Constants.Endpoints.SEND_Verification_EMAIL, identity.isAuthenticated())
     public async sendVerificationEmail(req: Request) {
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
         const result = await usersService.one({ _id: decodedToken.id });

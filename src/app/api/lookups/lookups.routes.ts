@@ -1,4 +1,4 @@
-import { Router, Get } from '@lib/restful';
+import { Router, HttpGet } from '@lib/restful';
 import { identity } from '@shared/identity';
 import { Responses } from '@core/response';
 
@@ -10,7 +10,7 @@ const nationalities = [{ key: 'Afghan', value: 'أفغاني' }, { key: 'Albania
 })
 export class LookupsRoutes {
 
-    @Get('nationalities')
+    @HttpGet('nationalities')
     getNationalities() {
         return new Responses.Ok(nationalities);
     }

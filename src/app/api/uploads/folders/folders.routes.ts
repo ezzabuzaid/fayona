@@ -3,7 +3,7 @@ import { identity, tokenService } from '@shared/identity';
 import { CrudRouter } from '@shared/crud';
 import { FoldersSchema } from '..';
 import foldersService from './folders.service';
-import { Get, Post, Router } from '@lib/restful';
+import { HttpGet, Post, Router } from '@lib/restful';
 import sharedFolderService from '../shared-folder/shared-folder.service';
 import { NameValidator, validate } from '@shared/common';
 import { Request } from 'express';
@@ -17,14 +17,14 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema> {
         super(foldersService);
     }
 
-    @Get('user/shared')
+    @HttpGet('user/shared')
     public async getUserSharedolders(req: Request) {
         const { id } = await tokenService.decodeToken(req.headers.authorization);
         const folders = await sharedFolderService.getUserFolders(id, true);
         return new Responses.Ok(folders.data);
     }
 
-    @Get('user')
+    @HttpGet('user')
     public async getUserFolders(req: Request) {
         const { id } = await tokenService.decodeToken(req.headers.authorization);
         const folders = await sharedFolderService.getUserFolders(id, false);
@@ -48,7 +48,7 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema> {
         return new Responses.Created(result.data);
     }
 
-    @Get('tags')
+    @HttpGet('tags')
     getTags() {
         class Tag {
             static count = -1;

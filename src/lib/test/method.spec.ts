@@ -7,7 +7,7 @@ import {
     Delete,
     Put,
     Patch,
-    Get,
+    HttpGet,
     define,
     Router,
 } from '@lib/restful';
@@ -97,7 +97,7 @@ describe('Decoration', () => {
     it('GET', () => {
         const metaDto = generateMeta({ method: METHODS.GET, uri: '/get' });
 
-        const decoration = Get(metaDto.uri);
+        const decoration = HttpGet(metaDto.uri);
         decoration(metaDto.target, metaDto.propertyKey, { value: null });
 
         const key = generateMetadataKey(metaDto.method, metaDto.uri);
