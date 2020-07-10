@@ -1,9 +1,9 @@
-import { Router } from '@lib/restful';
+import { Route } from '@lib/restful';
 import { FeedbackSchema, } from './feedback.model';
 import { Repo, CrudRouter, CrudService } from '@shared/crud';
 import { Constants } from '@core/helpers';
 
-@Router(Constants.Endpoints.FEEDBACK)
+@Route(Constants.Endpoints.FEEDBACK)
 export class FeedbackRouter extends CrudRouter<FeedbackSchema> {
     constructor() {
         super(new CrudService(new Repo(FeedbackSchema)));

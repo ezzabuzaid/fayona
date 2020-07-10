@@ -6,7 +6,7 @@ import { IRouterDecorationOption } from './methods.types';
 import { IMetadata, method_metadata_key } from './index';
 import { wrapRoutes } from '@core/helpers/route';
 
-export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
+export function Route(baseUri: string, options: IRouterDecorationOption = {}) {
     return function <T extends new (...args: any[]) => any>(constructor: T) {
         const router = expressRouter(options);
         const instance = new constructor();

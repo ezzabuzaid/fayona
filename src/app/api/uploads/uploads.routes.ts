@@ -1,4 +1,4 @@
-import { Router, Post, HttpGet } from '@lib/restful';
+import { Route, Post, HttpGet } from '@lib/restful';
 import { Multer } from '@shared/multer';
 import { Request } from 'express';
 import { Constants } from '@core/helpers';
@@ -32,7 +32,7 @@ const allowedImageTypes = [
 ];
 
 const multer = new Multer({ allowedTypes: allowedImageTypes });
-@Router(Constants.Endpoints.UPLOADS, {
+@Route(Constants.Endpoints.UPLOADS, {
     middleware: [identity.isAuthenticated()],
     children: [FoldersRoutes]
 })

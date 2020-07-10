@@ -6,7 +6,7 @@ import { Responses, SuccessResponse } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
 import { locate } from '@lib/locator';
 import { PrimaryKey } from '@lib/mongoose';
-import { HttpGet, Post, Router } from '@lib/restful';
+import { HttpGet, Post, Route } from '@lib/restful';
 import { PasswordValidator, PrimaryIDValidator, TokenValidator, validate } from '@shared/common';
 import { EmailService } from '@shared/email';
 import { identity, IRefreshTokenClaim, tokenService } from '@shared/identity';
@@ -114,7 +114,7 @@ export class RefreshTokenDto {
 
 export class LoginDto extends RefreshTokenDto { }
 
-@Router(Constants.Endpoints.PORTAL)
+@Route(Constants.Endpoints.PORTAL)
 export class PortalRoutes {
 
     static MAX_SESSION_SIZE = 10;

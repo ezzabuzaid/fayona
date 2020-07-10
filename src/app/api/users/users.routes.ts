@@ -2,7 +2,7 @@ import { AccountsRouter } from '@api/profiles';
 import { Constants } from '@core/helpers';
 import { Responses, SuccessResponse } from '@core/response';
 import { cast } from '@core/utils';
-import { HttpGet, Post, Router } from '@lib/restful';
+import { HttpGet, Post, Route } from '@lib/restful';
 import { validate } from '@shared/common';
 import { CrudRouter, Pagination } from '@shared/crud';
 import { EmailService } from '@shared/email';
@@ -18,7 +18,7 @@ class UsernameValidator extends Pagination {
     public username: string = null;
 }
 
-@Router(Constants.Endpoints.USERS, {
+@Route(Constants.Endpoints.USERS, {
     middleware: [identity.isAuthenticated()],
     children: [AccountsRouter]
 })

@@ -1,9 +1,9 @@
-import { Router, HttpGet, Post } from '@lib/restful';
+import { Route, HttpGet, Post } from '@lib/restful';
 import { Request } from 'express';
 import { locateModel } from '@lib/mongoose';
 import { SettingSchema } from './settings.model';
 
-@Router('settings')
+@Route('settings')
 export class SettingRoutes {
 
     @HttpGet()

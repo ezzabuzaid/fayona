@@ -1,4 +1,4 @@
-import { Router, Post, HttpGet } from '@lib/restful';
+import { Route, Post, HttpGet } from '@lib/restful';
 import { Constants } from '@core/helpers';
 import { CrudRouter, Pagination } from '@shared/crud';
 import { RoomSchema } from './rooms.model';
@@ -27,7 +27,7 @@ class SearchForRoomByMemberValidator {
     }) public members: PrimaryKey[] = null;
 }
 
-@Router(Constants.Endpoints.ROOMS, {
+@Route(Constants.Endpoints.ROOMS, {
     middleware: [identity.isAuthenticated()]
 })
 export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {

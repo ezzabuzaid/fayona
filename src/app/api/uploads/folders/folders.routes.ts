@@ -3,13 +3,13 @@ import { identity, tokenService } from '@shared/identity';
 import { CrudRouter } from '@shared/crud';
 import { FoldersSchema } from '..';
 import foldersService from './folders.service';
-import { HttpGet, Post, Router } from '@lib/restful';
+import { HttpGet, Post, Route } from '@lib/restful';
 import sharedFolderService from '../shared-folder/shared-folder.service';
 import { NameValidator, validate } from '@shared/common';
 import { Request } from 'express';
 import { Responses } from '@core/response';
 
-@Router(Constants.Endpoints.FOLDERS, {
+@Route(Constants.Endpoints.FOLDERS, {
     middleware: [identity.isAuthenticated()],
 })
 export class FoldersRoutes extends CrudRouter<FoldersSchema> {

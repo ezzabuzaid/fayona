@@ -1,6 +1,6 @@
 import { SessionSchema } from './sessions.model';
 import { Request } from 'express';
-import { HttpGet, Router, Patch } from '@lib/restful';
+import { HttpGet, Route, Patch } from '@lib/restful';
 import { Constants } from '@core/helpers';
 import { CrudRouter } from '../../shared/crud';
 import { sessionsService, SessionsService } from './sessions.service';
@@ -21,7 +21,7 @@ export class DeactivateSessionPayload extends PayloadValidator {
 
 }
 
-@Router(Constants.Endpoints.SESSIONS, {
+@Route(Constants.Endpoints.SESSIONS, {
     middleware: [identity.isAuthenticated()]
 })
 export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {

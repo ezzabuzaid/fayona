@@ -9,7 +9,7 @@ import {
     Patch,
     HttpGet,
     define,
-    Router,
+    Route,
 } from '@lib/restful';
 import 'reflect-metadata';
 
@@ -109,7 +109,7 @@ describe('Decoration', () => {
 
 describe('Router Decorator', () => {
     it('Test', () => {
-        const router = Router('router');
+        const router = Route('router');
         router(class {
 
         });
