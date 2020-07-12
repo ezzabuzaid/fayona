@@ -1,9 +1,10 @@
 export * from './field';
 export * from './entity';
 
-import { Schema, SchemaType, SchemaTypeOpts, Types } from 'mongoose';
+import { Schema, SchemaType, SchemaTypeOpts, Types, Document as MongooseDocument } from 'mongoose';
 import { OmitProperties } from '@core/utils';
 
+export type Document<T> = T & MongooseDocument
 export namespace MongooseTypes {
 
     export type FieldOptions = SchemaTypeOpts<any> | Schema | SchemaType & {
