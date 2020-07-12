@@ -49,8 +49,8 @@ export class EmailService {
 
 export function fakeEmail(token = ''): Mail.Options {
     return {
-        from: 'ezzabuzaid@gmail.com',
-        to: 'ezzabuzaid@hotmail.com',
+        from: 'sender@test.com',
+        to: 'receiver@test.com',
         subject: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
         Please click on the following link, or paste this into your browser to complete the process:\n\n
         http://website.com/reset/${token }\n\n
