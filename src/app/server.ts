@@ -1,19 +1,17 @@
+import messagesService from '@api/chat/messages/messages.service';
 import { Database } from '@core/database';
 import { StageLevel } from '@core/helpers';
-import { Logger, LoggerLevel, AppUtils } from '@core/utils';
-import { envirnoment } from '@environment/env';
-import http = require('http');
-import { URL } from 'url';
-import { Application } from './app';
-import socketIO from 'socket.io';
 import stage from '@core/helpers/stage';
-import messagesService from '@api/chat/messages/messages.service';
-import { IsString, IsMongoId, IsNotEmpty, IsInt, IsNumber } from 'class-validator';
-import { validatePayload } from '@shared/common';
+import { AppUtils, Logger, LoggerLevel } from '@core/utils';
+import { envirnoment } from '@environment/env';
 import { PrimaryKey } from '@lib/mongoose';
+import { strictAssign, validatePayload } from '@lib/validation';
 import { tokenService } from '@shared/identity';
-import { Request } from 'express';
-
+import { IsInt, IsMongoId, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import socketIO from 'socket.io';
+import url, { URL } from 'url';
+import { Application } from './app';
+import http = require('http');
 const log = new Logger('Server');
 
 interface IRoom {
@@ -35,13 +33,13 @@ class MessagePayload {
         public timestamp = null;
 
         constructor(payload: MessagePayload) {
-                AppUtils.strictAssign(this, payload);
+                strictAssign(this, payload);
         }
 }
 
 export class NodeServer extends Application {
-        private port = +envirnoment.get('PORT') || 8080;
-        private host = envirnoment.get('HOST') || '127.0.0.1';
+        private port = +envirnoment.get('PORT');
+        private host = envirnoment.get('HOST');
         private server: http.Server = null;
         public path: URL = null;
 
@@ -51,8 +49,13 @@ export class NodeServer extends Application {
                 this.populateServer();
         }
 
-        public static serverUrl(req: Request) {
-                return req.protocol + '://' + req.get('host') + '/api';
+        public static serverUrl(pathname: string) {
+                return url.format({
+                        protocol: envirnoment.get('PROTOCOL'),
+                        host: envirnoment.get('HOST'),
+                        port: envirnoment.get('PORT'),
+                        pathname: 'api/' + pathname
+                });
         }
 
         public static async bootstrap() {
