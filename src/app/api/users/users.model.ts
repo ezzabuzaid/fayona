@@ -1,5 +1,5 @@
 import { ProfilesSchema } from '@api/profiles';
-import { Constants, HashService } from '@core/helpers';
+import { Constants, HashHelper } from '@core/helpers';
 import { AppUtils } from '@core/utils';
 import { Entity, Field } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
@@ -25,7 +25,7 @@ export class UsersSchema {
         required: true,
         set(value: string) {
             if (ValidationPatterns.Password.test(value)) {
-                return HashService.hashSync(value);
+                return HashHelper.hashSync(value);
             } else {
                 throw new Error('wrong_password');
             }

@@ -1,6 +1,6 @@
 import bcrypt = require('bcrypt');
 
-export class HashService {
+export class HashHelper {
 
     public static hashAsync(text: string) {
         return bcrypt.hash(text, 12);
