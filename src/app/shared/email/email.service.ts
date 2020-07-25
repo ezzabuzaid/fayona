@@ -4,6 +4,7 @@ import { Constants } from '@core/helpers';
 import { AppUtils } from '@core/utils';
 import { tokenService } from '@shared/identity';
 import { PrimaryKey } from '@lib/mongoose';
+import { NodeServer } from 'app/server';
 
 export class EmailService {
     public static async sendEmail(message: Mail.Options) {
@@ -18,13 +19,13 @@ export class EmailService {
         return transporter.sendMail(message);
     }
 
-    public static sendVerificationEmail(url: string, userEmail: string, userId: PrimaryKey) {
+    public static sendVerificationEmail(userEmail: string, userId: PrimaryKey) {
         const token = tokenService.generateToken({ id: userId }, { expiresIn: '15m' });
         return EmailService.sendEmail({
             from: 'test@test.com',
             to: userEmail,
             subject: 'Verify Email',
-            html: AppUtils.renderHTML('verification-template', { link: `${ url }/${ Constants.Endpoints.PORTAL }/${ Constants.Endpoints.VERIFY_EMAIL }?token=${ token }` })
+            html: AppUtils.renderHTML('verification-template', { link: NodeServer.serverUrl(`${ Constants.Endpoints.PORTAL }/${ Constants.Endpoints.VERIFY_EMAIL }?token=${ token }`) })
         });
     }
 
