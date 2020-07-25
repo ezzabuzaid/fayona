@@ -1,7 +1,8 @@
+import { AppUtils } from '@core/utils';
+import { ColumnSort, Document, ForeignKey, locateModel, Payload, PrimaryKey, Projection } from '@lib/mongoose';
+import { Type } from '@lib/utils';
 import assert from 'assert';
-import { Model, FilterQuery } from 'mongoose';
-import { Document, Payload, Projection, ColumnSort, PrimaryKey, ForeignKey, locateModel } from '@lib/mongoose';
-import { AppUtils, Type } from '@core/utils';
+import { FilterQuery, Model } from 'mongoose';
 
 // TODO: Before any query or write check the body to meet the
 //  model to avoid [injections] this should be done in the repo.

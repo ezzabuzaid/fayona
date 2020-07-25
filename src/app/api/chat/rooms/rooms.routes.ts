@@ -6,12 +6,13 @@ import roomsService, { RoomsService } from './rooms.service';
 import { Request } from 'express';
 import { ArrayNotEmpty, IsString, ArrayMinSize, IsNotEmpty, IsOptional } from 'class-validator';
 import { cast } from '@core/utils';
-import { validate, isValidId } from '@shared/common';
+import { isValidId } from '@shared/common';
 import messagesService from '@api/chat/messages/messages.service';
 import membersService from '@api/chat/members/members.service';
 import { PrimaryKey } from '@lib/mongoose';
 import { identity, tokenService } from '@shared/identity';
 import { Responses } from '@core/response';
+import { validate } from '@lib/validation';
 
 class RoomPayload {
     @ArrayMinSize(1, { message: 'a room should at least contain two member' }) public members: PrimaryKey[] = null;

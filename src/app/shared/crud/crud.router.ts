@@ -5,10 +5,11 @@ import { Responses } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
 import { Payload } from '@lib/mongoose';
 import assert from 'assert';
-import { isValidId, validate } from '@shared/common';
+import { isValidId } from '@shared/common';
 import { IsOptional, IsNumberString, IsObject } from 'class-validator';
+import { validate, PayloadValidator } from '@lib/validation';
 
-export class Pagination {
+export class Pagination extends PayloadValidator {
     @IsOptional()
     @IsNumberString()
     page?: number = null;

@@ -4,14 +4,14 @@ import { HttpGet, Route, HttpPatch } from '@lib/restful';
 import { Constants } from '@core/helpers';
 import { CrudRouter } from '../../shared/crud';
 import { sessionsService, SessionsService } from './sessions.service';
-import { validate, PayloadValidator } from '@shared/common';
 import { IsMongoId } from 'class-validator';
 import { cast } from '@core/utils';
 import { ForeignKey, PrimaryKey } from '@lib/mongoose';
 import { identity, tokenService } from '@shared/identity';
 import { Responses } from '@core/response';
+import { validate } from '@lib/validation';
 
-export class DeactivateSessionPayload extends PayloadValidator {
+export class DeactivateSessionPayload {
 
     @IsMongoId({ message: 'user must be string' })
     public user: ForeignKey = null;

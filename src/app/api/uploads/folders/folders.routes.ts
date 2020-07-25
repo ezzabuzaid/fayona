@@ -5,9 +5,10 @@ import { FoldersSchema } from '..';
 import foldersService from './folders.service';
 import { HttpGet, HttpPost, Route } from '@lib/restful';
 import sharedFolderService from '../shared-folder/shared-folder.service';
-import { NameValidator, validate } from '@shared/common';
+import { NameValidator } from '@shared/common';
 import { Request } from 'express';
 import { Responses } from '@core/response';
+import { validate } from '@lib/validation';
 
 @Route(Constants.Endpoints.FOLDERS, {
     middleware: [identity.isAuthenticated()],

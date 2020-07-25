@@ -8,10 +8,11 @@ import uploadsService, { UploadsService } from './uploads.service';
 import path from 'path';
 import { cast } from '@core/utils';
 import { IsMongoId, IsOptional, IsString, IsNumberString } from 'class-validator';
-import { validate, isValidId } from '@shared/common';
+import { isValidId } from '@shared/common';
 import { identity, tokenService } from '@shared/identity';
 import { FoldersRoutes } from './folders/folders.routes';
 import { Responses } from '@core/response';
+import { validate } from '@lib/validation';
 
 class FilesSearchPayload extends Pagination {
     @IsOptional()

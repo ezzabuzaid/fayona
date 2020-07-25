@@ -1,8 +1,6 @@
 import { randomBytes } from 'crypto';
 import { Directories } from '@shared/common';
-
-export type Type<T> = new (...args: any[]) => T;
-export type Parameter<T extends (args: any) => any> = T extends (args: infer P) => any ? P : never;
+import { Type } from '@lib/utils';
 
 export class AppUtils {
 
@@ -140,14 +138,6 @@ export class AppUtils {
             } else { clone[i] = obj[i]; }
         }
         return clone;
-    }
-
-    public static strictAssign<T>(thisType: ThisType<T>, payload: Partial<T>) {
-        for (const key in thisType) {
-            if (thisType.hasOwnProperty(key)) {
-                thisType[key] = payload[key];
-            }
-        }
     }
 
     public static defineProperty(prototype: object, propertyKey: string, options: PropertyDescriptor) {

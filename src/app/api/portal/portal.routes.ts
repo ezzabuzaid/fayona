@@ -1,13 +1,13 @@
 import { sessionsService } from '@api/sessions/sessions.service';
 import usersService from '@api/users/users.service';
 import { ApplicationConstants } from '@core/constants';
-import { Constants, HashService } from '@core/helpers';
+import { Constants, HashHelper } from '@core/helpers';
 import { Responses, SuccessResponse } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
 import { locate } from '@lib/locator';
 import { PrimaryKey } from '@lib/mongoose';
 import { HttpGet, HttpPost, Route } from '@lib/restful';
-import { PasswordValidator, PrimaryIDValidator, TokenValidator, validate } from '@shared/common';
+import { PasswordValidator, PrimaryIDValidator, TokenValidator } from '@shared/common';
 import { EmailService } from '@shared/email';
 import { identity, IRefreshTokenClaim, tokenService } from '@shared/identity';
 import { NodeServer } from 'app/server';
@@ -16,6 +16,7 @@ import { Request, Response } from 'express';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { scheduleJob } from 'node-schedule';
 import { PortalHelper } from './portal.helper';
+import { validate } from '@lib/validation';
 
 class Pincode {
     public ttl = AppUtils.duration(5);
@@ -136,7 +137,7 @@ export class PortalRoutes {
         if (result.hasError) {
             return new Responses.BadRequest(result.message);
         }
-        const isPasswordEqual = HashService.comparePassword(password, user.password);
+        const isPasswordEqual = HashHelper.comparePassword(password, user.password);
         if (AppUtils.isFalsy(isPasswordEqual)) {
             return new Responses.BadRequest('wrong_credintals');
         }
@@ -293,7 +294,7 @@ export class PortalRoutes {
         if (result.hasError) {
             return new Responses.BadRequest('Please try again later');
         }
-        EmailService.sendVerificationEmail(NodeServer.serverUrl(req), result.data.email, result.data.id);
+        EmailService.sendVerificationEmail(result.data.email, result.data.id);
         return new Responses.Ok('Email has been sent successfully');
     }
 
