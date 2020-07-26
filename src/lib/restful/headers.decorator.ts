@@ -1,13 +1,12 @@
 import { ParameterMetadata, ParameterType, registerParameter } from '.';
-import { Type } from '@lib/utils';
 
-export function FromBody<T>(bodyType: Type<T>) {
+export function FromHeaders(header: string) {
     return (target: any, propertyKey: string, parameterIndex: number) => {
         registerParameter(
             new ParameterMetadata(
                 parameterIndex,
-                ParameterType.BODY,
-                bodyType,
+                ParameterType.HEADERS,
+                { header } as any,
                 propertyKey,
                 target.constructor.name
             )

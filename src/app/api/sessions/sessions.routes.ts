@@ -1,17 +1,17 @@
 import { SessionSchema } from './sessions.model';
 import { Request } from 'express';
-import { Get, Router, Patch } from '@lib/restful';
+import { HttpGet, Route, HttpPatch } from '@lib/restful';
 import { Constants } from '@core/helpers';
 import { CrudRouter } from '../../shared/crud';
 import { sessionsService, SessionsService } from './sessions.service';
-import { validate, PayloadValidator } from '@shared/common';
 import { IsMongoId } from 'class-validator';
 import { cast } from '@core/utils';
 import { ForeignKey, PrimaryKey } from '@lib/mongoose';
 import { identity, tokenService } from '@shared/identity';
 import { Responses } from '@core/response';
+import { validate } from '@lib/validation';
 
-export class DeactivateSessionPayload extends PayloadValidator {
+export class DeactivateSessionPayload {
 
     @IsMongoId({ message: 'user must be string' })
     public user: ForeignKey = null;
@@ -21,7 +21,7 @@ export class DeactivateSessionPayload extends PayloadValidator {
 
 }
 
-@Router(Constants.Endpoints.SESSIONS, {
+@Route(Constants.Endpoints.SESSIONS, {
     middleware: [identity.isAuthenticated()]
 })
 export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {
@@ -29,14 +29,14 @@ export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {
         super(sessionsService);
     }
 
-    @Get(Constants.Endpoints.USERS_SESSIONS)
+    @HttpGet(Constants.Endpoints.USERS_SESSIONS)
     public async getUserSessions(req: Request) {
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
         const records = await this.service.all({ user: decodedToken.id });
         return new Responses.Ok(records.data);
     }
 
-    @Patch('deactivate', validate(DeactivateSessionPayload))
+    @HttpPatch('deactivate', validate(DeactivateSessionPayload))
     public async deActivateSession(req: Request) {
         const { session_id: _id, user } = cast<DeactivateSessionPayload>(req.body);
         const result = await this.service.deActivate({ _id, user });

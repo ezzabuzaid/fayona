@@ -1,4 +1,4 @@
-import { Router, Post, Get } from '@lib/restful';
+import { Route, HttpPost, HttpGet } from '@lib/restful';
 import { Multer } from '@shared/multer';
 import { Request } from 'express';
 import { Constants } from '@core/helpers';
@@ -8,10 +8,11 @@ import uploadsService, { UploadsService } from './uploads.service';
 import path from 'path';
 import { cast } from '@core/utils';
 import { IsMongoId, IsOptional, IsString, IsNumberString } from 'class-validator';
-import { validate, isValidId } from '@shared/common';
+import { isValidId } from '@shared/common';
 import { identity, tokenService } from '@shared/identity';
 import { FoldersRoutes } from './folders/folders.routes';
 import { Responses } from '@core/response';
+import { validate } from '@lib/validation';
 
 class FilesSearchPayload extends Pagination {
     @IsOptional()
@@ -32,7 +33,7 @@ const allowedImageTypes = [
 ];
 
 const multer = new Multer({ allowedTypes: allowedImageTypes });
-@Router(Constants.Endpoints.UPLOADS, {
+@Route(Constants.Endpoints.UPLOADS, {
     middleware: [identity.isAuthenticated()],
     children: [FoldersRoutes]
 })
@@ -42,7 +43,7 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         super(uploadsService);
     }
 
-    @Post('/:id', isValidId(), multer.upload)
+    @HttpPost('/:id', isValidId(), multer.upload)
     public async uploadFile(req: Request) {
         const { id } = cast(req.params);
         const { file } = req;
@@ -65,7 +66,7 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         });
     }
 
-    @Get(Constants.Endpoints.SEARCH, validate(FilesSearchPayload, 'query'))
+    @HttpGet(Constants.Endpoints.SEARCH, validate(FilesSearchPayload, 'query'))
     public async searchForFolders(req: Request) {
         const { file, folder, tag, ...options } = cast<FilesSearchPayload>(req.query);
         const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);

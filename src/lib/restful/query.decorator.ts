@@ -1,13 +1,13 @@
 import { ParameterMetadata, ParameterType, registerParameter } from '.';
 import { Type } from '@lib/utils';
 
-export function FromBody<T>(bodyType: Type<T>) {
+export function FromQuery<T>(payload: Type<T>) {
     return (target: any, propertyKey: string, parameterIndex: number) => {
         registerParameter(
             new ParameterMetadata(
                 parameterIndex,
-                ParameterType.BODY,
-                bodyType,
+                ParameterType.QUERY,
+                payload,
                 propertyKey,
                 target.constructor.name
             )

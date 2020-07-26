@@ -2,12 +2,13 @@ import multer = require('multer');
 import path = require('path');
 import assert = require('assert');
 
-import { AppUtils, Parameter, cast } from '@core/utils';
+import { AppUtils, cast } from '@core/utils';
 import { Request, NextFunction, Response } from 'express';
 import { Responses, ErrorResponse } from '@core/response';
 import { Types } from 'mongoose';
 import foldersService from '@api/uploads/folders/folders.service';
 import { Directories } from '@shared/common';
+import { Parameter } from '@lib/utils';
 
 export class UploadOptions {
     public allowedTypes: string[] = [];

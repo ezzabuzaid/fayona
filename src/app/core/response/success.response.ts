@@ -1,4 +1,4 @@
-import { HttpResponse } from './response';
+import { HttpResponse } from './generic.response';
 import { NetworkStatus } from '@core/helpers';
 import { translate } from '@lib/translation';
 

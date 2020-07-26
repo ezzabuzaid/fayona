@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import { define, METHODS } from '.';
 
-export function Put(uri = '/', ...middlewares: RequestHandler[]): any {
+export function HttpPut(uri = '/', ...middlewares: RequestHandler[]): any {
     return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
         const originalMethod = descriptor.value;
         descriptor.value = function() {

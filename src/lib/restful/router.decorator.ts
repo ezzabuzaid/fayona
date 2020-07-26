@@ -1,12 +1,19 @@
-import 'reflect-metadata';
-import path = require('path');
-import { AppUtils } from '@core/utils';
-import { Router as expressRouter } from 'express';
-import { IRouterDecorationOption } from './methods.types';
-import { IMetadata, method_metadata_key } from './index';
 import { wrapRoutes } from '@core/helpers/route';
+import { AppUtils } from '@core/utils';
+import { locate } from '@lib/locator';
+import { _validate } from '@lib/validation';
+import { Router as expressRouter, Request } from 'express';
+import { Metadata, ParameterType } from './index';
+import { IRouterDecorationOption } from './methods.types';
+import path = require('path');
 
-export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
+/**
+ * When no name is provided the name will autamatically be the name of the route,
+ * which by convention is the route class name minus the "Route" suffix.
+ * ex., the Route class name is ExampleRoute, so the Route name is "example".
+ * @param path
+ */
+export function Route(endpoint?: string, options: IRouterDecorationOption = {}) {
     return function <T extends new (...args: any[]) => any>(constructor: T) {
         const router = expressRouter(options);
         const instance = new constructor();
@@ -18,20 +25,28 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
             });
         }
 
-        Reflect.getMetadataKeys(constructor)
-            .forEach((key: string) => {
-                if (key.startsWith(method_metadata_key)) {
-                    const metadata = Reflect.getMetadata(key, constructor) as IMetadata;
-                    Reflect.deleteMetadata(key, constructor);
-                    if (metadata) {
-                        const { handler, method, middlewares, uri } = metadata;
-                        const normalizedURI = path.normalize(path.join('/', uri));
-                        router[method](normalizedURI, wrapRoutes(...middlewares, function originalMethod() {
-                            return handler.apply(instance, Array.from(arguments));
-                        }));
-                    }
-                }
+        const metadata = locate(Metadata);
+        metadata.getRoutes(constructor.name)
+            .forEach(routeMetadata => {
+                const normalizedEndpoint = path.normalize(path.join('/', routeMetadata.endpoint));
+                routeMetadata.middlewares.push(function () {
+                    const [request] = Array.from(arguments) as [Request];
+                    const parameterizedArguments = metadata.getRouteParameter(routeMetadata.getHandlerName())
+                        .reduce((accumlator, parameterMetadata) => {
+                            if (parameterMetadata.type === ParameterType.HEADERS) {
+                                const [header] = Object.values(parameterMetadata.payload);
+                                accumlator[parameterMetadata.index] = request.header(header);
+                            } else {
+                                const payloadType = request[parameterMetadata.type];
+                                accumlator[parameterMetadata.index] = _validate(parameterMetadata.payload, payloadType);
+                            }
+                            return accumlator;
+                        }, []);
+                    return routeMetadata.handler.apply(instance, parameterizedArguments);
+                });
+                router[routeMetadata.method](normalizedEndpoint, wrapRoutes(...routeMetadata.middlewares));
             });
+        metadata.removeRoutes(constructor.name);
 
         if (AppUtils.hasItemWithin(options.middleware)) {
             router.use(wrapRoutes(...options.middleware));
@@ -45,9 +60,17 @@ export function Router(baseUri: string, options: IRouterDecorationOption = {}) {
                 return {
                     router,
                     id: AppUtils.generateHash(),
-                    uri: path.normalize(path.join('/', baseUri, '/'))
+                    uri: formatUri(constructor, endpoint)
                 };
             }
         };
     };
+}
+
+function formatUri(target, baseUri?: string) {
+    let uri = baseUri;
+    if (AppUtils.isEmptyString(baseUri)) {
+        uri = target.name.substring(target.name.lastIndexOf(Route.name), -target.name.length);
+    }
+    return path.normalize(path.join('/', uri, '/'));
 }

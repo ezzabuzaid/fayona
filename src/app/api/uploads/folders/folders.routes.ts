@@ -3,13 +3,14 @@ import { identity, tokenService } from '@shared/identity';
 import { CrudRouter } from '@shared/crud';
 import { FoldersSchema } from '..';
 import foldersService from './folders.service';
-import { Get, Post, Router } from '@lib/restful';
+import { HttpGet, HttpPost, Route } from '@lib/restful';
 import sharedFolderService from '../shared-folder/shared-folder.service';
-import { NameValidator, validate } from '@shared/common';
+import { NameValidator } from '@shared/common';
 import { Request } from 'express';
 import { Responses } from '@core/response';
+import { validate } from '@lib/validation';
 
-@Router(Constants.Endpoints.FOLDERS, {
+@Route(Constants.Endpoints.FOLDERS, {
     middleware: [identity.isAuthenticated()],
 })
 export class FoldersRoutes extends CrudRouter<FoldersSchema> {
@@ -17,21 +18,21 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema> {
         super(foldersService);
     }
 
-    @Get('user/shared')
+    @HttpGet('user/shared')
     public async getUserSharedolders(req: Request) {
         const { id } = await tokenService.decodeToken(req.headers.authorization);
         const folders = await sharedFolderService.getUserFolders(id, true);
         return new Responses.Ok(folders.data);
     }
 
-    @Get('user')
+    @HttpGet('user')
     public async getUserFolders(req: Request) {
         const { id } = await tokenService.decodeToken(req.headers.authorization);
         const folders = await sharedFolderService.getUserFolders(id, false);
         return new Responses.Ok(folders.data);
     }
 
-    @Post('/', validate(NameValidator))
+    @HttpPost('/', validate(NameValidator))
     public async createFolder(req: Request) {
         const { name } = req.body;
         const { id } = await tokenService.decodeToken(req.headers.authorization);
@@ -48,7 +49,7 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema> {
         return new Responses.Created(result.data);
     }
 
-    @Get('tags')
+    @HttpGet('tags')
     getTags() {
         class Tag {
             static count = -1;

@@ -68,6 +68,8 @@
     "tslib": "^1.13.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^9.0.1",
+    "@commitlint/config-conventional": "^9.0.1",
     "@types/faker": "^4.1.10",
     "@types/geoip-lite": "^1.1.31",
     "@types/jest": "^24.9.1",
@@ -90,7 +92,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint && npm run build:prod && git add ."
+      "pre-commit": "npm run lint && npm run build:prod && git add .",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   },
   "main": "main.ts",

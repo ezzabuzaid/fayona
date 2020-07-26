@@ -4,6 +4,7 @@ import { Constants } from '@core/helpers';
 import { AppUtils } from '@core/utils';
 import { tokenService } from '@shared/identity';
 import { PrimaryKey } from '@lib/mongoose';
+import { NodeServer } from 'app/server';
 
 export class EmailService {
     public static async sendEmail(message: Mail.Options) {
@@ -18,13 +19,13 @@ export class EmailService {
         return transporter.sendMail(message);
     }
 
-    public static sendVerificationEmail(url: string, userEmail: string, userId: PrimaryKey) {
+    public static sendVerificationEmail(userEmail: string, userId: PrimaryKey) {
         const token = tokenService.generateToken({ id: userId }, { expiresIn: '15m' });
         return EmailService.sendEmail({
             from: 'test@test.com',
             to: userEmail,
             subject: 'Verify Email',
-            html: AppUtils.renderHTML('verification-template', { link: `${ url }/${ Constants.Endpoints.PORTAL }/${ Constants.Endpoints.VERIFY_EMAIL }?token=${ token }` })
+            html: AppUtils.renderHTML('verification-template', { link: NodeServer.serverUrl(`${ Constants.Endpoints.PORTAL }/${ Constants.Endpoints.VERIFY_EMAIL }?token=${ token }`) })
         });
     }
 
@@ -49,8 +50,8 @@ export class EmailService {
 
 export function fakeEmail(token = ''): Mail.Options {
     return {
-        from: 'ezzabuzaid@gmail.com',
-        to: 'ezzabuzaid@hotmail.com',
+        from: 'sender@test.com',
+        to: 'receiver@test.com',
         subject: `You are receiving this email because you (or someone else) have requested the reset of the password for your account.\n\n
         Please click on the following link, or paste this into your browser to complete the process:\n\n
         http://website.com/reset/${token }\n\n

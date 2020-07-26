@@ -1,5 +1,5 @@
-import { Logger } from '@core/utils';
-import { connect, ConnectionOptions, Mongoose, Connection } from 'mongoose';
+import { Logger } from '@core/utils/logger.service';
+import { connect, Connection, ConnectionOptions } from 'mongoose';
 
 const log = new Logger('Database');
 
@@ -27,7 +27,7 @@ class MongooseURI {
     }
 
     get user() {
-        return this._user ? `${this._user}:` : '';
+        return this._user ? `${ this._user }:` : '';
     }
     get password() {
         return this._password || '';
@@ -36,13 +36,13 @@ class MongooseURI {
         return this._path || '';
     }
     get host() {
-        return this._host ? `@${this._host}` : '';
+        return this._host ? `@${ this._host }` : '';
     }
     get atlas() {
         return this._atlas;
     }
     get URI() {
-        return `mongodb${!!this.atlas ? '+srv' : ''}://${this.user}${this.password}${this.host}/${this.path}`;
+        return `mongodb${ !!this.atlas ? '+srv' : '' }://${ this.user }${ this.password }${ this.host }/${ this.path }`;
     }
 
 }

@@ -1,14 +1,15 @@
 import { CrudService } from './crud.service';
-import { Post, Put, Delete, Get, Patch } from '@lib/restful';
+import { HttpPost, HttpPut, HttpDelete, HttpGet, HttpPatch } from '@lib/restful';
 import { Request } from 'express';
 import { Responses } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
 import { Payload } from '@lib/mongoose';
 import assert from 'assert';
-import { isValidId, validate } from '@shared/common';
+import { isValidId } from '@shared/common';
 import { IsOptional, IsNumberString, IsObject } from 'class-validator';
+import { validate, PayloadValidator } from '@lib/validation';
 
-export class Pagination {
+export class Pagination extends PayloadValidator {
     @IsOptional()
     @IsNumberString()
     page?: number = null;
@@ -27,7 +28,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         assert(AppUtils.notNullOrUndefined(service));
     }
 
-    @Post('/')
+    @HttpPost('/')
     public async create(req: Request) {
         // TODO: payload is not validated yet
         const result = await this.service.create(req.body);
@@ -37,7 +38,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Created(result.data);
     }
 
-    @Patch(':id', isValidId())
+    @HttpPatch(':id', isValidId())
     public async update(req: Request) {
         const { id } = cast(req.params);
 
@@ -50,7 +51,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    @Put(':id', isValidId())
+    @HttpPut(':id', isValidId())
     public async set(req: Request) {
         const { id } = cast(req.params);
 
@@ -63,7 +64,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    @Delete(':id', isValidId())
+    @HttpDelete(':id', isValidId())
     public async delete(req: Request) {
         const { id } = req.params;
 
@@ -74,7 +75,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    @Get(':id', isValidId())
+    @HttpGet(':id', isValidId())
     public async fetchEntity(req: Request) {
         const { id } = req.params;
         const result = await this.service.one({ _id: id } as any);
@@ -84,7 +85,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    @Get('/', validate(Pagination, 'query'))
+    @HttpGet('/', validate(Pagination, 'query'))
     public async fetchEntities(req: Request) {
         // TODO: Check that the sort object has the same properties in <T>
         const { page, size, ...sort } = cast<Pagination>(req.query);
@@ -95,7 +96,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    @Delete('bulk')
+    @HttpDelete('bulk')
     public async bulkDelete(req: Request) {
         // FIXME will not work, the query array will be in queryPolluted
         // const idsList = req.query.ids.split(',');
@@ -112,7 +113,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return null;
     }
 
-    @Post('bulk')
+    @HttpPost('bulk')
     public async bulkUpdate(req: Request) {
         const { entites } = req.body as { entites: Array<Payload<SchemaType>> };
         if (AppUtils.isEmpty(entites)) {

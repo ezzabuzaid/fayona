@@ -3,13 +3,13 @@ import {
     IMetadataDto,
     IMetadata,
     generateMetadataKey,
-    Post,
-    Delete,
-    Put,
-    Patch,
-    Get,
+    HttpPost,
+    HttpDelete,
+    HttpPut,
+    HttpPatch,
+    HttpGet,
     define,
-    Router,
+    Route,
 } from '@lib/restful';
 import 'reflect-metadata';
 
@@ -53,7 +53,7 @@ describe('Decoration', () => {
     it('POST', () => {
         const metaDto = generateMeta({ method: METHODS.POST, uri: '/post' });
 
-        const decoration = Post(metaDto.uri);
+        const decoration = HttpPost(metaDto.uri);
         decoration(metaDto.target, metaDto.propertyKey, { value: null });
 
         const key = generateMetadataKey(metaDto.method, metaDto.uri);
@@ -64,7 +64,7 @@ describe('Decoration', () => {
     it('DELETE', () => {
         const metaDto = generateMeta({ method: METHODS.DELETE, uri: '/delete' });
 
-        const decoration = Delete(metaDto.uri);
+        const decoration = HttpDelete(metaDto.uri);
         decoration(metaDto.target, metaDto.propertyKey, { value: null });
 
         const key = generateMetadataKey(metaDto.method, metaDto.uri);
@@ -75,7 +75,7 @@ describe('Decoration', () => {
     it('PUT', () => {
         const metaDto = generateMeta({ method: METHODS.PUT, uri: '/put' });
 
-        const decoration = Put(metaDto.uri);
+        const decoration = HttpPut(metaDto.uri);
         decoration(metaDto.target, metaDto.propertyKey, { value: null });
 
         const key = generateMetadataKey(metaDto.method, metaDto.uri);
@@ -86,7 +86,7 @@ describe('Decoration', () => {
     it('PATCH', () => {
         const metaDto = generateMeta({ method: METHODS.PATCH, uri: '/patch' });
 
-        const decoration = Patch(metaDto.uri);
+        const decoration = HttpPatch(metaDto.uri);
         decoration(metaDto.target, metaDto.propertyKey, { value: null });
 
         const key = generateMetadataKey(metaDto.method, metaDto.uri);
@@ -97,7 +97,7 @@ describe('Decoration', () => {
     it('GET', () => {
         const metaDto = generateMeta({ method: METHODS.GET, uri: '/get' });
 
-        const decoration = Get(metaDto.uri);
+        const decoration = HttpGet(metaDto.uri);
         decoration(metaDto.target, metaDto.propertyKey, { value: null });
 
         const key = generateMetadataKey(metaDto.method, metaDto.uri);
@@ -109,7 +109,7 @@ describe('Decoration', () => {
 
 describe('Router Decorator', () => {
     it('Test', () => {
-        const router = Router('router');
+        const router = Route('router');
         router(class {
 
         });

@@ -1,6 +1,6 @@
 import en from '@assets/languages/en.json';
 import ar from '@assets/languages/ar.json';
-import { ErrorHandling, StageLevel, wrapRoutes } from '@core/helpers';
+import { wrapRoutes, ErrorHandling } from '@core/helpers';
 import { Logger } from '@core/utils';
 import { translation } from '@lib/translation';
 import compression = require('compression');
@@ -8,11 +8,10 @@ import express = require('express');
 import helmet = require('helmet');
 import hpp = require('hpp');
 import morgan = require('morgan');
-import { Wrapper } from './wrapper';
+import { ApiFactory } from './wrapper';
 import path from 'path';
 import cors from 'cors';
 import sanitize from 'express-mongo-sanitize';
-import stage from '@core/helpers/stage';
 import { Directories } from '@shared/common';
 
 const log = new Logger('Application');
@@ -31,12 +30,7 @@ export class Application {
      * set app variables
      */
     private configure() {
-        stage.test(StageLevel.PROD, () => {
-            // this.application
-            //     .use(Sentry.Handlers.requestHandler())
-            //     .use(Sentry.Handlers.errorHandler());
-        });
-
+        // TODO: Connect sentry
         this.application
             .use(cors({
                 origin: '*',
@@ -69,7 +63,7 @@ export class Application {
             next();
         });
 
-        Wrapper.routers.forEach(({ router, uri }) => {
+        ApiFactory.routers.forEach(({ router, uri }) => {
             this.application.use(path.join('/api', uri), router);
         });
 

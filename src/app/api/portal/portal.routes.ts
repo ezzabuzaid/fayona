@@ -1,13 +1,13 @@
 import { sessionsService } from '@api/sessions/sessions.service';
 import usersService from '@api/users/users.service';
 import { ApplicationConstants } from '@core/constants';
-import { Constants, HashService } from '@core/helpers';
+import { Constants, HashHelper } from '@core/helpers';
 import { Responses, SuccessResponse } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
 import { locate } from '@lib/locator';
 import { PrimaryKey } from '@lib/mongoose';
-import { Get, Post, Router } from '@lib/restful';
-import { PasswordValidator, PrimaryIDValidator, TokenValidator, validate } from '@shared/common';
+import { HttpGet, HttpPost, Route } from '@lib/restful';
+import { PasswordValidator, PrimaryIDValidator, TokenValidator } from '@shared/common';
 import { EmailService } from '@shared/email';
 import { identity, IRefreshTokenClaim, tokenService } from '@shared/identity';
 import { NodeServer } from 'app/server';
@@ -16,6 +16,7 @@ import { Request, Response } from 'express';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { scheduleJob } from 'node-schedule';
 import { PortalHelper } from './portal.helper';
+import { validate } from '@lib/validation';
 
 class Pincode {
     public ttl = AppUtils.duration(5);
@@ -114,13 +115,13 @@ export class RefreshTokenDto {
 
 export class LoginDto extends RefreshTokenDto { }
 
-@Router(Constants.Endpoints.PORTAL)
+@Route(Constants.Endpoints.PORTAL)
 export class PortalRoutes {
 
     static MAX_SESSION_SIZE = 10;
     constructor() { }
 
-    @Post(Constants.Endpoints.LOGIN, validate(CredentialsPayload), validate(DeviceUUIDHeaderValidator, 'headers'))
+    @HttpPost(Constants.Endpoints.LOGIN, validate(CredentialsPayload), validate(DeviceUUIDHeaderValidator, 'headers'))
     public async login(req: Request) {
         // TODO: send an email to user to notify him about login attempt.
 
@@ -136,7 +137,7 @@ export class PortalRoutes {
         if (result.hasError) {
             return new Responses.BadRequest(result.message);
         }
-        const isPasswordEqual = HashService.comparePassword(password, user.password);
+        const isPasswordEqual = HashHelper.comparePassword(password, user.password);
         if (AppUtils.isFalsy(isPasswordEqual)) {
             return new Responses.BadRequest('wrong_credintals');
         }
@@ -153,7 +154,7 @@ export class PortalRoutes {
 
     }
 
-    @Post(Constants.Endpoints.LOGOUT, validate(DeviceUUIDHeaderValidator, 'headers'))
+    @HttpPost(Constants.Endpoints.LOGOUT, validate(DeviceUUIDHeaderValidator, 'headers'))
     public async logout(req: Request) {
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
         const result = await sessionsService.deActivate({ device_uuid });
@@ -163,7 +164,7 @@ export class PortalRoutes {
         return new Responses.Ok(result.data);
     }
 
-    @Post(
+    @HttpPost(
         Constants.Endpoints.REFRESH_TOKEN,
         validate(DeviceUUIDHeaderValidator, 'headers'),
         validate(RefreshTokenPayload)
@@ -197,7 +198,7 @@ export class PortalRoutes {
         return new Responses.BadRequest();
     }
 
-    @Post(
+    @HttpPost(
         Constants.Endpoints.ACCOUNT_VERIFIED,
         validate(AccountVerificationPayload, 'body', 'Please make sure you have entered the correct information payload.')
     )
@@ -220,7 +221,7 @@ export class PortalRoutes {
         }
     }
 
-    @Post(Constants.Endpoints.SEND_PINCODE, validate(SendPincodeValidator))
+    @HttpPost(Constants.Endpoints.SEND_PINCODE, validate(SendPincodeValidator))
     public async sendPincode(req: Request) {
         const { email, mobile, type, id } = cast<SendPincodeValidator>(req.body);
         const pincode = locate(PortalHelper).generatePinCode();
@@ -240,7 +241,7 @@ export class PortalRoutes {
         // No error handling if the user is not exist
     }
 
-    @Post(Constants.Endpoints.CHECK_PINCODE, validate(CheckPincodeValidator))
+    @HttpPost(Constants.Endpoints.CHECK_PINCODE, validate(CheckPincodeValidator))
     public async checkPincode(req: Request) {
         const payload = cast<CheckPincodeValidator>(req.body);
         const expectedPincode = pincodes.get(payload.id);
@@ -252,7 +253,7 @@ export class PortalRoutes {
         return new Responses.Ok(null);
     }
 
-    @Post(
+    @HttpPost(
         Constants.Endpoints.RESET_PASSWORD,
         validate(PasswordValidator),
         validate(CheckPincodeValidator),
@@ -275,7 +276,7 @@ export class PortalRoutes {
         return new Responses.Ok(null);
     }
 
-    @Get(Constants.Endpoints.VERIFY_EMAIL, validate(TokenValidator, 'query'))
+    @HttpGet(Constants.Endpoints.VERIFY_EMAIL, validate(TokenValidator, 'query'))
     public async updateUserEmailVerification(req: Request, res: Response) {
         const { token } = cast<TokenValidator>(req.query);
         const decodedToken = await tokenService.decodeToken(token);
@@ -286,14 +287,14 @@ export class PortalRoutes {
         res.redirect('http://localhost:4200/');
     }
 
-    @Get(Constants.Endpoints.SEND_Verification_EMAIL, identity.isAuthenticated())
+    @HttpGet(Constants.Endpoints.SEND_Verification_EMAIL, identity.isAuthenticated())
     public async sendVerificationEmail(req: Request) {
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
         const result = await usersService.one({ _id: decodedToken.id });
         if (result.hasError) {
             return new Responses.BadRequest('Please try again later');
         }
-        EmailService.sendVerificationEmail(NodeServer.serverUrl(req), result.data.email, result.data.id);
+        EmailService.sendVerificationEmail(result.data.email, result.data.id);
         return new Responses.Ok('Email has been sent successfully');
     }
 
