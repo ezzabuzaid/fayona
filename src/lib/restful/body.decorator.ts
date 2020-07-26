@@ -1,12 +1,17 @@
-import { RequestHandler } from 'express';
-import { define, METHODS } from '.';
+import { ParameterMetadata, ParameterType, registerParameter } from '.';
+import { Type } from '@lib/utils';
 
-export function FromBody(type) {
-    // return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
-    //     const originalMethod = descriptor.value;
-    //     descriptor.value = function(...args: any[]) {
-    //         return originalMethod.apply(this, args);
-    //     };
-    //     define({ method: METHODS.GET, uri, middlewares, target, propertyKey });
-    // };
+export function FromBody<T>(bodyType: Type<T>) {
+    return (target: any, propertyKey: string, parameterIndex: number) => {
+        registerParameter(
+            new ParameterMetadata(
+                parameterIndex,
+                ParameterType.BODY,
+                bodyType,
+                propertyKey,
+                target.constructor.name
+            )
+        )
+    }
 }
+
