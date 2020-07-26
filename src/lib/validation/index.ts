@@ -10,11 +10,16 @@ export class PayloadValidator {
 
 export function validate<T>(validator: Type<T>, type: 'body' | 'query' | 'params' | 'headers' | 'queryPolluted' = 'body', message?: string) {
     return async (req: Request, res: Response, next: NextFunction) => {
-        const validatee = new validator();
-        strictAssign(validatee, req[type]);
-        await validatePayload(validatee, message);
+        _validate(validator, req[type], message);
         next();
     };
+}
+
+export async function _validate<T>(validator: Type<T>, incomingObject, message?: string) {
+    const validatee = new validator();
+    strictAssign(validatee, incomingObject);
+    await validatePayload(validatee, message);
+    return validatee;
 }
 
 export async function validatePayload<T>(payload: T, message?: string) {
@@ -28,7 +33,6 @@ export async function validatePayload<T>(payload: T, message?: string) {
         throw error;
     }
 }
-
 
 export function strictAssign<T>(thisType: ThisType<T>, payload: Partial<T>) {
     for (const key in thisType) {
