@@ -2,8 +2,8 @@ import { wrapRoutes } from '@core/helpers/route';
 import { AppUtils } from '@core/utils';
 import { locate } from '@lib/locator';
 import { _validate } from '@lib/validation';
-import { Router as expressRouter } from 'express';
-import { Metadata } from './index';
+import { Router as expressRouter, Request } from 'express';
+import { Metadata, ParameterType } from './index';
 import { IRouterDecorationOption } from './methods.types';
 import path = require('path');
 
@@ -30,11 +30,16 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
             .forEach(routeMetadata => {
                 const normalizedEndpoint = path.normalize(path.join('/', routeMetadata.endpoint));
                 routeMetadata.middlewares.push(function () {
-                    const originalArugments = Array.from(arguments);
+                    const [request] = Array.from(arguments) as [Request];
                     const parameterizedArguments = metadata.getRouteParameter(routeMetadata.getHandlerName())
                         .reduce((accumlator, parameterMetadata) => {
-                            const parameter = originalArugments[0][parameterMetadata.type];
-                            accumlator[parameterMetadata.index] = _validate(parameterMetadata.payload, parameter);
+                            if (parameterMetadata.type === ParameterType.HEADERS) {
+                                const [header] = Object.values(parameterMetadata.payload);
+                                accumlator[parameterMetadata.index] = request.header(header);
+                            } else {
+                                const payloadType = request[parameterMetadata.type];
+                                accumlator[parameterMetadata.index] = _validate(parameterMetadata.payload, payloadType);
+                            }
                             return accumlator;
                         }, []);
                     return routeMetadata.handler.apply(instance, parameterizedArguments);
