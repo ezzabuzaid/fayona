@@ -1,11 +1,16 @@
-import { Type, AppUtils } from '@core/utils';
+import { AppUtils } from '@core/utils';
+import { Type } from '@lib/utils';
 
 export class Locator {
     private static _instance: Locator;
     static instance = Locator._instance ?? (Locator._instance = new Locator());
     registry = new WeakMap();
-    registerSingelton(TypeOrProvide: Type<any>, provide?: object) {
-        this.registry.set(provide ?? TypeOrProvide, () => TypeOrProvide);
+    registerSingelton<T>(instance: T, provide?: object) {
+        const _provide = provide ?? instance['constructor'];
+        if (this.registry.has(_provide)) {
+            throw new Error('You cannot override registered types')
+        }
+        this.registry.set(_provide, () => instance);
         return this;
     }
     registerFactory(TypeOrProvide: Type<any>, factory?: (init) => Type<any>) {
@@ -32,3 +37,4 @@ export function Singelton() {
 export function locate<T>(type: Type<T>): T {
     return Locator.instance.locate(type);
 }
+
