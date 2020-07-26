@@ -1,18 +1,19 @@
-import en from '@assets/languages/en.json';
 import ar from '@assets/languages/ar.json';
-import { wrapRoutes, ErrorHandling } from '@core/helpers';
+import en from '@assets/languages/en.json';
+import { ErrorHandling, wrapRoutes } from '@core/helpers';
+import stage from '@core/helpers/stage';
 import { Logger } from '@core/utils';
 import { translation } from '@lib/translation';
+import { Directories } from '@shared/common';
+import cors from 'cors';
+import sanitize from 'express-mongo-sanitize';
+import path from 'path';
+import { ApiFactory } from './wrapper';
 import compression = require('compression');
 import express = require('express');
 import helmet = require('helmet');
 import hpp = require('hpp');
 import morgan = require('morgan');
-import { ApiFactory } from './wrapper';
-import path from 'path';
-import cors from 'cors';
-import sanitize from 'express-mongo-sanitize';
-import { Directories } from '@shared/common';
 
 const log = new Logger('Application');
 
@@ -33,7 +34,7 @@ export class Application {
         // TODO: Connect sentry
         this.application
             .use(cors({
-                origin: '*',
+                origin: stage.production ? 'https://angular-buildozer.herokuapp.com' : '*',
                 optionsSuccessStatus: 200,
             }))
             .use(express.json())
