@@ -48,10 +48,10 @@ export class ApiFactory {
 
 ApiFactory.registerRouter(PortalRoutes);
 ApiFactory.registerRouter(UsersRouter);
-ApiFactory.registerRouter(FeedbackRouter);
-ApiFactory.registerRouter(SessionRouter);
-ApiFactory.registerRouter(RoomsRouter);
-ApiFactory.registerRouter(FileUploadRoutes);
-ApiFactory.registerRouter(SettingRoutes);
-ApiFactory.registerRouter(AdvertisementRouter);
-ApiFactory.registerRouter(LookupsRoutes);
+// ApiFactory.registerRouter(FeedbackRouter);
+// ApiFactory.registerRouter(SessionRouter);
+// ApiFactory.registerRouter(RoomsRouter);
+// ApiFactory.registerRouter(FileUploadRoutes);
+// ApiFactory.registerRouter(SettingRoutes);
+// ApiFactory.registerRouter(AdvertisementRouter);
+// ApiFactory.registerRouter(LookupsRoutes);
