@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import 'reflect-metadata';
 import { Locator } from '@lib/locator';
-import { Type } from '@lib/utils';
+import { Type, getPrototypeChain } from '@lib/utils';
 
 export * from './get.decorator';
 export * from './put.decorator';
@@ -104,8 +104,12 @@ export class Metadata {
         this.#routes.push(httpRouteMetadata)
     }
 
-    getRoutes(controllerName: string) {
-        return this.#routes.filter((item) => item.controllerName === controllerName);
+    getRoutes(constructor) {
+        return getPrototypeChain(constructor)
+            .reduce((accumlator, controllerName) => {
+                accumlator.push(... this.#routes.filter((item) => item.controllerName === controllerName));
+                return accumlator;
+            }, []);
     }
 
     getRouteParameter(handlerName: string) {

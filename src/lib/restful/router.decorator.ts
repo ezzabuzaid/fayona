@@ -26,7 +26,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
         }
 
         const metadata = locate(Metadata);
-        metadata.getRoutes(constructor.name)
+        metadata.getRoutes(constructor)
             .forEach(routeMetadata => {
                 const normalizedEndpoint = path.normalize(path.join('/', routeMetadata.endpoint));
                 routeMetadata.middlewares.push(async function () {
