@@ -1,6 +1,6 @@
 import { Constants } from '@core/helpers';
 import { generateExpiredToken, generateDeviceUUIDHeader, getUri, generateToken, createApplicationUser, login } from '@test/fixture';
-import { CredentialsPayload, RefreshTokenPayload, PortalRoutes } from './portal.routes';
+import { CredentialsDto, RefreshTokenDto, PortalRoutes } from './portal.routes';
 import { AppUtils } from '@core/utils';
 import { tokenService, ITokenClaim, IClaim } from '@shared/identity';
 import { isMongoId } from 'class-validator';
@@ -21,14 +21,14 @@ async function getLastSession(headers) {
 }
 
 function createCredentials(username = 'fakeUsername', password = 'fakePassword') {
-    const credentials = new CredentialsPayload();
+    const credentials = new CredentialsDto();
     credentials.password = password;
     credentials.username = username;
     return credentials;
 }
 
 function createRefreshToken(token: string = generateToken(), refreshToken: string = generateToken()) {
-    const payload = new RefreshTokenPayload();
+    const payload = new RefreshTokenDto();
     payload.refreshToken = refreshToken;
     payload.token = token;
     return payload;

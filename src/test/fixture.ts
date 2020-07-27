@@ -4,7 +4,7 @@ import { Payload, WithMongoID } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
 import { ApplicationConstants } from '@core/constants';
 import { AppUtils } from '@core/utils';
-import { CredentialsPayload } from '@api/portal';
+import { CredentialsDto } from '@api/portal';
 import { tokenService } from '@shared/identity';
 import * as faker from 'faker';
 import { SignOptions } from 'jsonwebtoken';
@@ -20,7 +20,7 @@ export function getUri(value: string) {
     return `/api/${ value }`;
 }
 
-export async function prepareUserSession(user?: WithMongoID<CredentialsPayload>) {
+export async function prepareUserSession(user?: WithMongoID<CredentialsDto>) {
     const payload = user ?? {
         email: faker.internet.email(),
         username: generateUsername(),
@@ -110,7 +110,7 @@ export async function createApplicationUser(payload: Partial<UsersSchema> = null
     return response.body.data as UsersSchema;
 }
 
-export async function login(credentials: CredentialsPayload, headers = generateDeviceUUIDHeader()) {
+export async function login(credentials: CredentialsDto, headers = generateDeviceUUIDHeader()) {
 
     const { body: { data } } = await global['superAgent']
         .post(getUri(`${ Constants.Endpoints.PORTAL }/${ Constants.Endpoints.LOGIN }`))

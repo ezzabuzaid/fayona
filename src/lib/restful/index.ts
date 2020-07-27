@@ -12,6 +12,7 @@ export * from './intercept.decorator';
 export * from './post.decorator';
 export * from './body.decorator';
 export * from './query.decorator';
+export * from './response.decorator';
 export * from './methods.types';
 
 export enum METHODS {
@@ -88,7 +89,8 @@ export class HttpRouteMetadata {
 export enum ParameterType {
     BODY = 'body',
     HEADERS = 'headers',
-    QUERY = 'query'
+    QUERY = 'query',
+    RESPONSE = 'response'
 }
 
 export class Metadata {

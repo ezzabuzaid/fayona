@@ -61,6 +61,7 @@
     "nodemailer": "^6.4.4",
     "phone": "^2.4.8",
     "postman-collection": "^3.6.0",
+    "redis": "^3.0.2",
     "reflect-metadata": "^0.1.13",
     "socket.io": "^2.3.0",
     "sqlite": "^3.0.6",
