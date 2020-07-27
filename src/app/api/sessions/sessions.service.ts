@@ -3,7 +3,8 @@ import { Omit } from '@core/utils';
 import { Document, ForeignKey, Payload, WithMongoID } from '@lib/mongoose';
 import { CrudService, Query, Repo } from '@shared/crud';
 import { SessionSchema } from './sessions.model';
-
+import { Singelton } from '@lib/locator';
+@Singelton()
 export class SessionsService extends CrudService<SessionSchema> {
 
     constructor() {
@@ -53,4 +54,3 @@ export class SessionsService extends CrudService<SessionSchema> {
 
 }
 
-export const sessionsService = new SessionsService();

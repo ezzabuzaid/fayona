@@ -210,7 +210,7 @@ export class AppUtils {
 
     /**
      * check if the givin value is empty
-     * --
+     * 
      * supported values are string, array, pojo {}
      */
     static isEmpty(value: any) {

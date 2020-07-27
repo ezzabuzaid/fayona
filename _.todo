@@ -1,7 +1,3 @@
-REVIEW Features
-* Use get_it to manage dependency injection
-* use mongoose plugin to retrive <name> attribute depends on user language
-
 SECTION ALERTS
 * If a certin environment not available such as a "NODE_ENV" ..etc, throw an error before building
 * Make sure that two router doesn't have the same path, check it in the wrapper class
@@ -11,46 +7,3 @@ TODO
 * Crud generator
 * Export Application class instance to be used with server less
 
-SECTION mongoose model
-1_ add hook decorator
-2_ virtuals
-3_ query helper
-
-https://www.npmjs.com/package/injection-js
-
-use http://www.hygen.io/create style for documention section
-
-
-// import { Schema, model } from "mongoose";
-// import { CustomersRouter, SubCustomersRouter } from "./customers.routes";
-
-// function Wrapper(configuration) {
-//     return function (target) { }
-// }
-
-// @Wrapper({
-//     models: [],
-//     routes: [
-//         {
-//             path: 'customers', guard: ['or middleware'], router: CustomersRouter, children: [
-//                 { path: 'sub', router: SubCustomersRouter }
-//             ]
-//         }
-//     ]
-// })
-// export class CustomersModule { }
-
-
-
-// REVIEW  controller => handler(service => unitofwork(repo, model))
-/**
- * unitofwork(repo, model) => first prepare your model then expose it using the repo class and facilitate the methods
- * service => unitofwork(repo, model) => after composing the repo and model you need to leverage them
- * controller => handler(service => unitofwork(repo, model)) the controller like a king will ask the service
- * to do something, the service will be prepared to (validate | ask hassan) and check that everything is okay,
- * to procced the operation then
- * it asks the repo to hold the data in the model(database)
- */
-
-
-mongod --dbpath ~/data/db 

@@ -2,7 +2,7 @@ import { wrapRoutes } from '@core/helpers/route';
 import { AppUtils } from '@core/utils';
 import { locate } from '@lib/locator';
 import { _validate } from '@lib/validation';
-import { Router as expressRouter, Request } from 'express';
+import { Router as expressRouter, Request, Response } from 'express';
 import { Metadata, ParameterType } from './index';
 import { IRouterDecorationOption } from './methods.types';
 import path = require('path');
@@ -29,28 +29,34 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
         metadata.getRoutes(constructor.name)
             .forEach(routeMetadata => {
                 const normalizedEndpoint = path.normalize(path.join('/', routeMetadata.endpoint));
-                routeMetadata.middlewares.push(function () {
-                    const [request] = Array.from(arguments) as [Request];
-                    const parameterizedArguments = metadata.getRouteParameter(routeMetadata.getHandlerName())
-                        .reduce((accumlator, parameterMetadata) => {
-                            if (parameterMetadata.type === ParameterType.HEADERS) {
-                                const [header] = Object.values(parameterMetadata.payload);
-                                accumlator[parameterMetadata.index] = request.header(header);
-                            } else {
-                                const payloadType = request[parameterMetadata.type];
-                                accumlator[parameterMetadata.index] = _validate(parameterMetadata.payload, payloadType);
-                            }
-                            return accumlator;
-                        }, []);
+                routeMetadata.middlewares.push(async function () {
+                    const [request] = Array.from(arguments) as [Request, Response];
+                    const parameterizedArguments = [];
+                    const parameters = metadata.getRouteParameter(routeMetadata.getHandlerName());
+                    for (const parameterMetadata of parameters) {
+                        if (parameterMetadata.type === ParameterType.HEADERS) {
+                            const [header] = Object.values(parameterMetadata.payload);
+                            parameterizedArguments[parameterMetadata.index] = request.header(header);
+                        } else {
+                            const payloadType = request[parameterMetadata.type];
+                            parameterizedArguments[parameterMetadata.index] =
+                                parameterMetadata.payload
+                                    ? await _validate(parameterMetadata.payload, payloadType)
+                                    : payloadType
+                        }
+                    }
                     return routeMetadata.handler.apply(instance, parameterizedArguments);
                 });
-                router[routeMetadata.method](normalizedEndpoint, wrapRoutes(...routeMetadata.middlewares));
+                router[routeMetadata.method](normalizedEndpoint, wrapRoutes(
+                    ...(options.middleware ?? [])
+                    ,
+                    ...routeMetadata.middlewares
+                ));
             });
-        metadata.removeRoutes(constructor.name);
 
-        if (AppUtils.hasItemWithin(options.middleware)) {
-            router.use(wrapRoutes(...options.middleware));
-        }
+        // if (AppUtils.hasItemWithin(options.middleware)) {
+        //     router.use(wrapRoutes(...options.middleware));
+        // }
 
         return class extends constructor {
             constructor(...args) {

@@ -1,8 +1,8 @@
-import { Route, HttpPost, HttpGet } from '@lib/restful';
+import { Route, HttpPost, HttpGet, FromBody, FromQuery } from '@lib/restful';
 import { Constants } from '@core/helpers';
 import { CrudRouter, Pagination } from '@shared/crud';
 import { RoomSchema } from './rooms.model';
-import roomsService, { RoomsService } from './rooms.service';
+import { RoomsService } from './rooms.service';
 import { Request } from 'express';
 import { ArrayNotEmpty, IsString, ArrayMinSize, IsNotEmpty, IsOptional } from 'class-validator';
 import { cast } from '@core/utils';
@@ -13,8 +13,10 @@ import { PrimaryKey } from '@lib/mongoose';
 import { identity, tokenService } from '@shared/identity';
 import { Responses } from '@core/response';
 import { validate } from '@lib/validation';
+import { FromHeaders } from '@lib/restful/headers.decorator';
+import { locate } from '@lib/locator';
 
-class RoomPayload {
+class CreateRoomDto {
     @ArrayMinSize(1, { message: 'a room should at least contain two member' }) public members: PrimaryKey[] = null;
     @IsNotEmpty() message: string = null;
     // @IsOptional()
@@ -33,22 +35,21 @@ class SearchForRoomByMemberValidator {
 })
 export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
     constructor() {
-        super(roomsService);
+        super(locate(RoomsService));
     }
 
-    @HttpPost('/', validate(RoomPayload))
-    public async create(req: Request) {
+    @HttpPost('/')
+    public async createRoom(
+        @FromBody(CreateRoomDto) body: CreateRoomDto,
+        @FromHeaders() authorization: string
+    ) {
         // TODO: create member and group should be within transaction
-        const { members, message, name } = cast<RoomPayload>(req.body);
-        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
+        const { members, message, name } = body;
+        const decodedToken = await tokenService.decodeToken(authorization);
         const room = await this.service.create({
             single: members.length === 1,
             name
         });
-
-        if (room.hasError) {
-            return new Responses.BadRequest(room.message);
-        }
 
         await messagesService.create({
             text: message,
@@ -96,23 +97,22 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
     }
 
     @HttpGet('groups')
-    public async getGroups(req: Request) {
-        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
+    public async getGroups(@FromHeaders() authorization: string) {
+        const decodedToken = await tokenService.decodeToken(authorization);
         const groups = await membersService.getMemberRooms(decodedToken.id, false);
         return groups;
     }
 
     @HttpGet('conversations')
-    public async getConversations(req: Request) {
-        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
+    public async getConversations(@FromHeaders() authorization: string) {
+        const decodedToken = await tokenService.decodeToken(authorization);
         const conversations = await membersService.getMemberRooms(decodedToken.id, true);
         return conversations;
     }
 
     @HttpGet(':id/messages', isValidId(), validate(Pagination, 'query'))
-    async getConversationMessages(req: Request) {
+    async getConversationMessages(req: Request, @FromQuery(Pagination) options: Pagination) {
         const { id } = cast<{ id: PrimaryKey }>(req.params);
-        const options = cast<Pagination>(req.query);
         const result = await messagesService.getLastMessage(id, options);
         return new Responses.Ok(result.data);
     }
