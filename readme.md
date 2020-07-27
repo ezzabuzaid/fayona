@@ -1,17 +1,15 @@
-# Node Buildozer
+# Node Buildozer (The Node version of .NetCore)
 
-  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/ezzabuzaid/document-storage/pulls)  [![License](https://flat.badgen.net/npm/license/@ezzabuzaid/document-storage)](https://www.npmjs.com/package/@ezzabuzaid/document-storage) 
+  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/ezzabuzaid/document-storage/pulls) ![Typed with TypeScript](https://flat.badgen.net/badge/icon/Typed?icon=typescript&label&labelColor=blue&color=555555)
 
-![Typed with TypeScript](https://flat.badgen.net/badge/icon/Typed?icon=typescript&label&labelColor=blue&color=555555)
-
-**A small opinionated framework built on top of Express using Typescript that helps to easily kick off most of the small and mid projects.**
+**A small opinionated framework built on top of Express using Typescript that will help you to easily kick off your project to the world**
 
 ### Highlights
+1. Database independent, doesn't matter what you use!
+2. Errors are handled gloably so you catch when you need to know why that occured
+3. Service errors are handled by the route itself, unless you want to throw custom exception you don't need to do any error handling. default status is `Bad Request`
 
-1. Service error are handled by the route it self, unless you want to throw custom exception you don't need to do any error handling. default status is `Bad Request`
-
-#### List of packages that are totaly independent
-
+#### Packages
 | Package                   | Description                                                                         
 | ------------------------- | ----------------------------------------------------------------------------------- |
 | `@lib/translation` | Translation library that helps you to switch from language to another
@@ -19,8 +17,17 @@
 | `@lib/mongoose` | Set of typescript decorator for mapping fields and schema
 | `@lib/locator` | Simple service locator
 
-## Contributing
+#### Attributes
+| Attribute                   | Description                                                                         
+| ------------------------- | ----------------------------------------------------------------------------------- |
+| `FromBody` | retrive the body from the incoming requst and implictly validate it if possiple
+| `FromQuery` | retrive query params/param from Uri
+| `FromHeaders` | retrive header name from the request
+| `AllowAnonymous` | Mark the route to be authentication free
+| `Authorize(Roles?)` | Prevent access to a route if the user is not authenticated or have the desired role 
 
+
+## Contributing
 Don't hesitate to open issues and make a pull request to help improve code
 
 1.  Fork it!
@@ -30,7 +37,6 @@ Don't hesitate to open issues and make a pull request to help improve code
 5.  Submit a pull request :D
 
 ## Developer
-
 ##### [Ezzabuzaid](mailto:ezzabuzaid@hotmail.com)
 
 * [Dev.to](https://dev.to/ezzabuzaid)
