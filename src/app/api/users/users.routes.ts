@@ -1,36 +1,52 @@
-import { AccountsRouter } from '@api/profiles';
+import { AccountsRouter, ProfilesSchema } from '@api/profiles';
 import { Constants } from '@core/helpers';
 import { Responses, SuccessResponse } from '@core/response';
 import { FromBody, FromQuery, HttpGet, HttpPost, Route } from '@lib/restful';
 import { CrudRouter, Pagination } from '@shared/crud';
 import { EmailService } from '@shared/email';
 import { identity } from '@shared/identity';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, IsEmail } from 'class-validator';
 import { UsersSchema } from './users.model';
-import usersService, { UserService } from './users.service';
+import { UserService } from './users.service';
+import { locate } from '@lib/locator';
 class UsernameValidator extends Pagination {
     @IsOptional()
     @IsString()
     public username: string = null;
 }
 
+class CreateUserDto {
+    @IsString()
+    public username: string = null;
+
+    @IsString()
+    public password: string = null;
+
+    @IsEmail()
+    public email: string = null;
+
+    @IsString()
+    public mobile: string = null;
+
+    @IsOptional()
+    public profile: ProfilesSchema = null;
+}
+
 @Route(Constants.Endpoints.USERS, {
-    middleware: [identity.isAuthenticated()],
+    // middleware: [identity.isAuthenticated()],
     children: [AccountsRouter]
 })
 export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
     constructor() {
-        super(usersService);
+        super(locate(UserService));
     }
 
-    @HttpPost('testCreate')
-    public async creates(@FromBody(UsersSchema) body: UsersSchema) {
-        const result = await this.service.create(body);
-        if (result.hasError) {
-            return new Responses.BadRequest(result.message);
-        }
-        EmailService.sendVerificationEmail(body.email, result.data.id);
-        return new SuccessResponse(result.data, 'An e-mail has been sent to your email inbox in order to verify the account');
+    @HttpPost()
+    // TODO: Use AllowAnonymous()
+    public async create(@FromBody(CreateUserDto) body: CreateUserDto) {
+        const { data } = await this.service.create(body);
+        EmailService.sendVerificationEmail(body.email, data.id);
+        return new SuccessResponse(data, 'An e-mail has been sent to your email inbox in order to verify the account');
     }
 
     @HttpGet(Constants.Endpoints.SEARCH)
@@ -40,7 +56,7 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
         return new Responses.Ok(users.data);
     }
 
-    @HttpGet('username')
+    @HttpGet('username', identity.isAuthenticated())
     public async isUsernameExist(@FromQuery(UsernameValidator) query: UsernameValidator) {
         const { username } = query;
         const result = await this.service.one({ username });

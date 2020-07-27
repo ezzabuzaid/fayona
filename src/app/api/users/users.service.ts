@@ -1,7 +1,9 @@
 import { UsersSchema, } from './users.model';
 import { CrudService, } from '@shared/crud/crud.service';
 import { Repo, Pagination } from '@shared/crud';
+import { Singelton } from '@lib/locator';
 
+@Singelton()
 export class UserService extends CrudService<UsersSchema> {
     constructor() {
         super(new Repo(UsersSchema), {
@@ -18,4 +20,3 @@ export class UserService extends CrudService<UsersSchema> {
         }, options);
     }
 }
-export default new UserService();

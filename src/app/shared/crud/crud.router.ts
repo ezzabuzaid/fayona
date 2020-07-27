@@ -1,5 +1,5 @@
 import { CrudService } from './crud.service';
-import { HttpPost, HttpPut, HttpDelete, HttpGet, HttpPatch } from '@lib/restful';
+import { HttpPost, HttpPut, HttpDelete, HttpGet, HttpPatch, FromBody } from '@lib/restful';
 import { Request } from 'express';
 import { Responses } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
@@ -29,12 +29,9 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
     }
 
     @HttpPost('/')
-    public async create(req: Request) {
+    public async create(@FromBody() body) {
         // TODO: payload is not validated yet
-        const result = await this.service.create(req.body);
-        if (result.hasError) {
-            return new Responses.BadRequest(result.message);
-        }
+        const result = await this.service.create(body);
         return new Responses.Created(result.data);
     }
 

@@ -6,6 +6,7 @@ import { NextFunction, Request, Response } from 'express';
 import { NetworkStatus } from './network-status';
 import stage from './stage';
 import { PAYLOAD_VALIDATION_ERRORS } from '@lib/validation';
+import { Result } from '@core/response';
 
 export function wrapRoutes(...middlewares) {
     return middlewares.map((middleware) => (req: Request, res: Response, next: NextFunction) => {
@@ -83,6 +84,9 @@ function catchError(error: any) {
         case Errors.PayloadTooLargeError:
             response.code = NetworkStatus.BAD_REQUEST;
             response.message = 'request entity too large';
+            break;
+        case Result.Error:
+            response.code = NetworkStatus.BAD_REQUEST;
             break;
         default:
     }

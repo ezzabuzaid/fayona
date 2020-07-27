@@ -1,22 +1,22 @@
-import { sessionsService } from '@api/sessions/sessions.service';
-import usersService from '@api/users/users.service';
 import { ApplicationConstants } from '@core/constants';
 import { Constants, HashHelper } from '@core/helpers';
 import { Responses, SuccessResponse } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
 import { locate } from '@lib/locator';
 import { PrimaryKey } from '@lib/mongoose';
-import { HttpGet, HttpPost, Route } from '@lib/restful';
+import { FromBody, HttpGet, HttpPost, Route } from '@lib/restful';
+import { FromHeaders } from '@lib/restful/headers.decorator';
+import { validate } from '@lib/validation';
 import { PasswordValidator, PrimaryIDValidator, TokenValidator } from '@shared/common';
 import { EmailService } from '@shared/email';
 import { identity, IRefreshTokenClaim, tokenService } from '@shared/identity';
-import { NodeServer } from 'app/server';
 import { IsEmail, IsIn, IsJWT, IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Request, Response } from 'express';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { scheduleJob } from 'node-schedule';
 import { PortalHelper } from './portal.helper';
-import { validate } from '@lib/validation';
+import { SessionsService } from '@api/sessions';
+import { UserService } from '@api/users';
 
 class Pincode {
     public ttl = AppUtils.duration(5);
@@ -117,35 +117,35 @@ export class LoginDto extends RefreshTokenDto { }
 
 @Route(Constants.Endpoints.PORTAL)
 export class PortalRoutes {
-
     static MAX_SESSION_SIZE = 10;
+    private sessionsService = locate(SessionsService);
+    private usersService = locate(UserService);
+
     constructor() { }
 
-    @HttpPost(Constants.Endpoints.LOGIN, validate(CredentialsPayload), validate(DeviceUUIDHeaderValidator, 'headers'))
-    public async login(req: Request) {
+    @HttpPost(Constants.Endpoints.LOGIN)
+    public async login(
+        @FromBody(CredentialsPayload) credentials: CredentialsPayload,
+        @FromHeaders(ApplicationConstants.deviceIdHeader) device_uuid: string
+    ) {
         // TODO: send an email to user to notify him about login attempt.
 
-        const { username, password } = cast<CredentialsPayload>(req.body);
-        const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
-
-        const { data: user, ...result } = await usersService.one({ username }, {
+        const { data: user } = await this.usersService.one({ username: credentials.username }, {
             projection: {
                 password: 1,
                 role: 1
             }
         });
-        if (result.hasError) {
-            return new Responses.BadRequest(result.message);
-        }
-        const isPasswordEqual = HashHelper.comparePassword(password, user.password);
+
+        const isPasswordEqual = HashHelper.comparePassword(credentials.password, user.password);
         if (AppUtils.isFalsy(isPasswordEqual)) {
             return new Responses.BadRequest('wrong_credintals');
         }
-        const activeUserSessions = await sessionsService.getActiveUserSession(user.id);
+        const activeUserSessions = await this.sessionsService.getActiveUserSession(user.id);
         if (activeUserSessions.data.length >= PortalRoutes.MAX_SESSION_SIZE) {
             return new Responses.BadRequest('exceeded_allowed_sesison');
         }
-        await sessionsService.create({
+        await this.sessionsService.create({
             device_uuid,
             active: true,
             user: user.id
@@ -157,7 +157,7 @@ export class PortalRoutes {
     @HttpPost(Constants.Endpoints.LOGOUT, validate(DeviceUUIDHeaderValidator, 'headers'))
     public async logout(req: Request) {
         const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
-        const result = await sessionsService.deActivate({ device_uuid });
+        const result = await this.sessionsService.deActivate({ device_uuid });
         if (result.hasError) {
             return new Responses.BadRequest();
         }
@@ -178,7 +178,7 @@ export class PortalRoutes {
                 await tokenService.decodeToken(token);
             } catch (error) {
                 if (error instanceof TokenExpiredError) {
-                    const session = await sessionsService.getActiveSession({
+                    const session = await this.sessionsService.getActiveSession({
                         device_uuid,
                         user: decodedRefreshToken.id
                     });
@@ -186,14 +186,14 @@ export class PortalRoutes {
                     if (session.hasError) {
                         return new Responses.BadRequest();
                     }
-                    const { data: user } = await usersService.one({ _id: decodedRefreshToken.id });
+                    const { data: user } = await this.usersService.one({ _id: decodedRefreshToken.id });
 
-                    await sessionsService.updateById(session.data.id, { updatedAt: new Date().toISOString() });
+                    await this.sessionsService.updateById(session.data.id, { updatedAt: new Date().toISOString() });
                     return new Responses.Ok(new RefreshTokenDto(user.id, user.role, user.emailVerified));
                 }
             }
         } catch (error) {
-            await sessionsService.deActivate({ device_uuid });
+            await this.sessionsService.deActivate({ device_uuid });
         }
         return new Responses.BadRequest();
     }
@@ -204,7 +204,7 @@ export class PortalRoutes {
     )
     public async accountVerifed(req: Request) {
         const payload = cast<AccountVerificationPayload>(req.body);
-        const result = await usersService.one({
+        const result = await this.usersService.one({
             'username': payload.username,
             'profile.firstName': payload.firstName,
             'profile.lastName': payload.lastName,
@@ -226,12 +226,12 @@ export class PortalRoutes {
         const { email, mobile, type, id } = cast<SendPincodeValidator>(req.body);
         const pincode = locate(PortalHelper).generatePinCode();
         if (type === 'email') {
-            const result = await usersService.one({ email, _id: id });
+            const result = await this.usersService.one({ email, _id: id });
             if (AppUtils.not(result.hasError)) {
                 EmailService.sendPincodeEmail(email, pincode);
             }
         } else {
-            const result = await usersService.one({ mobile, _id: id });
+            const result = await this.usersService.one({ mobile, _id: id });
             if (AppUtils.not(result.hasError)) {
                 // Send sms
             }
@@ -268,7 +268,7 @@ export class PortalRoutes {
             res.redirect('http://localhost:4200/portal/login');
         }
         pincodes.delete(payload.id);
-        const result = await usersService.updateById(payload.id, { password: payload.password });
+        const result = await this.usersService.updateById(payload.id, { password: payload.password });
         if (result.hasError) {
             return new Responses.BadRequest('Please try again later');
         }
@@ -280,7 +280,7 @@ export class PortalRoutes {
     public async updateUserEmailVerification(req: Request, res: Response) {
         const { token } = cast<TokenValidator>(req.query);
         const decodedToken = await tokenService.decodeToken(token);
-        const result = await usersService.updateById(decodedToken.id, { emailVerified: true });
+        const result = await this.usersService.updateById(decodedToken.id, { emailVerified: true });
         if (result.hasError) {
             return new Responses.BadRequest('Please try again later');
         }
@@ -288,21 +288,23 @@ export class PortalRoutes {
     }
 
     @HttpGet(Constants.Endpoints.SEND_Verification_EMAIL, identity.isAuthenticated())
-    public async sendVerificationEmail(req: Request) {
-        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        const result = await usersService.one({ _id: decodedToken.id });
-        if (result.hasError) {
+    public async sendVerificationEmail(@FromHeaders('authorization') authorization: string) {
+        const decodedToken = await tokenService.decodeToken(authorization);
+        try {
+            const result = await this.usersService.one({ _id: decodedToken.id });
+            EmailService.sendVerificationEmail(result.data.email, result.data.id);
+            return new Responses.Ok('Email has been sent successfully');
+        } catch (error) {
             return new Responses.BadRequest('Please try again later');
         }
-        EmailService.sendVerificationEmail(result.data.email, result.data.id);
-        return new Responses.Ok('Email has been sent successfully');
     }
 
 }
 
+
 // TODO remove expired pincodes
 scheduleJob('30 * * * *', async () => {
-    const sessions = await sessionsService.getAllActiveSession();
+    const sessions = await locate(SessionsService).getAllActiveSession();
     sessions.data.list.forEach((session) => {
         // if the active session updatedAt is late by 12 that's means that this session is no
         // longer used and should be turned of

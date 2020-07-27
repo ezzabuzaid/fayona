@@ -45,9 +45,4 @@ export class UsersSchema {
         unique: true,
     }) public mobile: string = null;
 
-    get verified() {
-        // NOTE: will not work since the `loadClass` are not used
-        return this.emailVerified;
-    }
-
 }

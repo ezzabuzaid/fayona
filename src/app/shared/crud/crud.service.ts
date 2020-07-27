@@ -3,24 +3,13 @@ import { Payload, WithID, Document, Projection, ColumnSort, PrimaryKey } from '@
 import { AppUtils } from '@core/utils';
 import { Repo, Query, IReadOptions } from './crud.repo';
 import { translate } from '@lib/translation';
+import { Result } from '@core/response';
 
 function getHooks<T>(options: Partial<ICrudHooks<T>>): { [key in keyof ICrudHooks<T>]: any } {
     return {
         pre: (options && options.pre) ?? (() => { }),
         post: (options && options.post) ?? (() => { })
     };
-}
-
-class Result<T> {
-    public hasError = false;
-    public data: T = null;
-    public message: string = null;
-
-    constructor(result?: Partial<Result<T>>) {
-        this.data = result.data ?? null;
-        this.message = result.message ?? null;
-        this.hasError = result.hasError ?? AppUtils.isTruthy(result.message) ?? false;
-    }
 }
 
 export class WriteResult {
@@ -64,7 +53,6 @@ export class CrudService<T = null> {
         if (isExist) {
             return new Result({ message: isExist });
         }
-
         const entity = this.repo.create(payload);
         const { pre, post } = getHooks(this.options.create);
         await pre(entity);

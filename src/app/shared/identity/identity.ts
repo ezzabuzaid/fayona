@@ -1,9 +1,10 @@
 import { Responses, Result } from '@core/response';
 import { Logger, AppUtils } from '@core/utils';
 import { NextFunction, Request, Response } from 'express';
-import { sessionsService } from '@api/sessions/sessions.service';
 import { ApplicationConstants } from '@core/constants';
 import { tokenService, ITokenClaim } from './token';
+import { locate } from '@lib/locator';
+import { SessionsService } from '@api/sessions/sessions.service';
 export class Roles {
     static SUPERADMIN = 'SUPERADMIN';
     static ADMIN = 'ADMIN';
@@ -52,7 +53,7 @@ class Identity {
         const token = req.headers.authorization;
         if (AppUtils.isFalsy(device_uuid) || AppUtils.isFalsy(token)) {
             // TODO: validate them using `validate` middleware, add parameter to throw custom http response
-            return new Result<{ token: string, device_uuid: string }>({ hasError: true });
+            return new Result<{ token: string, device_uuid: string }>({ hasError: true, throwIfError: false });
         }
         return new Result<{ token: string, device_uuid: string }>({ data: { token, device_uuid } });
     }
@@ -64,11 +65,11 @@ class Identity {
 
         // STUB test if there's no session associated with `deviceIdHeader` header
         // STUB test if the session is not active
-        const session = await sessionsService.getActiveSession({ device_uuid });
+        const session = await locate(SessionsService).getActiveSession({ device_uuid });
 
         if (session.hasError) {
             // NOTE: not active mean that the session was disabled either by admin or the user logged out
-            return new Result<ITokenClaim>({ hasError: true });
+            return new Result<ITokenClaim>({ hasError: true, throwIfError: false });
         }
 
         return new Result<ITokenClaim>({ data: decodeToken });
