@@ -1,7 +1,9 @@
 import { CrudService, Repo } from '@shared/crud';
 import { RoomSchema } from './rooms.model';
 import foldersService from '@api/uploads/folders/folders.service';
+import { Singelton } from '@lib/locator';
 
+@Singelton()
 export class RoomsService extends CrudService<RoomSchema> {
     // TODO: you can easily move the creation logic from the room router to be used here
     // in create post hook, but the problem that we need to pass the user id from the token
@@ -16,5 +18,3 @@ export class RoomsService extends CrudService<RoomSchema> {
         });
     }
 }
-
-export default new RoomsService();
