@@ -26,23 +26,29 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
         }
 
         const metadata = locate(Metadata);
-        metadata.getRoutes(constructor.name)
+        metadata.getRoutes(constructor)
             .forEach(routeMetadata => {
                 const normalizedEndpoint = path.normalize(path.join('/', routeMetadata.endpoint));
                 routeMetadata.middlewares.push(async function () {
-                    const [request] = Array.from(arguments) as [Request, Response];
+                    const [request, response] = Array.from(arguments) as [Request, Response];
                     const parameterizedArguments = [];
                     const parameters = metadata.getRouteParameter(routeMetadata.getHandlerName());
                     for (const parameterMetadata of parameters) {
-                        if (parameterMetadata.type === ParameterType.HEADERS) {
-                            const [header] = Object.values(parameterMetadata.payload);
-                            parameterizedArguments[parameterMetadata.index] = request.header(header);
-                        } else {
-                            const payloadType = request[parameterMetadata.type];
-                            parameterizedArguments[parameterMetadata.index] =
-                                parameterMetadata.payload
-                                    ? await _validate(parameterMetadata.payload, payloadType)
-                                    : payloadType
+                        switch (parameterMetadata.type) {
+                            case ParameterType.HEADERS:
+                                const [header] = Object.values(parameterMetadata.payload);
+                                parameterizedArguments[parameterMetadata.index] = request.header(header);
+                                break;
+                            case ParameterType.RESPONSE:
+                                parameterizedArguments[parameterMetadata.index] = response;
+                                break;
+                            default:
+                                const payloadType = request[parameterMetadata.type];
+                                parameterizedArguments[parameterMetadata.index] =
+                                    parameterMetadata.payload
+                                        ? await _validate(parameterMetadata.payload, payloadType)
+                                        : payloadType
+                                break;
                         }
                     }
                     return routeMetadata.handler.apply(instance, parameterizedArguments);

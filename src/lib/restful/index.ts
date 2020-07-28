@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import 'reflect-metadata';
 import { Locator } from '@lib/locator';
-import { Type } from '@lib/utils';
+import { Type, getPrototypeChain } from '@lib/utils';
 
 export * from './get.decorator';
 export * from './put.decorator';
@@ -12,6 +12,7 @@ export * from './intercept.decorator';
 export * from './post.decorator';
 export * from './body.decorator';
 export * from './query.decorator';
+export * from './response.decorator';
 export * from './methods.types';
 
 export enum METHODS {
@@ -88,7 +89,8 @@ export class HttpRouteMetadata {
 export enum ParameterType {
     BODY = 'body',
     HEADERS = 'headers',
-    QUERY = 'query'
+    QUERY = 'query',
+    RESPONSE = 'response'
 }
 
 export class Metadata {
@@ -102,8 +104,12 @@ export class Metadata {
         this.#routes.push(httpRouteMetadata)
     }
 
-    getRoutes(controllerName: string) {
-        return this.#routes.filter((item) => item.controllerName === controllerName);
+    getRoutes(constructor) {
+        return getPrototypeChain(constructor)
+            .reduce((accumlator, controllerName) => {
+                accumlator.push(... this.#routes.filter((item) => item.controllerName === controllerName));
+                return accumlator;
+            }, []);
     }
 
     getRouteParameter(handlerName: string) {

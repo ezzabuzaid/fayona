@@ -8,7 +8,7 @@ import { Directories } from '@shared/common';
 import cors from 'cors';
 import sanitize from 'express-mongo-sanitize';
 import path from 'path';
-import { ApiFactory } from './wrapper';
+import { ApiFactory } from './factory';
 import compression = require('compression');
 import express = require('express');
 import helmet = require('helmet');
