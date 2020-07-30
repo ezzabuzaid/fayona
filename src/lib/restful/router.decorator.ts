@@ -39,6 +39,10 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                                 const [header] = Object.values(parameterMetadata.payload);
                                 parameterizedArguments[parameterMetadata.index] = request.header(header);
                                 break;
+                            case ParameterType.PARAMS:
+                                const [param] = Object.values(parameterMetadata.payload);
+                                parameterizedArguments[parameterMetadata.index] = request.params[param];
+                                break;
                             case ParameterType.RESPONSE:
                                 parameterizedArguments[parameterMetadata.index] = response;
                                 break;
