@@ -1,8 +1,7 @@
-import { Constants } from '@core/helpers';
+import { Constants } from '@core/constants';
 import { UsersSchema } from '@api/users';
 import { Payload, WithMongoID } from '@lib/mongoose';
 import { ValidationPatterns } from '@shared/common';
-import { ApplicationConstants } from '@core/constants';
 import { AppUtils } from '@core/utils';
 import { CredentialsDto } from '@api/portal';
 import { tokenService } from '@shared/identity';
@@ -12,7 +11,7 @@ import { Types } from 'mongoose';
 
 export function generateDeviceUUIDHeader() {
     return {
-        [ApplicationConstants.deviceIdHeader]: faker.random.uuid()
+        [Constants.Application.deviceIdHeader]: faker.random.uuid()
     };
 }
 

@@ -1,5 +1,3 @@
-import { ApplicationConstants } from '@core/constants';
-import { Constants, HashHelper } from '@core/helpers';
 import { Responses, SuccessResponse } from '@core/response';
 import { AppUtils, cast } from '@core/utils';
 import { locate } from '@lib/locator';
@@ -16,6 +14,8 @@ import { scheduleJob } from 'node-schedule';
 import { PortalHelper } from './portal.helper';
 import { SessionsService } from '@api/sessions';
 import { UserService } from '@api/users';
+import { Constants } from '@core/constants';
+import { HashHelper } from '@core/helpers';
 
 class Pincode {
     public ttl = AppUtils.duration(5);
@@ -99,7 +99,7 @@ export class RefreshTokenDto {
 }
 export class DeviceUUIDHeaderValidator {
     @IsString()
-    public [ApplicationConstants.deviceIdHeader] = null;
+    public [Constants.Application.deviceIdHeader] = null;
 }
 class ResetPasswordDto extends PrimaryIDValidator {
     @Matches(ValidationPatterns.Password, { message: 'wrong_password' })
@@ -118,7 +118,6 @@ export class RefreshToken {
     }
 }
 
-
 @Route(Constants.Endpoints.PORTAL)
 export class PortalRoutes {
     static MAX_SESSION_SIZE = 10;
@@ -130,7 +129,7 @@ export class PortalRoutes {
     @HttpPost(Constants.Endpoints.LOGIN)
     public async login(
         @FromBody(CredentialsDto) credentials: CredentialsDto,
-        @FromHeaders(ApplicationConstants.deviceIdHeader) device_uuid: string
+        @FromHeaders(Constants.Application.deviceIdHeader) device_uuid: string
     ) {
         // TODO: send an email to user to notify him about login attempt.
 
@@ -159,7 +158,7 @@ export class PortalRoutes {
     }
 
     @HttpPost(Constants.Endpoints.LOGOUT)
-    public async logout(@FromHeaders(ApplicationConstants.deviceIdHeader) device_uuid: string) {
+    public async logout(@FromHeaders(Constants.Application.deviceIdHeader) device_uuid: string) {
         const result = await this.sessionsService.deActivate({ device_uuid });
         return new Responses.Ok(result.data);
     }
@@ -167,7 +166,7 @@ export class PortalRoutes {
     @HttpPost(Constants.Endpoints.REFRESH_TOKEN)
     public async refreshToken(
         @FromBody(RefreshTokenDto) body: RefreshTokenDto,
-        @FromHeaders(ApplicationConstants.deviceIdHeader) device_uuid: string
+        @FromHeaders(Constants.Application.deviceIdHeader) device_uuid: string
     ) {
         const { token, refreshToken } = body;
         try {
@@ -216,7 +215,7 @@ export class PortalRoutes {
         }
     }
 
-    @HttpPost(Constants.Endpoints.SEND_PINCODE,)
+    @HttpPost(Constants.Endpoints.SEND_PINCODE, )
     public async sendPincode(@FromBody(SendPincodeValidator) body: SendPincodeValidator) {
         const { email, mobile, type, id } = body;
         const pincode = locate(PortalHelper).generatePinCode();
@@ -280,7 +279,7 @@ export class PortalRoutes {
     }
 
     @HttpGet(Constants.Endpoints.SEND_Verification_EMAIL, identity.isAuthenticated())
-    public async sendVerificationEmail(@FromHeaders() authorization: string) {
+    public async sendVerificationEmail(@FromHeaders('authorization') authorization: string) {
         const decodedToken = await tokenService.decodeToken(authorization);
         try {
             const result = await this.usersService.one({ _id: decodedToken.id });
@@ -292,7 +291,6 @@ export class PortalRoutes {
     }
 
 }
-
 
 // TODO remove expired pincodes
 scheduleJob('30 * * * *', async () => {

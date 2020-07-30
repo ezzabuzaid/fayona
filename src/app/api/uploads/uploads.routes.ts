@@ -1,7 +1,7 @@
 import { Route, HttpPost, HttpGet } from '@lib/restful';
 import { Multer } from '@shared/multer';
 import { Request } from 'express';
-import { Constants } from '@core/helpers';
+import { Constants } from '@core/constants';
 import { CrudRouter, Pagination } from '@shared/crud';
 import { UploadsSchema } from './uploads.model';
 import uploadsService, { UploadsService } from './uploads.service';
@@ -14,7 +14,7 @@ import { FoldersRoutes } from './folders/folders.routes';
 import { Responses } from '@core/response';
 import { validate } from '@lib/validation';
 
-class FilesSearchPayload extends Pagination {
+class FilesSearchQuery extends Pagination {
     @IsOptional()
     @IsMongoId()
     folder: string = null;
@@ -66,9 +66,9 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         });
     }
 
-    @HttpGet(Constants.Endpoints.SEARCH, validate(FilesSearchPayload, 'query'))
+    @HttpGet(Constants.Endpoints.SEARCH, validate(FilesSearchQuery, 'query'))
     public async searchForFolders(req: Request) {
-        const { file, folder, tag, ...options } = cast<FilesSearchPayload>(req.query);
+        const { file, folder, tag, ...options } = cast<FilesSearchQuery>(req.query);
         const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
         const files = await this.service.searchForFiles({
             folder,

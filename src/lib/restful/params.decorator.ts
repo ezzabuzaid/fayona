@@ -1,12 +1,12 @@
 import { ParameterMetadata, ParameterType, registerParameter } from '.';
 
-export function ContextResponse() {
+export function FromParams(param: string) {
     return (target: any, propertyKey: string, parameterIndex: number) => {
         registerParameter(
             new ParameterMetadata(
                 parameterIndex,
-                ParameterType.RESPONSE,
-                null,
+                ParameterType.PARAMS,
+                { [propertyKey]: param } as any,
                 propertyKey,
                 target.constructor.name
             )

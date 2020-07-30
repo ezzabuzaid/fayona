@@ -4,7 +4,7 @@ export * from './entity';
 import { Schema, SchemaType, SchemaTypeOpts, Types, Document as MongooseDocument } from 'mongoose';
 import { OmitProperties } from '@core/utils';
 
-export type Document<T> = T & MongooseDocument
+export type Document<T> = T & MongooseDocument;
 export namespace MongooseTypes {
 
     export type FieldOptions = SchemaTypeOpts<any> | Schema | SchemaType & {
@@ -31,7 +31,8 @@ export function generateModelMetadataKey(target: any) {
 }
 
 export type Projection<T> = Partial<{ [key in keyof Payload<T>]: 1 | 0 }>;
-export type ColumnSort<T> = { [ket in keyof T]?: 'asc' | 'desc' | 'ascending' | 'descending' };
+export type SortDirection = 'asc' | 'desc' | 'ascending' | 'descending';
+export type IColumnSort<T> = { [ket in keyof T]?: SortDirection };
 export type PrimaryKey = Types.ObjectId;
 export type ForeignKey = Types.ObjectId;
 export const PrimaryKey = Types.ObjectId;

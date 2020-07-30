@@ -1,5 +1,5 @@
 import { ICrudOptions, ICrudHooks } from './crud.options';
-import { Payload, WithID, Document, Projection, ColumnSort, PrimaryKey } from '@lib/mongoose';
+import { Payload, WithID, Document, Projection, IColumnSort, PrimaryKey } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
 import { Repo, Query, IReadOptions } from './crud.repo';
 import { translate } from '@lib/translation';
@@ -162,18 +162,17 @@ export class CrudService<T = null> {
     }
 
     public async all(query?: Query<T>, options: IReadOptions<T> = {}) {
-
         const readOptions = new ReadOptions(options);
         const documentQuery = this.repo.fetchAll(query, readOptions);
         const documents = await documentQuery.exec();
         const count = await this.repo.fetchAll().estimatedDocumentCount();
-
+        const pages = count / readOptions.limit;
         return new Result({
             data: {
                 list: documents,
                 length: documents.length,
                 totalCount: count,
-                pages: Math.ceil((count / readOptions.limit) ?? 0),
+                pages: isFinite(pages) ? Math.ceil(pages) : 0,
             }
         });
     }
@@ -189,7 +188,7 @@ class CrudQuery { }
 class ReadOptions<T> {
     public skip = 0;
     public limit = null;
-    public sort: ColumnSort<T> = null;
+    public sort: IColumnSort<T> = null;
     public projection: Projection<T> = {};
     public lean = false;
     public populate = null;
@@ -200,6 +199,6 @@ class ReadOptions<T> {
         this.sort = sort;
         this.populate = populate;
         this.projection = projection;
-        this.lean = lean;
+        this.lean = lean ?? false;
     }
 }

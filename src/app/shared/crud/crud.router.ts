@@ -1,24 +1,20 @@
-import { CrudService } from './crud.service';
-import { HttpPost, HttpPut, HttpDelete, HttpGet, HttpPatch, FromBody, FromQuery, Route } from '@lib/restful';
-import { Request } from 'express';
 import { Responses } from '@core/response';
-import { AppUtils, cast } from '@core/utils';
-import { Payload } from '@lib/mongoose';
+import { AppUtils } from '@core/utils';
+import { Payload, PrimaryKey, IColumnSort, SortDirection } from '@lib/mongoose';
+import { FromBody, FromParams, FromQuery, HttpDelete, HttpGet, HttpPatch, HttpPost, HttpPut } from '@lib/restful';
+import { PayloadValidator } from '@lib/validation';
 import assert from 'assert';
-import { isValidId } from '@shared/common';
-import { IsOptional, IsNumberString, IsObject } from 'class-validator';
-import { validate, PayloadValidator } from '@lib/validation';
+import { IsNumberString, IsObject, IsOptional } from 'class-validator';
+import { Request } from 'express';
+import { CrudService } from './crud.service';
 
-export class Pagination extends PayloadValidator {
+export class Pagination {
     @IsOptional()
     @IsNumberString()
     page?: number = null;
     @IsOptional()
     @IsNumberString()
     size?: number = null;
-    @IsOptional()
-    @IsObject()
-    sort?: any = null;
 }
 
 export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> = CrudService<SchemaType>> {
@@ -35,57 +31,34 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Created(result.data);
     }
 
-    @HttpPatch(':id', isValidId())
-    public async update(req: Request) {
-        const { id } = cast(req.params);
-
-        const result = await this.service.updateById(id, req.body);
-
-        if (result.hasError) {
-            return new Responses.BadRequest(result.message);
-        }
-
+    @HttpPatch(':id', )
+    public async update(@FromParams('id') id: PrimaryKey, @FromBody() body) {
+        const result = await this.service.updateById(id, body);
         return new Responses.Ok(result.data);
     }
 
-    @HttpPut(':id', isValidId())
-    public async set(req: Request) {
-        const { id } = cast(req.params);
-
-        const result = await this.service.updateById(id, req.body);
-
-        if (result.hasError) {
-            return new Responses.BadRequest(result.message);
-        }
-
+    @HttpPut(':id')
+    public async set(@FromParams('id') id: PrimaryKey, @FromBody() body) {
+        const result = await this.service.updateById(id, body);
         return new Responses.Ok(result.data);
     }
 
-    @HttpDelete(':id', isValidId())
-    public async delete(req: Request) {
-        const { id } = req.params;
-
+    @HttpDelete(':id')
+    public async delete(@FromParams('id') id: PrimaryKey) {
         const result = await this.service.delete({ _id: id } as any);
-        if (result.hasError) {
-            return new Responses.BadRequest(result.message);
-        }
         return new Responses.Ok(result.data);
     }
 
-    @HttpGet(':id', isValidId())
-    public async fetchEntity(req: Request) {
-        const { id } = req.params;
+    @HttpGet(':id')
+    public async fetchEntity(@FromParams('id') id: PrimaryKey) {
         const result = await this.service.one({ _id: id } as any);
-        if (result.hasError) {
-            return new Responses.BadRequest(result.message);
-        }
         return new Responses.Ok(result.data);
     }
 
     @HttpGet('/')
     public async fetchEntities(@FromQuery(Pagination) { page, size, ...sort }: Pagination) {
         // TODO: Check that the sort object has the same properties in <T>
-        const result = await this.service.all({}, { sort, size, page });
+        const result = await this.service.all({}, { size, page, sort: sort as any });
         return new Responses.Ok(result.data);
     }
 
@@ -113,7 +86,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
             return new Responses.BadRequest('please_provide_valid_list_of_ids');
         }
         const completion = await this.service.bulkUpdate(entites);
-        if (AppUtils.isFalsy(completion)) {
+        if (AppUtils.not(completion)) {
             return new Responses.BadRequest('one_of_entities_not_exist');
         }
 

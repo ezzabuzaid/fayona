@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
-import { Constants } from '@core/helpers';
+import { Constants } from '@core/constants';
 import { AppUtils } from '@core/utils';
 import { tokenService } from '@shared/identity';
 import { PrimaryKey } from '@lib/mongoose';

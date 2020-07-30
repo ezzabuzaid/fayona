@@ -1,5 +1,5 @@
 import { Route, HttpPost, HttpGet, FromBody, FromQuery } from '@lib/restful';
-import { Constants } from '@core/helpers';
+import { Constants } from '@core/constants';
 import { CrudRouter, Pagination } from '@shared/crud';
 import { RoomSchema } from './rooms.model';
 import { RoomsService } from './rooms.service';
@@ -41,7 +41,7 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
     @HttpPost('/')
     public async createRoom(
         @FromBody(CreateRoomDto) body: CreateRoomDto,
-        @FromHeaders() authorization: string
+        @FromHeaders('authorization') authorization: string
     ) {
         // TODO: create member and group should be within transaction
         const { members, message, name } = body;
@@ -97,14 +97,14 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
     }
 
     @HttpGet('groups')
-    public async getGroups(@FromHeaders() authorization: string) {
+    public async getGroups(@FromHeaders('authorization') authorization: string) {
         const decodedToken = await tokenService.decodeToken(authorization);
         const groups = await membersService.getMemberRooms(decodedToken.id, false);
         return groups;
     }
 
     @HttpGet('conversations')
-    public async getConversations(@FromHeaders() authorization: string) {
+    public async getConversations(@FromHeaders('authorization') authorization: string) {
         const decodedToken = await tokenService.decodeToken(authorization);
         const conversations = await membersService.getMemberRooms(decodedToken.id, true);
         return conversations;

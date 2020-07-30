@@ -4,9 +4,9 @@ import { AppUtils } from '@core/utils';
 import { translate } from '@lib/translation';
 import { NextFunction, Request, Response } from 'express';
 import { NetworkStatus } from './network-status';
-import stage from './stage';
 import { PAYLOAD_VALIDATION_ERRORS } from '@lib/validation';
 import { Result } from '@core/response';
+import { envirnoment } from '@environment/env';
 
 export function wrapRoutes(...middlewares) {
     return middlewares.map((middleware) => (req: Request, res: Response, next: NextFunction) => {
@@ -53,7 +53,7 @@ function catchError(error: any) {
     switch (error.name) {
         case Errors.AssertionError:
         case Errors.ERR_AMBIGUOUS_ARGUMENT:
-            response.code = stage.production ? NetworkStatus.BAD_REQUEST : response.code;
+            response.code = envirnoment.production ? NetworkStatus.BAD_REQUEST : response.code;
         case Errors.StrictModeError:
             response.message = translate('over_posting_is_not_allowed');
             response.code = NetworkStatus.BAD_REQUEST;
@@ -75,7 +75,7 @@ function catchError(error: any) {
             response.code = NetworkStatus.UNAUTHORIZED;
             break;
         case Errors.JsonWebTokenError:
-            response.message = translate(stage.production ? 'jwt_expired' : error.message);
+            response.message = translate(envirnoment.production ? 'jwt_expired' : error.message);
             response.code = NetworkStatus.UNAUTHORIZED;
             break;
         case Errors.MulterError:

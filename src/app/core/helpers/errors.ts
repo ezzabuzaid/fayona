@@ -6,7 +6,6 @@ import { NetworkStatus } from './network-status';
 
 const log = new Logger('Errors');
 
-
 export class ErrorHandling {
 
     constructor() {
@@ -37,7 +36,6 @@ export class ErrorHandling {
             });
         });
     }
-
 
     public static notFound(req: Request, res: Response) {
         const error = new ErrorResponse(

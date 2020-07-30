@@ -11,7 +11,6 @@ export function FromBody<T>(bodyType?: Type<T>) {
                 propertyKey,
                 target.constructor.name
             )
-        )
-    }
+        );
+    };
 }
-

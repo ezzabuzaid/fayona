@@ -1,4 +1,4 @@
-import { Constants } from '@core/helpers';
+import { Constants } from '@core/constants';
 import { identity, tokenService } from '@shared/identity';
 import { CrudRouter } from '@shared/crud';
 import { FoldersSchema } from '..';

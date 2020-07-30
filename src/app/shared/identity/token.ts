@@ -1,7 +1,8 @@
 import jwt = require('jsonwebtoken');
-import stage from '../../core/helpers/stage';
+// import stage from '../../core/helpers/stage';
 import { PrimaryKey } from '@lib/mongoose';
 import { Roles } from '@shared/identity';
+import { envirnoment } from '@environment/env';
 
 export interface IClaim {
     id: PrimaryKey;
@@ -46,7 +47,7 @@ class TokenService {
     }
 
     private get secretKey() {
-        return stage.testing
+        return envirnoment.testing
             ? 'fuckSecretForTestOnly'
             : process.env.JWT_SECRET_KEY;
         // FIXME idk what the issue with this when it comes to test

@@ -1,8 +1,6 @@
 import { Database } from '@core/database';
-import { StageLevel } from '@core/helpers';
-import stage from '@core/helpers/stage';
 import { AppUtils, Logger, LoggerLevel } from '@core/utils';
-import { envirnoment } from '@environment/env';
+import { envirnoment, EStage } from '@environment/env';
 import url, { URL } from 'url';
 import { Application } from './app';
 import http = require('http');
@@ -30,7 +28,6 @@ export class NodeServer extends Application {
         }
 
         public static async bootstrap() {
-                envirnoment.load(StageLevel.DEV);
                 const { server } = new NodeServer();
                 await NodeServer.loadDatabase();
                 return server;
@@ -38,7 +35,7 @@ export class NodeServer extends Application {
 
         public static test() {
                 Logger.level = LoggerLevel.Off;
-                envirnoment.load(StageLevel.TEST);
+                envirnoment.load(EStage.TEST);
         }
 
         /**
@@ -67,7 +64,7 @@ export class NodeServer extends Application {
                         MONGO_HOST: host
                 } = envirnoment.env;
                 try {
-                        return Database.load({ user, password, path, host, atlas: stage.production });
+                        return Database.load({ user, password, path, host, atlas: envirnoment.production });
                 } catch (error) {
                         throw new Error(`Faild to init the server ${ error }`);
                 }

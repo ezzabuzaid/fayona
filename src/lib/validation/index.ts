@@ -8,7 +8,11 @@ export class PayloadValidator {
     afterValidation?();
 }
 
-export function validate<T>(validator: Type<T>, type: 'body' | 'query' | 'params' | 'headers' | 'queryPolluted' = 'body', message?: string) {
+export function validate<T>(
+    validator: Type<T>,
+    type: 'body' | 'query' | 'params' | 'headers' | 'queryPolluted' = 'body',
+    message?: string
+) {
     return async (req: Request, res: Response, next: NextFunction) => {
         _validate(validator, req[type], message);
         next();

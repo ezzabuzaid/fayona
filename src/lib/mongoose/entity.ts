@@ -6,7 +6,7 @@ import { generateModelMetadataKey } from '.';
 import { Type } from '@lib/utils';
 
 export function Entity(name?: string, options: SchemaOptions = {}) {
-    return function (constructor) {
+    return function(constructor) {
         const metadataKey = generateModelMetadataKey(constructor);
         const fields = Reflect.getMetadata(metadataKey, constructor);
         Reflect.deleteMetadata(metadataKey, constructor);

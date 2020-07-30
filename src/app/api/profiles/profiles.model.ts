@@ -1,5 +1,5 @@
 import { Field, Entity } from '@lib/mongoose';
-import { Constants } from '@core/helpers';
+import { Constants } from '@core/constants';
 
 export enum EGender {
     Male,
