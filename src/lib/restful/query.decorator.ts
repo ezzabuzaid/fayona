@@ -13,7 +13,6 @@ export function FromQuery<T>(query?: string | Type<T>) {
                 propertyKey,
                 target.constructor.name
             )
-        )
-    }
+        );
+    };
 }
-

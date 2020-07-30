@@ -1,12 +1,14 @@
 import { RequestHandler } from 'express';
-import { define, METHODS } from '.';
+import { HttpRouteMetadata, METHODS, registerHttpRoute } from '.';
 
-export function HttpPut(uri = '/', ...middlewares: RequestHandler[]): any {
+export function HttpPut(endpoint = '/', ...middlewares: RequestHandler[]) {
     return function(target, propertyKey: string, descriptor: PropertyDescriptor) {
-        const originalMethod = descriptor.value;
-        descriptor.value = function() {
-            return originalMethod.apply(target, arguments);
-        };
-        define({ method: METHODS.PUT, uri, middlewares, target, propertyKey });
+        registerHttpRoute(new HttpRouteMetadata(
+            target.constructor,
+            target[propertyKey],
+            endpoint,
+            METHODS.PUT,
+            middlewares
+        ));
     };
 }

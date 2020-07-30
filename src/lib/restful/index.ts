@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import 'reflect-metadata';
 import { Locator } from '@lib/locator';
-import { Type, getPrototypeChain } from '@lib/utils';
+import { Type, getPrototypeChain, isNullOrUndefined, notNullOrUndefined, notEmpty } from '@lib/utils';
 
 export * from './get.decorator';
 export * from './put.decorator';
@@ -12,6 +12,7 @@ export * from './intercept.decorator';
 export * from './post.decorator';
 export * from './body.decorator';
 export * from './query.decorator';
+export * from './params.decorator';
 export * from './response.decorator';
 export * from './methods.types';
 
@@ -57,7 +58,6 @@ export function define({ method, uri, middlewares, target, propertyKey }: IMetad
     Reflect.defineMetadata(generateMetadataKey(method, uri), meta, target.constructor);
 }
 
-
 export class ParameterMetadata {
     constructor(
         public index: number,
@@ -74,15 +74,14 @@ export class ParameterMetadata {
 
 export class HttpRouteMetadata {
     constructor(
+        public controller: Type<any>,
         public handler: () => void,
         public endpoint: string,
         public method: METHODS,
-        public controllerName: string,
         public middlewares: RequestHandler[]
     ) { }
-
     getHandlerName() {
-        return this.controllerName + this.handler.name;
+        return this.controller.name + this.handler.name;
     }
 }
 
@@ -90,26 +89,30 @@ export enum ParameterType {
     BODY = 'body',
     HEADERS = 'headers',
     QUERY = 'query',
-    RESPONSE = 'response'
+    RESPONSE = 'response',
+    PARAMS = 'params'
 }
 
 export class Metadata {
     #parameters: ParameterMetadata[] = [];
-    #routes: HttpRouteMetadata[] = [];
+
+    private metadataKey(httpRouteMetadata: HttpRouteMetadata) {
+        return `${ httpRouteMetadata.method }:${ httpRouteMetadata.endpoint }`;
+    }
     registerParameter(parameterMetadata: ParameterMetadata) {
-        this.#parameters.push(parameterMetadata)
+        this.#parameters.push(parameterMetadata);
     }
 
     registerHttpRoute(httpRouteMetadata: HttpRouteMetadata) {
-        this.#routes.push(httpRouteMetadata)
+        Reflect.defineMetadata(this.metadataKey(httpRouteMetadata), httpRouteMetadata, httpRouteMetadata.controller);
     }
 
     getRoutes(constructor) {
-        return getPrototypeChain(constructor)
-            .reduce((accumlator, controllerName) => {
-                accumlator.push(... this.#routes.filter((item) => item.controllerName === controllerName));
-                return accumlator;
-            }, []);
+        return Reflect.getMetadataKeys(constructor)
+            .map((key, index, arr) => {
+                const metadata = Reflect.getMetadata(key, constructor);
+                return metadata;
+            }).filter(notEmpty) as HttpRouteMetadata[];
     }
 
     getRouteParameter(handlerName: string) {
@@ -120,25 +123,15 @@ export class Metadata {
         this.#parameters = this.#parameters.filter((item) => item.getHandlerName() !== handlerName);
     }
 
-    removeRoutes(controllerName: string) {
-        this.#routes = this.#routes.filter((route) => {
-            if (route.controllerName !== controllerName) {
-                return true;
-            }
-            this.removeParameters(route.getHandlerName());
-            return false;
-        });
-    }
-
 }
 Locator.instance.registerSingelton(new Metadata());
 
 export function registerParameter(parameterMetadata: ParameterMetadata) {
-    let metadata = Locator.instance.locate(Metadata);
+    const metadata = Locator.instance.locate(Metadata);
     metadata.registerParameter(parameterMetadata);
 }
 
 export function registerHttpRoute(httpRouteMetadata: HttpRouteMetadata) {
-    let metadata = Locator.instance.locate(Metadata);
+    const metadata = Locator.instance.locate(Metadata);
     metadata.registerHttpRoute(httpRouteMetadata);
 }

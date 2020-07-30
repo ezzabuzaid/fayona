@@ -1,10 +1,10 @@
 import { Responses, Result } from '@core/response';
 import { Logger, AppUtils } from '@core/utils';
 import { NextFunction, Request, Response } from 'express';
-import { ApplicationConstants } from '@core/constants';
 import { tokenService, ITokenClaim } from './token';
 import { locate } from '@lib/locator';
 import { SessionsService } from '@api/sessions/sessions.service';
+import { Constants } from '@core/constants';
 export class Roles {
     static SUPERADMIN = 'SUPERADMIN';
     static ADMIN = 'ADMIN';
@@ -49,7 +49,7 @@ class Identity {
         // STUB test if the request doesn't have an `authorization` header
         // TODO Amend the validate middleware to take custom response so you don't need the checking lines anymore
         // Read about the context option
-        const device_uuid = req.header(ApplicationConstants.deviceIdHeader);
+        const device_uuid = req.header(Constants.Application.deviceIdHeader);
         const token = req.headers.authorization;
         if (AppUtils.isFalsy(device_uuid) || AppUtils.isFalsy(token)) {
             // TODO: validate them using `validate` middleware, add parameter to throw custom http response

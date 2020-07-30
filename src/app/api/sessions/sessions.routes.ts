@@ -1,7 +1,7 @@
 import { SessionSchema } from './sessions.model';
 import { Request } from 'express';
 import { HttpGet, Route, HttpPatch } from '@lib/restful';
-import { Constants } from '@core/helpers';
+import { Constants } from '@core/constants';
 import { CrudRouter } from '../../shared/crud';
 import { SessionsService } from './sessions.service';
 import { IsMongoId } from 'class-validator';

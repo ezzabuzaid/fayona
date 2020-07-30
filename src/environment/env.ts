@@ -1,33 +1,30 @@
-import { NODE_STAGE, StageLevel } from '@core/helpers';
 import { AppUtils, Logger } from '@core/utils';
 import { config as envConfig } from 'dotenv';
-import { join } from 'path';
-import stage from '@core/helpers/stage';
+import path from 'path';
 const log = new Logger('Envirnoment');
 
-class Envirnoment {
-    private noEnvError = false;
+export enum EStage {
+    DEVELOPMENT = 'development',
+    TEST = 'test',
+    PRODUCTION = 'production'
+}
 
-    public load(env?: StageLevel) {
-        let envPath = '.env';
-        if (AppUtils.not(stage.production) && AppUtils.notNullOrUndefined(env)) {
-            envPath = `${ envPath }.${ env }`;
-        }
-        log.warn(envPath);
-        const { error, parsed } = envConfig({ path: join(__dirname, envPath) });
+/**
+ * NODE_STAGE name must be identical in .env*. files
+ */
+const NODE_STAGE = 'NODE_STAGE';
+
+class Envirnoment {
+    public load(env: string) {
+        const envPath = path.join(__dirname, `.env${ env ? `.${ env }` : '' }`);
+        const { error, parsed } = envConfig({ path: envPath });
         if (error) {
-            if (AppUtils.not(this.noEnvError)) {
-                this.load(null);
-                this.noEnvError = true;
-            } else {
-                throw new Error('an error occured while loading the env file' + error.message);
-            }
+            throw new Error('Error: loading the ' + env + ' env file at path ' + envPath + error.message);
         }
-        stage.load(this.get(NODE_STAGE) as StageLevel);
         return parsed;
     }
 
-    public set(envKey: string, value: string) {
+    public set<key extends keyof NodeJS.ProcessEnv>(envKey: key, value: NodeJS.ProcessEnv[key]) {
         const key = this.env[envKey];
         if (AppUtils.notNullOrUndefined(key)) {
             log.warn(`you're about adding a new key to the environment ${ envKey }`);
@@ -44,6 +41,17 @@ class Envirnoment {
         return process.env;
     }
 
+    public get development() {
+        return EStage.DEVELOPMENT === this.get(NODE_STAGE);
+    }
+
+    public get production() {
+        return EStage.PRODUCTION === this.get(NODE_STAGE);
+    }
+
+    public get testing() {
+        return EStage.TEST === this.get(NODE_STAGE);
+    }
 }
 
 export const envirnoment = new Envirnoment();

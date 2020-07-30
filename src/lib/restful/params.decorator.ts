@@ -10,7 +10,6 @@ export function FromParams(param: string) {
                 propertyKey,
                 target.constructor.name
             )
-        )
-    }
+        );
+    };
 }
-

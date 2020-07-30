@@ -3,7 +3,6 @@ export * from './result';
 export * from './success.response';
 export * from './generic.response';
 
-
 import { NetworkStatus } from '@core/helpers';
 import { ErrorResponse } from './error.response';
 import { SuccessResponse } from './success.response';

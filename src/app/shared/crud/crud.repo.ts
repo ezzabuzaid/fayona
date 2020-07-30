@@ -1,5 +1,5 @@
 import { AppUtils } from '@core/utils';
-import { ColumnSort, Document, ForeignKey, locateModel, Payload, PrimaryKey, Projection } from '@lib/mongoose';
+import { IColumnSort, Document, ForeignKey, locateModel, Payload, PrimaryKey, Projection } from '@lib/mongoose';
 import { Type } from '@lib/utils';
 import assert from 'assert';
 import { FilterQuery, Model } from 'mongoose';
@@ -24,7 +24,7 @@ export class Repo<T> {
         query?: Query<T>,
         options: Partial<IReadOptions<T>> = {}
     ) {
-        return this.model.find(query as any, {}, options as any);
+        return this.model.find(query as any, options.projection, options as any);
     }
 
     public fetchById(id: PrimaryKey) {
@@ -52,9 +52,8 @@ type ForeignKeysOnly<T> = {
 }[keyof T];
 
 export interface IReadAllOptions<T> {
-    sort?: ColumnSort<T>;
+    sort?: IColumnSort<T>;
     page?: number;
     size?: number;
 }
-
 export interface IReadOptions<T> extends IReadOneOptions<T>, IReadAllOptions<T> { }

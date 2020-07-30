@@ -1,7 +1,6 @@
 import ar from '@assets/languages/ar.json';
 import en from '@assets/languages/en.json';
 import { ErrorHandling, wrapRoutes } from '@core/helpers';
-import stage from '@core/helpers/stage';
 import { Logger } from '@core/utils';
 import { translation } from '@lib/translation';
 import { Directories } from '@shared/common';
@@ -14,6 +13,7 @@ import express = require('express');
 import helmet = require('helmet');
 import hpp = require('hpp');
 import morgan = require('morgan');
+import { envirnoment } from '@environment/env';
 
 const log = new Logger('Application');
 
@@ -34,7 +34,7 @@ export class Application {
         // TODO: Connect sentry
         this.application
             .use(cors({
-                origin: stage.production ? 'https://angular-buildozer.herokuapp.com' : '*',
+                origin: envirnoment.production ? 'https://angular-buildozer.herokuapp.com' : '*',
                 optionsSuccessStatus: 200,
             }))
             .use(express.json())

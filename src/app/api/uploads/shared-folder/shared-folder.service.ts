@@ -1,6 +1,6 @@
 import { CrudService, Repo } from '@shared/crud';
 import { SharedFolderSchema } from './shared-folder.model';
-import { Constants } from '@core/helpers';
+import { Constants } from '@core/constants';
 import { PrimaryKey } from '@lib/mongoose';
 
 export class SharedFolderService extends CrudService<SharedFolderSchema> {

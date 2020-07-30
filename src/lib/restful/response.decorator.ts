@@ -10,7 +10,6 @@ export function ContextResponse() {
                 propertyKey,
                 target.constructor.name
             )
-        )
-    }
+        );
+    };
 }
-

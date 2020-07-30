@@ -1,6 +1,6 @@
 import { CrudRouter, CrudService, Repo } from '@shared/crud';
 import { ProfilesSchema } from './profiles.model';
-import { Constants } from '@core/helpers';
+import { Constants } from '@core/constants';
 import { Route } from '@lib/restful';
 
 @Route(Constants.Endpoints.PROFILES)

@@ -1,4 +1,4 @@
-import { Constants } from '@core/helpers';
+import { Constants } from '@core/constants';
 import { generateExpiredToken, generateDeviceUUIDHeader, getUri, generateToken, createApplicationUser, login } from '@test/fixture';
 import { CredentialsDto, RefreshTokenDto, PortalRoutes } from './portal.routes';
 import { AppUtils } from '@core/utils';

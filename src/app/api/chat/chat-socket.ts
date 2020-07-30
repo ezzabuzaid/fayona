@@ -1,10 +1,10 @@
 import { Logger } from '@core/utils';
-import { PrimaryKey } from "@lib/mongoose";
-import { strictAssign, validatePayload } from "@lib/validation";
+import { PrimaryKey } from '@lib/mongoose';
+import { strictAssign, validatePayload } from '@lib/validation';
 import { locateSocketIO } from '@shared/common';
-import { tokenService } from "@shared/identity";
-import { IsInt, IsMongoId, IsNotEmpty, IsNumber, IsString } from "class-validator";
-import messagesService from "./messages/messages.service";
+import { tokenService } from '@shared/identity';
+import { IsInt, IsMongoId, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import messagesService from './messages/messages.service';
 
 interface IRoom {
     id: PrimaryKey;
@@ -76,4 +76,4 @@ const log = new Logger('ChatSocket');
             socket.broadcast.in(id as any).emit('StreamAnswer', negotiation);
         });
     });
-})()
+})();

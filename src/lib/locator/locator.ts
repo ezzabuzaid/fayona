@@ -8,7 +8,7 @@ export class Locator {
     registerSingelton<T>(instance: T, provide?: object) {
         const _provide = provide ?? instance['constructor'];
         if (this.#registry.has(_provide)) {
-            throw new Error('You cannot override registered types')
+            throw new Error('You cannot override registered types');
         }
         this.#registry.set(_provide, () => instance);
         return this;
@@ -37,4 +37,3 @@ export function Singelton() {
 export function locate<T>(type: Type<T>): T {
     return Locator.instance.locate(type);
 }
-

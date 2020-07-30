@@ -1,5 +1,5 @@
 import { Entity, Field } from '@lib/mongoose';
-import { Constants } from '@core/helpers';
+import { Constants } from '@core/constants';
 
 @Entity(Constants.Schemas.Feedback)
 export class FeedbackSchema {

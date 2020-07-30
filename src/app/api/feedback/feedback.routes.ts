@@ -1,7 +1,7 @@
 import { Route } from '@lib/restful';
 import { FeedbackSchema, } from './feedback.model';
 import { Repo, CrudRouter, CrudService } from '@shared/crud';
-import { Constants } from '@core/helpers';
+import { Constants } from '@core/constants';
 
 @Route(Constants.Endpoints.FEEDBACK)
 export class FeedbackRouter extends CrudRouter<FeedbackSchema> {

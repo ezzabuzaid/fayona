@@ -1,4 +1,4 @@
-import { Constants } from '@core/helpers';
+import { Constants } from '@core/constants';
 import { Entity, Field } from '@lib/mongoose';
 import { Types } from 'mongoose';
 

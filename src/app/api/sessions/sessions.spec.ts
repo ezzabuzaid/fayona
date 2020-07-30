@@ -1,12 +1,12 @@
-import { Constants } from '@core/helpers';
+import { Constants } from '@core/constants';
 import { getUri, prepareUserSession } from '@test/fixture';
 import { Types } from 'mongoose';
 import { DeactivateSessionPayload } from './sessions.routes';
 import { PrimaryKey } from '@lib/mongoose';
 
 const ENDPOINT = Constants.Endpoints.SESSIONS;
-const DEACTIVATE_ENDPOINT = getUri(`${ENDPOINT}/deactivate`);
-const USER_SESSION_ENDPOINT = getUri(`${ENDPOINT}/${Constants.Endpoints.USERS_SESSIONS}`);
+const DEACTIVATE_ENDPOINT = getUri(`${ ENDPOINT }/deactivate`);
+const USER_SESSION_ENDPOINT = getUri(`${ ENDPOINT }/${ Constants.Endpoints.USERS_SESSIONS }`);
 
 xdescribe('#INTEGRATION', () => {
 
