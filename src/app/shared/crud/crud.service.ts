@@ -48,7 +48,7 @@ export class CrudService<T = null> {
         return false;
     }
 
-    public async create(payload: Payload<T>): Promise<Result<WriteResult>> {
+    public async create(payload: T): Promise<Result<Document<T>>> {
         const isExist = await this.isEntityExist(payload);
         if (isExist) {
             return new Result({ message: isExist });
@@ -59,7 +59,7 @@ export class CrudService<T = null> {
         await entity.save();
         await post(entity);
 
-        return new Result({ data: new WriteResult(entity) });
+        return new Result({ data: entity });
     }
 
     public async delete(query: Query<T>): Promise<Result<WriteResult>> {
@@ -125,7 +125,7 @@ export class CrudService<T = null> {
         return true;
     }
 
-    public async bulkCreate(payloads: Array<Payload<T>>) {
+    public async bulkCreate(payloads: T[]) {
         // TODO: to be tested
         for (const payload of payloads) {
             await this.create(payload);
@@ -153,7 +153,7 @@ export class CrudService<T = null> {
     }
 
     public async one(query: Query<T>, options: IReadOptions<T> = {}) {
-        const documentQuery = this.repo.fetchOne(query, options.projection, options);
+        const documentQuery = this.repo.fetchOne(query, options);
         const record = await documentQuery.exec();
         if (AppUtils.isNullOrUndefined(record)) {
             return new Result<Document<T>>({ message: 'entity_not_exist' });
@@ -165,7 +165,7 @@ export class CrudService<T = null> {
         const readOptions = new ReadOptions(options);
         const documentQuery = this.repo.fetchAll(query, readOptions);
         const documents = await documentQuery.exec();
-        const count = await this.repo.fetchAll().estimatedDocumentCount();
+        const count = await this.repo.fetchAll().estimatedDocumentCount(query);
         const pages = count / readOptions.limit;
         return new Result({
             data: {

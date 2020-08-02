@@ -16,8 +16,8 @@ export class Repo<T> {
         this.model = locateModel(model);
     }
 
-    public fetchOne(query: Query<T>, projection: Projection<T> = {}, options = {}) {
-        return this.model.findOne(query as any, projection, options);
+    public fetchOne(query: Query<T>, options?: IReadOneOptions<T>) {
+        return this.model.findOne(query as any, options.projection, options as any);
     }
 
     public fetchAll(

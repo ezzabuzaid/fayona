@@ -1,4 +1,4 @@
-import { Route, HttpPost, HttpGet, FromBody, FromQuery, FromParams } from '@lib/restful';
+import { Route, HttpPost, HttpGet, FromBody, FromQuery, FromParams, ContextResponse, ContextRequest } from '@lib/restful';
 import { Constants } from '@core/constants';
 import { CrudRouter, Pagination } from '@shared/crud';
 import { RoomSchema } from './rooms.model';
@@ -38,7 +38,7 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
         super(RoomsService);
     }
 
-    @HttpPost('/')
+    @HttpPost()
     public async createRoom(
         @FromBody(CreateRoomDto) body: CreateRoomDto,
         @FromHeaders('authorization') authorization: string
@@ -77,9 +77,12 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
     }
 
     @HttpGet('members', validate(SearchForRoomByMemberDto, 'queryPolluted'))
-    async getRoomByMemebers(req: Request) {
-        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        const { members } = cast<SearchForRoomByMemberDto>(req['queryPolluted']);
+    async getRoomByMemebers(
+        @FromHeaders('authorization') authorization: string,
+        @ContextRequest() request
+    ) {
+        const decodedToken = await tokenService.decodeToken(authorization);
+        const { members } = cast<SearchForRoomByMemberDto>(request['queryPolluted']);
         members.push(decodedToken.id);
         const room = await membersService.getRoom(members);
         return new Responses.Ok(room);
@@ -110,7 +113,7 @@ export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
         return conversations;
     }
 
-    @HttpGet(':id/messages', isValidId(), )
+    @HttpGet(':id/messages', isValidId())
     async getConversationMessages(@FromParams('id') id: PrimaryKey, @FromQuery(Pagination) options: Pagination) {
         const result = await messagesService.getLastMessage(id, options);
         return new Responses.Ok(result.data);

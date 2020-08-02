@@ -16,12 +16,6 @@ export class MessagesService extends CrudService<MessagesSchema> {
             }
         });
     }
-
-    async createMessage(payload: Payload<MessagesSchema>) {
-        const message = await super.create(payload);
-        const result = new Result<WriteResult & Partial<MessagesSchema>>({ ...message, ...payload });
-        return result;
-    }
 }
 
 export default new MessagesService();

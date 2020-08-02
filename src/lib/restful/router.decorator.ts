@@ -29,16 +29,15 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
         metadata.getRoutes(constructor)
             .forEach(routeMetadata => {
                 const normalizedEndpoint = path.normalize(path.join('/', routeMetadata.endpoint));
-                routeMetadata.middlewares.push(async function () {
+                routeMetadata.middlewares.push(async function() {
                     const [request, response] = Array.from(arguments) as [Request, Response];
                     const parameters = [];
-                    const routeParameter = metadata.getRouteParameter(routeMetadata.getHandlerName());
+                    const routeParameter = metadata.getRouteParameter(routeMetadata.getHandlerName()).reverse();
                     for (const parameterMetadata of routeParameter) {
                         switch (parameterMetadata.type) {
                             case ParameterType.HEADERS:
                                 const [header] = Object.values(parameterMetadata.payload);
                                 parameters[parameterMetadata.index] = request.header(header) ?? request.headers[header];
-
                                 // TODO: check if it passed as single header or dictionary
                                 break;
                             case ParameterType.PARAMS:

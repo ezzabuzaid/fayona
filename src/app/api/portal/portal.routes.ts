@@ -158,7 +158,11 @@ export class PortalRoutes {
             active: true,
             user: user.id
         });
-        EmailService.sendEmail({ text: `New login at ${ new Date() }` });
+        EmailService.sendEmail({
+            text: `New login at ${ new Date() }`,
+            from: 'admin@admin.com',
+            to: user.email,
+        });
         return new Responses.Ok(new RefreshToken(user.id, user.role, user.emailVerified));
     }
 
@@ -220,7 +224,7 @@ export class PortalRoutes {
         }
     }
 
-    @HttpPost(Constants.Endpoints.SEND_PINCODE, )
+    @HttpPost(Constants.Endpoints.SEND_PINCODE)
     public async sendPincode(@FromBody(SendPincodeValidator) body: SendPincodeValidator) {
         const { email, mobile, type, id } = body;
         const pincode = locate(PortalHelper).generatePinCode();
@@ -273,8 +277,11 @@ export class PortalRoutes {
         return new Responses.Ok(null);
     }
 
-    @HttpGet(Constants.Endpoints.VERIFY_EMAIL, validate(TokenValidator, 'query'))
-    public async updateUserEmailVerification(@FromQuery('token') token: string, @ContextResponse() response: Response) {
+    @HttpGet(Constants.Endpoints.VERIFY_EMAIL)
+    public async updateUserEmailVerification(
+        @FromQuery(TokenValidator) { token }: TokenValidator,
+        @ContextResponse() response: Response
+    ) {
         const decodedToken = await tokenService.decodeToken(token);
         const result = await this.usersService.updateById(decodedToken.id, { emailVerified: true });
         if (result.hasError) {
@@ -283,7 +290,7 @@ export class PortalRoutes {
         response.redirect('http://localhost:4200/');
     }
 
-    @HttpGet(Constants.Endpoints.SEND_Verification_EMAIL, identity.isAuthenticated())
+    @HttpGet(Constants.Endpoints.SEND_VERIFICATION_EMAIL, identity.isAuthenticated())
     public async sendVerificationEmail(@FromHeaders('authorization') authorization: string) {
         const decodedToken = await tokenService.decodeToken(authorization);
         try {

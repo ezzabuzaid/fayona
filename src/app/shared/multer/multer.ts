@@ -35,9 +35,9 @@ export class Multer {
 
     public upload(req: Request, res: Response, next: NextFunction) {
         if (this.options.maxFilesNumber === 1) {
-            return this.multer.single(this.options.fieldName);
+            return this.multer.single(this.options.fieldName)(req, res, next);
         } else {
-            return this.multer.array(this.options.fieldName, this.options.maxFilesNumber);
+            return this.multer.array(this.options.fieldName, this.options.maxFilesNumber)(req, res, next);
         }
     }
 

@@ -23,7 +23,7 @@ export function wrapRoutes(...middlewares) {
             .catch((error) => {
                 const response = catchError(error);
                 res.status(response.code).json(response);
-                return;
+                return Promise.resolve();
             });
     });
 }

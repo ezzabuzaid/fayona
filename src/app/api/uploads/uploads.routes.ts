@@ -1,18 +1,17 @@
-import { Route, HttpPost, HttpGet } from '@lib/restful';
-import { Multer } from '@shared/multer';
-import { Request } from 'express';
 import { Constants } from '@core/constants';
+import { Responses } from '@core/response';
+import { PrimaryKey } from '@lib/mongoose';
+import { ContextRequest, FromParams, FromQuery, HttpGet, HttpPost, Route } from '@lib/restful';
+import { FromHeaders } from '@lib/restful/headers.decorator';
+import { isValidId } from '@shared/common';
 import { CrudRouter, Pagination } from '@shared/crud';
+import { identity, tokenService } from '@shared/identity';
+import { Multer } from '@shared/multer';
+import { IsMongoId, IsNumberString, IsOptional, IsString } from 'class-validator';
+import path from 'path';
+import { FoldersRoutes } from './folders/folders.routes';
 import { UploadsSchema } from './uploads.model';
 import { UploadsService } from './uploads.service';
-import path from 'path';
-import { cast } from '@core/utils';
-import { IsMongoId, IsOptional, IsString, IsNumberString } from 'class-validator';
-import { isValidId } from '@shared/common';
-import { identity, tokenService } from '@shared/identity';
-import { FoldersRoutes } from './folders/folders.routes';
-import { Responses } from '@core/response';
-import { validate } from '@lib/validation';
 
 class FilesSearchQuery extends Pagination {
     @IsOptional()
@@ -43,13 +42,16 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         super(UploadsService);
     }
 
-    @HttpPost('/:id', isValidId(), multer.upload)
-    public async uploadFile(req: Request) {
-        const { id } = cast(req.params);
-        const { file } = req;
-        const decodedToken = await tokenService.decodeToken(req.headers.authorization);
-        const filePath = `${ path.join(id, file.filename) }?name=${ file.originalname }&size=${ file.size }&type=${ file.mimetype }`;
-        const result = await this.create({
+    @HttpPost(':id', isValidId(), multer.upload)
+    public async uploadFile(
+        @FromHeaders('authorization') authorization: string,
+        @FromParams('id') id: PrimaryKey,
+        @ContextRequest() request
+    ) {
+        const { file } = request;
+        const decodedToken = await tokenService.decodeToken(authorization);
+        const filePath = `${ path.join(id as any, file.filename) }?name=${ file.originalname }&size=${ file.size }&type=${ file.mimetype }`;
+        const result = await this.service.create({
             folder: id,
             user: decodedToken.id,
             name: file.originalname,
@@ -57,19 +59,16 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
             type: file.mimetype,
             path: filePath,
         });
-        if (result.hasError) {
-            return new Responses.BadRequest(result.message);
-        }
-        return new Responses.Created({
-            ...result.data,
-            path: filePath
-        });
+        return new Responses.Created(result.data);
     }
 
-    @HttpGet(Constants.Endpoints.SEARCH, validate(FilesSearchQuery, 'query'))
-    public async searchForFolders(req: Request) {
-        const { file, folder, tag, ...options } = cast<FilesSearchQuery>(req.query);
-        const { id: user_id } = await tokenService.decodeToken(req.headers.authorization);
+    @HttpGet(Constants.Endpoints.SEARCH)
+    public async searchForFolders(
+        @FromHeaders('authorization') authorization: string,
+        @FromQuery(FilesSearchQuery) query: FilesSearchQuery
+    ) {
+        const { file, folder, tag, ...options } = query;
+        const { id: user_id } = await tokenService.decodeToken(authorization);
         const files = await this.service.searchForFiles({
             folder,
             tag,
