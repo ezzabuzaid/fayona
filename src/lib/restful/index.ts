@@ -15,6 +15,7 @@ export * from './post.decorator';
 export * from './put.decorator';
 export * from './query.decorator';
 export * from './response.decorator';
+export * from './request.decorator';
 export * from './router.decorator';
 
 export enum METHODS {
@@ -65,6 +66,7 @@ export enum ParameterType {
     HEADERS = 'headers',
     QUERY = 'query',
     RESPONSE = 'response',
+    REQUEST = 'request',
     PARAMS = 'params'
 }
 

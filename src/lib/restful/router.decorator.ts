@@ -29,7 +29,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
         metadata.getRoutes(constructor)
             .forEach(routeMetadata => {
                 const normalizedEndpoint = path.normalize(path.join('/', routeMetadata.endpoint));
-                routeMetadata.middlewares.push(async function() {
+                routeMetadata.middlewares.push(async function () {
                     const [request, response] = Array.from(arguments) as [Request, Response];
                     const parameters = [];
                     const routeParameter = metadata.getRouteParameter(routeMetadata.getHandlerName());
@@ -47,6 +47,9 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                                 break;
                             case ParameterType.RESPONSE:
                                 parameters[parameterMetadata.index] = response;
+                                break;
+                            case ParameterType.REQUEST:
+                                parameters[parameterMetadata.index] = request;
                                 break;
                             default:
                                 const payloadType = request[parameterMetadata.type];
