@@ -1,14 +1,14 @@
 import { Result } from '@core/response';
 import { Omit } from '@core/utils';
 import { Document, ForeignKey, Payload, WithMongoID } from '@lib/mongoose';
-import { CrudService, Query, Repo } from '@shared/crud';
+import { CrudService, Query, CrudDao } from '@shared/crud';
 import { SessionSchema } from './sessions.model';
 import { Singelton } from '@lib/locator';
 @Singelton()
 export class SessionsService extends CrudService<SessionSchema> {
 
     constructor() {
-        super(new Repo(SessionSchema));
+        super(new CrudDao(SessionSchema));
     }
 
     all(query: Query<SessionSchema>, options = {}) {

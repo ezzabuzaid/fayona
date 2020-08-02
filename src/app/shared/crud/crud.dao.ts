@@ -9,7 +9,7 @@ import { FilterQuery, Model } from 'mongoose';
 
 export type Query<T> = FilterQuery<T>;
 
-export class Repo<T> {
+export class CrudDao<T> {
     public model: Model<Document<T>>;
     constructor(model: Type<any>) {
         assert(AppUtils.notNullOrUndefined(model));

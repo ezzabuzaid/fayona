@@ -1,4 +1,4 @@
-import { CrudService, Repo } from '@shared/crud';
+import { CrudService, CrudDao } from '@shared/crud';
 import { RoomMemberSchema } from './members.model';
 import sharedFolder from '@api/uploads/shared-folder/shared-folder.service';
 import { PrimaryKey } from '@lib/mongoose';
@@ -7,7 +7,7 @@ import { AppUtils } from '@core/utils';
 
 export class RoomMembersService extends CrudService<RoomMemberSchema> {
     constructor() {
-        super(new Repo(RoomMemberSchema), {
+        super(new CrudDao(RoomMemberSchema), {
             create: {
                 async post(member) {
                     const populatedMember = await member.populate('room').execPopulate();
@@ -39,20 +39,10 @@ export class RoomMembersService extends CrudService<RoomMemberSchema> {
             ...result.data,
             list: result.data.list.map(({ room }) => room).filter(AppUtils.isTruthy)
         };
-        // return this.repo.fetchAll({
-        //     user: id
-        // }, {
-        //     populate: {
-        //         path: 'room',
-        //         match: {
-        //             single
-        //         }
-        //     }
-        // });
     }
 
     getRoom(ids: PrimaryKey[]) {
-        return this.repo.model.aggregate([
+        return this.dao.model.aggregate([
             {
                 $group: {
                     _id: '$room',

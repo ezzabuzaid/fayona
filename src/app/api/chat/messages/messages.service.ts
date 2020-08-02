@@ -1,11 +1,11 @@
-import { CrudService, Repo, IReadAllOptions, WriteResult } from '@shared/crud';
+import { CrudService, CrudDao, IReadAllOptions, WriteResult } from '@shared/crud';
 import { MessagesSchema } from './messages.model';
 import { PrimaryKey, Payload } from '@lib/mongoose';
 import { Result } from '@core/response';
 
 export class MessagesService extends CrudService<MessagesSchema> {
     constructor() {
-        super(new Repo(MessagesSchema));
+        super(new CrudDao(MessagesSchema));
     }
 
     getLastMessage(room: PrimaryKey, options: IReadAllOptions<MessagesSchema>) {

@@ -1,4 +1,4 @@
-import { CrudService, Repo } from '@shared/crud';
+import { CrudService, CrudDao } from '@shared/crud';
 import { SharedFolderSchema } from './shared-folder.model';
 import { Constants } from '@core/constants';
 import { PrimaryKey } from '@lib/mongoose';
@@ -6,11 +6,11 @@ import { PrimaryKey } from '@lib/mongoose';
 export class SharedFolderService extends CrudService<SharedFolderSchema> {
 
     constructor() {
-        super(new Repo(SharedFolderSchema));
+        super(new CrudDao(SharedFolderSchema));
     }
 
     get() {
-        return this.repo.model.aggregate([])
+        return this.dao.model.aggregate([])
             .lookup({
                 from: Constants.Schemas.FOLDERS,
                 localField: 'folder',

@@ -1,7 +1,7 @@
 import { ICrudOptions, ICrudHooks } from './crud.options';
 import { Payload, WithID, Document, Projection, IColumnSort, PrimaryKey } from '@lib/mongoose';
 import { AppUtils } from '@core/utils';
-import { Repo, Query, IReadOptions } from './crud.repo';
+import { CrudDao, Query, IReadOptions } from './crud.dao';
 import { translate } from '@lib/translation';
 import { Result } from '@core/response';
 
@@ -28,13 +28,13 @@ export class WriteResult {
 export class CrudService<T = null> {
 
     constructor(
-        protected repo: Repo<T>,
+        protected dao: CrudDao<T>,
         private options: ICrudOptions<T> = {} as any
     ) { }
 
     private async isEntityExist(payload: Payload<T>) {
         if (AppUtils.hasItemWithin(this.options.unique)) {
-            const fetchOne = (field: keyof Payload<T>) => this.repo.fetchOne({ [field]: payload[field] } as any);
+            const fetchOne = (field: keyof Payload<T>) => this.dao.fetchOne({ [field]: payload[field] } as any);
             for (let index = 0; index < this.options.unique.length; index++) {
                 const field = this.options.unique[index];
                 if (AppUtils.notNullOrUndefined(payload[field])) {
@@ -53,7 +53,7 @@ export class CrudService<T = null> {
         if (isExist) {
             return new Result({ message: isExist });
         }
-        const entity = this.repo.create(payload);
+        const entity = this.dao.create(payload);
         const { pre, post } = getHooks(this.options.create);
         await pre(entity);
         await entity.save();
@@ -63,7 +63,7 @@ export class CrudService<T = null> {
     }
 
     public async delete(query: Query<T>): Promise<Result<WriteResult>> {
-        const entity = await this.repo.fetchOne(query);
+        const entity = await this.dao.fetchOne(query);
         if (AppUtils.isNullOrUndefined(entity)) {
             return new Result({ message: 'entity_not_exist' });
         }
@@ -77,7 +77,7 @@ export class CrudService<T = null> {
     }
 
     public async updateById(id: PrimaryKey, payload: Partial<Payload<T>>) {
-        return this.doUpdate(await this.repo.fetchById(id), payload);
+        return this.doUpdate(await this.dao.fetchById(id), payload);
     }
 
     public async update(record: Document<T>, payload: Partial<Payload<T>>) {
@@ -110,7 +110,7 @@ export class CrudService<T = null> {
         // TODO: to be tested
         // TODO: hooks should be called
         // TODO: all calls should be run within transaction
-        const records = await Promise.all(entites.map((record) => this.repo.fetchById(record.id)));
+        const records = await Promise.all(entites.map((record) => this.dao.fetchById(record.id)));
         if (entites.every((item) => !!item)) {
             return null;
         }
@@ -136,7 +136,7 @@ export class CrudService<T = null> {
     public async bulkDelete(ids: PrimaryKey[]) {
         // TODO: to be tested
         // TODO: add transaction
-        const records = await Promise.all(ids.map((id) => this.repo.fetchById(id)));
+        const records = await Promise.all(ids.map((id) => this.dao.fetchById(id)));
         if (records.every(AppUtils.isTruthy)) {
             return null;
         }
@@ -153,7 +153,7 @@ export class CrudService<T = null> {
     }
 
     public async one(query: Query<T>, options: IReadOptions<T> = {}) {
-        const documentQuery = this.repo.fetchOne(query, options);
+        const documentQuery = this.dao.fetchOne(query, options);
         const record = await documentQuery.exec();
         if (AppUtils.isNullOrUndefined(record)) {
             return new Result<Document<T>>({ message: 'entity_not_exist' });
@@ -163,9 +163,9 @@ export class CrudService<T = null> {
 
     public async all(query?: Query<T>, options: IReadOptions<T> = {}) {
         const readOptions = new ReadOptions(options);
-        const documentQuery = this.repo.fetchAll(query, readOptions);
+        const documentQuery = this.dao.fetchAll(query, readOptions);
         const documents = await documentQuery.exec();
-        const count = await this.repo.fetchAll().estimatedDocumentCount(query);
+        const count = await this.dao.fetchAll().estimatedDocumentCount(query);
         const pages = count / readOptions.limit;
         return new Result({
             data: {

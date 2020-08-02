@@ -1,4 +1,4 @@
-import { CrudService, Repo } from '@shared/crud';
+import { CrudService, CrudDao } from '@shared/crud';
 import { FoldersSchema, } from './folders.model';
 import sharedFolderService from '../shared-folder/shared-folder.service';
 import { Directories } from '@shared/common';
@@ -8,7 +8,7 @@ import { Singelton } from '@lib/locator';
 export class FoldersService extends CrudService<FoldersSchema> {
 
     constructor() {
-        super(new Repo(FoldersSchema), {
+        super(new CrudDao(FoldersSchema), {
             unique: ['name'],
             create: {
                 post(folder) {
