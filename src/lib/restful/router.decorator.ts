@@ -21,7 +21,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
         if (AppUtils.hasItemWithin(options.children)) {
             options.children.forEach((child) => {
                 const internal = child.__router();
-                router.use(internal.uri, internal.router);
+                router.use(internal.endpoint, internal.router);
             });
         }
 
@@ -31,31 +31,33 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                 const normalizedEndpoint = path.normalize(path.join('/', routeMetadata.endpoint));
                 routeMetadata.middlewares.push(async function() {
                     const [request, response] = Array.from(arguments) as [Request, Response];
-                    const parameterizedArguments = [];
-                    const parameters = metadata.getRouteParameter(routeMetadata.getHandlerName());
-                    for (const parameterMetadata of parameters) {
+                    const parameters = [];
+                    const routeParameter = metadata.getRouteParameter(routeMetadata.getHandlerName());
+                    for (const parameterMetadata of routeParameter) {
                         switch (parameterMetadata.type) {
                             case ParameterType.HEADERS:
                                 const [header] = Object.values(parameterMetadata.payload);
-                                parameterizedArguments[parameterMetadata.index] = request.header(header);
+                                parameters[parameterMetadata.index] = request.header(header) ?? request.headers[header];
+
+                                // TODO: check if it passed as single header or dictionary
                                 break;
                             case ParameterType.PARAMS:
                                 const [param] = Object.values(parameterMetadata.payload);
-                                parameterizedArguments[parameterMetadata.index] = request.params[param];
+                                parameters[parameterMetadata.index] = request.params[param];
                                 break;
                             case ParameterType.RESPONSE:
-                                parameterizedArguments[parameterMetadata.index] = response;
+                                parameters[parameterMetadata.index] = response;
                                 break;
                             default:
                                 const payloadType = request[parameterMetadata.type];
-                                parameterizedArguments[parameterMetadata.index] =
+                                parameters[parameterMetadata.index] =
                                     parameterMetadata.payload
                                         ? await _validate(parameterMetadata.payload, payloadType)
                                         : payloadType;
                                 break;
                         }
                     }
-                    return routeMetadata.handler.apply(instance, parameterizedArguments);
+                    return routeMetadata.handler.apply(instance, parameters);
                 });
                 router[routeMetadata.method](normalizedEndpoint, wrapRoutes(
                     ...(options.middleware ?? [])
@@ -76,17 +78,17 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                 return {
                     router,
                     id: AppUtils.generateHash(),
-                    uri: formatUri(constructor, endpoint)
+                    endpoint: normalizeEndpoint(constructor, endpoint)
                 };
             }
         };
     };
 }
 
-function formatUri(target, baseUri?: string) {
-    let uri = baseUri;
-    if (AppUtils.isEmptyString(baseUri)) {
-        uri = target.name.substring(target.name.lastIndexOf(Route.name), -target.name.length);
+function normalizeEndpoint(target, endpoint?: string) {
+    let mappedValue = endpoint;
+    if (AppUtils.isEmptyString(endpoint)) {
+        mappedValue = target.name.substring(target.name.lastIndexOf(Route.name), -target.name.length);
     }
-    return path.normalize(path.join('/', uri, '/'));
+    return path.normalize(path.join('/', mappedValue, '/'));
 }

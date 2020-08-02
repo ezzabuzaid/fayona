@@ -4,7 +4,7 @@ import { Request } from 'express';
 import { Constants } from '@core/constants';
 import { CrudRouter, Pagination } from '@shared/crud';
 import { UploadsSchema } from './uploads.model';
-import uploadsService, { UploadsService } from './uploads.service';
+import { UploadsService } from './uploads.service';
 import path from 'path';
 import { cast } from '@core/utils';
 import { IsMongoId, IsOptional, IsString, IsNumberString } from 'class-validator';
@@ -40,7 +40,7 @@ const multer = new Multer({ allowedTypes: allowedImageTypes });
 export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> {
 
     constructor() {
-        super(uploadsService);
+        super(UploadsService);
     }
 
     @HttpPost('/:id', isValidId(), multer.upload)
@@ -49,7 +49,7 @@ export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> 
         const { file } = req;
         const decodedToken = await tokenService.decodeToken(req.headers.authorization);
         const filePath = `${ path.join(id, file.filename) }?name=${ file.originalname }&size=${ file.size }&type=${ file.mimetype }`;
-        const result = await uploadsService.create({
+        const result = await this.create({
             folder: id,
             user: decodedToken.id,
             name: file.originalname,

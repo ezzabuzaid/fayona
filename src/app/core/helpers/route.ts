@@ -90,5 +90,8 @@ function catchError(error: any) {
             break;
         default:
     }
+    if (response.code === NetworkStatus.INTERNAL_SERVER_ERROR) {
+        console.log(error);
+    }
     return response;
 }

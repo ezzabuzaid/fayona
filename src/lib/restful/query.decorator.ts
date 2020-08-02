@@ -1,15 +1,13 @@
 import { ParameterMetadata, ParameterType, registerParameter } from '.';
 import { Type, isNullOrUndefined } from '@lib/utils';
 
-export function FromQuery<T>(query?: string | Type<T>) {
+export function FromQuery<T>(query: string | Type<T>) {
     return (target: any, propertyKey: string, parameterIndex: number) => {
         registerParameter(
             new ParameterMetadata(
                 parameterIndex,
                 ParameterType.QUERY,
-                (isNullOrUndefined(query) || typeof query === 'string')
-                    ? { [propertyKey]: query ?? propertyKey } as any
-                    : query,
+                typeof query === 'string' ? { [propertyKey]: query } as any : query,
                 propertyKey,
                 target.constructor.name
             )

@@ -14,7 +14,7 @@ import helmet = require('helmet');
 import hpp = require('hpp');
 import morgan = require('morgan');
 import { envirnoment } from '@environment/env';
-
+import endpoints from 'express-list-endpoints';
 const log = new Logger('Application');
 
 export class Application {
@@ -24,6 +24,7 @@ export class Application {
         this.configure();
         this.setupLocalization();
         this.populateRoutes();
+        console.table(endpoints(this.application));
     }
 
     /**
@@ -64,7 +65,7 @@ export class Application {
             next();
         });
 
-        ApiFactory.routers.forEach(({ router, uri }) => {
+        ApiFactory.routers.forEach(({ router, endpoint: uri }) => {
             this.application.use(path.join('/api', uri), router);
         });
 

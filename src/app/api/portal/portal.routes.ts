@@ -16,6 +16,7 @@ import { SessionsService } from '@api/sessions';
 import { UserService } from '@api/users';
 import { Constants } from '@core/constants';
 import { HashHelper } from '@core/helpers';
+import { Response } from 'express';
 
 class Pincode {
     public ttl = AppUtils.duration(5);
@@ -131,8 +132,7 @@ export class PortalRoutes {
         @FromBody(CredentialsDto) credentials: CredentialsDto,
         @FromHeaders(Constants.Application.deviceIdHeader) device_uuid: string
     ) {
-        // TODO: send an email to user to notify him about login attempt.
-
+        // TODO: Send Email only if push notification not applicable
         const { data: user } = await this.usersService.one({ username: credentials.username }, {
             projection: {
                 password: 1,
@@ -146,6 +146,11 @@ export class PortalRoutes {
         }
         const activeUserSessions = await this.sessionsService.getActiveUserSession(user.id);
         if (activeUserSessions.data.length >= PortalRoutes.MAX_SESSION_SIZE) {
+            EmailService.sendEmail({
+                from: 'admin@admin.com',
+                to: user.email,
+                text: `Your have exceeded your login attempts, please contact with the support for more information`
+            });
             return new Responses.BadRequest('exceeded_allowed_sesison');
         }
         await this.sessionsService.create({
@@ -153,8 +158,8 @@ export class PortalRoutes {
             active: true,
             user: user.id
         });
+        EmailService.sendEmail({ text: `New login at ${ new Date() }` });
         return new Responses.Ok(new RefreshToken(user.id, user.role, user.emailVerified));
-
     }
 
     @HttpPost(Constants.Endpoints.LOGOUT)
@@ -269,7 +274,7 @@ export class PortalRoutes {
     }
 
     @HttpGet(Constants.Endpoints.VERIFY_EMAIL, validate(TokenValidator, 'query'))
-    public async updateUserEmailVerification(@FromQuery() token: string, @ContextResponse() response) {
+    public async updateUserEmailVerification(@FromQuery('token') token: string, @ContextResponse() response: Response) {
         const decodedToken = await tokenService.decodeToken(token);
         const result = await this.usersService.updateById(decodedToken.id, { emailVerified: true });
         if (result.hasError) {

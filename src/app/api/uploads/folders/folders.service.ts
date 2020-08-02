@@ -2,7 +2,9 @@ import { CrudService, Repo } from '@shared/crud';
 import { FoldersSchema, } from './folders.model';
 import sharedFolderService from '../shared-folder/shared-folder.service';
 import { Directories } from '@shared/common';
+import { Singelton } from '@lib/locator';
 
+@Singelton()
 export class FoldersService extends CrudService<FoldersSchema> {
 
     constructor() {
@@ -35,5 +37,3 @@ export class FoldersService extends CrudService<FoldersSchema> {
         });
     }
 }
-
-export default new FoldersService();

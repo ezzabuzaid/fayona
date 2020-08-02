@@ -6,9 +6,10 @@ import { AppUtils, cast } from '@core/utils';
 import { Request, NextFunction, Response } from 'express';
 import { Responses, ErrorResponse } from '@core/response';
 import { Types } from 'mongoose';
-import foldersService from '@api/uploads/folders/folders.service';
 import { Directories } from '@shared/common';
 import { Parameter } from '@lib/utils';
+import { FoldersService } from '@api/uploads/folders/folders.service';
+import { locate } from '@lib/locator';
 
 export class UploadOptions {
     public allowedTypes: string[] = [];
@@ -63,7 +64,7 @@ export class Multer {
 
                 if (folder !== 'others') {
                     if (Types.ObjectId.isValid(folder)) {
-                        const folderExistance = await foldersService.exists({ _id: folder });
+                        const folderExistance = await locate(FoldersService).exists({ _id: folder });
                         if (folderExistance.hasError) {
                             callback(new Responses.BadRequest(String(folderExistance.data)), null);
                         }

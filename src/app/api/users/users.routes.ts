@@ -1,4 +1,3 @@
-import { AccountsRouter, ProfilesSchema } from '@api/profiles';
 import { Responses, SuccessResponse } from '@core/response';
 import { FromBody, FromQuery, HttpGet, HttpPost, Route } from '@lib/restful';
 import { CrudRouter, Pagination } from '@shared/crud';
@@ -7,12 +6,12 @@ import { identity } from '@shared/identity';
 import { IsOptional, IsString, IsEmail } from 'class-validator';
 import { UsersSchema } from './users.model';
 import { UserService } from './users.service';
-import { locate } from '@lib/locator';
 import redis from 'redis';
 import { Constants } from '@core/constants';
 import Cache from 'file-system-cache';
+import { ProfilesSchema } from './profile.model';
 
-class UsernameValidator extends Pagination {
+class SearchForUserDto extends Pagination {
     @IsOptional()
     @IsString()
     public username: string = null;
@@ -37,28 +36,12 @@ class CreateUserDto {
 
 @Route(Constants.Endpoints.USERS, {
     // middleware: [identity.isAuthenticated()],
-    children: [AccountsRouter]
 })
 export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
-    private redisClient = redis.createClient(6379, );
-    private fileSystemCache = Cache({
-        basePath: './.cache',
-    });
+    private redisClient = redis.createClient(6379);
+    private fileSystemCache = Cache({ basePath: './.cache', });
     constructor() {
-        super(locate(UserService));
-    }
-
-    fsCache(key: string, value: any) {
-        return this.fileSystemCache.set(key, JSON.stringify(value));
-    }
-
-    async fsGetCache(key) {
-        const data = await this.fileSystemCache.get(key);
-        try {
-            return JSON.parse(data);
-        } catch (error) {
-            return null;
-        }
+        super(UserService);
     }
 
     cache(key: string, value: any) {
@@ -85,12 +68,25 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
         });
     }
 
+    fsCache(key: string, value: any) {
+        return this.fileSystemCache.set(key, JSON.stringify(value));
+    }
+
+    async fsGetCache(key) {
+        const data = await this.fileSystemCache.get(key);
+        try {
+            return JSON.parse(data);
+        } catch (error) {
+            return null;
+        }
+    }
+
     @HttpGet()
     async getAll(@FromQuery(Pagination) { page, size, ...sort }: Pagination) {
-        const cachedData = await this.fsGetCache('getAll');
-        if (cachedData) {
-            return cachedData;
-        }
+        // const cachedData = await this.fsGetCache('getAll');
+        // if (cachedData) {
+        //     return cachedData;
+        // }
         const { data } = (await this.service.all({}, { page, size, sort }));
         await this.fsCache('getAll', data);
         return data;
@@ -99,20 +95,19 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
     @HttpPost()
     // TODO: Use AllowAnonymous()
     public async create(@FromBody(CreateUserDto) body: CreateUserDto) {
-        const { data } = await this.service.create(body);
+        const { data } = await this.service.create(body as any);
         EmailService.sendVerificationEmail(body.email, data.id);
         return new SuccessResponse(data, 'An e-mail has been sent to your email inbox in order to verify the account');
     }
 
     @HttpGet(Constants.Endpoints.SEARCH)
-    public async searchForUsers(@FromQuery(UsernameValidator) query: UsernameValidator) {
-        const { username, ...options } = query;
-        const users = await this.service.searchForUser(username, options);
+    public async searchForUsers(@FromQuery(SearchForUserDto) query: SearchForUserDto) {
+        const users = await this.service.searchForUser(query.username, query);
         return new Responses.Ok(users.data);
     }
 
     @HttpGet('username', identity.isAuthenticated())
-    public async isUsernameExist(@FromQuery(UsernameValidator) query: UsernameValidator) {
+    public async isUsernameExist(@FromQuery(SearchForUserDto) query: SearchForUserDto) {
         const { username } = query;
         const result = await this.service.one({ username });
         if (result.hasError) {

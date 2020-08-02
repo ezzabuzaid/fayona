@@ -1,8 +1,7 @@
 import { Constants } from '@core/constants';
-import { getUri, prepareUserSession } from '@test/fixture';
-import { Types } from 'mongoose';
-import { DeactivateSessionPayload } from './sessions.routes';
 import { PrimaryKey } from '@lib/mongoose';
+import { getUri, prepareUserSession } from '@test/fixture';
+import { DeactivateSessionDto } from './sessions.routes';
 
 const ENDPOINT = Constants.Endpoints.SESSIONS;
 const DEACTIVATE_ENDPOINT = getUri(`${ ENDPOINT }/deactivate`);
@@ -37,14 +36,14 @@ xdescribe('#INTEGRATION', () => {
                 .send({
                     user: userSession.user_id,
                     session_id: userSession.session_id
-                } as DeactivateSessionPayload);
+                } as DeactivateSessionDto);
             expect(response.ok).toBeTruthy();
             expect(response.body.data).toBe('Session deactivated');
         });
 
         test('should return bad request if there is no session', async () => {
             const userSession = await prepareUserSession();
-            const payload = new DeactivateSessionPayload();
+            const payload = new DeactivateSessionDto();
             payload.session_id = new PrimaryKey();
             payload.user = userSession.user_id;
             const response = await global.superAgent.patch(DEACTIVATE_ENDPOINT)
@@ -61,7 +60,7 @@ xdescribe('#INTEGRATION', () => {
                 .send({
                     user: userSession.user_id,
                     session_id: false as any,
-                } as DeactivateSessionPayload);
+                } as DeactivateSessionDto);
             expect(response.badRequest).toBeTruthy();
             expect(response.body.message).toBe('session_id must be string');
         });
@@ -73,7 +72,7 @@ xdescribe('#INTEGRATION', () => {
                 .send({
                     user: false as any,
                     session_id: userSession.session_id,
-                } as DeactivateSessionPayload);
+                } as DeactivateSessionDto);
             expect(response.badRequest).toBeTruthy();
             expect(response.body.message).toBe('user must be string');
         });

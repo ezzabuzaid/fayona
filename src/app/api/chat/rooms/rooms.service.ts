@@ -1,7 +1,7 @@
 import { CrudService, Repo } from '@shared/crud';
 import { RoomSchema } from './rooms.model';
-import foldersService from '@api/uploads/folders/folders.service';
-import { Singelton } from '@lib/locator';
+import { Singelton, locate } from '@lib/locator';
+import { FoldersService } from '@api/uploads';
 
 @Singelton()
 export class RoomsService extends CrudService<RoomSchema> {
@@ -11,7 +11,7 @@ export class RoomsService extends CrudService<RoomSchema> {
         super(new Repo(RoomSchema), {
             create: {
                 async pre(room) {
-                    const folder = await foldersService.create({ name: room.name, _id: room.id } as any);
+                    const folder = await locate(FoldersService).create({ name: room.name, _id: room.id } as any);
                     room.folder = folder.data.id;
                 }
             },

@@ -7,7 +7,8 @@ export function HttpGet(endpoint = '/', ...middlewares: RequestHandler[]) {
             target[propertyKey],
             endpoint,
             METHODS.GET,
-            middlewares
+            middlewares,
+            target,
         ));
     };
 }
