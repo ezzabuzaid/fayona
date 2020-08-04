@@ -20,7 +20,7 @@ export class DeactivateSessionDto {
 }
 
 @Route(Constants.Endpoints.SESSIONS, {
-    middleware: [identity.isAuthenticated()]
+    middleware: [identity.Authorize()]
 })
 export class SessionRouter extends CrudRouter<SessionSchema, SessionsService> {
     constructor() {

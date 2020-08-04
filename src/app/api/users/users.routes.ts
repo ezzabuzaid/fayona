@@ -35,7 +35,7 @@ class CreateUserDto {
 }
 
 @Route(Constants.Endpoints.USERS, {
-    middleware: [identity.isAuthenticated()],
+    middleware: [identity.Authorize()],
 })
 export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
     private redisClient = redis.createClient(6379);
@@ -81,7 +81,6 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
         }
     }
 
-    @AllowAnonymous()
     @HttpGet()
     async getAll(@FromQuery(Pagination) { page, size, ...sort }: Pagination) {
         // const cachedData = await this.fsGetCache('getAll');
@@ -94,7 +93,7 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
     }
 
     @HttpPost()
-    // TODO: Use AllowAnonymous()
+    @AllowAnonymous()
     public async create(@FromBody(CreateUserDto) body: CreateUserDto) {
         const { data } = await this.service.create(body as any);
         EmailService.sendVerificationEmail(body.email, data.id);
@@ -107,7 +106,7 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
         return new Responses.Ok(users.data);
     }
 
-    @HttpGet('username', identity.isAuthenticated())
+    @HttpGet('username')
     public async isUsernameExist(@FromQuery(SearchForUserDto) query: SearchForUserDto) {
         const { username } = query;
         const result = await this.service.one({ username });

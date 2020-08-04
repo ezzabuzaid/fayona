@@ -33,7 +33,7 @@ const allowedImageTypes = [
 
 const multer = new Multer({ allowedTypes: allowedImageTypes });
 @Route(Constants.Endpoints.UPLOADS, {
-    middleware: [identity.isAuthenticated()],
+    middleware: [identity.Authorize()],
     children: [FoldersRoutes]
 })
 export class FileUploadRoutes extends CrudRouter<UploadsSchema, UploadsService> {

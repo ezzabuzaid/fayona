@@ -24,26 +24,11 @@ class Identity {
             }
             try {
                 const result = await this.verifyUserSession(headersResult.data.token, headersResult.data.device_uuid);
-                if (roles.includes(result.data.role)) {
+                if (AppUtils.isEmpty(roles) || roles.includes(result.data.role)) {
                     return next();
                 } else {
                     return new Responses.Forbidden();
                 }
-            } catch (error) {
-                return new Responses.Unauthorized();
-            }
-        };
-    }
-
-    public isAuthenticated() {
-        return async (req: Request, res: Response, next: NextFunction) => {
-            const headersResult = this.extractToken(req);
-            if (headersResult.hasError) {
-                return new Responses.Unauthorized();
-            }
-            try {
-                await this.verifyUserSession(headersResult.data.token, headersResult.data.device_uuid);
-                return next();
             } catch (error) {
                 return new Responses.Unauthorized();
             }

@@ -31,7 +31,7 @@ class SearchForRoomByMemberDto {
 }
 
 @Route(Constants.Endpoints.ROOMS, {
-    middleware: [identity.isAuthenticated()]
+    middleware: [identity.Authorize()]
 })
 export class RoomsRouter extends CrudRouter<RoomSchema, RoomsService> {
     constructor() {

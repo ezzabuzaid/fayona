@@ -11,7 +11,7 @@ import sharedFolderService from '../shared-folder/shared-folder.service';
 import { FoldersService } from './folders.service';
 
 @Route(Constants.Endpoints.FOLDERS, {
-    middleware: [identity.isAuthenticated()],
+    middleware: [identity.Authorize()],
 })
 export class FoldersRoutes extends CrudRouter<FoldersSchema> {
 

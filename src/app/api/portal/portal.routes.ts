@@ -290,7 +290,7 @@ export class PortalRoutes {
         response.redirect('http://localhost:4200/');
     }
 
-    @HttpGet(Constants.Endpoints.SEND_VERIFICATION_EMAIL, identity.isAuthenticated())
+    @HttpGet(Constants.Endpoints.SEND_VERIFICATION_EMAIL, identity.Authorize())
     public async sendVerificationEmail(@FromHeaders('authorization') authorization: string) {
         const decodedToken = await tokenService.decodeToken(authorization);
         try {
