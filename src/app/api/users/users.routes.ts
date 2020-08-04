@@ -2,7 +2,7 @@ import { Responses, SuccessResponse } from '@core/response';
 import { FromBody, FromQuery, HttpGet, HttpPost, Route, RemoveMiddleware } from '@lib/restful';
 import { CrudRouter, Pagination } from '@shared/crud';
 import { EmailService } from '@shared/email';
-import { identity } from '@shared/identity';
+import { identity, AllowAnonymous } from '@shared/identity';
 import { IsOptional, IsString, IsEmail } from 'class-validator';
 import { UsersSchema } from './users.model';
 import { UserService } from './users.service';
@@ -81,7 +81,7 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
         }
     }
 
-    @RemoveMiddleware(identity.isAuthenticated())
+    @AllowAnonymous()
     @HttpGet()
     async getAll(@FromQuery(Pagination) { page, size, ...sort }: Pagination) {
         // const cachedData = await this.fsGetCache('getAll');
