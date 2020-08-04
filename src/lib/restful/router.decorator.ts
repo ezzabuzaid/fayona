@@ -2,8 +2,8 @@ import { wrapRoutes } from '@core/helpers/route';
 import { AppUtils } from '@core/utils';
 import { locate } from '@lib/locator';
 import { _validate } from '@lib/validation';
-import { Router as expressRouter, Request, Response } from 'express';
-import { Metadata, ParameterType } from './index';
+import { Request, Response, Router as expressRouter } from 'express';
+import { HttpRouteMiddlewareMetadata, Metadata, ParameterType } from './index';
 import { IRouterDecorationOption } from './methods.types';
 import path = require('path');
 
@@ -61,16 +61,13 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                     }
                     return routeMetadata.handler.apply(instance, parameters);
                 });
+                const routeMiddlewares = metadata.getHttpRouteMiddleware(routeMetadata.getHandlerName());
                 router[routeMetadata.method](normalizedEndpoint, wrapRoutes(
-                    ...(options.middleware ?? [])
+                    ...(populateRouteMiddlewares(routeMiddlewares, options.middleware))
                     ,
                     ...routeMetadata.middlewares
                 ));
             });
-
-        // if (AppUtils.hasItemWithin(options.middleware)) {
-        //     router.use(wrapRoutes(...options.middleware));
-        // }
 
         return class extends constructor {
             constructor(...args) {
@@ -93,4 +90,17 @@ function normalizeEndpoint(target, endpoint?: string) {
         mappedValue = target.name.substring(target.name.lastIndexOf(Route.name), -target.name.length);
     }
     return path.normalize(path.join('/', mappedValue, '/'));
+}
+
+function populateRouteMiddlewares(routeMiddlewares: HttpRouteMiddlewareMetadata[], parentMiddlewares: any[]) {
+    const clonedParentMiddlewares = parentMiddlewares?.slice(0) ?? [];
+    const index = clonedParentMiddlewares.findIndex(parentMiddleware => {
+        return routeMiddlewares.find(routeMiddleware =>
+            routeMiddleware.middleware.toString() === parentMiddleware.toString()
+        );
+    });
+    if (index !== -1) {
+        clonedParentMiddlewares.splice(index, 1);
+    }
+    return clonedParentMiddlewares;
 }

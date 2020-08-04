@@ -17,6 +17,7 @@ export * from './query.decorator';
 export * from './response.decorator';
 export * from './request.decorator';
 export * from './router.decorator';
+export * from './remove-middleware.decorator';
 
 export enum METHODS {
     PUT = 'put',
@@ -47,6 +48,18 @@ export class ParameterMetadata {
     }
 }
 
+export class HttpRouteMiddlewareMetadata {
+    constructor(
+        public middleware: () => any,
+        public controller: Type<any>,
+        public handler: () => void,
+    ) { }
+
+    getHandlerName() {
+        return this.controller.name + this.handler.name;
+    }
+}
+
 export class HttpRouteMetadata {
     constructor(
         public controller: Type<any>,
@@ -54,8 +67,8 @@ export class HttpRouteMetadata {
         public endpoint: string,
         public method: METHODS,
         public middlewares: RequestHandler[],
-        public target?,
     ) { }
+
     getHandlerName() {
         return this.controller.name + this.handler.name;
     }
@@ -73,6 +86,7 @@ export enum ParameterType {
 @Singelton()
 export class Metadata {
     #parameters = new Map<string, ParameterMetadata[]>();
+    #middlewares = new Map<string, HttpRouteMiddlewareMetadata[]>();
     static MetadataKey = AppUtils.generateAlphabeticString();
     private metadataKey(httpRouteMetadata: HttpRouteMetadata) {
         return `${ Metadata.MetadataKey }:${ httpRouteMetadata.method }:${ httpRouteMetadata.endpoint }`;
@@ -98,6 +112,16 @@ export class Metadata {
         return this.#parameters.get(handlerName) ?? [];
     }
 
+    getHttpRouteMiddleware(handlerName: string) {
+        return this.#middlewares.get(handlerName) ?? [];
+    }
+
+    registerHttpRouteMiddleware(httpRouteMiddlewareMetadata: HttpRouteMiddlewareMetadata) {
+        const middlewares = this.#middlewares.get(httpRouteMiddlewareMetadata.getHandlerName()) ?? [];
+        middlewares.push(httpRouteMiddlewareMetadata);
+        this.#middlewares.set(httpRouteMiddlewareMetadata.getHandlerName(), middlewares);
+    }
+
 }
 
 export function registerParameter(parameterMetadata: ParameterMetadata) {
@@ -108,4 +132,9 @@ export function registerParameter(parameterMetadata: ParameterMetadata) {
 export function registerHttpRoute(httpRouteMetadata: HttpRouteMetadata) {
     const metadata = Locator.instance.locate(Metadata);
     metadata.registerHttpRoute(httpRouteMetadata);
+}
+
+export function registerMiddleware(httpRouteMetadata: HttpRouteMiddlewareMetadata) {
+    const metadata = Locator.instance.locate(Metadata);
+    metadata.registerHttpRouteMiddleware(httpRouteMetadata);
 }

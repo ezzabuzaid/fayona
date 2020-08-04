@@ -1,5 +1,5 @@
 import { Responses, SuccessResponse } from '@core/response';
-import { FromBody, FromQuery, HttpGet, HttpPost, Route } from '@lib/restful';
+import { FromBody, FromQuery, HttpGet, HttpPost, Route, RemoveMiddleware } from '@lib/restful';
 import { CrudRouter, Pagination } from '@shared/crud';
 import { EmailService } from '@shared/email';
 import { identity } from '@shared/identity';
@@ -35,7 +35,7 @@ class CreateUserDto {
 }
 
 @Route(Constants.Endpoints.USERS, {
-    // middleware: [identity.isAuthenticated()],
+    middleware: [identity.isAuthenticated()],
 })
 export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
     private redisClient = redis.createClient(6379);
@@ -81,6 +81,7 @@ export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
         }
     }
 
+    @RemoveMiddleware(identity.isAuthenticated())
     @HttpGet()
     async getAll(@FromQuery(Pagination) { page, size, ...sort }: Pagination) {
         // const cachedData = await this.fsGetCache('getAll');
