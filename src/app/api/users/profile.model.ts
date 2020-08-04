@@ -1,4 +1,4 @@
-import { Field, Entity } from '@lib/mongoose';
+import { Entity, Field } from '@lib/mongoose';
 import { Constants } from '@core/constants';
 
 export enum EGender {

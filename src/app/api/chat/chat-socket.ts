@@ -30,7 +30,7 @@ class MessagePayload {
 }
 const log = new Logger('ChatSocket');
 
-(() => {
+export function startChatSocket() {
     const io = locateSocketIO();
     io.use(async (socket, next) => {
         try {
@@ -55,11 +55,11 @@ const log = new Logger('ChatSocket');
         });
         socket.on('SendMessage', async (message: MessagePayload) => {
             const { id } = socket['decodedToken'];
-            log.debug('New Message from => ', message, typeof message.text);
+            log.debug('New Message => ', message);
             const payload = new MessagePayload(message);
             try {
                 await validatePayload(payload);
-                const createdMessage = await messagesService.createMessage({
+                const createdMessage = await messagesService.create({
                     room: payload.id,
                     user: id,
                     text: payload.text,
@@ -69,11 +69,11 @@ const log = new Logger('ChatSocket');
                 socket.broadcast.in(message.id as any).emit('Message', createdMessage.data);
             } catch (error) {
                 console.log('MessageValidationError => ', error);
-                socket.emit('MessageValidationError', message);
+                socket.emit('SendMessageError', error);
             }
         });
         socket.on('StreamOffer', ({ negotiation, id }: { id: string, negotiation }) => {
             socket.broadcast.in(id as any).emit('StreamAnswer', negotiation);
         });
     });
-})();
+}

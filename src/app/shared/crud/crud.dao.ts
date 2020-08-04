@@ -9,15 +9,15 @@ import { FilterQuery, Model } from 'mongoose';
 
 export type Query<T> = FilterQuery<T>;
 
-export class Repo<T> {
+export class CrudDao<T> {
     public model: Model<Document<T>>;
     constructor(model: Type<any>) {
         assert(AppUtils.notNullOrUndefined(model));
         this.model = locateModel(model);
     }
 
-    public fetchOne(query: Query<T>, projection: Projection<T> = {}, options = {}) {
-        return this.model.findOne(query as any, projection, options);
+    public fetchOne(query: Query<T>, options?: IReadOneOptions<T>) {
+        return this.model.findOne(query as any, options.projection, options as any);
     }
 
     public fetchAll(

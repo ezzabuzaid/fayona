@@ -1,21 +1,28 @@
 import { Constants } from '@core/constants';
-import { identity, tokenService } from '@shared/identity';
-import { CrudRouter } from '@shared/crud';
-import { FoldersSchema } from '..';
-import foldersService from './folders.service';
-import { HttpGet, HttpPost, Route } from '@lib/restful';
-import sharedFolderService from '../shared-folder/shared-folder.service';
-import { NameValidator } from '@shared/common';
-import { Request } from 'express';
 import { Responses } from '@core/response';
-import { validate } from '@lib/validation';
+import { FromBody, FromQuery, HttpGet, HttpPost, Route } from '@lib/restful';
+import { FromHeaders } from '@lib/restful/headers.decorator';
+import { NameValidator } from '@shared/common';
+import { CrudRouter, Pagination } from '@shared/crud';
+import { identity, tokenService } from '@shared/identity';
+import { Request } from 'express';
+import { FoldersSchema } from '..';
+import sharedFolderService from '../shared-folder/shared-folder.service';
+import { FoldersService } from './folders.service';
 
 @Route(Constants.Endpoints.FOLDERS, {
-    middleware: [identity.isAuthenticated()],
+    middleware: [identity.Authorize()],
 })
 export class FoldersRoutes extends CrudRouter<FoldersSchema> {
+
     constructor() {
-        super(foldersService);
+        super(FoldersService);
+    }
+
+    @HttpGet()
+    async getAll(@FromQuery(Pagination) pagination: Pagination) {
+        const { data } = await this.service.all({}, pagination);
+        return data;
     }
 
     @HttpGet('user/shared')
@@ -26,21 +33,20 @@ export class FoldersRoutes extends CrudRouter<FoldersSchema> {
     }
 
     @HttpGet('user')
-    public async getUserFolders(req: Request) {
-        const { id } = await tokenService.decodeToken(req.headers.authorization);
+    public async getUserFolders(@FromHeaders('authorization') authorization: string) {
+        const { id } = await tokenService.decodeToken(authorization);
         const folders = await sharedFolderService.getUserFolders(id, false);
         return new Responses.Ok(folders.data);
     }
 
-    @HttpPost('/', validate(NameValidator))
-    public async createFolder(req: Request) {
-        const { name } = req.body;
-        const { id } = await tokenService.decodeToken(req.headers.authorization);
-        const result = await foldersService.create({ name });
+    @HttpPost('/')
+    public async createFolder(
+        @FromBody(NameValidator) body: NameValidator,
+        @FromHeaders('authorization') authorization: string
+    ) {
+        const { id } = await tokenService.decodeToken(authorization);
+        const result = await this.service.create({ name: body.name });
         // TODO: it's very important to find a way to pass the current user to service
-        if (result.hasError) {
-            return new Responses.BadRequest(result.message);
-        }
         await sharedFolderService.create({
             folder: result.data.id,
             shared: false,

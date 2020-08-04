@@ -9,7 +9,7 @@ export interface IRouterDecorationOption extends RouterOptions {
 export interface IExpressRouter {
     router: Router;
     id: string;
-    uri: string;
+    endpoint: string;
 }
 
 export interface IExpressInternal {

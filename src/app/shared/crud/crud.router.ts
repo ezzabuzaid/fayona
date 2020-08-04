@@ -1,27 +1,33 @@
 import { Responses } from '@core/response';
 import { AppUtils } from '@core/utils';
-import { Payload, PrimaryKey, IColumnSort, SortDirection } from '@lib/mongoose';
+import { locate } from '@lib/locator';
+import { Payload, PrimaryKey } from '@lib/mongoose';
 import { FromBody, FromParams, FromQuery, HttpDelete, HttpGet, HttpPatch, HttpPost, HttpPut } from '@lib/restful';
-import { PayloadValidator } from '@lib/validation';
+import { Type } from '@lib/utils';
 import assert from 'assert';
-import { IsNumberString, IsObject, IsOptional } from 'class-validator';
+import { IsNumberString, IsOptional } from 'class-validator';
 import { Request } from 'express';
 import { CrudService } from './crud.service';
+import { PayloadValidator } from '@lib/validation';
 
-export class Pagination {
+export class Pagination extends PayloadValidator {
     @IsOptional()
     @IsNumberString()
     page?: number = null;
     @IsOptional()
     @IsNumberString()
     size?: number = null;
+
+    beforeValidation(payload) {
+        Object.assign(this, payload);
+    }
 }
 
 export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> = CrudService<SchemaType>> {
-    constructor(
-        protected service: ServiceType & CrudService<SchemaType>
-    ) {
-        assert(AppUtils.notNullOrUndefined(service));
+    protected readonly service: ServiceType;
+    constructor(serviceType: Type<any>) {
+        assert(AppUtils.notNullOrUndefined(serviceType));
+        this.service = locate(serviceType);
     }
 
     @HttpPost('/')
@@ -31,7 +37,7 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Created(result.data);
     }
 
-    @HttpPatch(':id', )
+    @HttpPatch(':id')
     public async update(@FromParams('id') id: PrimaryKey, @FromBody() body) {
         const result = await this.service.updateById(id, body);
         return new Responses.Ok(result.data);
@@ -55,10 +61,10 @@ export class CrudRouter<SchemaType, ServiceType extends CrudService<SchemaType> 
         return new Responses.Ok(result.data);
     }
 
-    @HttpGet('/')
+    @HttpGet()
     public async fetchEntities(@FromQuery(Pagination) { page, size, ...sort }: Pagination) {
         // TODO: Check that the sort object has the same properties in <T>
-        const result = await this.service.all({}, { size, page, sort: sort as any });
+        const result = await this.service.all({}, { size, page, sort });
         return new Responses.Ok(result.data);
     }
 

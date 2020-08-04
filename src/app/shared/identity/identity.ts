@@ -22,25 +22,16 @@ class Identity {
             if (headersResult.hasError) {
                 return new Responses.Unauthorized();
             }
-            const { token, device_uuid } = headersResult.data;
-            const result = await this.verifyUserSession(token, device_uuid);
-            if (AppUtils.not(result.hasError) && roles.includes(result.data.role)) {
-                return next();
-            }
-            return new Responses.Forbidden();
-        };
-    }
-
-    public isAuthenticated() {
-        return async (req: Request, res: Response, next: NextFunction) => {
-            const headersResult = this.extractToken(req);
-            if (AppUtils.not(headersResult.hasError)) {
+            try {
                 const result = await this.verifyUserSession(headersResult.data.token, headersResult.data.device_uuid);
-                if (AppUtils.not(result.hasError)) {
+                if (AppUtils.isEmpty(roles) || roles.includes(result.data.role)) {
                     return next();
+                } else {
+                    return new Responses.Forbidden();
                 }
+            } catch (error) {
+                return new Responses.Unauthorized();
             }
-            return new Responses.Unauthorized();
         };
     }
 
@@ -66,7 +57,6 @@ class Identity {
         // STUB test if there's no session associated with `deviceIdHeader` header
         // STUB test if the session is not active
         const session = await locate(SessionsService).getActiveSession({ device_uuid });
-
         if (session.hasError) {
             // NOTE: not active mean that the session was disabled either by admin or the user logged out
             return new Result<ITokenClaim>({ hasError: true, throwIfError: false });

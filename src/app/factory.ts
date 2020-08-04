@@ -1,6 +1,5 @@
 import { UsersRouter } from '@api/users';
 import { PortalRoutes } from '@api/portal';
-import { FeedbackRouter } from '@api/feedback';
 import { SessionRouter } from '@api/sessions';
 import { IExpressInternal, IExpressRouter } from '@lib/restful';
 import { FileUploadRoutes } from '@api/uploads';
@@ -9,7 +8,6 @@ import { RoomsRouter } from '@api/chat/rooms';
 import { AppUtils } from '@core/utils';
 import assert from 'assert';
 import { LookupsRoutes } from '@api/lookups';
-import { AdvertisementRouter } from '@api/advertisement';
 
 export class ApiFactory {
     private static list = [];
@@ -32,7 +30,7 @@ export class ApiFactory {
         const internal = (subRouter as IExpressInternal).__router();
         const parentRouter = this.getRouter(superRouter);
         assert(AppUtils.notNullOrUndefined(parentRouter), 'Please register the parent router first, then try');
-        parentRouter.use(internal.uri, internal.router);
+        parentRouter.use(internal.endpoint, internal.router);
     }
 
     static get routers(): IExpressRouter[] {
@@ -47,11 +45,9 @@ export class ApiFactory {
 }
 
 ApiFactory.registerRouter(PortalRoutes);
+ApiFactory.registerRouter(SessionRouter);
 ApiFactory.registerRouter(UsersRouter);
-// ApiFactory.registerRouter(FeedbackRouter);
-// ApiFactory.registerRouter(SessionRouter);
-// ApiFactory.registerRouter(RoomsRouter);
-// ApiFactory.registerRouter(FileUploadRoutes);
-// ApiFactory.registerRouter(SettingRoutes);
-// ApiFactory.registerRouter(AdvertisementRouter);
-// ApiFactory.registerRouter(LookupsRoutes);
+ApiFactory.registerRouter(RoomsRouter);
+ApiFactory.registerRouter(FileUploadRoutes);
+ApiFactory.registerRouter(SettingRoutes);
+ApiFactory.registerRouter(LookupsRoutes);

@@ -1,10 +1,12 @@
-import { CrudService, Repo, IReadAllOptions, Query } from '@shared/crud';
+import { CrudService, CrudDao, IReadAllOptions, Query } from '@shared/crud';
 import { UploadsSchema } from './uploads.model';
 import { AppUtils } from '@core/utils';
+import { Singelton } from '@lib/locator';
 
+@Singelton()
 export class UploadsService extends CrudService<UploadsSchema> {
     constructor() {
-        super(new Repo(UploadsSchema));
+        super(new CrudDao(UploadsSchema));
     }
 
     public searchForFiles(query: Query<UploadsSchema>, options: IReadAllOptions<UploadsSchema>) {
@@ -22,5 +24,3 @@ export class UploadsService extends CrudService<UploadsSchema> {
         return this.all(AppUtils.excludeEmptyKeys(extendedQuery), options);
     }
 }
-
-export default new UploadsService();

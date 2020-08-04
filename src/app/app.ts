@@ -14,7 +14,6 @@ import helmet = require('helmet');
 import hpp = require('hpp');
 import morgan = require('morgan');
 import { envirnoment } from '@environment/env';
-
 const log = new Logger('Application');
 
 export class Application {
@@ -64,7 +63,7 @@ export class Application {
             next();
         });
 
-        ApiFactory.routers.forEach(({ router, uri }) => {
+        ApiFactory.routers.forEach(({ router, endpoint: uri }) => {
             this.application.use(path.join('/api', uri), router);
         });
 

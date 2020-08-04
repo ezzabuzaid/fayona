@@ -10,9 +10,9 @@ export enum EStage {
 }
 
 /**
- * NODE_STAGE name must be identical in .env*. files
+ * NODE_ENV name must be identical in .env*. files
  */
-const NODE_STAGE = 'NODE_STAGE';
+const NODE_ENV = 'NODE_ENV';
 
 class Envirnoment {
     public load(env: string) {
@@ -42,15 +42,15 @@ class Envirnoment {
     }
 
     public get development() {
-        return EStage.DEVELOPMENT === this.get(NODE_STAGE);
+        return EStage.DEVELOPMENT === this.get(NODE_ENV);
     }
 
     public get production() {
-        return EStage.PRODUCTION === this.get(NODE_STAGE);
+        return EStage.PRODUCTION === this.get(NODE_ENV);
     }
 
     public get testing() {
-        return EStage.TEST === this.get(NODE_STAGE);
+        return EStage.TEST === this.get(NODE_ENV);
     }
 }
 

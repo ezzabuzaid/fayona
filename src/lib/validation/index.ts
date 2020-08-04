@@ -4,10 +4,11 @@ import { Type } from '@lib/utils';
 export const PAYLOAD_VALIDATION_ERRORS = 'payload_validator_error';
 
 export class PayloadValidator {
-    beforeValidation?();
+    beforeValidation?(payload): void | Promise<void>;
     afterValidation?();
 }
 
+// FIXME: Remove this and rename _validate to validate
 export function validate<T>(
     validator: Type<T>,
     type: 'body' | 'query' | 'params' | 'headers' | 'queryPolluted' = 'body',
@@ -19,11 +20,12 @@ export function validate<T>(
     };
 }
 
-export async function _validate<T>(validator: Type<T>, incomingObject, message?: string) {
-    const validatee = new validator();
-    strictAssign(validatee, incomingObject);
-    await validatePayload(validatee, message);
-    return validatee;
+export async function _validate<T extends PayloadValidator>(payloadType: Type<T>, incomingPayload, message?: string) {
+    const payload = new payloadType();
+    await (payload.beforeValidation && payload.beforeValidation(incomingPayload));
+    strictAssign(payload, incomingPayload);
+    await validatePayload(payload, message);
+    return payload;
 }
 
 export async function validatePayload<T>(payload: T, message?: string) {

@@ -1,12 +1,14 @@
 import { ParameterMetadata, ParameterType, registerParameter } from '.';
+import 'reflect-metadata';
+import { Type } from '@lib/utils';
 
-export function FromHeaders(header: string) {
+export function FromHeaders<T>(header: string | Type<T>) {
     return (target: any, propertyKey: string, parameterIndex: number) => {
         registerParameter(
             new ParameterMetadata(
                 parameterIndex,
                 ParameterType.HEADERS,
-                { [propertyKey]: header } as any,
+                typeof header === 'string' ? { [propertyKey]: header } as any : header,
                 propertyKey,
                 target.constructor.name
             )

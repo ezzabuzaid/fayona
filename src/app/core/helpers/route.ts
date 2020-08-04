@@ -23,7 +23,7 @@ export function wrapRoutes(...middlewares) {
             .catch((error) => {
                 const response = catchError(error);
                 res.status(response.code).json(response);
-                return;
+                return Promise.resolve();
             });
     });
 }
@@ -89,6 +89,9 @@ function catchError(error: any) {
             response.code = NetworkStatus.BAD_REQUEST;
             break;
         default:
+    }
+    if (response.code === NetworkStatus.INTERNAL_SERVER_ERROR) {
+        console.log(error);
     }
     return response;
 }
