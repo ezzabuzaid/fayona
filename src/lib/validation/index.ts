@@ -15,12 +15,12 @@ export function validate<T>(
     message?: string
 ) {
     return async (req: Request, res: Response, next: NextFunction) => {
-        _validate(validator, req[type], message);
+        doValidate(validator, req[type], message);
         next();
     };
 }
 
-export async function _validate<T extends PayloadValidator>(payloadType: Type<T>, incomingPayload, message?: string) {
+export async function doValidate<T extends PayloadValidator>(payloadType: Type<T>, incomingPayload, message?: string) {
     const payload = new payloadType();
     await (payload.beforeValidation && payload.beforeValidation(incomingPayload));
     strictAssign(payload, incomingPayload);

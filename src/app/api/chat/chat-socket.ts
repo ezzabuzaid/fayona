@@ -49,7 +49,7 @@ export function startChatSocket() {
         }
         socket.on('disconnect', () => {
             leave(null, 'Disconnect');
-        })
+        });
         socket.on('error', () => {
             leave(null, 'Error');
         });
