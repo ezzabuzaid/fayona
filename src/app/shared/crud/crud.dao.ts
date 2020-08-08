@@ -17,7 +17,7 @@ export class CrudDao<T> {
     }
 
     public fetchOne(query: Query<T>, options?: IReadOneOptions<T>) {
-        return this.model.findOne(query as any, options.projection, options as any);
+        return this.model.findOne(query as any, options?.projection, options as any);
     }
 
     public fetchAll(
