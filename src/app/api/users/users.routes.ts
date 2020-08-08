@@ -38,7 +38,7 @@ class CreateUserDto {
     middleware: [identity.Authorize()],
 })
 export class UsersRouter extends CrudRouter<UsersSchema, UserService> {
-    private redisClient = redis.createClient(6379);
+    private redisClient: redis.RedisClient /*= redis.createClient(6379)**/;
     private fileSystemCache = Cache({ basePath: './.cache', });
     constructor() {
         super(UserService);

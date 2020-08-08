@@ -16,6 +16,7 @@ export class NodeServer extends Application {
                 super();
                 this.path = new URL(`http://${ this.host }:${ this.port }`);
                 this.populateServer();
+                console.log(envirnoment.env);
         }
 
         public static serverUrl(pathname: string) {
