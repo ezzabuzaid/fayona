@@ -7,7 +7,7 @@ import { IsInt, IsMongoId, IsNotEmpty, IsNumber, IsString } from 'class-validato
 import messagesService from './messages/messages.service';
 
 interface IRoom {
-    id: PrimaryKey;
+    id: string;
 }
 
 class MessagePayload {
@@ -42,20 +42,26 @@ export function startChatSocket() {
     });
 
     io.on('connection', (socket) => {
-        socket.on('Join', async (room: IRoom) => {
-            log.debug('New Joiner => ', room.id);
-            socket.join(room.id as any);
-        });
-        socket.on('Leave', async (room: IRoom) => {
-            log.debug('New Joiner => ', room.id);
-            socket.leave(room.id as any);
-        });
+        function leave(id, type) {
+            id ? socket.leave(id) : socket.leaveAll();
+            log.debug(type);
+            log.warn(socket.rooms);
+        }
+        socket.on('disconnect', () => {
+            leave(null, 'Disconnect');
+        })
         socket.on('error', () => {
-            socket.leaveAll();
+            leave(null, 'Error');
+        });
+        socket.once('Leave', async (room: IRoom) => {
+            leave(room.id, 'Leave');
+        });
+        socket.once('Join', async (room: IRoom) => {
+            log.debug('New Joiner => ', room.id);
+            socket.join(room.id);
         });
         socket.on('SendMessage', async (message: MessagePayload) => {
             const { id } = socket['decodedToken'];
-            log.debug('New Message => ', message);
             const payload = new MessagePayload(message);
             try {
                 await validatePayload(payload);
@@ -63,17 +69,33 @@ export function startChatSocket() {
                     room: payload.id,
                     user: id,
                     text: payload.text,
-                    order: message.order
+                    order: payload.order
                 });
                 socket.emit(`saved_${ message.timestamp }`, message.id);
-                socket.broadcast.in(message.id as any).emit('Message', createdMessage.data);
+                io.sockets.to(payload.id as any).emit('Message', createdMessage.data);
+                log.debug('New Message => ', createdMessage.data);
             } catch (error) {
                 console.log('MessageValidationError => ', error);
                 socket.emit('SendMessageError', error);
             }
         });
-        socket.on('StreamOffer', ({ negotiation, id }: { id: string, negotiation }) => {
-            socket.broadcast.in(id as any).emit('StreamAnswer', negotiation);
+        socket.on('MakeCallNegotiation', (negotiation: CallNegotiation) => {
+            log.debug('MakeCallNegotiation', negotiation.id);
+            socket.to(negotiation.id).emit('CallNegotiationMade', negotiation);
+        });
+        socket.on('AcceptCallNegotiation', (negotiation: CallNegotiation) => {
+            log.debug('AcceptCallNegotiation', negotiation.id);
+            socket.to(negotiation.id).emit('AcceptedCallNegotiation', negotiation);
+        });
+        socket.on('CallerCandidate', (negotiation: CallNegotiation) => {
+            log.debug('candidate', negotiation);
+            socket.to(negotiation.id).emit('CalleeCandidate', negotiation);
         });
     });
+}
+export class CallNegotiation {
+    constructor(
+        public negotiation: any,
+        public id: string
+    ) { }
 }
