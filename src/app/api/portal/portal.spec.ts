@@ -1,6 +1,6 @@
 import { Constants } from '@core/constants';
 import { generateExpiredToken, generateDeviceUUIDHeader, getUri, generateToken, createApplicationUser, login } from '@test/fixture';
-import { CredentialsDto, RefreshTokenDto, PortalRoutes } from './portal.routes';
+import { CredentialsDto, RefreshTokenDto, PortalRouter } from './portal.routes';
 import { AppUtils } from '@core/utils';
 import { tokenService, ITokenClaim, IClaim } from '@shared/identity';
 import { isMongoId } from 'class-validator';
@@ -104,7 +104,7 @@ describe('#INTERGRATION', () => {
                 await createApplicationUser(credentials);
 
                 const session = await login(credentials);
-                for (let index = 0; index < PortalRoutes.MAX_SESSION_SIZE - 1; index++) {
+                for (let index = 0; index < PortalRouter.MAX_SESSION_SIZE - 1; index++) {
                     // Act
                     await superAgent
                         .post(LOGIN_ENDPOINT)

@@ -1,5 +1,5 @@
 import { UsersRouter } from '@api/users';
-import { PortalRoutes } from '@api/portal';
+import { PortalRouter } from '@api/portal';
 import { SessionRouter } from '@api/sessions';
 import { IExpressInternal, IExpressRouter } from '@lib/restful';
 import { FileUploadRoutes } from '@api/uploads';
@@ -44,7 +44,7 @@ export class ApiFactory {
 
 }
 
-ApiFactory.registerRouter(PortalRoutes);
+ApiFactory.registerRouter(PortalRouter);
 ApiFactory.registerRouter(SessionRouter);
 ApiFactory.registerRouter(UsersRouter);
 ApiFactory.registerRouter(RoomsRouter);
