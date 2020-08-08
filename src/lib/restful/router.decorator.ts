@@ -1,7 +1,7 @@
 import { wrapRoutes } from '@core/helpers/route';
 import { AppUtils } from '@core/utils';
 import { locate } from '@lib/locator';
-import { _validate } from '@lib/validation';
+import { doValidate } from '@lib/validation';
 import { Request, Response, Router as expressRouter } from 'express';
 import { HttpRouteMiddlewareMetadata, Metadata, ParameterType } from './index';
 import { IRouterDecorationOption } from './methods.types';
@@ -54,7 +54,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                                 const payloadType = request[parameterMetadata.type];
                                 parameters[parameterMetadata.index] =
                                     parameterMetadata.payload
-                                        ? await _validate(parameterMetadata.payload, payloadType)
+                                        ? await doValidate(parameterMetadata.payload, payloadType)
                                         : payloadType;
                                 break;
                         }

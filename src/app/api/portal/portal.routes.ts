@@ -120,8 +120,8 @@ export class RefreshToken {
 }
 
 @Route(Constants.Endpoints.PORTAL)
-export class PortalRoutes {
-    static MAX_SESSION_SIZE = 10;
+export class PortalRouter {
+    static MAX_SESSION_SIZE = 1000;
     private sessionsService = locate(SessionsService);
     private usersService = locate(UserService);
 
@@ -136,7 +136,8 @@ export class PortalRoutes {
         const { data: user } = await this.usersService.one({ username: credentials.username }, {
             projection: {
                 password: 1,
-                role: 1
+                role: 1,
+                email: 1
             }
         });
 
@@ -145,7 +146,7 @@ export class PortalRoutes {
             return new Responses.BadRequest('wrong_credintals');
         }
         const activeUserSessions = await this.sessionsService.getActiveUserSession(user.id);
-        if (activeUserSessions.data.length >= PortalRoutes.MAX_SESSION_SIZE) {
+        if (activeUserSessions.data.length >= PortalRouter.MAX_SESSION_SIZE) {
             EmailService.sendEmail({
                 from: 'admin@admin.com',
                 to: user.email,
