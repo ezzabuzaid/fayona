@@ -1,18 +1,21 @@
-import { Logger } from '@core/utils';
-import { envirnoment } from '@environment/env';
-import { registerSocket } from '@shared/common';
+import { Envirnoment } from './environment';
+import { locate } from 'locator';
+import { Logger } from 'utils';
 import yargs from 'yargs';
-import { NodeServer } from './app/server';
-import { startChatSocket } from '@api/chat/chat-socket';
 const log = new Logger('MAIN');
 
-envirnoment.load(yargs.parse().env as string);
-log.info('envirnoment =>', yargs.parse().env);
 
-NodeServer.bootstrap()
-    .then((server) => {
-        registerSocket(server);
-        startChatSocket();
-        log.info('Node verions is => ', process.version);
-        log.info('Node title is => ', process.title);
-    });
+async function main(args) {
+    // Load the envirnoment based on givin <env> argument from command line
+    // defaults to empty
+    const envirnoment = locate(Envirnoment);
+    envirnoment.load(args.env);
+
+    log.info('Node verions is => ', process.version);
+    log.info('Node title is => ', process.title);
+    log.info('envirnoment =>', envirnoment.get('NODE_ENV'));
+
+}
+
+
+main(yargs.parse());

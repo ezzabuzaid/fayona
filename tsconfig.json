@@ -24,29 +24,6 @@
     "strictBindCallApply": true,
     "noEmitHelpers": true,
     "resolveJsonModule": true,
-    "paths": {
-      "@core/*": [
-        "app/core/*"
-      ],
-      "@api/*": [
-        "app/api/*"
-      ],
-      "@shared/*": [
-        "app/shared/*"
-      ],
-      "@environment/*": [
-        "environment/*"
-      ],
-      "@lib/*": [
-        "lib/*"
-      ],
-      "@assets/*": [
-        "assets/*"
-      ],
-      "@test/*": [
-        "test/*"
-      ]
-    },
     "pretty": true,
     "diagnostics": true,
     "noStrictGenericChecks": false,

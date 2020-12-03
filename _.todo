@@ -1,9 +1,0 @@
-SECTION ALERTS
-* If a certin environment not available such as a "NODE_ENV" ..etc, throw an error before building
-* Make sure that two router doesn't have the same path, check it in the wrapper class
-
-TODO
-* Extract all `translate` arguments and export them json file, see ngx-translate-extract
-* Crud generator
-* Export Application class instance to be used with server less
-

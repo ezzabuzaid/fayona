@@ -1,38 +1,98 @@
 # Node Buildozer (The Node version of . NetCore)
 
-  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/ezzabuzaid/document-storage/pulls) 
-
 ![Typed with TypeScript](https://flat.badgen.net/badge/icon/Typed?icon=typescript&label&labelColor=blue&color=555555)
 
-**A small opinionated framework built on top of Express using Typescript that will help you to easily kick off your project to the world**
+**Documention not ready as of yet, the below details is high abstract of what the library provide**
 
-### Highlights
+although I'm using this library in the side/demo projects, still **The whole thing here is showcase so don't risk anyone by counting too much on it!**
 
-1. Database independent, doesn't matter what you use!
-2. Errors are handled gloably so you catch when you need to know why that occured
-3. Service errors are handled by the route itself, unless you want to throw custom exception you don't need to do any error handling. default status is `Bad Request`
-4. Api folder is an example of how you can utilize the functionality
+## Motivation
 
-#### Packages
+I was so jealous from . NetCore back then, so I decided to make Node. Js version of it ^^
 
-| Package                   | Description                                                                         
+At some point, we needed Node.js for a particular thing and my colleagues have been using . NetCore for always, so I thought it would be nice to make the functions and classes look familiar to reduce the learning curve for them
+
+## Getting Started
+
+1. Create `Application` class and extend `Restful` class
+2. Invoke `UseControllers` instance method to register the controllers
+3. `UseControllers` accept callback with registry instance
+4. Invoke `UseEndpoints` to configure routes/endpoints options
+5. you can use `UseErrorHandler` to catch any unhandled application error
+
+``` typescript
+export class Application extends Restful {
+    constructor() {
+        this.UseControllers((registry) => {
+            registry.addController(UserController);
+            registry.addController(ActivityController);
+        });
+
+        this.UseEndpoints((endpointOptions) => {
+            endpointOptions.prefix = '/api';
+        })
+
+        this.UseErrorHandler(globalErrorHandler);
+    }
+}
+```
+
+### Define Controllers
+
+``` typescript
+
+@Route('users')
+export class UserController {
+    service = locate(UserService);
+
+    @HttpGet('', identity.Authorize(Role.ADMIN))
+    async  getAllUsers(@FromQuery(Pagination) pagination: Pagination) {
+        const users = await this.service.getAll(pagination);
+        return users;
+    }
+
+    @HttpGet('search', identity.Authorize())
+  public searchForUser(@FromQuery(SearchForUsersQuery) dto: SearchForUsersQuery) {
+        return this.service.searchForUsers(dto);
+    }
+
+    @HttpGet(':id', identity.Authorize(Role.ADMIN))
+    public get(@FromParams('id') id: string) {
+        return this.service.getById(id);
+    }
+
+    @HttpPost('')
+    async createUser(@FromBody(CreateUserDto) dto: CreateUserDto) {
+        // you don't need to handle any error in service.create method, you catch all up in UseErrorHandler, typically create entity method will be called a lot and in most cases you'll return the same exception or doing same null checking therefore you can handle it all once by just letting them.  
+        await this.service.create(dto);
+        return new SuccessResponse('Created');
+    }
+
+}
+```
+
+`Application` class contains express instance, so you can fallback to it in any case.
+
+Still there's a lot to be written, this is just for demonstration sake.
+
+### Modules
+
+| Module                   | Description
 | ------------------------- | ----------------------------------------------------------------------------------- |
-| `@lib/translation` | Translation library that helps you to switch from language to another
-| `@lib/restful` | Set of typescript decorator for easily register HTTP routes handler 
-| `@lib/mongoose` | Set of typescript decorator for mapping fields and schema
-| `@lib/locator` | Simple service locator
+| `translation` | Translation library that helps you to switch from language to another
+| `restful` | Set of decorators to facilitate declaring HTTP actions
+| `locator` | Simple service locator implementation
+| `identity` | Simple service locator implementation (Under Development)
 
-#### Attributes
+#### Restful Decorators/Attributes
 
-| Attribute                   | Description                                                                         
-| ------------------------- | ----------------------------------------------------------------------------------- |
+| Attribute | Description
+| --------- | ----------------------------------------------------------------------------------- |
 | `Route` | explicty mark the handler to specific endpoint
 | `FromBody` | retrive the body from the incoming requst and implictly validate it if possible
 | `FromQuery` | retrive query params/param from Uri
 | `FromParams` | retrive specific param from Uri
 | `FromHeaders` | retrive header name from the request
-| `AllowAnonymous` | Mark the route to be authentication free
-| `identity.Authorize(Roles?)` | Prevent access to a route if the user is not authenticated or have the desired role
 | `ContextResponse` | Get current http context **Response**
 | `ContextRequest` | Get current http context **Request**
 | `HttpPost` | Mark the handler as HTTP POST request handler
@@ -40,20 +100,39 @@
 | `HttpPut` | Mark the handler as HTTP PUT request handler
 | `HttpDelete` | Mark the handler as HTTP DELETE request handler
 | `HttpPatch` | Mark the handler as HTTP PATCH request handler
+----
+
+#### Identity Decorators/Attributes
+
+| Attribute | Description
+| ----------- | ----------------------------------------------------------------------------------- |
+| `AllowAnonymous` | Mark the route to be authentication free
+| `identity.Authorize(...Roles?)` | Prevent access to a route or route action if the user is not authenticated or have the desired role
+| `identity.Authenticated()` | Prevent access to a route or route action if the user is not authenticated
+----
+
+#### Locator Decorators/Attributes
+
+| Attribute | Description
+| ----------- | ----------------------------------------------------------------------------------- |
+| `Singelton` | Provide one instance of the marked class throught the application lifetime
+| `Factory` | Create new instance for each call made by `locate(ClassName)`
+
+| `Transient` | (Under Development)
 
 ## Contributing
 
 Don't hesitate to open issues and make a pull request to help improve code
 
-1.  Fork it!
-2.  Create your feature branch: `git checkout -b my-new-feature`
-3.  Commit your changes: `git commit -m 'Add some feature'`
-4.  Push to the branch: `git push origin my-new-feature`
-5.  Submit a pull request :D
+1. Fork it!
+2. Create your feature branch: `git checkout -b my-new-feature`
+3. Commit your changes: `git commit -m 'Add some feature'`
+4. Push to the branch: `git push origin my-new-feature`
+5. Submit a pull request :D
 
 ## Developer
 
-##### [Ezzabuzaid](mailto:ezzabuzaid@hotmail.com)
+**[Ezzabuzaid](mailto:ezzabuzaid@hotmail.com)**
 
 * [Dev.to](https://dev.to/ezzabuzaid)
 * [GitHub](https://github.com/ezzabuzaid)
@@ -61,6 +140,6 @@ Don't hesitate to open issues and make a pull request to help improve code
 
 ## License
 
-##### The MIT License (MIT)
+**The MIT License (MIT)**
 
-##### Built with love <3
+**Built with love <3**
