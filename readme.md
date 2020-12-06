@@ -120,6 +120,53 @@ Still there's a lot to be written, this is just for demonstration sake.
 
 | `Transient` | (Under Development)
 
+### Api
+
+* `@Route(endpoint: string, options?: IRouterDecorationOption)`
+
+is the escence of this library, it will route all the requests to the givin path and will execute the handler that match the final endpoint
+
+``` typescript
+
+@Route('examples')
+class ExampleController {
+}
+
+```
+
+### Classes
+
+``` typescript
+export interface IRouterDecorationOption extends RouterOptions {
+    /**
+     * Register child route under the parent prefix
+     * 
+     * e.g:
+     * 
+     * @Route('restaurants', {
+     *  children: [MealController]
+     * })
+     * class RestaurantController {}
+     * 
+     * 
+     * @Route('meals')
+     * class MealController {}
+     * 
+     * so in order to hit the meals, you will call `restaurants/meals`
+     * 
+     * Note: you mustn't explicty register ChildController via AddController method in startup configuration
+     */
+    children?: any[];
+
+    /**
+     * Set of middleware will be executed before calling the final end point
+     * 
+     * e.g: identity.Authorize()
+     */
+    middleware?: RequestHandler[] | RequestHandlerParams[];
+}
+```
+
 ## Contributing
 
 Don't hesitate to open issues and make a pull request to help improve code
