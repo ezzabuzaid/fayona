@@ -1,4 +1,3 @@
-import { wrapRoutes } from '../restful/route_wrapper';
 import { Request, Response, Router as expressRouter } from 'express';
 import { locate } from '../locator';
 import { construct } from '../validation';
@@ -6,6 +5,7 @@ import { HttpRemoveRouteMiddlewareMetadata, Metadata, ParameterType } from './in
 import { IRouterDecorationOption } from './methods_types';
 import path = require('path');
 import { generateAlphabeticString, isEmptyString, notEmpty, Type } from '../utils';
+import { wrapRoutes } from './wrap_route';
 
 /**
  * When no name is provided the name will autamatically be the name of the route,

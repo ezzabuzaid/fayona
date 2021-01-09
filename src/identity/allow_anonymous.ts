@@ -1,4 +1,4 @@
-import { RemoveMiddleware } from '../restful';
+import { RemoveMiddleware } from '../routing';
 import { identity } from './identity';
 
 

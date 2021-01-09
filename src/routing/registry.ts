@@ -1,5 +1,5 @@
 import { Singelton } from '../locator';
-import { IExpressInternal, IExpressRouter } from '../restful';
+import { IExpressInternal, IExpressRouter } from '.';
 import assert from 'assert';
 import { notNullOrUndefined } from 'utils';
 

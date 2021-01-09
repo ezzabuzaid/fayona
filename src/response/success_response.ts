@@ -22,5 +22,9 @@ export class SuccessResponse<T> extends HttpResponse {
     static Ok(data?) {
         return new SuccessResponse(data, "Success", StatusCodes.OK);
     }
-
+    static NoContent() {
+        const response = new SuccessResponse(undefined, "Success", StatusCodes.NO_CONTENT);
+        delete response.status;
+        return response;
+    }
 }

@@ -1,6 +1,12 @@
-const { compilerOptions: { baseUrl, paths } } = require("./tsconfig.json");
-const fromPairs = pairs => pairs.reduce((res, [key, value]) => ({ ...res, [key]: value }), {})
-const moduleNameMapper = fromPairs(Object.entries(paths).map(([k, [v]]) => [k.replace(/\*/, "(.*)"), `<rootDir>/${baseUrl}/${v.replace(/\*/, "$1")}`,]))
+const tsconfig = require("./tsconfig.json");
+
+const fromPairs = pairs => pairs.reduce((res, [key, value]) => ({ ...res, [key]: value }), {});
+
+const resolvedPathes = Object
+  .entries(tsconfig.paths)
+  .map(([key, [value]]) => [key.replace(/\*/, "(.*)"), `<rootDir>/${tsconfig.baseUrl}/${value.replace(/\*/, "$1")}`,])
+
+const moduleNameMapper = fromPairs(resolvedPathes)
 
 module.exports = {
   roots: ["./src"],

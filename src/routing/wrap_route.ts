@@ -8,15 +8,21 @@ export function wrapRoutes(...middlewares) {
             const response = await middleware(req, res, next);
             if (notNullOrUndefined(response)) {
                 if (response instanceof HttpResponse) {
-                    return res.status(response.code).json(response);
+                    return send(response)
                 } else {
-                    const implictResponse = SuccessResponse.Ok(response)
-                    return res.status(implictResponse.code).json(implictResponse);
+                    return send(SuccessResponse.Ok(response))
                 }
             }
+
+            // TODO: To be tested
+            return send(SuccessResponse.NoContent());
             // throw Error('Void or Promise<Void> cannot work, please return something');
         } catch (error) {
             next(error);
+        }
+
+        function send(response: HttpResponse) {
+            return res.status(response.code).json(response);
         }
     });
 }

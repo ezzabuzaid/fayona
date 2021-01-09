@@ -53,7 +53,6 @@ export function generateAlphabeticString(stringLength = 5) {
     return randomString;
 }
 
-
 export function isEmptyString(value: string): boolean {
     return typeof value !== 'string' || value === '';
 }

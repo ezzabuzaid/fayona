@@ -31,7 +31,10 @@ export async function construct<T>(classType: Type<T>, properties: Partial<T>, a
 
 async function validatePayload<T>(payload: T) {
     try {
-        await validateOrReject(payload);
+        await validateOrReject(payload, {
+            // TODO: add override options using service locator ()
+            forbidUnknownValues: true,
+        });
     } catch (validationErrors) {
         // Make it like .netcore modelstate
         const errorConstraints = (validationErrors[0] as ValidationError).constraints;

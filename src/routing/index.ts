@@ -1,14 +1,14 @@
 
-import { locate, Locator, registerSingelton, Singelton } from '../locator';
 import { RequestHandler } from 'express';
 import 'reflect-metadata';
+import { ErrorResponse } from 'response/error_response';
+import { HttpResponse } from 'response/generic_response';
+import { generateAlphabeticString, notEmpty, Type } from 'utils';
+import { locate, registerSingelton, Singelton } from '../locator';
 import { Registry } from './registry';
+import { wrapRoutes } from './wrap_route';
 import express = require('express');
 import path = require('path');
-import { wrapRoutes } from './route_wrapper';
-import { notEmpty, Type, generateAlphabeticString } from 'utils';
-import { HttpResponse } from 'response/generic_response';
-import { ErrorResponse } from 'response/error_response';
 
 export * from './body_decorator';
 export * from './delete_decorator';
@@ -19,10 +19,11 @@ export * from './patch_decorator';
 export * from './post_decorator';
 export * from './put_decorator';
 export * from './query_decorator';
-export * from './response_decorator';
-export * from './request_decorator';
 export * from './remove_middleware_decorator';
+export * from './request_decorator';
+export * from './response_decorator';
 export * from './route_decorator';
+export * from './wrap_route';
 
 export enum METHODS {
     PUT = 'put',

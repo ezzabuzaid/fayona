@@ -8,28 +8,28 @@ export class Locator {
     private static _instance: Locator;
     static instance = Locator._instance ?? (Locator._instance = new Locator());
 
-    private registry = new Map<string, Registry<any>>();
+    #registry = new Map<string, Registry<any>>();
 
     registerSingelton(instance: any, provide?: Type<any>) {
         const provideName = (provide ?? instance['constructor']).name;
-        if (this.registry.has(provideName)) {
+        if (this.#registry.has(provideName)) {
             throw new Error('You cannot override registered types');
         }
-        this.registry.set(provideName, new Registry('singelton', () => instance));
+        this.#registry.set(provideName, new Registry('singelton', () => instance));
         return this;
     }
 
     registerFactory<T>(TypeOrProvide: Type<T>, factory?: () => T) {
-        const existedRegistry = this.registry.get(TypeOrProvide.name);
+        const existedRegistry = this.#registry.get(TypeOrProvide.name);
         if (existedRegistry) {
             throw new Error(`${ TypeOrProvide.name } is already registered as ${ existedRegistry.type }`);
         }
-        this.registry.set(TypeOrProvide.name, new Registry('factory', factory ?? (() => new TypeOrProvide())));
+        this.#registry.set(TypeOrProvide.name, new Registry('factory', factory ?? (() => new TypeOrProvide())));
         return this;
     }
 
     locate<T>(type: Type<T>): T {
-        const registry = this.registry.get(type.name);
+        const registry = this.#registry.get(type.name);
         if (isNullOrUndefined(registry)) {
             throw new Error(`${ type.name } is not registered in the locator`);
         }
