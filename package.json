@@ -1,26 +1,35 @@
 {
+  "version": "0.0.0",
+  "name": "@ezzabuzaid/fayona",
+  "main": "public_api.js",
   "scripts": {
     "test": "clear && jest --detectOpenHandles --passWithNoTests --verbose --silent",
-    "build": ""
+    "start": "ts-node ./src/main.ts",
+    "build": "npm run delete-build && tsc && npm run copy-assets",
+    "copy-assets": "cp ./package.json ./package-lock.json ./readme.md ./dist",
+    "delete-build": "rm -rf ./dist",
+    "cli": "ts-node ./src/cli/cli.ts"
   },
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^4.17.0",
+    "@types/fs-extra": "^9.0.6",
     "@types/jsonwebtoken": "^8.3.8",
     "ansi-colors": "^3.2.4",
     "bcrypt": "^3.0.8",
     "class-validator": "^0.12.2",
+    "commander": "^6.2.1",
+    "deepmerge": "^4.2.2",
     "del": "^3.0.0",
     "dotenv": "^6.2.0",
+    "express": "^4.17.1",
     "http-status-codes": "^2.1.4",
-    "husky": "^3.1.0",
     "jsonwebtoken": "^8.5.1",
     "reflect-metadata": "^0.1.13",
     "tsconfig-paths": "^3.8.0",
     "tslib": "^1.13.0",
-    "typescript": "^4.1.2",
-    "yargs": "^13.3.2"
+    "typescript": "^4.1.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^9.1.2",
@@ -30,17 +39,14 @@
     "nodemon": "^2.0.2",
     "ts-jest": "^26.0.0",
     "ts-node": "^7.0.1",
-    "tslint": "^5.20.1"
+    "tslint": "^5.20.1",
+    "husky": "^3.1.0"
   },
   "husky": {
     "hooks": {
       "pre-commit": "npm run lint && npm run build:prod && git add .",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
-  },
-  "main": "main.ts",
-  "engines": {
-    "node": "10.15.1"
   },
   "bugs": {
     "email": "ezzabuzaid@hotmail.com",
@@ -59,9 +65,10 @@
     "email": "ezzabuzaid@hotmail.com",
     "url": "https://ezzabuzaid.com"
   },
+  "bin": {
+    "fayona": "./cli/cli.js"
+  },
   "repository": "github:ezzabuzaid/node_buildozer",
   "private": true,
-  "license": "MIT",
-  "name": "node_buildozer",
-  "version": "0.0.0"
+  "license": "MIT"
 }

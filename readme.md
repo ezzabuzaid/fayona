@@ -14,14 +14,14 @@ At some point, we needed Node.js for a particular thing and my colleagues have b
 
 ## Getting Started
 
-1. Create `Application` class and extend `Restful` class
+1. Create `Application` class and extend `Fayona` class
 2. Invoke `UseControllers` instance method to register the controllers
 3. `UseControllers` accept callback with registry instance
 4. Invoke `UseEndpoints` to configure routes/endpoints options
 5. you can use `UseErrorHandler` to catch any unhandled application error
 
 ``` typescript
-export class Application extends Restful {
+export class Application extends Fayona {
     constructor() {
         this.UseControllers((registry) => {
             registry.addController(UserController);
@@ -80,11 +80,11 @@ Still there's a lot to be written, this is just for demonstration sake.
 | Module                   | Description
 | ------------------------- | ----------------------------------------------------------------------------------- |
 | `translation` | Translation library that helps you to switch from language to another
-| `restful` | Set of decorators to facilitate declaring HTTP actions
+| `routing` | Set of decorators to facilitate declaring HTTP actions
 | `locator` | Simple service locator implementation
 | `identity` | Simple service locator implementation (Under Development)
 
-#### Restful Decorators/Attributes
+#### Routing Decorators/Attributes
 
 | Attribute | Description
 | --------- | ----------------------------------------------------------------------------------- |
