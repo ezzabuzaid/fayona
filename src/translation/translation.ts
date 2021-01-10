@@ -1,4 +1,4 @@
-import { Logger } from 'utils';
+import { Logger } from '../utils';
 import { Local } from './local';
 const log = new Logger('Localization Class');
 

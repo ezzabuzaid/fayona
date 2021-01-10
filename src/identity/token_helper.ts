@@ -1,6 +1,6 @@
 import { Envirnoment } from '../environment';
 import jwt = require('jsonwebtoken');
-import { Singelton, locate } from 'locator';
+import { Singelton, locate } from '../locator';
 import { Role } from './roles';
 
 export class Claims {
@@ -76,7 +76,7 @@ export class TokenHelper {
     }
 
     public generateAccessToken(claims: AccessTokenClaims) {
-        return this.generateToken(claims, { expiresIn: locate(Envirnoment).production ? '10m' : '1h' });
+        return this.generateToken(claims, { expiresIn: locate(Envirnoment).isProduction ? '10m' : '1h' });
     }
 
 }

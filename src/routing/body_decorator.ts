@@ -1,4 +1,4 @@
-import { Type } from 'utils';
+import { Type } from '../utils';
 import { ParameterMetadata, ParameterType, registerParameter } from './index';
 
 export function FromBody<T>(bodyType?: Type<T>): ParameterDecorator {

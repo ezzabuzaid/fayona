@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { Singelton, locate } from 'locator';
-import { ErrorResponse } from 'response';
-import { Logger } from 'utils';
+import { Singelton, locate } from '../locator';
+import { ErrorResponse } from '../response';
+import { Logger } from '../utils';
 import { Role } from './roles';
 import { AccessTokenClaims, Claims, TokenHelper } from './token_helper';
 

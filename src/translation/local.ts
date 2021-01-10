@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { notNullOrUndefined } from 'utils';
+import { notNullOrUndefined } from '../utils';
 
 export class Local<T> {
     /**

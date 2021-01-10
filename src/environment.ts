@@ -1,36 +1,39 @@
-import { Singelton } from './locator';
 import { config as envConfig } from 'dotenv';
 import path from 'path';
-import { Logger, notNullOrUndefined } from 'utils';
+import { locate, Singelton } from './locator';
+import { Logger, notNullOrUndefined } from './utils';
 const log = new Logger('Envirnoment');
 
-export enum EStage {
+enum EStage {
     DEVELOPMENT = 'development',
     PRODUCTION = 'production',
-    TEST = 'test'
+    Staging = 'staging'
 }
 
-/**
- * NODE_ENV name must be identical in .env*. files
- */
-const NODE_ENV = 'NODE_ENV';
 
 @Singelton()
 export class Envirnoment {
     /**
      * Load the envirnoment file and merge with proccess.env using dotenv package
      * 
-     * @param env is the suffix that comes after the dot(.) in filename
+     * @param nodeEnv is the suffix that comes after the dot(.) in filename
      * 
      * eg if the file name if .env.dev so you only will pass the 'dev'
      * 
-     * Usually, you'll not explictly use this method, it will be used only once during build/run
+     * Don't call it, it will be used only once during the application boostrap
      */
-    public load(env: string) {
-        const envPath = path.join(__dirname, `.env${ env ? `.${ env }` : '' }`);
+    public static load(nodeEnv: string) {
+        const instance = locate(Envirnoment);
+        let envPath;
+        if (instance.isDevelopment) {
+            // get the environments path from launchsettings.json
+            envPath = path.join('src/environments', `.env${ nodeEnv ? `.${ nodeEnv }` : '' }`);
+        } else {
+            envPath = path.join(__dirname, `.env${ nodeEnv ? `.${ nodeEnv }` : '' }`);
+        }
         const { error, parsed } = envConfig({ path: envPath });
         if (error) {
-            throw new Error('Error: loading the ' + env + ' env file at path ' + envPath + error.message);
+            throw new Error('loading the ' + nodeEnv + ' env file at path ' + envPath + error.message);
         }
         return parsed;
     }
@@ -52,12 +55,17 @@ export class Envirnoment {
         return process.env;
     }
 
-    public get development() {
-        return EStage.DEVELOPMENT === this.get(NODE_ENV);
+
+    public get isDevelopment() {
+        return EStage.DEVELOPMENT === this.get('NODE_ENV')?.toLowerCase();
     }
 
-    public get production() {
-        return EStage.PRODUCTION === this.get(NODE_ENV);
+    public get isProduction() {
+        return EStage.PRODUCTION === this.get('NODE_ENV')?.toLowerCase();
+    }
+
+    public get isStaging() {
+        return EStage.Staging === this.get('NODE_ENV')?.toLowerCase();
     }
 
 }

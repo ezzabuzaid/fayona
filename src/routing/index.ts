@@ -1,9 +1,9 @@
 
 import { RequestHandler } from 'express';
 import 'reflect-metadata';
-import { ErrorResponse } from 'response/error_response';
-import { HttpResponse } from 'response/generic_response';
-import { generateAlphabeticString, notEmpty, Type } from 'utils';
+import { ErrorResponse } from '../response/error_response';
+import { HttpResponse } from '../response/generic_response';
+import { generateAlphabeticString, notEmpty, Type } from '../utils';
 import { locate, registerSingelton, Singelton } from '../locator';
 import { Registry } from './registry';
 import { wrapRoutes } from './wrap_route';
@@ -24,6 +24,7 @@ export * from './request_decorator';
 export * from './response_decorator';
 export * from './route_decorator';
 export * from './wrap_route';
+export * from './headers_decorator';
 
 export enum METHODS {
     PUT = 'put',
@@ -152,16 +153,16 @@ export interface IEndpointOptions {
 
 
 
-export class Restful {
+export class Fayona {
     private static created = false;
     protected application = express();
     private registry = locate(Registry);
 
     constructor() {
-        if (Restful.created) {
-            throw new Error('Restful can be only created once');
+        if (Fayona.created) {
+            throw new Error('Fayona can be only used once');
         } else {
-            Restful.created = true;
+            Fayona.created = true;
             registerSingelton(this);
         }
     }

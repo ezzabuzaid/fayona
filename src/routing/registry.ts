@@ -1,7 +1,7 @@
 import { Singelton } from '../locator';
-import { IExpressInternal, IExpressRouter } from '.';
+import { IExpressInternal, IExpressRouter } from './index';
 import assert from 'assert';
-import { notNullOrUndefined } from 'utils';
+import { notNullOrUndefined } from '../utils';
 
 @Singelton()
 export class Registry {

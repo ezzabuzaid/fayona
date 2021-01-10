@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { HttpResponse, SuccessResponse } from 'response';
-import { notNullOrUndefined } from 'utils';
+import { HttpResponse, SuccessResponse } from '../response';
+import { notNullOrUndefined } from '../utils';
 
 export function wrapRoutes(...middlewares) {
     return middlewares.map((middleware) => async (req: Request, res: Response, next: NextFunction) => {
