@@ -1,7 +1,7 @@
-import { Envirnoment } from '../environment';
-import jwt = require('jsonwebtoken');
-import { Singelton, locate } from '../locator';
+import { locate, Singelton } from '../locator';
 import { Role } from './roles';
+import { IdentitySecret } from './secret';
+import jwt = require('jsonwebtoken');
 
 export class Claims {
     readonly iat?: number;
@@ -43,9 +43,9 @@ export class RefreshTokenClaims extends Claims {
 @Singelton()
 export class TokenHelper {
 
-    public decodeTokenAsync<T extends Claims>(token: string, ignoreExpiration = false): Promise<T> {
+    public decodeTokenAsync<T extends Claims>(token: string, options?: jwt.SignOptions): Promise<T> {
         return new Promise<T>((resolve, reject) => {
-            jwt.verify(token, this.secretKey, { ignoreExpiration }, (error, decodedToken) => {
+            jwt.verify(token, this.secretKey, options, (error, decodedToken) => {
                 if (error) {
                     reject(error);
                 }
@@ -66,17 +66,12 @@ export class TokenHelper {
         return Date.now() >= decodedToken.exp * 1000;
     }
 
-    private get secretKey() {
-        return locate(Envirnoment).get('JWT_SECRET_KEY');
-    }
-
-
-    public generateRefreshToken(id: string) {
-        return this.generateToken<RefreshTokenClaims>(new RefreshTokenClaims(id), { expiresIn: '24 weeks' });
-    }
-
-    public generateAccessToken(claims: AccessTokenClaims) {
-        return this.generateToken(claims, { expiresIn: locate(Envirnoment).isProduction ? '10m' : '1h' });
+    get secretKey() {
+        const secret = locate(IdentitySecret);
+        if (!secret) {
+            throw new Error('IdentitySecret is not registerd as part of service locator');
+        }
+        return secret.getSecret();
     }
 
 }

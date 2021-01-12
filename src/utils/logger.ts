@@ -11,7 +11,6 @@ import colors = require('ansi-colors');
  *
  * Example usage:
  * ```
- * import { Logger } from 'app/core/utils/logger.service';
  *
  * const log = new Logger('myFile');
  * ...
@@ -21,7 +20,7 @@ import colors = require('ansi-colors');
  * To disable debug and info logs in production, add this snippet to your root component:
  * ```
  *
- *     if (environment.production) {
+ *     if (environment.isProduction) {
  *       Logger.enableProductionMode();
  *     }
  *

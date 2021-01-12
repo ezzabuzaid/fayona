@@ -24,7 +24,7 @@ export class Locator {
         if (existedRegistry) {
             throw new Error(`${ TypeOrProvide.name } is already registered as ${ existedRegistry.type }`);
         }
-        this.#registry.set(TypeOrProvide.name, new Registry('factory', factory ?? (() => new TypeOrProvide())));
+        this.#registry.set(TypeOrProvide.name, new Registry('factory', factory ?? (() => new (TypeOrProvide as any)())));
         return this;
     }
 
@@ -50,7 +50,7 @@ export function registerFactory(TypeOrProvide: Type<any>, factory?: () => any) {
 }
 
 /**
- * Use it to locate an instance that is already registerd in service locator
+ * Locate an instance that is already registerd in service locator
  * 
  * Short for Locator.instance.locate(type);
  */

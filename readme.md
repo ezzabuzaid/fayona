@@ -1,4 +1,4 @@
-# Node Buildozer (The Node version of . NetCore)
+# Fayona (The Node version of . NetCore)
 
 ![Typed with TypeScript](https://flat.badgen.net/badge/icon/Typed?icon=typescript&label&labelColor=blue&color=555555)
 

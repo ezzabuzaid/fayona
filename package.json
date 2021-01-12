@@ -50,16 +50,16 @@
   },
   "bugs": {
     "email": "ezzabuzaid@hotmail.com",
-    "url": "https://github.com/ezzabuzaid/node_buildozer/issues"
+    "url": "https://github.com/ezzabuzaid/fayona/issues"
   },
   "description": "Easier way of writing api using nodejs and express",
   "keywords": [
     "Node js",
     "restful",
-    "node buildozer",
+    "fayona",
     "ezzabuzaid"
   ],
-  "homepage": "https://github.com/ezzabuzaid/node_buildozer",
+  "homepage": "https://github.com/ezzabuzaid/fayona",
   "author": {
     "name": "ezzabuzaid",
     "email": "ezzabuzaid@hotmail.com",
@@ -68,7 +68,7 @@
   "bin": {
     "fayona": "./cli/cli.js"
   },
-  "repository": "github:ezzabuzaid/node_buildozer",
+  "repository": "github:ezzabuzaid/fayona",
   "private": true,
   "license": "MIT"
 }
