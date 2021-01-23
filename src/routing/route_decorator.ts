@@ -70,6 +70,15 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                             case ParameterType.REQUEST:
                                 parameters[parameterMetadata.index] = request;
                                 break;
+                            case ParameterType.QUERY:
+                                const query = request[parameterMetadata.type];
+                                parameters[parameterMetadata.index] =
+                                    parameterMetadata.payload
+                                        ? typeof parameterMetadata.payload === 'string'
+                                            ? query[parameterMetadata.payload]
+                                            : await construct(parameterMetadata.payload as Type<T>, query as any)
+                                        : query;
+                                break;
                             default:
                                 const incomingPayload = request[parameterMetadata.type];
                                 parameters[parameterMetadata.index] =
