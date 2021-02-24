@@ -1,3 +1,5 @@
+import { ServiceLocator } from './locator';
+import { locate, Scoped, Singelton } from './locator/helpers';
 import { Envirnoment } from './environment';
 import { Logger } from './utils';
 const log = new Logger('MAIN');
