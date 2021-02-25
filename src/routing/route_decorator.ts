@@ -1,5 +1,5 @@
 import { Request, Response, Router as expressRouter } from 'express';
-import { locate } from '../locator';
+import { locate, ServiceLocator } from '../locator';
 import { construct } from '../validation';
 import { HttpRemoveRouteMiddlewareMetadata, Metadata, ParameterType } from './index';
 import { IRouterDecorationOption } from './methods_types';
@@ -20,7 +20,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
         }
 
         const router = expressRouter(options);
-        const instance = new constructor();
+        const normalizedEndpoint = normalizeEndpoint(constructor, endpoint);
 
         if (notEmpty(options.children)) {
             options.children.forEach((child) => {
@@ -30,6 +30,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
         }
 
         const metadata = locate(Metadata);
+        ServiceLocator.instance.addScoped(constructor);
         // FIXME: reorder the routes to have the path variable routes at end
         // e.g
         // 1. /:id
@@ -43,6 +44,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                 const normalizedEndpoint = path.normalize(path.join('/', routeMetadata.endpoint));
                 routeMetadata.middlewares.push(async function () {
                     const [request, response] = Array.from(arguments) as [Request, Response];
+                    const controllerInstance = locate(constructor, request);
                     const parameters = [];
                     const routeParameter = metadata.getRouteParameter(routeMetadata.getHandlerName()).reverse();
                     for (const parameterMetadata of routeParameter) {
@@ -59,6 +61,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                                 break;
                             case ParameterType.PARAMS:
                                 const param = parameterMetadata.payload;
+                                // FIXME: validate the params based on the type
                                 if (isEmptyString(param)) {
                                     throw new Error('param must be a string');
                                 }
@@ -71,6 +74,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                                 parameters[parameterMetadata.index] = request;
                                 break;
                             case ParameterType.QUERY:
+                                // FIXME: validate the params based on the type
                                 const query = request[parameterMetadata.type];
                                 parameters[parameterMetadata.index] =
                                     parameterMetadata.payload
@@ -88,7 +92,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                                 break;
                         }
                     }
-                    return routeMetadata.handler.apply(instance, parameters);
+                    return routeMetadata.handler.apply(controllerInstance, parameters);
                 });
                 const routeMiddlewares = metadata.getHttpRouteMiddleware(routeMetadata.getHandlerName());
                 router[routeMetadata.method](normalizedEndpoint, wrapRoutes(
@@ -106,7 +110,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                 return {
                     router,
                     id: generateAlphabeticString(),
-                    endpoint: normalizeEndpoint(constructor, endpoint)
+                    endpoint: normalizedEndpoint
                 };
             }
         };
@@ -114,9 +118,12 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
 }
 
 function normalizeEndpoint(target, endpoint?: string) {
+    // TODO: add options to transform the name to either singular, plural or as is
     let mappedValue = endpoint;
     if (isEmptyString(endpoint)) {
-        mappedValue = target.name.substring(target.name.lastIndexOf('Controller'), -target.name.length);
+        mappedValue = target.name
+            .substring(target.name.lastIndexOf('Controller'), -target.name.length)
+            .toLowerCase();
     }
     return path.normalize(path.join('/', mappedValue, '/'));
 }
