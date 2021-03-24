@@ -81,7 +81,7 @@ class BuildCommand extends Command {
 }
 
 
-class ServerCommand extends Command {
+class ServeCommand extends Command {
     constructor() {
         super('serve');
         this
@@ -113,7 +113,7 @@ class ServerCommand extends Command {
 
 program
     .addCommand(new BuildCommand())
-    .addCommand(new ServerCommand())
+    .addCommand(new ServeCommand())
     .parse(process.argv)
 
 

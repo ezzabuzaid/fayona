@@ -77,7 +77,7 @@ Still there's a lot to be written, this is just for demonstration sake.
 
 ### Modules
 
-| Module                   | Description
+| Module                    | Description
 | ------------------------- | ----------------------------------------------------------------------------------- |
 | `translation` | Translation library that helps you to switch from language to another
 | `routing` | Set of decorators to facilitate declaring HTTP actions
@@ -110,15 +110,6 @@ Still there's a lot to be written, this is just for demonstration sake.
 | `identity.Authorize(...Roles?)` | Prevent access to a route or route action if the user is not authenticated or have the desired role
 | `identity.Authenticated()` | Prevent access to a route or route action if the user is not authenticated
 ----
-
-#### Locator Decorators/Attributes
-
-| Attribute | Description
-| ----------- | ----------------------------------------------------------------------------------- |
-| `Singelton` | Provide one instance of the marked class throught the application lifetime
-| `Factory` | Create new instance for each call made by `locate(ClassName)`
-
-| `Transient` | (Under Development)
 
 ### Api
 

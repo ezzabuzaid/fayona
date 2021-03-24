@@ -1,15 +1,10 @@
-import { ServiceLocator } from './locator';
-import { locate, Scoped, Singelton } from './locator/helpers';
-import { Envirnoment } from './environment';
 import { Logger } from './utils';
 const log = new Logger('MAIN');
 
 
-export function bootstrap() {
-    const nodeEnv = process.env.NODE_ENV;
-    Envirnoment.load(nodeEnv);
-
+function main() {
     log.info('Node verions is => ', process.version);
-    log.info('envirnoment =>', nodeEnv);
-
+    log.info('envirnoment =>', process.env.NODE_ENV);
 }
+
+main();
