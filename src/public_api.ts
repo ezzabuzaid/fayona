@@ -1,4 +1,3 @@
-export * from './identity';
 export * from './main';
 export * from './response';
 export * from './routing';

@@ -1,11 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import { Singelton, locate } from '../locator';
 import { ErrorResponse } from '../response';
-import { Logger } from '../utils';
 import { Role } from './roles';
 import { AccessTokenClaims, Claims, TokenHelper } from './token_helper';
 
-const log = new Logger('Auth Module');
 
 @Singelton()
 class Identity {
@@ -82,4 +79,3 @@ class Identity {
 
 }
 
-export const identity = locate(Identity);

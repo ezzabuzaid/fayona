@@ -28,18 +28,6 @@ export function notEmpty(object: any) {
     return false;
 }
 
-export function getPrototypeChain(constructor: Type<any>) {
-    const chains = [];
-    for (
-        let prototype = constructor.prototype;
-        prototype !== Object.prototype;
-        prototype = Object.getPrototypeOf(prototype)
-    ) {
-        chains.push(prototype.constructor.name);
-    }
-    return chains;
-}
-
 export type OmitProperties<T, P> = Pick<T, { [key in keyof T]: T[key] extends P ? never : key }[keyof T]>;
 export type Properties<T> = OmitProperties<T, (...args: any) => any>;
 

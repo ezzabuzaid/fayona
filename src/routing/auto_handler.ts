@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
-import { HttpResponse, SuccessResponse } from '../response';
-import { notNullOrUndefined } from '../utils';
+import { NextFunction, Request, Response } from 'express';
+import { HttpResponse, SuccessResponse } from 'response';
+import { notNullOrUndefined } from 'utils';
 
-export function wrapRoutes(...middlewares) {
+export function autoHandler(...middlewares) {
     return middlewares.map((middleware) => async (req: Request, res: Response, next: NextFunction) => {
         try {
             const response = await middleware(req, res, next);
@@ -13,10 +13,7 @@ export function wrapRoutes(...middlewares) {
                     return send(SuccessResponse.Ok(response))
                 }
             }
-
-            // TODO: To be tested
             return send(SuccessResponse.NoContent());
-            // throw Error('Void or Promise<Void> cannot work, please return something');
         } catch (error) {
             next(error);
         }

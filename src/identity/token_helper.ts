@@ -1,4 +1,3 @@
-import { locate, Singelton } from '../locator';
 import { Role } from './roles';
 import { IdentitySecret } from './secret';
 import jwt = require('jsonwebtoken');

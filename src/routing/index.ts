@@ -6,7 +6,7 @@ import { HttpResponse } from '../response/generic_response';
 import { generateAlphabeticString, notEmpty, Type } from '../utils';
 import { locate, registerSingelton, Singelton } from '../locator';
 import { Registry } from './registry';
-import { wrapRoutes } from './wrap_route';
+import { autoHandler } from './auto_handler';
 import express = require('express');
 import path = require('path');
 
@@ -23,7 +23,7 @@ export * from './remove_middleware_decorator';
 export * from './request_decorator';
 export * from './response_decorator';
 export * from './route_decorator';
-export * from './wrap_route';
+export * from './auto_handler';
 export * from './headers_decorator';
 
 export enum METHODS {
@@ -187,7 +187,7 @@ export class Fayona {
         this.registry.routers.forEach(({ router, endpoint }) => {
             this.application.use(path.join(path.normalize(options.prefix ?? '/'), endpoint), router);
         });
-        this.application.use(wrapRoutes((req) => {
+        this.application.use(autoHandler((req) => {
             throw new ErrorResponse(`${ req.originalUrl } => ${ 'endpoint_not_found' }`, 404);
         }));
 

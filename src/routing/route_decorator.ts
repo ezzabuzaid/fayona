@@ -1,11 +1,10 @@
 import { Request, Response, Router as expressRouter } from 'express';
-import { locate, ServiceLocator } from '../locator';
 import { construct } from '../validation';
 import { HttpRemoveRouteMiddlewareMetadata, Metadata, ParameterType } from './index';
 import { IRouterDecorationOption } from './methods_types';
 import path = require('path');
 import { generateAlphabeticString, isEmptyString, notEmpty, Type } from '../utils';
-import { wrapRoutes } from './wrap_route';
+import { autoHandler } from './auto_handler';
 
 /**
  * When no name is provided the name will autamatically be the name of the route,
@@ -95,7 +94,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                     return routeMetadata.handler.apply(controllerInstance, parameters);
                 });
                 const routeMiddlewares = metadata.getHttpRouteMiddleware(routeMetadata.getHandlerName());
-                router[routeMetadata.method](normalizedEndpoint, wrapRoutes(
+                router[routeMetadata.method](normalizedEndpoint, autoHandler(
                     ...(populateRouteMiddlewares(routeMiddlewares, options.middleware))
                     ,
                     ...routeMetadata.middlewares
