@@ -1,4 +1,4 @@
-import { ParameterMetadata, ParameterType, registerParameter } from './index';
+import { ParameterMetadata, ParameterType, registerParameter } from '../metadata';
 import 'reflect-metadata';
 
 export function FromHeaders(header: string | ((headers: { [key: string]: any }) => any)): ParameterDecorator {
