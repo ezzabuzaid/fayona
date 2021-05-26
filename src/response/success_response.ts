@@ -1,30 +1,46 @@
+import { getReasonPhrase, StatusCodes } from 'http-status-codes';
 import { HttpResponse } from './generic_response';
-import { StatusCodes } from 'http-status-codes';
 
 export class SuccessResponse<T> extends HttpResponse {
     [x: string]: any;
-    constructor(public data: T, public message = 'success', code = StatusCodes.OK) {
+
+    constructor(
+        public data: T,
+        public code: StatusCodes,
+        message?: string,
+    ) {
         super(code);
+        this.message = message ?? getReasonPhrase(code);
     }
 
-    static Deleted() {
-        return new SuccessResponse(null, "Deleted");
+    static Deleted(result = null) {
+        return new SuccessResponse(result, StatusCodes.OK, "Deleted",);
     }
 
-    static Created(data?) {
-        return new SuccessResponse(data, "Created", StatusCodes.CREATED);
+    static Created(result = null) {
+        return new SuccessResponse(result, StatusCodes.CREATED, "Created",);
     }
 
-    static Updated(data?) {
-        return new SuccessResponse(data, "Updated", StatusCodes.OK);
+    static Updated(result = null) {
+        return new SuccessResponse(result, StatusCodes.OK, "Updated",);
     }
 
-    static Ok(data?) {
-        return new SuccessResponse(data, "Success", StatusCodes.OK);
+    static Ok(result = null) {
+        return new SuccessResponse(result, StatusCodes.OK, "Success",);
     }
+
     static NoContent() {
-        const response = new SuccessResponse(undefined, "Success", StatusCodes.NO_CONTENT);
+        const response = new SuccessResponse(undefined, StatusCodes.NO_CONTENT, "Success");
         delete response.status;
         return response;
     }
+
+    toJson(): object {
+        return {
+            'message': this.message,
+            'code': this.code,
+            'data': this.data
+        }
+    }
+
 }

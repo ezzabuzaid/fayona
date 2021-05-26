@@ -1,9 +1,10 @@
-import { getReasonPhrase, StatusCodes } from 'http-status-codes';
-
-export class HttpResponse extends Error {
-    public status: string;
-    constructor(public code: number) {
+export abstract class HttpResponse extends Error {
+    constructor(
+        public statusCode: number
+    ) {
         super();
-        this.status = getReasonPhrase(code);
     }
+
+    abstract toJson(): object;
+
 }
