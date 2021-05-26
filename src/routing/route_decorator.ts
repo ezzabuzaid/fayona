@@ -1,9 +1,9 @@
 import { Request, Response, Router as expressRouter } from 'express';
-import { construct } from '../validation';
 import { HttpRemoveRouteMiddlewareMetadata, Metadata, ParameterType } from './index';
 import { IRouterDecorationOption } from './methods_types';
 import path = require('path');
-import { generateAlphabeticString, isEmptyString, notEmpty, Type } from '../utils';
+import { isEmptyString, notEmpty, Type } from '../utils';
+import { construct } from '../validation';
 import { autoHandler } from './auto_handler';
 
 /**
@@ -12,15 +12,13 @@ import { autoHandler } from './auto_handler';
  * ex., the Controller class name is ExampleController, so the Route name is "example".
  */
 export function Route(endpoint?: string, options: IRouterDecorationOption = {}) {
-    return function <T extends new (...args: any[]) => any>(constructor: T) {
-
+    return function <T extends Type<any>>(constructor: T) {
         if (!constructor.name.endsWith('Controller')) {
             throw new Error(`${ constructor.name } is not valid name, please consider suffixing your class with Controller`);
         }
 
         const router = expressRouter(options);
         const normalizedEndpoint = normalizeEndpoint(constructor, endpoint);
-
         if (notEmpty(options.children)) {
             options.children.forEach((child) => {
                 const internal = child.__router();
@@ -28,8 +26,8 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
             });
         }
 
-        const metadata = locate(Metadata);
-        ServiceLocator.instance.addScoped(constructor);
+        const metadata = Injector.Locate(Metadata);
+        Injector.AddScoped(constructor);
         // FIXME: reorder the routes to have the path variable routes at end
         // e.g
         // 1. /:id
@@ -41,9 +39,9 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
         metadata.getRoutes(constructor)
             .forEach(routeMetadata => {
                 const normalizedEndpoint = path.normalize(path.join('/', routeMetadata.endpoint));
-                routeMetadata.middlewares.push(async function () {
+                const endpointHandler = async function () {
                     const [request, response] = Array.from(arguments) as [Request, Response];
-                    const controllerInstance = locate(constructor, request);
+                    const controllerInstance = request.locate(constructor);
                     const parameters = [];
                     const routeParameter = metadata.getRouteParameter(routeMetadata.getHandlerName()).reverse();
                     for (const parameterMetadata of routeParameter) {
@@ -60,7 +58,6 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                                 break;
                             case ParameterType.PARAMS:
                                 const param = parameterMetadata.payload;
-                                // FIXME: validate the params based on the type
                                 if (isEmptyString(param)) {
                                     throw new Error('param must be a string');
                                 }
@@ -70,35 +67,50 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                                 parameters[parameterMetadata.index] = response;
                                 break;
                             case ParameterType.REQUEST:
-                                parameters[parameterMetadata.index] = request;
+                                if (parameterMetadata.payload) {
+                                    parameters[parameterMetadata.index] = parameterMetadata.payload(request);
+                                } else {
+                                    parameters[parameterMetadata.index] = request;
+                                }
                                 break;
                             case ParameterType.QUERY:
-                                // FIXME: validate the params based on the type
-                                const query = request[parameterMetadata.type];
-                                parameters[parameterMetadata.index] =
-                                    parameterMetadata.payload
-                                        ? typeof parameterMetadata.payload === 'string'
-                                            ? query[parameterMetadata.payload]
-                                            : await construct(parameterMetadata.payload as Type<T>, query as any)
-                                        : query;
+                                let query = request.query;
+                                if (parameterMetadata.options?.queryPolluted) {
+                                    query = merge({}, query, request['queryPolluted']);
+                                }
+
+                                if (parameterMetadata.payload) {
+                                    if (typeof parameterMetadata.payload !== 'string') {
+                                        throw new Error('Queryparam name must be string.');
+                                    } else {
+                                        parameters[parameterMetadata.index] = query[parameterMetadata.payload];
+                                    }
+                                } else {
+                                    if (userDefinedType(parameterMetadata.expectedType)) {
+                                        parameters[parameterMetadata.index] = await construct(parameterMetadata.expectedType as Type<T>, query as any)
+                                    } else {
+                                        parameters[parameterMetadata.index] = query;
+                                    }
+                                }
+
                                 break;
                             default:
                                 const incomingPayload = request[parameterMetadata.type];
                                 parameters[parameterMetadata.index] =
-                                    parameterMetadata.payload
-                                        ? await construct(parameterMetadata.payload as Type<T>, incomingPayload)
+                                    userDefinedType(parameterMetadata.expectedType)
+                                        ? await construct(parameterMetadata.expectedType as Type<T>, incomingPayload)
                                         : incomingPayload;
                                 break;
                         }
                     }
                     return routeMetadata.handler.apply(controllerInstance, parameters);
-                });
+                }
                 const routeMiddlewares = metadata.getHttpRouteMiddleware(routeMetadata.getHandlerName());
                 router[routeMetadata.method](normalizedEndpoint, autoHandler(
-                    ...(populateRouteMiddlewares(routeMiddlewares, options.middleware))
-                    ,
-                    ...routeMetadata.middlewares
-                ));
+                    ...populateRouteMiddlewares(routeMiddlewares, options.middleware),
+                    ...routeMetadata.middlewares,
+                    endpointHandler)
+                );
             });
 
         return class extends constructor {
@@ -108,7 +120,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
             static __router() {
                 return {
                     router,
-                    id: generateAlphabeticString(),
+                    id: generateHash(),
                     endpoint: normalizedEndpoint
                 };
             }
@@ -135,4 +147,9 @@ function populateRouteMiddlewares(routeMiddlewares: HttpRemoveRouteMiddlewareMet
         clonedParentMiddlewares.splice(index, 1);
     }
     return clonedParentMiddlewares;
+}
+
+
+function userDefinedType(type: any) {
+    return !([String, Number, Object, Symbol, Date, Promise, Proxy].includes(type));
 }

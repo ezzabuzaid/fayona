@@ -13,13 +13,13 @@ export function autoHandler(...middlewares) {
                     return send(SuccessResponse.Ok(response))
                 }
             }
-            return send(SuccessResponse.NoContent());
+            // if there's no response it means it just call to next()
         } catch (error) {
             next(error);
         }
 
         function send(response: HttpResponse) {
-            return res.status(response.code).json(response);
+            return res.status(response.statusCode).json(response.toJson());
         }
     });
 }

@@ -1,14 +1,14 @@
 
 import { RequestHandler } from 'express';
+import { StatusCodes } from 'http-status-codes';
 import 'reflect-metadata';
-import { ErrorResponse } from '../response/error_response';
-import { HttpResponse } from '../response/generic_response';
-import { generateAlphabeticString, notEmpty, Type } from '../utils';
-import { locate, registerSingelton, Singelton } from '../locator';
-import { Registry } from './registry';
 import { autoHandler } from './auto_handler';
+import { Registry } from './registry';
 import express = require('express');
 import path = require('path');
+import { Injectable, Injector, ServiceLifetime } from '@lib/dependency-injection';
+import { generateAlphabeticString, notEmpty, Type } from 'utils';
+import { ErrorResponse, HttpResponse } from 'response';
 
 export * from './body_decorator';
 export * from './delete_decorator';
@@ -23,8 +23,6 @@ export * from './remove_middleware_decorator';
 export * from './request_decorator';
 export * from './response_decorator';
 export * from './route_decorator';
-export * from './auto_handler';
-export * from './headers_decorator';
 
 export enum METHODS {
     PUT = 'put',
@@ -42,16 +40,22 @@ export interface IMetadata {
 }
 
 export class ParameterMetadata {
+    public expectedType;
     constructor(
         public index: number,
         public type: ParameterType,
         public payload: any,
         private handlerName: string,
         private controllerName: string,
+        public options?: any
     ) { }
 
     getHandlerName() {
         return this.controllerName + this.handlerName;
+    }
+
+    setExpectedType(type: any) {
+        this.expectedType = type;
     }
 }
 
@@ -90,18 +94,18 @@ export enum ParameterType {
     PARAMS = 'params'
 }
 
-@Singelton()
+@Injectable({ lifetime: ServiceLifetime.Singleton })
 export class Metadata {
-    private parameters = new Map<string, ParameterMetadata[]>();
-    private middlewares = new Map<string, HttpRemoveRouteMiddlewareMetadata[]>();
+    #parameters = new Map<string, ParameterMetadata[]>();
+    #middlewares = new Map<string, HttpRemoveRouteMiddlewareMetadata[]>();
     static MetadataKey = generateAlphabeticString();
     private metadataKey(httpRouteMetadata: HttpRouteMetadata) {
         return `${ Metadata.MetadataKey }:${ httpRouteMetadata.method }:${ httpRouteMetadata.endpoint }`;
     }
     registerParameter(parameterMetadata: ParameterMetadata) {
-        const parameters = this.parameters.get(parameterMetadata.getHandlerName()) ?? [];
+        const parameters = this.#parameters.get(parameterMetadata.getHandlerName()) ?? [];
         parameters.push(parameterMetadata);
-        this.parameters.set(parameterMetadata.getHandlerName(), parameters);
+        this.#parameters.set(parameterMetadata.getHandlerName(), parameters);
     }
 
     registerHttpRoute(httpRouteMetadata: HttpRouteMetadata) {
@@ -116,31 +120,31 @@ export class Metadata {
     }
 
     getRouteParameter(handlerName: string) {
-        return this.parameters.get(handlerName) ?? [];
+        return this.#parameters.get(handlerName) ?? [];
     }
 
     getHttpRouteMiddleware(handlerName: string) {
-        return this.middlewares.get(handlerName) ?? [];
+        return this.#middlewares.get(handlerName) ?? [];
     }
 
     registerHttpRouteMiddleware(httpRouteMiddlewareMetadata: HttpRemoveRouteMiddlewareMetadata) {
-        const middlewares = this.middlewares.get(httpRouteMiddlewareMetadata.getHandlerName()) ?? [];
+        const middlewares = this.#middlewares.get(httpRouteMiddlewareMetadata.getHandlerName()) ?? [];
         middlewares.push(httpRouteMiddlewareMetadata);
-        this.middlewares.set(httpRouteMiddlewareMetadata.getHandlerName(), middlewares);
+        this.#middlewares.set(httpRouteMiddlewareMetadata.getHandlerName(), middlewares);
     }
 
 }
 
 export function registerParameter(parameterMetadata: ParameterMetadata) {
-    locate(Metadata).registerParameter(parameterMetadata);
+    Injector.Locate(Metadata).registerParameter(parameterMetadata);
 }
 
 export function registerHttpRoute(httpRouteMetadata: HttpRouteMetadata) {
-    locate(Metadata).registerHttpRoute(httpRouteMetadata);
+    Injector.Locate(Metadata).registerHttpRoute(httpRouteMetadata);
 }
 
 export function registerMiddleware(httpRouteMetadata: HttpRemoveRouteMiddlewareMetadata) {
-    locate(Metadata).registerHttpRouteMiddleware(httpRouteMetadata);
+    Injector.Locate(Metadata).registerHttpRouteMiddleware(httpRouteMetadata);
 }
 
 
@@ -153,17 +157,16 @@ export interface IEndpointOptions {
 
 
 
-export class Fayona {
+export class Restful {
     private static created = false;
     protected application = express();
-    private registry = locate(Registry);
+    #registry = Injector.Locate(Registry);
 
     constructor() {
-        if (Fayona.created) {
-            throw new Error('Fayona can be only used once');
+        if (Restful.created) {
+            throw new Error('Restful can be only created once');
         } else {
-            Fayona.created = true;
-            registerSingelton(this);
+            Restful.created = true;
         }
     }
 
@@ -173,7 +176,7 @@ export class Fayona {
      * all calls after `UseEndpoints` will be ignored 
      */
     UseControllers(action: (Registry: Registry) => void) {
-        action(this.registry);
+        action(this.#registry);
     }
 
     /**
@@ -184,11 +187,11 @@ export class Fayona {
     UseEndpoints(action?: (options: IEndpointOptions) => void) {
         const options: IEndpointOptions = {};
         action?.call(null, options);
-        this.registry.routers.forEach(({ router, endpoint }) => {
+        this.#registry.routers.forEach(({ router, endpoint }) => {
             this.application.use(path.join(path.normalize(options.prefix ?? '/'), endpoint), router);
         });
         this.application.use(autoHandler((req) => {
-            throw new ErrorResponse(`${ req.originalUrl } => ${ 'endpoint_not_found' }`, 404);
+            throw new ErrorResponse(`${ req.originalUrl } => ${ 'endpoint_not_found' }`, StatusCodes.NOT_FOUND);
         }));
 
     }
@@ -204,8 +207,11 @@ export class Fayona {
      */
     UseErrorHandler(action: (error: any) => HttpResponse) {
         this.application.use((error, req, res, next) => {
+            if (res.headersSent) {
+                return next(error);
+            }
             const response = action(error);
-            res.status(response.code).json(response);
+            res.status(response.statusCode).json(response.toJson());
         });
     }
 
@@ -217,4 +223,13 @@ export class Fayona {
     public set(key: string, value: any) {
         this.application.set(key, value);
     }
+
+    get expressApplication() {
+        return this.application;
+    }
+}
+
+
+export function isEnv(name: 'development' | 'production') {
+    return process.env.NODE_ENV === name;
 }

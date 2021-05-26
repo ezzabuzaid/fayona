@@ -1,16 +1,12 @@
-# Fayona (The Node version of . NetCore)
+# Fayona (The Node version of . Net Core)
 
 ![Typed with TypeScript](https://flat.badgen.net/badge/icon/Typed?icon=typescript&label&labelColor=blue&color=555555)
 
-**Documention not ready as of yet, the below details is high abstract of what the library provide**
-
-although I'm using this library in the side/demo projects, still **The whole thing here is showcase so don't risk anyone by counting too much on it!**
+Note: **The below details is high abstract of what the library provide**
 
 ## Motivation
 
-I was so jealous from . NetCore back then, so I decided to make Node. Js version of it ^^
-
-At some point, we needed Node.js for a particular thing and my colleagues have been using . NetCore for always, so I thought it would be nice to make the functions and classes look familiar to reduce the learning curve for them
+At some point, we needed Node.js for a particular thing and my colleagues have been using  Net Core for always, so I thought it would be nice to make the functions and classes look familiar to reduce the learning.
 
 ## Getting Started
 
@@ -20,7 +16,7 @@ At some point, we needed Node.js for a particular thing and my colleagues have b
 4. Invoke `UseEndpoints` to configure routes/endpoints options
 5. you can use `UseErrorHandler` to catch any unhandled application error
 
-``` typescript
+```typescript
 export class Application extends Fayona {
     constructor() {
         this.UseControllers((registry) => {
@@ -39,7 +35,7 @@ export class Application extends Fayona {
 
 ### Define Controllers
 
-``` typescript
+```typescript
 
 @Route('users')
 export class UserController {
@@ -117,7 +113,7 @@ Still there's a lot to be written, this is just for demonstration sake.
 
 is the escence of this library, it will route all the requests to the givin path and will execute the handler that match the final endpoint
 
-``` typescript
+```typescript
 
 @Route('examples')
 class ExampleController {
@@ -127,7 +123,7 @@ class ExampleController {
 
 ### Classes
 
-``` typescript
+```typescript
 export interface IRouterDecorationOption extends RouterOptions {
     /**
      * Register child route under the parent prefix
@@ -158,16 +154,6 @@ export interface IRouterDecorationOption extends RouterOptions {
 }
 ```
 
-## Contributing
-
-Don't hesitate to open issues and make a pull request to help improve code
-
-1. Fork it!
-2. Create your feature branch: `git checkout -b my-new-feature`
-3. Commit your changes: `git commit -m 'Add some feature'`
-4. Push to the branch: `git push origin my-new-feature`
-5. Submit a pull request :D
-
 ## Developer
 
 **[Ezzabuzaid](mailto:ezzabuzaid@hotmail.com)**
@@ -178,6 +164,4 @@ Don't hesitate to open issues and make a pull request to help improve code
 
 ## License
 
-**The MIT License (MIT)**
-
-**Built with love <3**
+Licensed under MIT

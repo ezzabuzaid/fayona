@@ -1,13 +1,13 @@
-import { Singelton } from '../locator';
-import { IExpressInternal, IExpressRouter } from './index';
-import assert from 'assert';
-import { notNullOrUndefined } from '../utils';
 
-@Singelton()
+import assert from 'assert';
+import { IExpressRouter, IExpressInternal } from '../routing';
+import { notNullOrUndefined, Type } from '../utils';
+
+@Injectable({ lifetime: ServiceLifetime.Singleton })
 export class Registry {
     private list = [];
 
-    public addController(router, subRouter?) {
+    public addController(router: Type<any>, subRouter?) {
         if (!!subRouter) {
             this.assignRouterTo(subRouter, this.wrapRouter(router));
         } else {
@@ -15,9 +15,9 @@ export class Registry {
         }
     }
 
-    private wrapRouter(Router: IExpressInternal) {
-        assert(notNullOrUndefined(Router.__router), 'please consider add @Router on the top of class');
-        const internal = Router.__router();
+    private wrapRouter(Router: Type<any>) {
+        assert(notNullOrUndefined(Router['__router']), 'please consider add @Router on the top of class');
+        const internal = Router['__router']();
         this.list.push(internal);
         return internal;
     }
