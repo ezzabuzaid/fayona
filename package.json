@@ -5,9 +5,9 @@
   "scripts": {
     "test": "clear && jest --detectOpenHandles --passWithNoTests --verbose --silent",
     "start": "ts-node ./src/main.ts",
-    "build": "npm run delete-build && tsc && npm run copy-assets",
-    "copy-assets": "cp ./package.json ./package-lock.json ./readme.md ./dist",
-    "delete-build": "rm -rf ./dist",
+    "build": "tsc --project tsconfig.json",
+    "prebuild": "del ./dist/",
+    "postbuild": "cpy 'readme.md' 'package*.json' ./dist/ --no-overwrite --parents",
     "cli": "ts-node ./src/cli/cli.ts"
   },
   "dependencies": {
