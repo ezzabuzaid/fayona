@@ -1,7 +1,7 @@
-import { ParameterType } from "./parameter_type";
+import { ParameterType } from "./ParameterType";
 
 export class ParameterMetadata {
-    public expectedType;
+    public expectedType: any;
     constructor(
         public index: number,
         public type: ParameterType,

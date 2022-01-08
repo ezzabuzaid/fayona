@@ -1,20 +1,20 @@
 import { validateOrReject, ValidationError } from 'class-validator';
 import { notNullOrUndefined, Type } from '../utils';
-import { ModelValidator } from './model-validator';
+import { ModelValidator } from './ModelValidator';
 export const MODEL_VALIDATION_ERRORS = 'payload_validator_error';
 
 /**
- * 
+ *
  * Construct the givin Type Class and perform validation check to see if the givin properties are adhering the rules
- * 
+ *
  * Basically what it does is create new instance `new classType()`
  * then assign the @param properties and @param additionalProperties
- * then validate it to check if the values as intended 
- * 
- * @param classType 
+ * then validate it to check if the values as intended
+ *
+ * @param classType
  * @param properties
  * @param additionalProperties
- * 
+ *
  * @returns the created instance
  * @exception ModelStateException with complete details about the violation
  */

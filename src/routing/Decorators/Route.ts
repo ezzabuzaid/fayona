@@ -1,10 +1,15 @@
+import { AppUtils } from '@core/utils';
+import { Injector } from '@lib/dependency-injection';
+import { autoHandler } from '@lib/restful/AutoHandler';
+import { Type } from '@lib/utils';
 import { Request, Response, Router as expressRouter } from 'express';
-import { HttpRemoveRouteMiddlewareMetadata, Metadata, ParameterType } from './index';
-import { IRouterDecorationOption } from './methods_types';
+import { construct } from 'lib/validation';
+import { HttpRemoveEndpointMiddlewareMetadata } from '../HttpRemoveEndpointMiddlewareMetadata';
+import { HttpRouteMetadata } from '../HttpRouteMetadata';
+import { IRouterDecorationOption } from '../IRouterDecorationOption';
+import { Metadata } from '../Metadata';
+import { ParameterType } from '../ParameterType';
 import path = require('path');
-import { isEmptyString, notEmpty, Type } from '../utils';
-import { construct } from '../validation';
-import { autoHandler } from './auto_handler';
 
 /**
  * When no name is provided the name will autamatically be the name of the route,
@@ -14,20 +19,26 @@ import { autoHandler } from './auto_handler';
 export function Route(endpoint?: string, options: IRouterDecorationOption = {}) {
     return function <T extends Type<any>>(constructor: T) {
         if (!constructor.name.endsWith('Controller')) {
-            throw new Error(`${ constructor.name } is not valid name, please consider suffixing your class with Controller`);
+            throw new Error(`${constructor.name} is not valid name, please consider suffixing your class with Controller`);
         }
 
+        const metadata = Injector.GetRequiredService(Metadata);
         const router = expressRouter(options);
         const normalizedEndpoint = normalizeEndpoint(constructor, endpoint);
-        if (notEmpty(options.children)) {
-            options.children.forEach((child) => {
-                const internal = child.__router();
-                router.use(internal.endpoint, internal.router);
+        if (AppUtils.notEmpty(options.children)) {
+            options.children.forEach((childController) => {
+                const childRoute = metadata.getHttpRoute(childController);
+                router.use(childRoute.endpoint, childRoute.router);
             });
         }
 
-        const metadata = Injector.Locate(Metadata);
+        metadata.registerHttpRoute(new HttpRouteMetadata(
+            constructor,
+            router,
+            normalizedEndpoint
+        ))
         Injector.AddScoped(constructor);
+
         // FIXME: reorder the routes to have the path variable routes at end
         // e.g
         // 1. /:id
@@ -36,17 +47,17 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
         // 2. /:id
         // 1. /filter
         // so we avoid hitting wrong resource
-        metadata.getRoutes(constructor)
+        metadata.getEndpoints(constructor)
             .forEach(routeMetadata => {
-                const normalizedEndpoint = path.normalize(path.join('/', routeMetadata.endpoint));
+                const normalizedEndpoint = routeMetadata.endpoint instanceof RegExp ? routeMetadata.endpoint : path.normalize(path.join('/', routeMetadata.endpoint));
                 const endpointHandler = async function () {
                     const [request, response] = Array.from(arguments) as [Request, Response];
                     const controllerInstance = request.locate(constructor);
                     const parameters = [];
-                    const routeParameter = metadata.getRouteParameter(routeMetadata.getHandlerName()).reverse();
-                    for (const parameterMetadata of routeParameter) {
+                    const endpointParameters = metadata.getHttpEndpointParameters(routeMetadata.getHandlerName()).reverse();
+                    for (const parameterMetadata of endpointParameters) {
                         switch (parameterMetadata.type) {
-                            case ParameterType.HEADERS:
+                            case ParameterType.FROM_HEADER:
                                 const headerArgument = parameterMetadata.payload;
                                 let header = null;
                                 if (typeof headerArgument === 'function') {
@@ -56,9 +67,9 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                                 }
                                 parameters[parameterMetadata.index] = header;
                                 break;
-                            case ParameterType.PARAMS:
+                            case ParameterType.FROM_ROUTE:
                                 const param = parameterMetadata.payload;
-                                if (isEmptyString(param)) {
+                                if (AppUtils.isEmptyString(param)) {
                                     throw new Error('param must be a string');
                                 }
                                 parameters[parameterMetadata.index] = request.params[param];
@@ -73,10 +84,10 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                                     parameters[parameterMetadata.index] = request;
                                 }
                                 break;
-                            case ParameterType.QUERY:
+                            case ParameterType.FROM_QUERY:
                                 let query = request.query;
                                 if (parameterMetadata.options?.queryPolluted) {
-                                    query = merge({}, query, request['queryPolluted']);
+                                    query = AppUtils.merge({}, query, request['queryPolluted']);
                                 }
 
                                 if (parameterMetadata.payload) {
@@ -94,6 +105,9 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                                 }
 
                                 break;
+                            case ParameterType.FROM_SERVICES:
+                                parameters[parameterMetadata.index] = request.locate(parameterMetadata.expectedType);
+                                break;
                             default:
                                 const incomingPayload = request[parameterMetadata.type];
                                 parameters[parameterMetadata.index] =
@@ -105,33 +119,22 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                     }
                     return routeMetadata.handler.apply(controllerInstance, parameters);
                 }
-                const routeMiddlewares = metadata.getHttpRouteMiddleware(routeMetadata.getHandlerName());
+                const routeMiddlewares = metadata.getHttpEndpointMiddlewares(routeMetadata.getHandlerName());
                 router[routeMetadata.method](normalizedEndpoint, autoHandler(
                     ...populateRouteMiddlewares(routeMiddlewares, options.middleware),
                     ...routeMetadata.middlewares,
-                    endpointHandler)
-                );
+                    endpointHandler
+                ));
             });
 
-        return class extends constructor {
-            constructor(...args) {
-                super(...args);
-            }
-            static __router() {
-                return {
-                    router,
-                    id: generateHash(),
-                    endpoint: normalizedEndpoint
-                };
-            }
-        };
+        return constructor;
     };
 }
 
 function normalizeEndpoint(target, endpoint?: string) {
     // TODO: add options to transform the name to either singular, plural or as is
     let mappedValue = endpoint;
-    if (isEmptyString(endpoint)) {
+    if (AppUtils.isEmptyString(endpoint)) {
         mappedValue = target.name
             .substring(target.name.lastIndexOf('Controller'), -target.name.length)
             .toLowerCase();
@@ -139,9 +142,9 @@ function normalizeEndpoint(target, endpoint?: string) {
     return path.normalize(path.join('/', mappedValue, '/'));
 }
 
-function populateRouteMiddlewares(routeMiddlewares: HttpRemoveRouteMiddlewareMetadata[], parentMiddlewares: any[]) {
+function populateRouteMiddlewares(listRemoveEndpointMiddlewareMetadata: HttpRemoveEndpointMiddlewareMetadata[], parentMiddlewares: any[]) {
     const clonedParentMiddlewares = parentMiddlewares?.slice(0) ?? [];
-    const middlewares = routeMiddlewares.map(routeMiddleware => routeMiddleware.middleware.toString());
+    const middlewares = listRemoveEndpointMiddlewareMetadata.map(endpointMiddleware => endpointMiddleware.middleware.toString());
     const index = clonedParentMiddlewares.findIndex(parentMiddleware => middlewares.includes(parentMiddleware.toString()));
     if (index !== -1) {
         clonedParentMiddlewares.splice(index, 1);

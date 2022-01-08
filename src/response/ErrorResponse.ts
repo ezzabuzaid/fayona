@@ -1,5 +1,5 @@
 import { getReasonPhrase, StatusCodes } from 'http-status-codes';
-import { HttpResponse } from './generic_response';
+import { HttpResponse } from './HttpResponse';
 
 export class ErrorResponse extends HttpResponse {
     constructor(

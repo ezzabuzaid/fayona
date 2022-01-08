@@ -1,6 +1,7 @@
+import { HttpResponse } from '@core/response/generic_response';
+import { SuccessResponse } from '@core/response/success_response';
+import { notNullOrUndefined } from '@lib/utils';
 import { NextFunction, Request, Response } from 'express';
-import { HttpResponse, SuccessResponse } from 'response';
-import { notNullOrUndefined } from 'utils';
 
 export function autoHandler(...middlewares) {
     return middlewares.map((middleware) => async (req: Request, res: Response, next: NextFunction) => {
@@ -13,13 +14,13 @@ export function autoHandler(...middlewares) {
                     return send(SuccessResponse.Ok(response))
                 }
             }
-            // if there's no response it means it just call to next()
+            // if there's no response that means next() has been called.
         } catch (error) {
             next(error);
         }
 
         function send(response: HttpResponse) {
-            return res.status(response.statusCode).json(response.toJson());
+            return res.status(response.status).json(response.toJson());
         }
     });
 }

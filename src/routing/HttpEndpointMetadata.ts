@@ -1,11 +1,11 @@
 import { RequestHandler } from "express";
-import { METHODS } from "./methods";
+import { METHODS } from "./Methods";
 
-export class HttpRouteMetadata {
+export class HttpEndpointMetadata {
     constructor(
         public controller: Function,
         public handler: () => void,
-        public endpoint: string,
+        public endpoint: string | RegExp,
         public method: METHODS,
         public middlewares: RequestHandler[],
     ) { }

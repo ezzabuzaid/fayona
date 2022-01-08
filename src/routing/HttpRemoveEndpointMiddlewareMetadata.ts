@@ -1,6 +1,6 @@
-import { Type } from "../utils";
+import { Type } from "@lib/utils";
 
-export class HttpRemoveRouteMiddlewareMetadata {
+export class HttpRemoveEndpointMiddlewareMetadata {
     constructor(
         public middleware: () => any,
         public controller: Type<any>,
@@ -11,3 +11,4 @@ export class HttpRemoveRouteMiddlewareMetadata {
         return this.controller.name + this.handler.name;
     }
 }
+

@@ -1,9 +1,13 @@
+import { Injector } from '@lib/dependency-injection';
 import { RequestHandler } from 'express';
-import { HttpRouteMetadata, METHODS, registerHttpRoute } from './index';
+import { HttpEndpointMetadata } from '../HttpEndpointMetadata';
+import { Metadata } from '../Metadata';
+import { METHODS } from '../Methods';
 
 export function HttpPatch(endpoint = '/', ...middlewares: RequestHandler[]): MethodDecorator {
     return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
-        registerHttpRoute(new HttpRouteMetadata(
+        const metadata = Injector.GetRequiredService(Metadata);
+        metadata.registerHttpEndpoint(new HttpEndpointMetadata(
             target.constructor,
             target[propertyKey],
             endpoint,

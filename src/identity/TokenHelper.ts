@@ -1,5 +1,5 @@
-import { Role } from './roles';
-import { IdentitySecret } from './secret';
+import { Role } from './Role';
+import { IdentitySecret } from './Secret';
 import jwt = require('jsonwebtoken');
 
 export class Claims {

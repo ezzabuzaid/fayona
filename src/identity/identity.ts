@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { ErrorResponse } from '../response';
-import { Role } from './roles';
-import { AccessTokenClaims, Claims, TokenHelper } from './token_helper';
+import { ErrorResponse } from '../Response';
+import { Role } from './Role';
+import { AccessTokenClaims, Claims, TokenHelper } from './TokenHelper';
 
 
 @Singelton()
@@ -10,13 +10,13 @@ class Identity {
 
     /**
      * Check if the user carry the intened roles
-     * 
+     *
      * Authorize("HRManager") only HRManager users are authorized to continue
-     * 
+     *
      * Authorize("HRManager,Finance") only HRManager or Finance users are authorized to continue
-     * 
+     *
      * [Authorize("HRManager"), Authorize("Finance")] only users of both HRManager and Finance roles are authorized to continue
-     * 
+     *
      * Will throw Forbidden response in case of authenticated user but not authorized
      */
     public Authorize(...roles: Role[]) {
@@ -36,7 +36,7 @@ class Identity {
 
     /**
      * Check if user jwt token are valid and not expired
-     * 
+     *
      * Will throw Unauthorized response in case of failure
      */
     public Authenticated() {
@@ -56,7 +56,7 @@ class Identity {
 
     /**
      * Claims authorization checks the validatiy of the user identity against endpoint or route.
-     * 
+     *
      * you'll write the requirement logic based on user claims and the internals will proccess the user upon success
      */
     public useClaims(handler: (claims: Claims) => Promise<boolean> | boolean) {
