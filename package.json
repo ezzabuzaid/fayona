@@ -18,7 +18,7 @@
     "@types/jsonwebtoken": "^8.3.8",
     "ansi-colors": "^3.2.4",
     "bcrypt": "^5.0.1",
-    "class-validator": "^0.12.2",
+    "class-validator": "^0.13.2",
     "commander": "^6.2.1",
     "deepmerge": "^4.2.2",
     "del": "^3.0.0",

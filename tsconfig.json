@@ -1,50 +1,44 @@
 {
-  "compilerOptions": {
-    "target": "ES2019",
-    "module": "commonjs",
-    "lib": [
-      "es2015"
-    ],
-    "declaration": true,
-    "baseUrl": "./src/",
-    "outDir": "./dist/",
-    "removeComments": true,
-    "downlevelIteration": true,
-    "strict": false,
-    "watch": false,
-    "moduleResolution": "node",
-    "noImplicitReturns": false,
-    "noUnusedLocals": false,
-    "sourceMap": false,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "importHelpers": true,
-    "strictBindCallApply": true,
-    "noEmitHelpers": true,
-    "resolveJsonModule": true,
-    "pretty": true,
-    "diagnostics": true,
-    "noStrictGenericChecks": false,
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "types": [
-      "node",
-      "jest"
-    ]
-  },
-  "typedocOptions": {
-    "mode": "modules",
-    "out": "docs",
-    "theme": "minimal",
-    "exclude": [
-      "**/*+(index|.spec|.e2e).ts",
-      "./src/test/**/*",
-      "./global.d.ts"
-    ],
-    "excludePrivate": true,
-    "excludeProtected": true
-  }
+	"compilerOptions": {
+		"target": "ES2019",
+		"module": "commonjs",
+		"lib": ["es2015"],
+		"declaration": true,
+		"baseUrl": "./src/",
+		"outDir": "./dist/",
+		"removeComments": true,
+		"downlevelIteration": true,
+		"strict": false,
+		"watch": false,
+		"moduleResolution": "node",
+		"noImplicitReturns": false,
+		"noUnusedLocals": false,
+		"sourceMap": false,
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"importHelpers": true,
+		"strictBindCallApply": true,
+		"noEmitHelpers": true,
+		"resolveJsonModule": true,
+		"pretty": true,
+		"diagnostics": true,
+		"noStrictGenericChecks": false,
+		"typeRoots": ["node_modules/@types"],
+		"types": ["node", "jest"]
+	},
+	"typedocOptions": {
+		"mode": "modules",
+		"out": "docs",
+		"theme": "minimal",
+		"exclude": [
+			"**/*+(index|.spec|.e2e).ts",
+			"./src/test/**/*",
+			"./global.d.ts"
+		],
+		"excludePrivate": true,
+		"excludeProtected": true
+	}
 }
