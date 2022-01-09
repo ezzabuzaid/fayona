@@ -120,9 +120,9 @@ export default {
   // rootDir: undefined,
 
   // A list of paths to directories that Jest should use to search for files in
-  // "roots": [
-  //   "<rootDir>/__test__"
-  // ],
+  "roots": [
+    "<rootDir>/__test__"
+  ],
 
   // Allows you to use a custom runner instead of Jest's default test runner
   // runner: "jest-runner",
@@ -178,11 +178,13 @@ export default {
   // transform: undefined,
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-  // transformIgnorePatterns: [
-  //   "/node_modules/",
-  //   "\\.pnp\\.[^\\/]+$"
-  // ],
-
+  transformIgnorePatterns: [
+    "/node_modules/(?!@fayonaio/tiny-injector)",
+    "\\.pnp\\.[^\\/]+$"
+  ],
+  moduleNameMapper: {
+    "tiny-injector": "<rootDir>/node_modules/@fayonaio/tiny-injector/src",
+  },
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,
 
