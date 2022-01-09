@@ -1,14 +1,18 @@
 {
 	"compilerOptions": {
-		"target": "ES2019",
+		"target": "es2019",
 		"module": "commonjs",
-		"lib": ["es2015"],
 		"declaration": true,
 		"baseUrl": "./src/",
 		"outDir": "./dist/",
 		"removeComments": true,
 		"downlevelIteration": true,
-		"strict": false,
+		"strict": true,
+		"alwaysStrict": true,
+		"strictBindCallApply": true,
+		"strictFunctionTypes": true,
+		"strictNullChecks": true,
+		"strictPropertyInitialization": true,
 		"watch": false,
 		"moduleResolution": "node",
 		"noImplicitReturns": false,
@@ -20,25 +24,11 @@
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
 		"importHelpers": true,
-		"strictBindCallApply": true,
 		"noEmitHelpers": true,
 		"resolveJsonModule": true,
 		"pretty": true,
 		"diagnostics": true,
-		"noStrictGenericChecks": false,
 		"typeRoots": ["node_modules/@types"],
 		"types": ["node", "jest"]
-	},
-	"typedocOptions": {
-		"mode": "modules",
-		"out": "docs",
-		"theme": "minimal",
-		"exclude": [
-			"**/*+(index|.spec|.e2e).ts",
-			"./src/test/**/*",
-			"./global.d.ts"
-		],
-		"excludePrivate": true,
-		"excludeProtected": true
 	}
 }
