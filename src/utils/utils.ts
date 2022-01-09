@@ -1,14 +1,16 @@
+import deepmerge from 'deepmerge';
 
 // export type Type<T> = new (...args: any[]) => T;
 export type Type<T> = Function & { prototype: T }
 
 export type Parameter<T extends (args: any) => any> = T extends (args: infer P) => any ? P : never;
 
-export function isNullOrUndefined(value: any) {
+
+export function isNullOrUndefined(value: any): value is undefined | null {
     return value === undefined || value === null;
 }
 
-export function notNullOrUndefined(value: any) {
+export function notNullOrUndefined<T>(value: T): value is Exclude<T, null | undefined> {
     return !isNullOrUndefined(value);
 }
 
@@ -47,13 +49,10 @@ export function isEmptyString(value: string): boolean {
     return typeof value !== 'string' || value === '';
 }
 
-export function isConstructor(value: any) {
-    const handler = { construct() { return handler } } //Must return ANY object, so reuse one
-    try {
-        return !!(new (new Proxy(value, handler))())
-    } catch (e) {
-        return false
-    }
+/**
+* @description
+* Deep merge list of objects and return new one
+*/
+export function merge<T>(...objects: Partial<T>[]): T {
+    return deepmerge.all(objects) as unknown as T;
 }
-
-export const isArrowFn = (fn) => (typeof fn === 'function') && /^[^{]+?=>/.test(fn.toString());

@@ -1,19 +1,19 @@
 import { NextFunction, Request, Response } from 'express';
+import { Injectable, ServiceLifetime } from 'tiny-injector';
 import { ErrorResponse } from '../Response';
 import { Role } from './Role';
-import { AccessTokenClaims, Claims, TokenHelper } from './TokenHelper';
+import { Claims } from './TokenHelper';
 
 
-@Singelton()
-class Identity {
-    tokenService = locate(TokenHelper);
+@Injectable({ lifetime: ServiceLifetime.Singleton })
+export class Identity {
 
     /**
      * Check if the user carry the intened roles
      *
      * Authorize("HRManager") only HRManager users are authorized to continue
      *
-     * Authorize("HRManager,Finance") only HRManager or Finance users are authorized to continue
+     * Authorize("HRManager", "Finance") only HRManager or Finance users are authorized to continue
      *
      * [Authorize("HRManager"), Authorize("Finance")] only users of both HRManager and Finance roles are authorized to continue
      *
@@ -23,11 +23,11 @@ class Identity {
         return async (req: Request, res: Response, next: NextFunction) => {
             try {
                 const claims = await this._authenticated(req.headers.authorization);
-                if (roles.includes(claims.role)) {
-                    return next();
-                } else {
-                    return ErrorResponse.Forbidden();
-                }
+                // if (roles.includes(claims.role)) {
+                //     return next();
+                // } else {
+                //     return ErrorResponse.Forbidden();
+                // }
             } catch (error) {
                 return ErrorResponse.Unauthorized();
             }
@@ -50,8 +50,9 @@ class Identity {
         };
     }
 
-    private async _authenticated(authorization: string) {
-        return this.tokenService.decodeTokenAsync<AccessTokenClaims>(authorization)
+    private async _authenticated(authorization: string | undefined) {
+        return new Claims('');
+        // return this.tokenService.decodeTokenAsync<AccessTokenClaims>(authorization)
     }
 
     /**

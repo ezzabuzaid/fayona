@@ -1,18 +1,17 @@
-import { Injector } from "@lib/dependency-injection";
+import { Injector } from "tiny-injector";
 import { Metadata } from "../Metadata";
 import { ParameterMetadata } from "../ParameterMetadata";
 import { ParameterType } from "../ParameterType";
 
-// FIXME: rename it to FromRoute
-export function FromParams(param: string): ParameterDecorator {
-    return (target: any, propertyKey: string, parameterIndex: number) => {
+export function FromRoute(param: string): ParameterDecorator {
+    return (target: any, propertyKey, parameterIndex: number) => {
         const metadata = Injector.GetRequiredService(Metadata);
         metadata.registerParameter(
             new ParameterMetadata(
                 parameterIndex,
                 ParameterType.FROM_ROUTE,
                 param,
-                propertyKey,
+                propertyKey as string,
                 target.constructor.name
             )
         );

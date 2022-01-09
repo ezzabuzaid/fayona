@@ -7,9 +7,9 @@ import { ServeCommand } from './ServeCommands';
 
 program
     .configureOutput({
-        writeOut: (str) => process.stdout.write(`[OUT] ${ str }`),
-        writeErr: (str) => process.stdout.write(`[ERR] ${ str }`),
-        outputError: (str, write) => write(`\x1b[31m${ str }\x1b[0m`)
+        writeOut: (str: string) => process.stdout.write(`[OUT] ${ str }`),
+        writeErr: (str: string) => process.stdout.write(`[ERR] ${ str }`),
+        outputError: (str: string, write: (val: string) => void) => write(`\x1b[31m${ str }\x1b[0m`)
     })
     .addCommand(new BuildCommand())
     .addCommand(new ServeCommand())

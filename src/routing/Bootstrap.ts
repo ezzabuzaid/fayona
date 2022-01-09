@@ -1,7 +1,7 @@
-import { Injector } from "@lib/dependency-injection";
 import express from "express";
 import glob from "fast-glob";
 import path from "path";
+import { Injector } from 'tiny-injector';
 import { EXPRESS_TOKEN } from "./ExpressToken";
 import { Metadata } from "./Metadata";
 

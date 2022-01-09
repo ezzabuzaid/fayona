@@ -1,15 +1,15 @@
-import { Injector } from '@lib/dependency-injection';
 import { RequestHandler } from 'express';
+import { Injector } from 'tiny-injector';
 import { HttpEndpointMetadata } from '../HttpEndpointMetadata';
 import { Metadata } from '../Metadata';
 import { METHODS } from '../Methods';
 
 export function HttpPatch(endpoint = '/', ...middlewares: RequestHandler[]): MethodDecorator {
-    return function (target, propertyKey: string, descriptor: PropertyDescriptor) {
+    return function (target: Record<string, any>, propertyKey, descriptor: PropertyDescriptor) {
         const metadata = Injector.GetRequiredService(Metadata);
         metadata.registerHttpEndpoint(new HttpEndpointMetadata(
             target.constructor,
-            target[propertyKey],
+            target[propertyKey as string],
             endpoint,
             METHODS.PATCH,
             middlewares

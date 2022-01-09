@@ -1,9 +1,8 @@
-import { HttpResponse } from '@core/response/generic_response';
-import { SuccessResponse } from '@core/response/success_response';
-import { notNullOrUndefined } from '@lib/utils';
 import { NextFunction, Request, Response } from 'express';
+import { HttpResponse, SuccessResponse } from '../Response';
+import { notNullOrUndefined } from '../utils';
 
-export function autoHandler(...middlewares) {
+export function autoHandler(...middlewares: any[]) {
     return middlewares.map((middleware) => async (req: Request, res: Response, next: NextFunction) => {
         try {
             const response = await middleware(req, res, next);
@@ -20,7 +19,7 @@ export function autoHandler(...middlewares) {
         }
 
         function send(response: HttpResponse) {
-            return res.status(response.status).json(response.toJson());
+            return res.status(response.statusCode).json(response.toJson());
         }
     });
 }

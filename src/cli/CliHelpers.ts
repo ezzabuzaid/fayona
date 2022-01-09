@@ -29,7 +29,7 @@ export function tsConfig() {
     return JSON.parse(readFileSync(`${ tsConfigPath }.json`, 'utf8'));
 }
 
-export function tryTo(fn: (...args) => any) {
+export function tryTo(fn: (...args: any[]) => any) {
     try {
         return fn();
     } catch (error) {
@@ -57,14 +57,6 @@ export function getBuildDirectory() {
         throw new Error('outDir is not specified in tsconfig file');
     }
     return buildDirectory;
-}
-
-export function actionRunner(fn: (...args) => Promise<any>) {
-    return (...args) => fn(...args)
-        .catch((error) => {
-            console.error(error);
-            process.exit(1);
-        });
 }
 
 export function copyEnvironmentFile(to: string) {
@@ -103,8 +95,8 @@ export function copyAssets(to: string, files: string) {
     }
 }
 
-function isFile(pathItem) {
-    return !!extname(pathItem);
+function isFile(fileOrDirectoryPath: string) {
+    return !!extname(fileOrDirectoryPath);
 }
 
 export function capitalizeFirstLetter(name: string) {
@@ -115,7 +107,7 @@ export function dePascalString(value: string) {
     return value?.split(' ').map(name => name.replace(/^\w/, c => c.toUpperCase()).replace(/([A-Z][a-z])/g, ' $1')).join('').trim();
 }
 
-export function toCamelCase(str) {
+export function toCamelCase(str: string) {
     // Lower cases the string
     return str.toLowerCase()
         // Replaces any - or _ characters with a space

@@ -1,4 +1,4 @@
-import { Type } from "@lib/utils";
+import { Type } from "../utils";
 
 export class HttpRemoveEndpointMiddlewareMetadata {
     constructor(

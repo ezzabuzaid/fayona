@@ -3,4 +3,14 @@ export * from './Response';
 export * from './Routing';
 export * from './utils/logger';
 export * from './validation';
+import { ServiceType } from "tiny-injector";
 
+
+declare global {
+    namespace Express {
+
+        interface Request {
+            locate<T>(serviceType: ServiceType<T>): T
+        }
+    }
+}

@@ -1,6 +1,5 @@
-import { AppUtils } from "@core/utils";
-import { Injectable, ServiceLifetime } from "@lib/dependency-injection";
-import { notEmpty } from "@lib/utils";
+import { Injectable, ServiceLifetime } from "tiny-injector";
+import { generateAlphabeticString, notEmpty, Type } from "../utils";
 import { HttpEndpointMetadata } from "./HttpEndpointMetadata";
 import { HttpRemoveEndpointMiddlewareMetadata } from "./HttpRemoveEndpointMiddlewareMetadata";
 import { HttpRouteMetadata } from "./HttpRouteMetadata";
@@ -11,9 +10,9 @@ export class Metadata {
     #routes: HttpRouteMetadata[] = [];
     #parameters = new Map<string, ParameterMetadata[]>();
     #middlewares = new Map<string, HttpRemoveEndpointMiddlewareMetadata[]>();
-    static MetadataKey = AppUtils.generateAlphabeticString();
+    static MetadataKey = generateAlphabeticString();
     private metadataKey(httpEndpointMetadata: HttpEndpointMetadata) {
-        return `${Metadata.MetadataKey}:${httpEndpointMetadata.method}:${httpEndpointMetadata.endpoint}`;
+        return `${ Metadata.MetadataKey }:${ httpEndpointMetadata.method }:${ httpEndpointMetadata.endpoint }`;
     }
 
     registerParameter(parameterMetadata: ParameterMetadata) {
@@ -38,7 +37,7 @@ export class Metadata {
         return this.#routes.find(route => route.controller === child);
     }
 
-    getEndpoints(constructor) {
+    getEndpoints(constructor: Type<any>) {
         return (Reflect.getMetadataKeys(constructor) as string[])
             .filter(it => it.startsWith(Metadata.MetadataKey))
             .map(it => [Reflect.getMetadata, Reflect.deleteMetadata].map(_ => _(it, constructor))[0])

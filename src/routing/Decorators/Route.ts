@@ -1,9 +1,8 @@
-import { AppUtils } from '@core/utils';
-import { Injector } from '@lib/dependency-injection';
-import { autoHandler } from '@lib/restful/AutoHandler';
-import { Type } from '@lib/utils';
 import { Request, Response, Router as expressRouter } from 'express';
-import { construct } from 'lib/validation';
+import { Injector } from 'tiny-injector';
+import { isEmptyString, merge, Type } from '../../utils';
+import { construct } from '../../validation';
+import { autoHandler } from '../AutoHandler';
 import { HttpRemoveEndpointMiddlewareMetadata } from '../HttpRemoveEndpointMiddlewareMetadata';
 import { HttpRouteMetadata } from '../HttpRouteMetadata';
 import { IRouterDecorationOption } from '../IRouterDecorationOption';
@@ -17,18 +16,23 @@ import path = require('path');
  * ex., the Controller class name is ExampleController, so the Route name is "example".
  */
 export function Route(endpoint?: string, options: IRouterDecorationOption = {}) {
-    return function <T extends Type<any>>(constructor: T) {
+    return function (constructor: Type<any>) {
         if (!constructor.name.endsWith('Controller')) {
-            throw new Error(`${constructor.name} is not valid name, please consider suffixing your class with Controller`);
+            throw new Error(`${ constructor.name } is not valid name, please consider suffixing your class with Controller`);
         }
 
         const metadata = Injector.GetRequiredService(Metadata);
         const router = expressRouter(options);
-        const normalizedEndpoint = normalizeEndpoint(constructor, endpoint);
-        if (AppUtils.notEmpty(options.children)) {
+        const normalizedEndpoint = normalizeEndpoint(constructor, endpoint ?? '/');
+
+        if (Array.isArray(options.children) && options.children.length > 0) {
             options.children.forEach((childController) => {
                 const childRoute = metadata.getHttpRoute(childController);
-                router.use(childRoute.endpoint, childRoute.router);
+                if (childRoute) {
+                    router.use(childRoute.endpoint, childRoute.router);
+                } else {
+                    throw new Error(`Cannot find @Route for ${ childController.name }`);
+                }
             });
         }
 
@@ -37,7 +41,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
             router,
             normalizedEndpoint
         ))
-        Injector.AddScoped(constructor);
+        Injector.AddScoped(constructor as any);
 
         // FIXME: reorder the routes to have the path variable routes at end
         // e.g
@@ -69,7 +73,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                                 break;
                             case ParameterType.FROM_ROUTE:
                                 const param = parameterMetadata.payload;
-                                if (AppUtils.isEmptyString(param)) {
+                                if (isEmptyString(param)) {
                                     throw new Error('param must be a string');
                                 }
                                 parameters[parameterMetadata.index] = request.params[param];
@@ -87,7 +91,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                             case ParameterType.FROM_QUERY:
                                 let query = request.query;
                                 if (parameterMetadata.options?.queryPolluted) {
-                                    query = AppUtils.merge({}, query, request['queryPolluted']);
+                                    query = merge({}, query, request['queryPolluted']);
                                 }
 
                                 if (parameterMetadata.payload) {
@@ -131,10 +135,10 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
     };
 }
 
-function normalizeEndpoint(target, endpoint?: string) {
+function normalizeEndpoint(target: Record<string, any>, endpoint: string) {
     // TODO: add options to transform the name to either singular, plural or as is
     let mappedValue = endpoint;
-    if (AppUtils.isEmptyString(endpoint)) {
+    if (isEmptyString(endpoint)) {
         mappedValue = target.name
             .substring(target.name.lastIndexOf('Controller'), -target.name.length)
             .toLowerCase();

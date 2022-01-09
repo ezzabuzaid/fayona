@@ -1,6 +1,8 @@
+import jwt from 'jsonwebtoken';
+import { Injectable, Injector, ServiceLifetime } from 'tiny-injector';
+import { isNullOrUndefined } from 'utils';
 import { Role } from './Role';
 import { IdentitySecret } from './Secret';
-import jwt = require('jsonwebtoken');
 
 export class Claims {
     readonly iat?: number;
@@ -39,7 +41,7 @@ export class RefreshTokenClaims extends Claims {
 }
 
 
-@Singelton()
+@Injectable({ lifetime: ServiceLifetime.Singleton })
 export class TokenHelper {
 
     public decodeTokenAsync<T extends Claims>(token: string, options?: jwt.SignOptions): Promise<T> {
@@ -62,11 +64,14 @@ export class TokenHelper {
     }
 
     public isTokenExpired<T extends Claims>(decodedToken: T) {
+        if (isNullOrUndefined(decodedToken.exp)) {
+            return true;
+        }
         return Date.now() >= decodedToken.exp * 1000;
     }
 
     get secretKey() {
-        const secret = locate(IdentitySecret);
+        const secret = Injector.GetRequiredService(IdentitySecret);
         if (!secret) {
             throw new Error('IdentitySecret is not registerd as part of service locator');
         }
