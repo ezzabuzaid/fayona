@@ -13,7 +13,7 @@ interface ConfigureOptions {
     prefix: string;
 }
 
-export function isEnv(name: 'development' | 'production') {
+export function isEnv(name: 'development' | 'production' | string) {
     return process.env.NODE_ENV === name;
 }
 
