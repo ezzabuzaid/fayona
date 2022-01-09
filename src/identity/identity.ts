@@ -26,8 +26,8 @@ export class Identity {
                 // if (roles.includes(claims.role)) {
                 //     return next();
                 // } else {
-                //     return ErrorResponse.Forbidden();
                 // }
+                return ErrorResponse.MethodNotAllowed();
             } catch (error) {
                 return ErrorResponse.Unauthorized();
             }

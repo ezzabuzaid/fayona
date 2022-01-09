@@ -1,9 +1,8 @@
-import { Type } from "../utils";
 
 export class HttpRemoveEndpointMiddlewareMetadata {
     constructor(
         public middleware: () => any,
-        public controller: Type<any>,
+        public controller: Function,
         public handler: () => void,
     ) { }
 

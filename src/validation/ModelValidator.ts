@@ -1,4 +1,4 @@
 export class ModelValidator {
-    BeforeValidation?(payload: any): void | Promise<void>;
-    AfterValidation?(): any;
+    BeforeValidation?(): void | Promise<void>;
+    AfterValidation?(): Promise<any>;
 }

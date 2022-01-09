@@ -8,11 +8,14 @@ export function autoHandler(...middlewares: any[]) {
             const response = await middleware(req, res, next);
             if (notNullOrUndefined(response)) {
                 if (response instanceof HttpResponse) {
-                    return send(response)
+                    send(response)
+                    return;
                 } else {
-                    return send(SuccessResponse.Ok(response))
+                    send(SuccessResponse.Ok(response))
+                    return;
                 }
             }
+            return;
             // if there's no response that means next() has been called.
         } catch (error) {
             next(error);

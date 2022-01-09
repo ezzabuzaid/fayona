@@ -16,9 +16,9 @@
 		"strictPropertyInitialization": true,
 		"watch": false,
 		"moduleResolution": "node",
-		"noImplicitReturns": false,
+		"noImplicitReturns": true,
 		"noUnusedLocals": false,
-		"sourceMap": false,
+		"sourceMap": true,
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
@@ -38,5 +38,6 @@
 		"paths": {
 			"tiny-injector": ["../node_modules/@fayonaio/tiny-injector/src"]
 		}
-	}
+	},
+	"exclude": ["node_modules", "dist"]
 }

@@ -1,6 +1,8 @@
-import { Request, Response, Router as expressRouter } from 'express';
+import { Request, RequestHandler, Response, Router as expressRouter } from 'express';
+import { RequestHandlerParams } from 'express-serve-static-core';
+import path from 'path';
 import { Injector } from 'tiny-injector';
-import { isEmptyString, merge, Type } from '../../utils';
+import { isEmptyString, Type } from '../../utils';
 import { construct } from '../../validation';
 import { autoHandler } from '../AutoHandler';
 import { HttpRemoveEndpointMiddlewareMetadata } from '../HttpRemoveEndpointMiddlewareMetadata';
@@ -8,8 +10,6 @@ import { HttpRouteMetadata } from '../HttpRouteMetadata';
 import { IRouterDecorationOption } from '../IRouterDecorationOption';
 import { Metadata } from '../Metadata';
 import { ParameterType } from '../ParameterType';
-import path = require('path');
-
 /**
  * When no name is provided the name will autamatically be the name of the route,
  * which by convention is the route class name minus the "Controller" suffix.
@@ -90,8 +90,11 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                                 break;
                             case ParameterType.FROM_QUERY:
                                 let query = request.query;
+                                // FIXME: to be removed
+                                // it should be abstraction so the user can hook it with his logic
+                                // maybe provide action function as hook that returns a Record<string, any>
                                 if (parameterMetadata.options?.queryPolluted) {
-                                    query = merge({}, query, request['queryPolluted']);
+                                    // query = merge({}, query, request['queryPolluted']);
                                 }
 
                                 if (parameterMetadata.payload) {
@@ -102,7 +105,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                                     }
                                 } else {
                                     if (userDefinedType(parameterMetadata.expectedType)) {
-                                        parameters[parameterMetadata.index] = await construct(parameterMetadata.expectedType as Type<T>, query as any)
+                                        parameters[parameterMetadata.index] = await construct(parameterMetadata.expectedType as Type<any>, query as any)
                                     } else {
                                         parameters[parameterMetadata.index] = query;
                                     }
@@ -116,12 +119,12 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                                 const incomingPayload = request[parameterMetadata.type];
                                 parameters[parameterMetadata.index] =
                                     userDefinedType(parameterMetadata.expectedType)
-                                        ? await construct(parameterMetadata.expectedType as Type<T>, incomingPayload)
+                                        ? await construct(parameterMetadata.expectedType as Type<any>, incomingPayload)
                                         : incomingPayload;
                                 break;
                         }
                     }
-                    return routeMetadata.handler.apply(controllerInstance, parameters);
+                    return routeMetadata.handler.apply(controllerInstance, parameters as []);
                 }
                 const routeMiddlewares = metadata.getHttpEndpointMiddlewares(routeMetadata.getHandlerName());
                 router[routeMetadata.method](normalizedEndpoint, autoHandler(
@@ -146,7 +149,7 @@ function normalizeEndpoint(target: Record<string, any>, endpoint: string) {
     return path.normalize(path.join('/', mappedValue, '/'));
 }
 
-function populateRouteMiddlewares(listRemoveEndpointMiddlewareMetadata: HttpRemoveEndpointMiddlewareMetadata[], parentMiddlewares: any[]) {
+function populateRouteMiddlewares(listRemoveEndpointMiddlewareMetadata: HttpRemoveEndpointMiddlewareMetadata[], parentMiddlewares?: RequestHandler[] | RequestHandlerParams[]) {
     const clonedParentMiddlewares = parentMiddlewares?.slice(0) ?? [];
     const middlewares = listRemoveEndpointMiddlewareMetadata.map(endpointMiddleware => endpointMiddleware.middleware.toString());
     const index = clonedParentMiddlewares.findIndex(parentMiddleware => middlewares.includes(parentMiddleware.toString()));

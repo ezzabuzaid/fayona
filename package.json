@@ -4,7 +4,7 @@
   "main": "public_api.js",
   "scripts": {
     "test": "jest --watch",
-    "start": "nodemon -e ts -w ./src -x ts-node --inspect ./src/main.ts",
+    "start": "nodemon --ext ts --watch ./src -x ts-node ./src/main.ts",
     "build": "tsc --project tsconfig.json",
     "prebuild": "del ./dist/",
     "postbuild": "cpy 'readme.md' 'package*.json' ./dist/ --no-overwrite --parents",
@@ -12,14 +12,6 @@
   },
   "dependencies": {
     "@fayonaio/tiny-injector": "^0.0.1",
-    "@types/bcrypt": "^3.0.0",
-    "@types/dotenv": "^6.1.1",
-    "@types/express": "^4.17.0",
-    "@types/fs-extra": "^9.0.6",
-    "@types/jest": "^27.4.0",
-    "@types/jsonwebtoken": "^8.3.8",
-    "ansi-colors": "^3.2.4",
-    "bcrypt": "^5.0.1",
     "class-validator": "^0.13.2",
     "commander": "^6.2.1",
     "deepmerge": "^4.2.2",
@@ -34,11 +26,18 @@
     "ts-jest": "^27.1.2",
     "tsconfig-paths": "^3.8.0",
     "tslib": "^2.3.1",
-    "typescript": "^4.1.2"
+    "tslog": "^3.3.1"
   },
   "devDependencies": {
+    "typescript": "^4.5.4",
     "@commitlint/cli": "^9.1.2",
     "@commitlint/config-conventional": "^12.0.0",
+    "@types/bcrypt": "^3.0.0",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^4.17.0",
+    "@types/fs-extra": "^9.0.6",
+    "@types/jest": "^27.4.0",
+    "@types/jsonwebtoken": "^8.3.8",
     "husky": "^3.1.0",
     "nodemon": "^2.0.2",
     "ts-node": "^7.0.1",

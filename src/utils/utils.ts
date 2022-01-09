@@ -1,7 +1,7 @@
 import deepmerge from 'deepmerge';
 
-// export type Type<T> = new (...args: any[]) => T;
-export type Type<T> = Function & { prototype: T }
+export type Type<T> = new (...args: any[]) => T;
+// export type Type<T> = Function & { prototype: T }
 
 export type Parameter<T extends (args: any) => any> = T extends (args: infer P) => any ? P : never;
 
@@ -14,6 +14,7 @@ export function notNullOrUndefined<T>(value: T): value is Exclude<T, null | unde
     return !isNullOrUndefined(value);
 }
 
+// FIXME: remove it and explictly check if an object is empty
 export function notEmpty(object: any) {
     if (Array.isArray(object)) {
         return !!object.length;

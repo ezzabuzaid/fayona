@@ -17,8 +17,13 @@ export class ErrorResponse extends HttpResponse {
     static Unauthorized() {
         return new ErrorResponse(getReasonPhrase(StatusCodes.UNAUTHORIZED), StatusCodes.UNAUTHORIZED, 'unauthorized');
     }
+
     static Forbidden() {
         return new ErrorResponse('You are not allowed to access this resource', StatusCodes.FORBIDDEN, 'forbidden');
+    }
+
+    static MethodNotAllowed() {
+        return new ErrorResponse(getReasonPhrase(StatusCodes.METHOD_NOT_ALLOWED), StatusCodes.METHOD_NOT_ALLOWED, 'method_not_allowed');
     }
 
     toJson(): object {
