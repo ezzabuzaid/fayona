@@ -1,12 +1,12 @@
 {
-  "version": "0.0.0",
+  "version": "0.0.1",
   "name": "@ezzabuzaid/fayona",
-  "main": "public_api.js",
+  "main": "index",
   "scripts": {
     "test": "jest --watch",
     "start": "nodemon --ext ts --watch ./src -x ts-node ./src/main.ts",
-    "build": "tsc --project tsconfig.json",
-    "prebuild": "del ./dist/",
+    "build": "tsc --project ./tsconfig.json",
+    "prebuild": "del-cli ./dist/",
     "postbuild": "cpy 'readme.md' 'package*.json' ./dist/ --no-overwrite --parents",
     "cli": "ts-node ./src/cli/cli.ts"
   },
@@ -41,7 +41,9 @@
     "husky": "^3.1.0",
     "nodemon": "^2.0.2",
     "ts-node": "^7.0.1",
-    "tslint": "^5.20.1"
+    "tslint": "^5.20.1",
+    "cpy-cli": "^1.0.1",
+    "del-cli": "^4.0.1"
   },
   "husky": {
     "hooks": {

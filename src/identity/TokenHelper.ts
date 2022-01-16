@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { Injectable, Injector, ServiceLifetime } from 'tiny-injector';
-import { isNullOrUndefined } from 'utils';
+import { isNullOrUndefined } from '../utils';
 import { Role } from './Role';
 import { IdentitySecret } from './Secret';
 

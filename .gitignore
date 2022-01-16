@@ -103,4 +103,5 @@ local_configuration.json
 
 uploads/**/*
 .sqlite
-docs
+
+tsconfig.tsbuildinfo

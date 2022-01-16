@@ -1,4 +1,4 @@
-import { isEnv } from "../../src/public_api";
+import { isEnv } from "../../src";
 
 describe('Bootstrap', () => {
 

@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import path from 'path';
-import packageJson from "../../package.json";
 import { execute, getSourceDirectory, tryTo } from './CliHelpers';
+const packageJson = require('../../package.json');
 
 export class ServeCommand extends Command {
     constructor() {
@@ -20,21 +20,21 @@ export class ServeCommand extends Command {
             throw new Error('you should specify baseUrl in tsconfig.json or pass --source with serve command');
         }
         const executeCommand = this.getExecuteCommand(source, ext);
-        const watchCommand = `nodemon --legacy-watch --ext ${ ext } --watch ${ source } --exec ${ executeCommand }`;
-        const command = `${ watch ? watchCommand : executeCommand }`;
+        const watchCommand = `nodemon --legacy-watch --ext ${ext} --watch ${source} --exec ${executeCommand}`;
+        const command = `${watch ? watchCommand : executeCommand}`;
         execute(command);
     }
 
     private getExecuteCommand(watchDirectoy: string, ext: string) {
         const watchEntryPoint = path.join(watchDirectoy, this.getEntryPointFile());
         if (ext === 'ts') {
-            return `ts-node ${ watchEntryPoint }`;
+            return `ts-node ${watchEntryPoint}`;
         }
-        return `node ${ watchEntryPoint }`;
+        return `node ${watchEntryPoint}`;
         // return `node -r ts-node/register ${ watchEntryPoint }`;
     }
 
     private getEntryPointFile() {
-        return `${ packageJson.main }`;
+        return `${packageJson.main}`;
     }
 }
