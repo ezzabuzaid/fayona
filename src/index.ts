@@ -1,15 +1,17 @@
-export * from './main';
+export * from './Environment';
+export * from './RequestId/';
 export * from './Response';
 export * from './Routing';
 export * from './validation';
-import { ServiceType } from "tiny-injector";
+export * from './WebApplication';
 
+import { ServiceType } from "tiny-injector";
 
 declare global {
     namespace Express {
 
         interface Request {
-            locate<T>(serviceType: ServiceType<T>): T
+            inject<T>(serviceType: ServiceType<T>): T
         }
     }
 }

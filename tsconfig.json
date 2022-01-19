@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"watch": false,
 		"target": "es2019",
 		"module": "commonjs",
 		"declaration": true,
@@ -15,27 +16,19 @@
 		"strictFunctionTypes": true,
 		"strictNullChecks": true,
 		"strictPropertyInitialization": true,
-		"watch": false,
 		"moduleResolution": "node",
 		"noImplicitReturns": true,
 		"noUnusedLocals": false,
-		"sourceMap": true,
+		"inlineSourceMap": true,
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
 		"importHelpers": true,
-		"listFiles": false,
 		"useDefineForClassFields": true,
-		"listEmittedFiles": false,
-		"noEmitHelpers": true,
 		"resolveJsonModule": true,
-		"incremental": true,
-		"pretty": true,
-		"diagnostics": true,
-		"typeRoots": ["node_modules/@types"],
-		"skipLibCheck": true
+		"incremental": false
 	},
 	"exclude": ["node_modules", "dist", "./jest.config.ts", "__test__"]
 }

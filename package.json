@@ -1,35 +1,41 @@
 {
   "version": "0.0.1",
-  "name": "@ezzabuzaid/fayona",
+  "name": "@fayona/routing",
   "main": "index",
+  "bin": {
+    "fayona": "./Cli/Cli.js"
+  },
   "scripts": {
     "test": "jest --watch",
-    "start": "nodemon --ext ts --watch ./src -x ts-node ./src/main.ts",
-    "build": "tsc --project ./tsconfig.json",
+    "start": "nodemon --ext ts --watch ./src -x ts-node ./src/index.ts",
+    "build": "./node_modules/.bin/tsc --watch",
     "prebuild": "del-cli ./dist/",
     "postbuild": "cpy 'readme.md' 'package*.json' ./dist/ --no-overwrite --parents",
     "cli": "ts-node ./src/cli/cli.ts"
   },
   "dependencies": {
     "@fayonaio/tiny-injector": "^0.0.1",
-    "class-validator": "^0.13.2",
     "commander": "^6.2.1",
     "deepmerge": "^4.2.2",
     "del": "^3.0.0",
     "dotenv": "^6.2.0",
-    "express": "^4.17.1",
     "fast-glob": "^3.2.10",
     "http-status-codes": "^2.1.4",
     "jest": "^27.4.7",
     "jsonwebtoken": "^8.5.1",
+    "nanoid": "^3.2.0",
     "reflect-metadata": "^0.1.13",
     "ts-jest": "^27.1.2",
     "tsconfig-paths": "^3.8.0",
     "tslib": "^2.3.1",
     "tslog": "^3.3.1"
   },
+  "peerDependencies": {
+    "class-validator": "^0.13.2",
+    "express": "^4.17.2",
+    "express-list-endpoints": "^6.0.0"
+  },
   "devDependencies": {
-    "typescript": "^4.5.4",
     "@commitlint/cli": "^9.1.2",
     "@commitlint/config-conventional": "^12.0.0",
     "@types/bcrypt": "^3.0.0",
@@ -38,12 +44,14 @@
     "@types/fs-extra": "^9.0.6",
     "@types/jest": "^27.4.0",
     "@types/jsonwebtoken": "^8.3.8",
+    "@types/validator": "^13.7.1",
+    "cpy-cli": "^3.1.1",
+    "del-cli": "^4.0.1",
     "husky": "^3.1.0",
     "nodemon": "^2.0.2",
     "ts-node": "^7.0.1",
     "tslint": "^5.20.1",
-    "cpy-cli": "^1.0.1",
-    "del-cli": "^4.0.1"
+    "typescript": "^4.5.4"
   },
   "husky": {
     "hooks": {
@@ -66,9 +74,6 @@
     "name": "ezzabuzaid",
     "email": "ezzabuzaid@hotmail.com",
     "url": "https://ezzabuzaid.com"
-  },
-  "bin": {
-    "fayona": "./cli/cli.js"
   },
   "repository": "github:ezzabuzaid/fayona",
   "private": true,

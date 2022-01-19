@@ -13,19 +13,19 @@ export class SuccessResponse<T> extends HttpResponse {
         this.message = message ?? getReasonPhrase(code);
     }
 
-    static Deleted(result = null) {
+    static Deleted(result: any = null) {
         return new SuccessResponse(result, StatusCodes.OK, "Deleted",);
     }
 
-    static Created(result = null) {
+    static Created(result: any = null) {
         return new SuccessResponse(result, StatusCodes.CREATED, "Created",);
     }
 
-    static Updated(result = null) {
+    static Updated(result: any = null) {
         return new SuccessResponse(result, StatusCodes.OK, "Updated",);
     }
 
-    static Ok(result = null) {
+    static Ok(result: any = null) {
         return new SuccessResponse(result, StatusCodes.OK, "Success",);
     }
 

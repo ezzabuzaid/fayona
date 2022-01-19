@@ -18,7 +18,7 @@ import { ParameterType } from '../ParameterType';
 export function Route(endpoint?: string, options: IRouterDecorationOption = {}) {
     return function (constructor: Type<any>) {
         if (!constructor.name.endsWith('Controller')) {
-            throw new Error(`${ constructor.name } is not valid name, please consider suffixing your class with Controller`);
+            throw new Error(`${constructor.name} is not valid name, please consider suffixing your class with Controller`);
         }
 
         const metadata = Injector.GetRequiredService(Metadata);
@@ -31,7 +31,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                 if (childRoute) {
                     router.use(childRoute.endpoint, childRoute.router);
                 } else {
-                    throw new Error(`Cannot find @Route for ${ childController.name }`);
+                    throw new Error(`Cannot find @Route for ${childController.name}`);
                 }
             });
         }
@@ -56,7 +56,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                 const normalizedEndpoint = routeMetadata.endpoint instanceof RegExp ? routeMetadata.endpoint : path.normalize(path.join('/', routeMetadata.endpoint));
                 const endpointHandler = async function () {
                     const [request, response] = Array.from(arguments) as [Request, Response];
-                    const controllerInstance = request.locate(constructor);
+                    const controllerInstance = request.inject(constructor);
                     const parameters = [];
                     const endpointParameters = metadata.getHttpEndpointParameters(routeMetadata.getHandlerName()).reverse();
                     for (const parameterMetadata of endpointParameters) {
@@ -113,7 +113,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
 
                                 break;
                             case ParameterType.FROM_SERVICES:
-                                parameters[parameterMetadata.index] = request.locate(parameterMetadata.expectedType);
+                                parameters[parameterMetadata.index] = request.inject(parameterMetadata.expectedType);
                                 break;
                             default:
                                 const incomingPayload = request[parameterMetadata.type];

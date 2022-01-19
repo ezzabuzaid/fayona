@@ -20,24 +20,33 @@ export const MODEL_VALIDATION_ERRORS = 'payload_validator_error';
  */
 export async function construct<T extends ModelValidator>(classType: Type<T>, properties: Partial<T>, additionalProperties: Partial<T> = {}) {
     const payload = new classType();
-    if (payload instanceof ModelValidator) {
-        await payload.AfterValidation?.();
-    }
-    Object.assign(payload, properties, additionalProperties);
-    await validatePayload(payload);
+    // if (payload instanceof ModelValidator) {
+    //     await payload.BeforeValidation?.();
+    // }
+    // const payload = new Proxy(new classType(), {
+    //     get(target: any, name) {
+    //         console.log('target', target, name, properties)
+    //         return target[name] ?? (properties as any ?? {})[name];
+    //     }
+    // });
+    console.log('payload', payload);
+    Object.assign(payload, properties ?? {}, additionalProperties ?? {});
+    // console.log(payload, properties ?? {}, additionalProperties ?? {});
+    await ValidatePayload(payload);
     if (payload instanceof ModelValidator) {
         await payload.AfterValidation?.();
     }
     return payload;
 }
 
-async function validatePayload<T extends Record<string, any>>(payload: T) {
+async function ValidatePayload<T extends Record<string, any>>(payload: T) {
     try {
         await validateOrReject(payload, {
             // TODO: add override options using service locator ()
             forbidUnknownValues: true,
         });
     } catch (validationErrors: any) {
+        console.log('validationErrors', validationErrors);
         // Make it like .netcore modelstate
         const errorConstraints = (validationErrors[0] as ValidationError).constraints as any;
         const error = new Error(Object.values<string>(errorConstraints)[0]);
@@ -49,3 +58,19 @@ async function validatePayload<T extends Record<string, any>>(payload: T) {
 export class ModelStateException extends Error {
 
 }
+
+// const openapiSpecification = swaggerJsdoc({
+//     definition: {
+//         openapi: '3.0.0',
+//         info: { title: 'Hello World', version: '1.0.0', },
+//     },
+//     apis: ['**/Controllers/*.ts'],
+// });
+
+// application
+//     .use(express.json())
+//     .use(
+//         '/api/docs',
+//         swaggerUi.serve,
+//         swaggerUi.setup(openapiSpecification)
+//     );

@@ -1,12 +1,11 @@
 import 'reflect-metadata';
 
-export * from './Bootstrap';
 export * from './Decorators/ContextRequest';
 export * from './Decorators/ContextResponse';
 export * from './Decorators/FromBody';
 export * from './Decorators/FromHeaders';
-export * from './Decorators/FromParams';
 export * from './Decorators/FromQuery';
+export * from './Decorators/FromRoute';
 export * from './Decorators/FromServices';
 export * from './Decorators/HttpDelete';
 export * from './Decorators/HttpGet';
