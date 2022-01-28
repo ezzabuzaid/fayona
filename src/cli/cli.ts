@@ -2,7 +2,6 @@
 
 import { program } from 'commander';
 import { BuildCommand } from './BuildCommand';
-import { ServeCommand } from './ServeCommands';
 
 
 program
@@ -12,7 +11,7 @@ program
         outputError: (str: string, write: (val: string) => void) => write(`\x1b[31m${str}\x1b[0m`)
     })
     .addCommand(new BuildCommand())
-    .addCommand(new ServeCommand())
+    // .addCommand(new ServeCommand())
     .parse(process.argv)
 
 
