@@ -1,3 +1,5 @@
+## [0.1.1](https://github.com/ezzabuzaid/fayona/compare/0.1.0...0.1.1) (2022-01-28)
+
 # 0.1.0 (2022-01-28)
 
 
