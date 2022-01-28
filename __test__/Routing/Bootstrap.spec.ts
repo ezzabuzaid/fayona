@@ -1,4 +1,5 @@
-import { isEnv } from "../../src";
+import { Injector } from "tiny-injector";
+import { Environment } from "../../src/index";
 
 describe('Bootstrap', () => {
 
@@ -11,10 +12,10 @@ describe('Bootstrap', () => {
         process.env.NODE_ENV = env;
 
         // Act
-        const actual = isEnv(env);
+        const actual = Injector.GetRequiredService(Environment);
 
         // Assert
-        expect(actual).toEqual(expected);
+        expect(actual.EnvironmentName === env).toEqual(expected);
     });
 
 });

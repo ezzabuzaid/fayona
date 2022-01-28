@@ -110,8 +110,15 @@
       "publishPath": "./dist"
     },
     "hooks": {
-      "before:npm:publish": "npm run build"
+      "before:init": [
+        "npm test"
+      ],
+      "before:npm:publish": "npm run build",
+      "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
     }
   },
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }
