@@ -88,7 +88,6 @@
     "type": "git",
     "url": "git+https://github.com/ezzabuzaid/fayona.git"
   },
-  "private": true,
   "release-it": {
     "plugins": {
       "@release-it/conventional-changelog": {
