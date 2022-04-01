@@ -1,4 +1,11 @@
-# [0.2.0](https://github.com/ezzabuzaid/fayona/compare/0.1.1...0.2.0) (2022-04-01)
+
+
+## [0.2.1](https://github.com/ezzabuzaid/fayona/compare/0.2.0...0.2.1) (2022-04-01)
+
+
+### Bug Fixes
+
+* allow non-Authorize endpoint to pass ([7d9ccb5](https://github.com/ezzabuzaid/fayona/commit/7d9ccb52a897d37e1c7f97f1b56135e570b3b202))# [0.2.0](https://github.com/ezzabuzaid/fayona/compare/0.1.1...0.2.0) (2022-04-01)
 
 
 ### Features
@@ -68,4 +75,3 @@
 * **Repo:** use locateModel function to resolve models ([2deb89f](https://github.com/ezzabuzaid/fayona/commit/2deb89f2eca293c28bb92c4df748bee3ade4d69f))
 * **restful:** arr RemoveMiddleware decorator that allow to remove a parent middleware from speicifc route ([1be1119](https://github.com/ezzabuzaid/fayona/commit/1be1119ad98afff58dc6763daa72640664e7e8c1))
 * support router inhertance ([addda27](https://github.com/ezzabuzaid/fayona/commit/addda2724bccb57addf40281c6913cdd9c40f219))
-
