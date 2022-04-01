@@ -1,126 +1,121 @@
 {
-    "name": "@fayona/routing",
-    "version": "0.2.0",
-    "main": "index",
-    "description": "The Node.js version of .NetCore",
-    "bin": {
-        "fayona": "./Cli/Cli.js"
-    },
-    "scripts": {
-        "test": "jest --runInBand --detectOpenHandles --no-cache",
-        "test:majestic": "majestic",
-        "start": "nodemon --ext ts --watch ./src -x ts-node ./src/index.ts",
-        "build": "./node_modules/.bin/tsc",
-        "prebuild": "del-cli ./dist/",
-        "postbuild": "cpy 'readme.md' 'package*.json' ./dist/ --no-overwrite --parents",
-        "cli": "ts-node ./src/cli/cli.ts",
-        "release": "release-it"
-    },
-    "dependencies": {
-        "@types/passport": "^1.0.7",
-        "deepmerge": "^4.2.2",
-        "fast-glob": "^3.2.10",
-        "http-status-codes": "^2.1.4",
-        "jsonwebtoken": "^8.5.1",
-        "nanoid": "^3.2.0",
-        "passport": "^0.5.2",
-        "reflect-metadata": "^0.1.13",
-        "tiny-injector": "^0.1.1",
-        "tslib": "^2.3.1",
-        "tslog": "^3.3.1"
-    },
-    "peerDependencies": {
-        "class-validator": "^0.13.2",
-        "express": "^4.17.2",
-        "express-list-endpoints": "^6.0.0"
-    },
-    "devDependencies": {
-        "@commitlint/cli": "^9.1.2",
-        "@commitlint/config-conventional": "^12.0.0",
-        "@release-it/conventional-changelog": "^4.1.0",
-        "@types/bcrypt": "^3.0.0",
-        "@types/dotenv": "^6.1.1",
-        "@types/express": "^4.17.0",
-        "@types/fs-extra": "^9.0.6",
-        "@types/jest": "^27.4.0",
-        "@types/jsonwebtoken": "^8.3.8",
-        "@types/validator": "^13.7.1",
-        "commander": "^6.2.1",
-        "cpy-cli": "^3.1.1",
-        "del-cli": "^4.0.1",
-        "husky": "^3.1.0",
-        "jest": "^27.4.7",
-        "nodemon": "^2.0.2",
-        "release-it": "^14.12.4",
-        "ts-jest": "^27.1.2",
-        "ts-node": "^7.0.1",
-        "tslint": "^5.20.1",
-        "typescript": "^4.5.4"
-    },
-    "husky": {
-        "hooks": {
-            "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-        }
-    },
-    "bugs": {
-        "email": "ezzabuzaid@hotmail.com",
-        "url": "https://github.com/ezzabuzaid/fayona/issues"
-    },
-    "keywords": [
-        "node js",
-        "restful",
-        "rest ful",
-        "rest api",
-        "rest",
-        "fayona",
-        ".net",
-        ".netcore",
-        "nodejs .netcore",
-        "node .netcore",
-        "tiny-injector",
-        "ezzabuzaid"
-    ],
-    "homepage": "https://github.com/ezzabuzaid/fayona",
-    "author": {
-        "name": "ezzabuzaid",
-        "email": "ezzabuzaid@hotmail.com",
-        "url": "https://ezzabuzaid.com"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/ezzabuzaid/fayona.git"
-    },
-    "release-it": {
-        "plugins": {
-            "@release-it/conventional-changelog": {
-                "preset": "angular",
-                "infile": "CHANGELOG.md"
-            }
-        },
-        "git": {
-            "requireBranch": "master",
-            "requireCleanWorkingDir": true,
-            "requireCommits": true,
-            "requireUpstream": true,
-            "tag": true
-        },
-        "github": {
-            "release": true
-        },
-        "npm": {
-            "publish": true,
-            "publishPath": "./dist"
-        },
-        "hooks": {
-            "before:init": [
-                "npm test"
-            ],
-            "after:bump": "npm run build",
-            "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
-        }
-    },
-    "license": "MIT",
-    "publishConfig": {
-        "access": "public"
-    }
+	"name": "@fayona/routing",
+	"version": "0.2.0",
+	"main": "index",
+	"description": "The Node.js version of .NetCore",
+	"bin": {
+		"fayona": "./Cli/Cli.js"
+	},
+	"scripts": {
+		"test": "jest --runInBand --detectOpenHandles --no-cache",
+		"test:majestic": "majestic",
+		"start": "nodemon --ext ts --watch ./src -x ts-node ./src/index.ts",
+		"build": "./node_modules/.bin/tsc",
+		"prebuild": "del-cli ./dist/",
+		"postbuild": "cpy 'readme.md' 'package*.json' ./dist/ --no-overwrite --parents",
+		"cli": "ts-node ./src/cli/cli.ts",
+		"release": "release-it"
+	},
+	"dependencies": {
+		"@types/passport": "^1.0.7",
+		"class-validator": "^0.13.2",
+		"deepmerge": "^4.2.2",
+		"fast-glob": "^3.2.10",
+		"http-status-codes": "^2.1.4",
+		"jsonwebtoken": "^8.5.1",
+		"nanoid": "^3.2.0",
+		"passport": "^0.5.2",
+		"reflect-metadata": "^0.1.13",
+		"tiny-injector": "^0.1.1",
+		"tslib": "^2.3.1",
+		"tslog": "^3.3.1",
+		"express": "^4.17.2",
+		"express-list-endpoints": "^6.0.0"
+	},
+	"devDependencies": {
+		"@commitlint/cli": "^9.1.2",
+		"@commitlint/config-conventional": "^12.0.0",
+		"@release-it/conventional-changelog": "^4.1.0",
+		"@types/bcrypt": "^3.0.0",
+		"@types/dotenv": "^6.1.1",
+		"@types/express": "^4.17.0",
+		"@types/fs-extra": "^9.0.6",
+		"@types/jest": "^27.4.0",
+		"@types/jsonwebtoken": "^8.3.8",
+		"@types/validator": "^13.7.1",
+		"commander": "^6.2.1",
+		"cpy-cli": "^3.1.1",
+		"del-cli": "^4.0.1",
+		"husky": "^3.1.0",
+		"jest": "^27.4.7",
+		"nodemon": "^2.0.2",
+		"release-it": "^14.12.4",
+		"ts-jest": "^27.1.2",
+		"ts-node": "^7.0.1",
+		"tslint": "^5.20.1",
+		"typescript": "^4.5.4"
+	},
+	"husky": {
+		"hooks": {
+			"commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+		}
+	},
+	"bugs": {
+		"email": "ezzabuzaid@hotmail.com",
+		"url": "https://github.com/ezzabuzaid/fayona/issues"
+	},
+	"keywords": [
+		"node js",
+		"restful",
+		"rest ful",
+		"rest api",
+		"rest",
+		"fayona",
+		".net",
+		".netcore",
+		"nodejs .netcore",
+		"node .netcore",
+		"tiny-injector",
+		"ezzabuzaid"
+	],
+	"homepage": "https://github.com/ezzabuzaid/fayona",
+	"author": {
+		"name": "ezzabuzaid",
+		"email": "ezzabuzaid@hotmail.com",
+		"url": "https://ezzabuzaid.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ezzabuzaid/fayona.git"
+	},
+	"release-it": {
+		"plugins": {
+			"@release-it/conventional-changelog": {
+				"preset": "angular",
+				"infile": "CHANGELOG.md"
+			}
+		},
+		"git": {
+			"requireBranch": "master",
+			"requireCleanWorkingDir": true,
+			"requireCommits": true,
+			"requireUpstream": true,
+			"tag": true
+		},
+		"github": {
+			"release": true
+		},
+		"npm": {
+			"publish": true,
+			"publishPath": "./dist"
+		},
+		"hooks": {
+			"after:bump": "yarn build",
+			"after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
+		}
+	},
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	}
 }

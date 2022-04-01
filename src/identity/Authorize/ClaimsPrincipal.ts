@@ -9,7 +9,6 @@ import { Action } from "utils";
 import { RoutingCollection } from "../../utils/Collections";
 import { ROLE_CLAIM_TYPE } from "./RoleClaimType";
 
-
 // 	HasClaim(type: string, value: string): boolean {
 // 		return this.Identities.some(it => it.HasClaim(type, value))
 // 	}
@@ -21,7 +20,6 @@ import { ROLE_CLAIM_TYPE } from "./RoleClaimType";
 // 	AddIdentity(identity: ClaimsIdentity): void { }
 // }
 
-
 // class ClaimsIdentity {
 // 	private Claims: Claim[] = [];
 // 	HasClaim(type: string, value: string): boolean {
@@ -30,10 +28,7 @@ import { ROLE_CLAIM_TYPE } from "./RoleClaimType";
 // }
 
 class Claim {
-	constructor(
-		public Type: string,
-		public Value: string
-	) { }
+	constructor(public Type: string, public Value: string) {}
 }
 
 export class ClaimsPrincipal {
@@ -41,10 +36,10 @@ export class ClaimsPrincipal {
 	#Roles: string[] = [];
 
 	IsInRole(roleOrRoles: string | string[]): boolean {
-		const roleClaims = this.#Claims.filter(it => it.Type === ROLE_CLAIM_TYPE);
-		const roles = roleClaims.map(it => it.Value);
+		const roleClaims = this.#Claims.filter((it) => it.Type === ROLE_CLAIM_TYPE);
+		const roles = roleClaims.map((it) => it.Value);
 		if (Array.isArray(roleOrRoles)) {
-			return roles.some(it => roleOrRoles.includes(it))
+			return roles.some((it) => roleOrRoles.includes(it));
 		}
 		return roles.includes(roleOrRoles);
 	}
@@ -56,30 +51,35 @@ export class ClaimsPrincipal {
 	Print() {
 		console.log({
 			Roles: this.#Roles,
-			Claims: this.#Claims
-		})
+			Claims: this.#Claims,
+		});
 	}
 
 	HasClaim(predicate: Action<Claim, boolean>): boolean;
 	HasClaim(type: string, values?: string[] | null): boolean;
-	HasClaim(type: string | Action<Claim, boolean>, values?: string[] | null): boolean {
+	HasClaim(
+		type: string | Action<Claim, boolean>,
+		values?: string[] | null
+	): boolean {
 		// if value is not null then check if the claim has it
 		// if value is null then only check if claim type exist
 		if (type instanceof Function) {
 			return this.#Claims.some(type);
 		}
-		return this.#Claims.some(it => {
-			return it.Type === type && (
-				values === null ? true : values!.includes(it.Value)
-			)
+		return this.#Claims.some((it) => {
+			return (
+				it.Type === type &&
+				(values === null ? true : values!.includes(it.Value))
+			);
 		});
 	}
-
 }
-export const SecureUserToken = new InjectionToken<Promise<ClaimsPrincipal> | ClaimsPrincipal>('SecureUserToken', {
+export const SecureUserToken = new InjectionToken<
+	Promise<ClaimsPrincipal> | ClaimsPrincipal
+>("SecureUserToken", {
 	lifetime: ServiceLifetime.Scoped,
 	implementationFactory: () => {
-		throw new Error('SecureUser is not defined');
+		throw new Error("SecureUser is not defined");
 	},
-	provideIn: RoutingCollection
+	provideIn: RoutingCollection,
 });

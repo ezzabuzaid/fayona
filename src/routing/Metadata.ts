@@ -9,102 +9,135 @@ import { HttpRouteMetadata } from "./HttpRouteMetadata";
 import { ParameterMetadata } from "./ParameterMetadata";
 import { makeHandlerName } from "./Utils";
 
-const logger = new Logger({ name: 'Routing', minLevel: 'error' });
+const logger = new Logger({ name: "Routing", minLevel: "error" });
 
 @Injectable({ lifetime: ServiceLifetime.Singleton })
 export class Metadata {
-    #endpointToPolicy: Record<string, AuthorizationPolicyBuilder[]> = {};
-    #routes: HttpRouteMetadata[] = [];
-    #parameters = new Map<string, ParameterMetadata[]>();
-    #middlewares = new Map<string, HttpEndpointMiddlewareMetadata[]>();
-    #endpoints: HttpEndpointMetadata[] = [];
-    static MetadataKey = generateAlphabeticString();
-    private metadataKey(methodName: string, endpoint: string | RegExp) {
-        return `${Metadata.MetadataKey}:${methodName}:${endpoint}`;
-    }
+	#endpointToPolicy: Record<string, AuthorizationPolicyBuilder[]> = {};
+	#routes: HttpRouteMetadata[] = [];
+	#parameters = new Map<string, ParameterMetadata[]>();
+	#middlewares = new Map<string, HttpEndpointMiddlewareMetadata[]>();
+	#endpoints: HttpEndpointMetadata[] = [];
+	static MetadataKey = generateAlphabeticString();
+	private metadataKey(methodName: string, endpoint: string | RegExp) {
+		return `${Metadata.MetadataKey}:${methodName}:${endpoint}`;
+	}
 
-    registerHttpEndpointMiddleware(httpEndpointMiddlewareMetadata: HttpEndpointMiddlewareMetadata) {
-        logger.debug('Registering Endpoint Middleware', httpEndpointMiddlewareMetadata.getHandlerName());
-        const middlewares = this.#middlewares.get(httpEndpointMiddlewareMetadata.getHandlerName()) ?? [];
-        middlewares.push(httpEndpointMiddlewareMetadata);
-        this.#middlewares.set(httpEndpointMiddlewareMetadata.getHandlerName(), middlewares);
-    }
+	public RegisterHttpEndpointMiddleware(
+		httpEndpointMiddlewareMetadata: HttpEndpointMiddlewareMetadata
+	) {
+		// FIXME: to be removed - each HttpEndpointMetadata should hold array of middlewares and not added to metadata state
+		logger.debug(
+			"Registering Endpoint Middleware",
+			httpEndpointMiddlewareMetadata.getHandlerName()
+		);
+		const middlewares =
+			this.#middlewares.get(httpEndpointMiddlewareMetadata.getHandlerName()) ??
+			[];
+		middlewares.push(httpEndpointMiddlewareMetadata);
+		this.#middlewares.set(
+			httpEndpointMiddlewareMetadata.getHandlerName(),
+			middlewares
+		);
+	}
 
-    RegisterHttpEndpointMiddlewareV2(httpEndpointMetadata: HttpEndpointMetadata, ...middlewares: RequestHandler[]) {
-        httpEndpointMetadata.middlewares.push(...middlewares)
-    }
+	public RegisterHttpEndpointMiddlewareV2(
+		httpEndpointMetadata: HttpEndpointMetadata,
+		...middlewares: RequestHandler[]
+	) {
+		httpEndpointMetadata.middlewares.push(...middlewares);
+	}
 
-    registerParameter(parameterMetadata: ParameterMetadata) {
-        logger.debug('Registering Parameter for ', parameterMetadata.getHandlerName(), ' at index ', parameterMetadata.index);
-        const parameters = this.#parameters.get(parameterMetadata.getHandlerName()) ?? [];
-        parameters.push(parameterMetadata);
-        this.#parameters.set(parameterMetadata.getHandlerName(), parameters);
-    }
+	public RegisterParameter(parameterMetadata: ParameterMetadata) {
+		logger.debug(
+			"Registering Parameter for ",
+			parameterMetadata.getHandlerName(),
+			" at index ",
+			parameterMetadata.index
+		);
+		const parameters =
+			this.#parameters.get(parameterMetadata.getHandlerName()) ?? [];
+		parameters.push(parameterMetadata);
+		this.#parameters.set(parameterMetadata.getHandlerName(), parameters);
+	}
 
-    registerHttpEndpoint(httpEndpointMetadata: HttpEndpointMetadata) {
-        logger.debug('Registering Endpoint', httpEndpointMetadata.getHandlerName());
-        const { endpoint, method, controller } = httpEndpointMetadata;
-        const key = this.metadataKey(method, endpoint);
-        Reflect.defineMetadata(key, httpEndpointMetadata, controller);
-        this.#endpoints.push(httpEndpointMetadata);
-    }
+	public RegisterHttpEndpoint(httpEndpointMetadata: HttpEndpointMetadata) {
+		logger.debug("Registering Endpoint", httpEndpointMetadata.getHandlerName());
+		const { endpoint, method, controller } = httpEndpointMetadata;
+		const key = this.metadataKey(method, endpoint);
+		Reflect.defineMetadata(key, httpEndpointMetadata, controller);
+		this.#endpoints.push(httpEndpointMetadata);
+	}
 
-    registerHttpRoute(httpRouteMetadata: HttpRouteMetadata) {
-        logger.debug('Registering Route', httpRouteMetadata.controller.name);
-        this.#routes.push(httpRouteMetadata);
-    }
+	public RegisterHttpRoute(httpRouteMetadata: HttpRouteMetadata) {
+		logger.debug("Registering Route", httpRouteMetadata.controller.name);
+		this.#routes.push(httpRouteMetadata);
+	}
 
-    GetHttpRoutes() {
-        return Array.from(this.#routes);
-    }
+	public GetHttpRoutes() {
+		return Array.from(this.#routes);
+	}
 
-    GetHttpEndpoint(methodName: string, endpoint: string | RegExp) {
+	public GetHttpEndpoint(methodName: string, endpoint: string | RegExp) {}
 
-    }
+	public RegisterPolicy(
+		controller: Function,
+		propertyKey: string,
+		policy: AuthorizationPolicyBuilder
+	) {
+		const key = makeHandlerName(controller, propertyKey);
+		logger.debug("Registering Policy", key);
+		if (!Array.isArray(this.#endpointToPolicy[key])) {
+			this.#endpointToPolicy[key] = [];
+		}
+		this.#endpointToPolicy[key].push(policy);
+	}
 
-    RegisterAuthorize(controller: Function, propertyKey: string, middleware: any) {
-        const key = makeHandlerName(controller, propertyKey);
-        logger.debug('Registering Authorize', key);
-        const middlewares = Reflect.getMetadata(key, controller) ?? [];
-        middlewares.push(middleware);
-        Reflect.defineMetadata(key, middlewares, controller);
-    }
+	public GetPolices(httpEndpointMetadata: HttpEndpointMetadata) {
+		return this.#endpointToPolicy[httpEndpointMetadata.getHandlerName()];
+	}
 
-    RegisterPolicy(controller: Function, propertyKey: string, policy: AuthorizationPolicyBuilder) {
-        const key = makeHandlerName(controller, propertyKey);
-        logger.debug('Registering Policy', key);
-        if (!Array.isArray(this.#endpointToPolicy[key])) {
-            this.#endpointToPolicy[key] = [];
-        }
-        this.#endpointToPolicy[key].push(policy)
-    }
+	public RegisterAuthorize(
+		controller: Function,
+		propertyKey: string,
+		middleware: any
+	) {
+		// FIXME: should use registerHttpEndpointMiddleware
+		const key = makeHandlerName(controller, propertyKey);
+		logger.debug("Registering Authorize", key);
+		const middlewares = Reflect.getMetadata(key, controller) ?? [];
+		middlewares.push(middleware);
+		Reflect.defineMetadata(key, middlewares, controller);
+	}
 
-    GetPolices(httpEndpointMetadata: HttpEndpointMetadata) {
-        return this.#endpointToPolicy[httpEndpointMetadata.getHandlerName()];
-    }
+	public GetAuthorizeMiddlewares(
+		httpEndpointMetadata: HttpEndpointMetadata
+	): any[] {
+		const key = httpEndpointMetadata.getHandlerName();
+		return Reflect.getMetadata(key, httpEndpointMetadata.controller) ?? [];
+	}
 
-    GetAuthorizeMiddlewares(httpEndpointMetadata: HttpEndpointMetadata) {
-        const key = httpEndpointMetadata.getHandlerName();
-        return Reflect.getMetadata(key, httpEndpointMetadata.controller) ?? [];
-    }
+	public GetHttpRoute(child: any) {
+		return this.#routes.find((route) => route.controller === child);
+	}
 
-    GetHttpRoute(child: any) {
-        return this.#routes.find(route => route.controller === child);
-    }
+	public GetEndpoints(constructor: Type<any>) {
+		return (Reflect.getMetadataKeys(constructor) as string[])
+			.filter((it) => it.startsWith(Metadata.MetadataKey))
+			.map(
+				(it) =>
+					[Reflect.getMetadata, Reflect.deleteMetadata].map((_) =>
+						_(it, constructor)
+					)[0]
+			)
+			.filter(notEmpty) as HttpEndpointMetadata[];
+	}
 
-    GetEndpoints(constructor: Type<any>) {
-        return (Reflect.getMetadataKeys(constructor) as string[])
-            .filter(it => it.startsWith(Metadata.MetadataKey))
-            .map(it => [Reflect.getMetadata, Reflect.deleteMetadata].map(_ => _(it, constructor))[0])
-            .filter(notEmpty) as HttpEndpointMetadata[];
-    }
+	public getHttpEndpointParameters(handlerName: string) {
+		return this.#parameters.get(handlerName) ?? [];
+	}
 
-    getHttpEndpointParameters(handlerName: string) {
-        return this.#parameters.get(handlerName) ?? [];
-    }
-
-    GetHttpEndpointMiddlewares(handlerName: string) {
-        return this.#middlewares.get(handlerName) ?? [];
-    }
-
+	public GetHttpEndpointMiddlewares(handlerName: string) {
+		return this.#middlewares.get(handlerName) ?? [];
+	}
 }
