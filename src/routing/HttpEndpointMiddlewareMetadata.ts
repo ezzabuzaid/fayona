@@ -1,5 +1,6 @@
+import { makeHandlerName } from "./Utils";
 
-export class HttpRemoveEndpointMiddlewareMetadata {
+export class HttpEndpointMiddlewareMetadata {
     constructor(
         public middleware: () => any,
         public controller: Function,
@@ -7,7 +8,7 @@ export class HttpRemoveEndpointMiddlewareMetadata {
     ) { }
 
     getHandlerName() {
-        return this.controller.name + this.handler.name;
+        return makeHandlerName(this.controller, this.handler.name);
     }
 }
 

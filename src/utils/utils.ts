@@ -4,7 +4,7 @@ export type Type<T> = new (...args: any[]) => T;
 // export type Type<T> = Function & { prototype: T }
 
 export type Parameter<T extends (args: any) => any> = T extends (args: infer P) => any ? P : never;
-
+export type Action<T, R = void> = (args: T) => R;
 
 export function isNullOrUndefined(value: any): value is undefined | null {
     return value === undefined || value === null;

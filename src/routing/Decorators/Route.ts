@@ -2,10 +2,13 @@ import { Request, RequestHandler, Response, Router as expressRouter } from 'expr
 import { RequestHandlerParams } from 'express-serve-static-core';
 import path from 'path';
 import { Injector } from 'tiny-injector';
+import { AuthorizationService, SecureUserToken } from '../../Identity';
+import { HttpEndpointMetadata } from '../../Routing/HttpEndpointMetadata';
 import { isEmptyString, Type } from '../../utils';
+import { RoutingInjector } from '../../utils/Collections';
 import { construct } from '../../validation';
 import { autoHandler } from '../AutoHandler';
-import { HttpRemoveEndpointMiddlewareMetadata } from '../HttpRemoveEndpointMiddlewareMetadata';
+import { HttpEndpointMiddlewareMetadata } from '../HttpEndpointMiddlewareMetadata';
 import { HttpRouteMetadata } from '../HttpRouteMetadata';
 import { IRouterDecorationOption } from '../IRouterDecorationOption';
 import { Metadata } from '../Metadata';
@@ -27,7 +30,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
 
         if (Array.isArray(options.children) && options.children.length > 0) {
             options.children.forEach((childController) => {
-                const childRoute = metadata.getHttpRoute(childController);
+                const childRoute = metadata.GetHttpRoute(childController);
                 if (childRoute) {
                     router.use(childRoute.endpoint, childRoute.router);
                 } else {
@@ -41,7 +44,7 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
             router,
             normalizedEndpoint
         ))
-        Injector.AddScoped(constructor as any);
+        RoutingInjector.AddScoped(constructor as any);
 
         // FIXME: reorder the routes to have the path variable routes at end
         // e.g
@@ -51,14 +54,14 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
         // 2. /:id
         // 1. /filter
         // so we avoid hitting wrong resource
-        metadata.getEndpoints(constructor)
-            .forEach(routeMetadata => {
-                const normalizedEndpoint = routeMetadata.endpoint instanceof RegExp ? routeMetadata.endpoint : path.normalize(path.join('/', routeMetadata.endpoint));
+        metadata.GetEndpoints(constructor)
+            .forEach(httpEndpointMetadata => {
+                const normalizedEndpoint = httpEndpointMetadata.endpoint instanceof RegExp ? httpEndpointMetadata.endpoint : path.normalize(path.join('/', httpEndpointMetadata.endpoint));
                 const endpointHandler = async function () {
                     const [request, response] = Array.from(arguments) as [Request, Response];
                     const controllerInstance = request.inject(constructor);
                     const parameters = [];
-                    const endpointParameters = metadata.getHttpEndpointParameters(routeMetadata.getHandlerName()).reverse();
+                    const endpointParameters = metadata.getHttpEndpointParameters(httpEndpointMetadata.getHandlerName()).reverse();
                     for (const parameterMetadata of endpointParameters) {
                         switch (parameterMetadata.type) {
                             case ParameterType.FROM_HEADER:
@@ -124,12 +127,16 @@ export function Route(endpoint?: string, options: IRouterDecorationOption = {}) 
                                 break;
                         }
                     }
-                    return routeMetadata.handler.apply(controllerInstance, parameters as []);
+                    return httpEndpointMetadata.handler.apply(controllerInstance, parameters as []);
                 }
-                const routeMiddlewares = metadata.getHttpEndpointMiddlewares(routeMetadata.getHandlerName());
-                router[routeMetadata.method](normalizedEndpoint, autoHandler(
-                    ...populateRouteMiddlewares(routeMiddlewares, options.middleware),
-                    ...routeMetadata.middlewares,
+                const routeMiddlewares = metadata.GetHttpEndpointMiddlewares(httpEndpointMetadata.getHandlerName());
+                const authorizeMiddlewares = metadata.GetAuthorizeMiddlewares(httpEndpointMetadata);
+                router[httpEndpointMetadata.method](normalizedEndpoint, autoHandler(
+                    ...authorizeMiddlewares,
+                    AuthorizeMiddlewares(httpEndpointMetadata),
+                    // ...populateRouteMiddlewares(routeMiddlewares, options.middleware),
+                    ...(options.middleware ?? []),
+                    ...httpEndpointMetadata.middlewares,
                     endpointHandler
                 ));
             });
@@ -149,7 +156,7 @@ function normalizeEndpoint(target: Record<string, any>, endpoint: string) {
     return path.normalize(path.join('/', mappedValue, '/'));
 }
 
-function populateRouteMiddlewares(listRemoveEndpointMiddlewareMetadata: HttpRemoveEndpointMiddlewareMetadata[], parentMiddlewares?: RequestHandler[] | RequestHandlerParams[]) {
+function populateRouteMiddlewares(listRemoveEndpointMiddlewareMetadata: HttpEndpointMiddlewareMetadata[], parentMiddlewares?: RequestHandler[] | RequestHandlerParams[]) {
     const clonedParentMiddlewares = parentMiddlewares?.slice(0) ?? [];
     const middlewares = listRemoveEndpointMiddlewareMetadata.map(endpointMiddleware => endpointMiddleware.middleware.toString());
     const index = clonedParentMiddlewares.findIndex(parentMiddleware => middlewares.includes(parentMiddleware.toString()));
@@ -159,7 +166,22 @@ function populateRouteMiddlewares(listRemoveEndpointMiddlewareMetadata: HttpRemo
     return clonedParentMiddlewares;
 }
 
-
 function userDefinedType(type: any) {
     return !([String, Number, Object, Symbol, Date, Promise, Proxy].includes(type));
+}
+
+const AuthorizeMiddlewares: (httpEndpointMetadata: HttpEndpointMetadata) => RequestHandler = (httpEndpointMetadata) => async (req, res, next) => {
+    const metadata = Injector.GetRequiredService(Metadata);
+    const authorizationService = req.inject(AuthorizationService);
+    const polices = metadata.GetPolices(httpEndpointMetadata);
+    const result = authorizationService.Authorize(
+        await req.inject(SecureUserToken as any),
+        polices.map(it => it.Requirements).flat(),
+    );
+    if (result.Succeeded) {
+        next();
+    } else {
+        console.log(result);
+        next(result)
+    }
 }

@@ -1,54 +1,96 @@
 import { NextFunction, Request, Response } from "express";
 import glob from "fast-glob";
 import { StatusCodes } from "http-status-codes";
+import passport from "passport";
 import path from "path";
 import { Injector } from "tiny-injector";
 import { Logger } from "tslog";
-import { ConfigureOptions, CONFIGURE_OPTIONS } from "./ConfigureOptions";
+import { ConfigureOptions } from "./ConfigureOptions";
 import { Environment } from "./Environment";
+import { AuthenticationOptions, AuthorizationEvaluator, AuthorizationOptions, AuthorizationService, IAuthorizationHandler, PassThroughAuthorizationHandler } from "./Identity";
 import { requestIdMiddleware, RequestIdOptions } from "./RequestId";
 import { ErrorResponse, HttpResponse, SuccessResponse } from "./Response";
 import { autoHandler } from "./Routing/AutoHandler";
 import { Metadata } from "./Routing/Metadata";
+import { RoutingCollection, RoutingInjector } from "./utils/Collections";
 const logger = new Logger({ name: 'WebApplication' })
+
+declare module 'tiny-injector' {
+    export interface AbstractServiceCollection {
+    }
+}
 
 export class WebApplicationBuilder {
     public Environment = new Environment();
+    public Services = RoutingCollection;
+
+    constructor(
+        private options: ConfigureOptions
+    ) { }
 
     AddHsts() { }
 
     AddRequestId(optFn: (options: RequestIdOptions) => void) {
         const options = new RequestIdOptions();
         optFn(options);
-        Injector.ReplaceScoped(RequestIdOptions, () => options);
+        this.Services.TryAddTransient(RequestIdOptions, () => options);
+    }
+
+    AddAuthorization(optFn: (options: AuthorizationOptions) => void) {
+        const options = new AuthorizationOptions();
+        optFn(options);
+        // Add auth related services here and not using "Injectable"
+        // https://github.com/dotnet/aspnetcore/blob/main/src/Security/Authorization/Core/src/AuthorizationServiceCollectionExtensions.cs
+        this.Services.TryAddTransient(AuthorizationService);
+        this.Services.TryAddTransient(AuthorizationEvaluator);
+        this.Services.AppendTransient(IAuthorizationHandler, PassThroughAuthorizationHandler)
+        this.Services.AddSingleton(AuthorizationOptions, () => options);
+    }
+
+    AddAuthentication(optFn: (options: AuthenticationOptions) => void) {
+        const options = new AuthenticationOptions();
+        optFn(options);
+        this.Services.AddSingleton(AuthenticationOptions, () => options);
     }
 
     Build() {
-        return new WebApplication();
+        return new WebApplication(this.options);
     }
 }
 
 export class WebApplication {
-    #application = this.#options.apiAdaptar;
+    // private Services = _RootServicesCollection;
+    #application = this.options.apiAdaptar;
+    // FIXME: create custom service collection for metadata
     #metadata = Injector.GetRequiredService(Metadata);
     #basePath: string = '';
 
-    get #options() {
-        return Injector.GetRequiredService(CONFIGURE_OPTIONS);
-    }
+    constructor(
+        private options: ConfigureOptions
+    ) { }
 
     static CreateBuilder(
         options: ConfigureOptions
     ) {
-        Injector.AddSingleton(CONFIGURE_OPTIONS, () => options);
-        return new WebApplicationBuilder();
+        return new WebApplicationBuilder(options);
     }
 
     private static Create(
         options: ConfigureOptions
     ) {
-        Injector.AddSingleton(CONFIGURE_OPTIONS, () => options);
-        return new WebApplicationBuilder();
+        return new WebApplicationBuilder(options);
+    }
+
+    public UseAuthentication() {
+        const authenticationOptions = RoutingInjector.GetRequiredService(AuthenticationOptions);
+        const strategy = authenticationOptions.Strategies.find((it) => it.Name === authenticationOptions.DefaultStrategyName);
+        if (!strategy) {
+            throw new Error(`${authenticationOptions.DefaultStrategyName} is not configured.`);
+        }
+        passport.use(authenticationOptions.DefaultStrategyName, strategy.Strategy);
+    }
+
+    public UseAuthorization() {
     }
 
     LogEndpoints() {
@@ -56,14 +98,14 @@ export class WebApplication {
     }
 
     AddControllers() {
-        glob.sync(this.#options.controllers, { absolute: true })
+        glob.sync(this.options.controllers, { absolute: true })
             .forEach(filePath => {
                 require(filePath);
             });
     }
 
     UseRouting() {
-        this.#metadata.getHttpRoutes()
+        this.#metadata.GetHttpRoutes()
             .forEach(({ router, endpoint }) => {
                 const prefixedEndpoint = path.join(this.#basePath ?? '/', endpoint);
                 logger.info('register endpoint', prefixedEndpoint);
@@ -133,13 +175,14 @@ export class WebApplication {
 
     private DIMiddleware() {
         return (req: Request, res: Response, next: NextFunction) => {
-            const context = Injector.Create();
-            const dispose = () => Injector.Destroy(context);
+            const context = RoutingInjector.Create();
+            const dispose = () => RoutingInjector.Destroy(context);
             context.setExtra('request', req);
             ['error', 'end'].forEach((eventName) => {
                 req.on(eventName, dispose);
             });
-            req.inject = (serviceType) => Injector.GetRequiredService(serviceType, context);
+            req.__InjectionContext = context;
+            req.inject = (serviceType) => RoutingInjector.GetRequiredService(serviceType, context);
             next();
         }
     }
@@ -158,3 +201,4 @@ export class WebApplication {
     }
 
 }
+

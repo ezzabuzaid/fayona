@@ -6,4 +6,5 @@ export class HttpRouteMetadata {
         public router: ReturnType<typeof express.Router>,
         public endpoint: string,
     ) { }
+
 }
