@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@fayona/core": ["libs/core/src/index.ts"],
       "@fayona/identity": ["libs/identity/src/index.ts"]
     }
   },
