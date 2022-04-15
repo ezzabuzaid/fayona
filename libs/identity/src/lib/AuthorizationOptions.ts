@@ -1,7 +1,7 @@
+import { Action } from '@fayona/utils';
 import { Injectable } from 'tiny-injector';
 import { AuthorizationPolicy } from './AuthorizationPolicy';
 import { AuthorizationPolicyBuilder } from './AuthorizationPolicyBuilder';
-import { Action } from './Utils';
 
 @Injectable()
 export class AuthorizationOptions {

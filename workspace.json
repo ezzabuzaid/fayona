@@ -2,6 +2,7 @@
   "version": 2,
   "projects": {
     "core": "libs/core",
-    "identity": "libs/identity"
+    "identity": "libs/identity",
+    "utils": "libs/utils"
   }
 }

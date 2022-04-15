@@ -1,4 +1,4 @@
-import passport from 'passport';
+import * as passport from 'passport';
 import { Injector } from 'tiny-injector';
 import { Metadata } from '../../Routing/Metadata';
 import { RoutingInjector } from '../../utils/Collections';

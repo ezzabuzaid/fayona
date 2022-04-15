@@ -4,10 +4,10 @@
 // 		return false
 // 	}
 
+import { Action, IsNullOrUndefined } from '@fayona/utils';
 import { InjectionToken, ServiceLifetime } from 'tiny-injector';
 import { RoutingCollection } from '../../utils/Collections';
 import { ROLE_CLAIM_TYPE } from './RoleClaimType';
-import { Action, IsNullOrUndefined } from './Utils';
 
 // 	HasClaim(type: string, value: string): boolean {
 // 		return this.Identities.some(it => it.HasClaim(type, value))
