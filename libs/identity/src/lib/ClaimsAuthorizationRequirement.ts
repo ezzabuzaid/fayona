@@ -6,7 +6,7 @@ export class ClaimsAuthorizationRequirement
   extends AuthorizationHandler<ClaimsAuthorizationRequirement>
   implements IAuthorizationRequirement
 {
-  constructor(public claimType: string, public allowedValues: string[] | null) {
+  constructor(public ClaimType: string, public AllowedValues: string[] | null) {
     super();
   }
 
@@ -14,14 +14,18 @@ export class ClaimsAuthorizationRequirement
     context: AuthorizationHandlerContext,
     requirement: ClaimsAuthorizationRequirement
   ): void {
-    const found = false;
+    let found = false;
     if (
-      requirement.allowedValues == null ||
-      requirement.allowedValues.length === 0
+      requirement.AllowedValues == null ||
+      requirement.AllowedValues.length === 0
     ) {
-      context.User.HasClaim(requirement.claimType, null);
+      found = context.User.HasClaim(requirement.ClaimType);
     } else {
-      context.User.HasClaim(requirement.claimType, requirement.allowedValues);
+      found = context.User.HasClaim(
+        (claim) =>
+          claim.Type === this.ClaimType &&
+          this.AllowedValues!.includes(claim.Value)
+      );
     }
     if (found) {
       context.Succeed(requirement);
@@ -31,12 +35,12 @@ export class ClaimsAuthorizationRequirement
   // eslint-disable-next-line @typescript-eslint/naming-convention
   public override toString(): string {
     const value =
-      this.allowedValues == null || this.allowedValues.length === 0
+      this.AllowedValues == null || this.AllowedValues.length === 0
         ? ''
-        : `and Claim.Value is one of the following values: (${this.allowedValues.join(
+        : `and Claim.Value is one of the following values: (${this.AllowedValues.join(
             ' | '
           )})`;
 
-    return `{nameof(ClaimsAuthorizationRequirement)}:Claim.Type=${this.claimType}${value}`;
+    return `{nameof(ClaimsAuthorizationRequirement)}:Claim.Type=${this.ClaimType}${value}`;
   }
 }

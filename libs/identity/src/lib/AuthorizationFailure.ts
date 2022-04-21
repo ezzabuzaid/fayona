@@ -4,7 +4,7 @@ import { IAuthorizationRequirement } from './IAuthorizationRequirement';
 export class AuthorizationFailure {
   public FailedRequirements: IAuthorizationRequirement[] = [];
   public FailureReasons: AuthorizationFailureReason[] = [];
-  private constructor(public failCalled?: boolean) {}
+  private constructor(public FailCalled?: boolean) {}
 
   public static ExplicitFail(): AuthorizationFailure {
     return new AuthorizationFailure(true);

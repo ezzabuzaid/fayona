@@ -1,33 +1,20 @@
+import { MakeHandlerName } from '@fayona/utils';
 import * as passport from 'passport';
 import { Injector } from 'tiny-injector';
-import { Metadata } from '../../Routing/Metadata';
-import { RoutingInjector } from '../../utils/Collections';
-import { AuthenticationOptions } from './AuthenticationOptions';
+
+import { AuthenticationOptions } from './Authentication/AuthenticationOptions';
 import { AuthorizationOptions } from './AuthorizationOptions';
+import { IAuthorizeData } from './IAuthorizeData';
+import { IdentityInjector } from './IdentityServiceCollection';
+import { Metadata } from './Metadata';
 
-/**
- * Check if the user carry the intened roles
- *
- * Authorize("HRManager") only HRManager users are authorized to continue
- *
- * Authorize("HRManager", "Finance") only HRManager or Finance users are authorized to continue
- *
- * [Authorize("HRManager"), Authorize("Finance")] only users of both HRManager and Finance roles are authorized to continue
- *
- * Will throw Forbidden response in case of authenticated user but not authorized
- */
-interface IAuthorizeData {
-  StrategyName?: string;
-  Role?: string[] | string;
-  Claim?: string;
-  Policy: string;
-}
-
-export function Authorize(authorizeData?: IAuthorizeData): PropertyDecorator {
-  return (target, propertyKey) => {
+export function Authorize(authorizeData?: IAuthorizeData): any {
+  return (target: Function, propertyKey: string): void => {
+    // FIXME: throw error if UseAuthorization is not called
+    const endpointId = MakeHandlerName(target, propertyKey);
     const authorizationOptions =
-      RoutingInjector.GetRequiredService(AuthorizationOptions);
-    const authenticationOptions = RoutingInjector.GetRequiredService(
+      IdentityInjector.GetRequiredService(AuthorizationOptions);
+    const authenticationOptions = IdentityInjector.GetRequiredService(
       AuthenticationOptions
     );
     const strategyName =
@@ -35,23 +22,17 @@ export function Authorize(authorizeData?: IAuthorizeData): PropertyDecorator {
     const policyName = authorizeData?.Policy;
     const metadata = Injector.GetRequiredService(Metadata);
     if (policyName) {
+      // FIXME: I do not know how, but no injector should be here
+      // This decorator should be purly used as Annotation
       const policy = authorizationOptions.GetPolicy(policyName);
       if (policy) {
-        metadata.RegisterPolicy(
-          target.constructor,
-          propertyKey as string,
-          policy
-        );
+        metadata.RegisterPolicy(endpointId, policy);
       } else {
         // TODO: throw an error if the policy is not exist
       }
     }
     // the below lines should be replaced by "RequireAuthenticatedUsers"
-    const middleware = passport.authenticate(strategyName, { session: false });
-    metadata.RegisterAuthorize(
-      target.constructor,
-      propertyKey as string,
-      middleware
-    );
+    // const middleware = passport.authenticate(strategyName, { session: false });
+    // metadata.RegisterAuthorize(endpointId, middleware);
   };
 }

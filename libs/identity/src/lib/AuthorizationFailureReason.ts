@@ -1,5 +1,5 @@
 import { IAuthorizationHandler } from './IAuthorizationHandler';
 
 export class AuthorizationFailureReason {
-  constructor(public handler: IAuthorizationHandler, public message: string) {}
+  constructor(public Handler: IAuthorizationHandler, public Message: string) {}
 }

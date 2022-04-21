@@ -1,10 +1,13 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "outDir": "../dist/out-tsc/tools",
     "rootDir": ".",
     "module": "commonjs",
     "target": "es5",
+    "allowJs": true,
     "types": ["node"],
     "importHelpers": false
   },

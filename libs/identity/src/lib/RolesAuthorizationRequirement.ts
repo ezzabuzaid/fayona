@@ -6,7 +6,7 @@ export class RolesAuthorizationRequirement
   extends AuthorizationHandler<RolesAuthorizationRequirement>
   implements IAuthorizationRequirement
 {
-  constructor(private allowedRoles: string[]) {
+  constructor(private AllowedRoles: readonly string[]) {
     super();
     // if (allowedRoles == null) {
     //     throw new ArgumentNullException('allowedRoles');
@@ -20,15 +20,20 @@ export class RolesAuthorizationRequirement
     context: AuthorizationHandlerContext,
     requirement: RolesAuthorizationRequirement
   ): void {
-    if (context.User.IsInRole(this.allowedRoles)) {
-      context.User.Print();
+    let found = false;
+    if (!this.AllowedRoles?.length) {
+      // let it fail
+    } else {
+      found = this.AllowedRoles.some((role) => context.User.IsInRole(role));
+    }
+    if (found) {
       context.Succeed(requirement);
     }
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
   public override toString(): string {
-    const roles = `User.IsInRole must be true for one of the following roles: (${this.allowedRoles.join(
+    const roles = `User.IsInRole must be true for one of the following roles: (${this.AllowedRoles.join(
       ' | '
     )})`;
     return `{RolesAuthorizationRequirement}:${roles}`;
