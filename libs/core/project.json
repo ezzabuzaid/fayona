@@ -13,6 +13,53 @@
         "updateBuildableProjectDepsInPackageJson": true
       }
     },
+
+    "release": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "conventional",
+        "tagPrefix": "",
+        "baseBranch": "master",
+        "push": true,
+        "postTargets": ["core:github", "core:publish"]
+      }
+    },
+    "pre-release": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "conventional",
+        "tagPrefix": "",
+        "baseBranch": "beta",
+        "releaseAs": "prerelease",
+        "preid": "beta",
+        "push": true,
+        "postTargets": ["core:github", "core:beta-publish"]
+      }
+    },
+    "github": {
+      "executor": "@jscutlery/semver:github",
+      "options": {
+        "tag": "${tag}",
+        "notes": "${notes}"
+      }
+    },
+    "publish": {
+      "executor": "ngx-deploy-npm:deploy",
+      "options": {
+        "noBuild": false,
+        "access": "public",
+        "buildTarget": "production"
+      }
+    },
+    "beta-publish": {
+      "executor": "ngx-deploy-npm:deploy",
+      "options": {
+        "noBuild": false,
+        "access": "public",
+        "buildTarget": "production",
+        "tag": "beta"
+      }
+    },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
