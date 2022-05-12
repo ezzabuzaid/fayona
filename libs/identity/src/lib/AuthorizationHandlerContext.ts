@@ -1,5 +1,6 @@
+import { ClaimsPrincipal } from '@fayona/core';
+
 import { AuthorizationFailureReason } from './AuthorizationFailureReason';
-import { ClaimsPrincipal } from './Claims/ClaimsPrincipal';
 import { IAuthorizationHandler } from './IAuthorizationHandler';
 import { IAuthorizationRequirement } from './IAuthorizationRequirement';
 
@@ -11,7 +12,7 @@ export class AuthorizationHandlerContext {
   constructor(
     // Requirements can be both simple Requirement and AuthorizationHandler
     // PassThroughAuthorizationHandler will help in invoking requirments that are AuthorizationHandler
-    public Requirements: IAuthorizationRequirement[] = [],
+    public Requirements: readonly IAuthorizationRequirement[] = [],
     public User: ClaimsPrincipal
   ) {
     this.PendingRequirements = this.Requirements.slice(0);

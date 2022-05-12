@@ -1,3 +1,5 @@
+import { ArgumentNullException, IsNullOrEmpty } from '@fayona/core';
+
 /**
  * Check if the user carry the intened roles
  *
@@ -9,16 +11,13 @@
  *
  * Will throw Forbidden response in case of authenticated user but not authorized
  */
-export interface IAuthorizeData {
+export abstract class IAuthorizeData {
   /**
    * Do not use
    */
-  Claim?: string;
-  /**
-   * Do not use
-   */
-  StrategyName?: string;
+  public Claim?: string;
 
-  Roles?: string[] | string;
-  Policy: string;
+  public Roles?: string[] | string = [];
+  public AuthenticationSchemes?: string | string[];
+  public Policy?: string;
 }

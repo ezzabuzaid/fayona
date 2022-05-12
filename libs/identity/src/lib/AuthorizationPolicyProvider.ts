@@ -21,6 +21,6 @@ export class DefaultAuthorizationPolicyProvider
     return this.AuthorizeOptions.DefaultPolicy;
   }
   public GetFallbackPolicy(): AuthorizationPolicy | undefined {
-    return this.AuthorizeOptions.DefaultPolicy;
+    return this.AuthorizeOptions.FallbackPolicy;
   }
 }

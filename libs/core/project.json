@@ -9,7 +9,8 @@
         "outputPath": "dist/libs/core",
         "main": "libs/core/src/index.ts",
         "tsConfig": "libs/core/tsconfig.lib.json",
-        "assets": ["libs/core/*.md"]
+        "assets": ["libs/core/*.md"],
+        "updateBuildableProjectDepsInPackageJson": true
       }
     },
     "lint": {
@@ -23,7 +24,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/core"],
       "options": {
-        "jestConfig": "libs/core/jest.config.js",
+        "jestConfig": "libs/core/jest.config.ts",
         "passWithNoTests": true
       }
     }

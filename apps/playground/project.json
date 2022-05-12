@@ -1,0 +1,44 @@
+{
+  "root": "apps/playground",
+  "sourceRoot": "apps/playground/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/node:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/playground",
+        "main": "apps/playground/src/main.ts",
+        "tsConfig": "apps/playground/tsconfig.app.json",
+        "assets": ["apps/playground/src/assets"]
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false,
+          "fileReplacements": [
+            {
+              "replace": "apps/playground/src/environments/environment.ts",
+              "with": "apps/playground/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/node:node",
+      "options": {
+        "buildTarget": "playground:build"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/playground/**/*.ts"]
+      }
+    }
+  },
+  "tags": []
+}

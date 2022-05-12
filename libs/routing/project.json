@@ -1,0 +1,32 @@
+{
+  "root": "libs/routing",
+  "sourceRoot": "libs/routing/src",
+  "targets": {
+    "build": {
+      "executor": "./tools/executors/pages:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/routing",
+        "main": "libs/routing/src/index.ts",
+        "tsConfig": "libs/routing/tsconfig.lib.json",
+        "assets": ["libs/routing/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/routing/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/routing"],
+      "options": {
+        "jestConfig": "libs/routing/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

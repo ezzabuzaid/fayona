@@ -1,14 +1,16 @@
-import { WebApplicationBuilder } from '@fayona/core';
+import {
+  IWebApplication,
+  WebApplication,
+  WebApplicationBuilder,
+} from '@fayona/core';
 
-declare module '@fayona/core' {
-  export interface IWebApplication {
-    UseAuthorization(): void;
-  }
-}
+import { AuthorizationMiddleware } from './AuthorizationMiddleware';
 
 const prototype: import('@fayona/core').IWebApplication =
-  WebApplicationBuilder.prototype as any;
+  WebApplication.prototype as any;
 
-prototype.UseAuthorization = function (): void {
+prototype.UseAuthorization = function (): IWebApplication {
   // TODO Add auth middleware here
+  this.UseMiddleware(AuthorizationMiddleware);
+  return this;
 };

@@ -4,8 +4,10 @@ import {
 } from './AuthenticateResult';
 
 export abstract class IAuthenticationHandler {
-  public abstract InitializeAsync(): void;
-  public abstract AuthenticateAsync(): AuthenticateResult;
-  public abstract ChallengeAsync(properties?: AuthenticationProperties): void;
-  public abstract ForbidAsync(properties?: AuthenticationProperties): void;
+  public abstract Initialize(): Promise<void>;
+  public abstract Authenticate(): Promise<AuthenticateResult>;
+  public abstract Challenge(
+    properties?: AuthenticationProperties
+  ): Promise<void>;
+  public abstract Forbid(properties?: AuthenticationProperties): Promise<void>;
 }

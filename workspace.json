@@ -3,6 +3,7 @@
   "projects": {
     "core": "libs/core",
     "identity": "libs/identity",
-    "utils": "libs/utils"
+    "playground": "apps/playground",
+    "routing": "libs/routing"
   }
 }

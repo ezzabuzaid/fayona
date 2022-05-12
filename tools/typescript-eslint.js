@@ -1,5 +1,6 @@
 module.exports = {
   "rules": {
+    "prefer-spread": "off",
     "@typescript-eslint/naming-convention": [
       "error",
       {
@@ -20,7 +21,7 @@ module.exports = {
       },
       {
         "selector": ["parameterProperty"],
-        "format": ["PascalCase"]
+        "format": ["PascalCase", "camelCase"]
       },
       {
         "selector": "enumMember",
@@ -64,6 +65,9 @@ module.exports = {
         "default": "array"
       }
     ],
+    "no-case-declarations": "off",
+    "prefer-rest-params": "off",
+    "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/explicit-function-return-type": "error",
     "@typescript-eslint/prefer-function-type": "error",
     "@typescript-eslint/member-ordering": [

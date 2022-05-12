@@ -1,13 +1,22 @@
-import type { Strategy } from 'passport';
-import { Injectable } from 'tiny-injector';
+import { InvalidOperationException } from '@fayona/core';
 
-export interface AuthenticationStrategy {
-  Name: string;
-  Strategy: Strategy;
-}
+import { AuthenticationScheme } from './AuthenticationScheme';
 
-@Injectable()
-export class AuthenticationOptions {
-  public Strategies: AuthenticationStrategy[] = [];
-  public DefaultStrategyName!: string;
+export class IAuthenticationOptions {
+  public DefaultScheme?: string;
+  public DefaultAuthenticateScheme?: string;
+  public DefaultChallengeScheme?: string;
+  public SchemasMap = new Map();
+  public Schemas: AuthenticationScheme[] = [];
+
+  public AddScheme(authenticationScheme: AuthenticationScheme): void {
+    if (this.Schemas.some((item) => item)) {
+      throw new InvalidOperationException(
+        `${authenticationScheme} already exist.`
+      );
+    } else {
+      this.Schemas.push(authenticationScheme);
+      this.SchemasMap.set(authenticationScheme.Name, authenticationScheme);
+    }
+  }
 }

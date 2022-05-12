@@ -1,4 +1,4 @@
-import { Action } from '@fayona/utils';
+import { Action } from '@fayona/core';
 import { Injectable } from 'tiny-injector';
 
 import { AuthorizationPolicy } from './AuthorizationPolicy';

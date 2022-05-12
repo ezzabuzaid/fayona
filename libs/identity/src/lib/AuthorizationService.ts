@@ -1,24 +1,33 @@
+import { ClaimsPrincipal } from '@fayona/core';
 import { Inject } from 'tiny-injector';
 
 import { AuthorizationEvaluator } from './AuthorizationEvaluator';
 import { AuthorizationHandlerContext } from './AuthorizationHandlerContext';
+import { AuthorizationOptions } from './AuthorizationOptions';
+import { AuthorizationPolicy } from './AuthorizationPolicy';
 import { AuthorizationResult } from './AuthorizationResult';
-import { ClaimsPrincipal } from './Claims/ClaimsPrincipal';
 import { IAuthorizationHandler } from './IAuthorizationHandler';
 import { IAuthorizationRequirement } from './IAuthorizationRequirement';
 
 export class AuthorizationService {
+  public AuthorizationOptions: AuthorizationOptions;
   constructor(
-    public AuthorizationOptions: import('./AuthorizationOptions').AuthorizationOptions,
+    authorizationOptions: AuthorizationOptions,
     @Inject(IAuthorizationHandler) private Handlers: IAuthorizationHandler[],
     private Evaluator: AuthorizationEvaluator
-  ) {}
+  ) {
+    this.AuthorizationOptions = authorizationOptions;
+  }
+
   // Will run for each policy for a givin endpoint
   public Authorize(
     user: ClaimsPrincipal,
-    requirements: IAuthorizationRequirement[]
+    policy: AuthorizationPolicy
   ): AuthorizationResult {
-    const authContext = new AuthorizationHandlerContext(requirements, user);
+    const authContext = new AuthorizationHandlerContext(
+      policy.Requirements,
+      user
+    );
     for (const handler of this.Handlers) {
       handler.Handle(authContext);
       if (
@@ -29,7 +38,6 @@ export class AuthorizationService {
       }
     }
     const result = this.Evaluator.Evaluate(authContext);
-    console.log(result);
     // Log the result, see in details
     // src/Security/Authorization/Core/src/LoggingExtensions.cs
     return result;

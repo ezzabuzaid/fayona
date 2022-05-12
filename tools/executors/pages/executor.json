@@ -1,0 +1,9 @@
+{
+  "executors": {
+    "build": {
+      "implementation": "./build",
+      "schema": "./schema.json",
+      "description": "Build specific pages with express"
+    }
+  }
+}

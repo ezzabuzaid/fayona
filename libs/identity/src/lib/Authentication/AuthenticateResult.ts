@@ -1,30 +1,25 @@
-import { ClaimsPrincipal } from '../Claims/ClaimsPrincipal';
+import { ClaimsPrincipal } from '@fayona/core';
 
-interface AuthenticationTicket {
-  Principal: ClaimsPrincipal;
-  Properties: AuthenticationProperties;
-}
+import { AuthenticationTicket } from './AuthenticationTicket';
+
 export interface AuthenticationProperties {}
+
+interface IAuthenticateResultOptions {
+  Ticket?: AuthenticationTicket;
+  Properties?: AuthenticationProperties;
+  Failure?: Error;
+  None?: boolean;
+}
 export class AuthenticateResult {
   #None?: boolean;
   #Failure?: Error;
   #Ticket?: AuthenticationTicket;
   #Properties?: AuthenticationProperties;
-  protected constructor({
-    Ticket,
-    Properties,
-    Failure,
-    None,
-  }: {
-    Ticket?: AuthenticationTicket;
-    Properties?: AuthenticationProperties;
-    Failure?: Error;
-    None?: boolean;
-  }) {
-    this.#Ticket = Ticket;
-    this.#Properties = Properties;
-    this.#Failure = Failure;
-    this.#None = None;
+  protected constructor(options: IAuthenticateResultOptions) {
+    this.#Ticket = options.Ticket;
+    this.#Properties = options.Properties;
+    this.#Failure = options.Failure;
+    this.#None = options.None;
   }
   /**
    * If a ticket was produced, authenticate was successful.
@@ -36,7 +31,7 @@ export class AuthenticateResult {
   /**
    * The authentication ticket
    */
-  public get Ticket(): any {
+  public get Ticket(): AuthenticationTicket | undefined {
     return this.#Ticket;
   }
 

@@ -9,7 +9,8 @@
         "outputPath": "dist/libs/identity",
         "main": "libs/identity/src/index.ts",
         "tsConfig": "libs/identity/tsconfig.lib.json",
-        "assets": ["libs/identity/*.md"]
+        "assets": ["libs/identity/*.md"],
+        "updateBuildableProjectDepsInPackageJson": true
       }
     },
     "lint": {
@@ -23,7 +24,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/identity"],
       "options": {
-        "jestConfig": "libs/identity/jest.config.js",
+        "jestConfig": "libs/identity/jest.config.ts",
         "passWithNoTests": true
       }
     }

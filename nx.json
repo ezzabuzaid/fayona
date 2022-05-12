@@ -1,5 +1,5 @@
 {
-  "extends": "@nrwl/workspace/presets/core.json",
+  "extends": "nx/presets/core.json",
   "npmScope": "fayona",
   "affected": {
     "defaultBase": "master"
@@ -9,7 +9,7 @@
     "libsDir": "libs"
   },
   "cli": {
-    "defaultCollection": "@nrwl/workspace",
+    "defaultCollection": "@nrwl/express",
     "packageManager": "yarn"
   },
   "tasksRunnerOptions": {
@@ -29,5 +29,6 @@
       "js": false,
       "pascalCaseFiles": true
     }
-  }
+  },
+  "defaultProject": "playground"
 }

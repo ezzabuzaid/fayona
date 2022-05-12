@@ -1,4 +1,4 @@
-import * as passport from 'passport';
+import { ArgumentNullException, IsNullOrUndefined } from '@fayona/core';
 
 import { AuthorizationPolicy } from './AuthorizationPolicy';
 import { ClaimsAuthorizationRequirement } from './ClaimsAuthorizationRequirement';
@@ -9,6 +9,7 @@ import { RolesAuthorizationRequirement } from './RolesAuthorizationRequirement';
 export class AuthorizationPolicyBuilder {
   public AuthenticationSchemes: string[] = [];
   public Requirements: IAuthorizationRequirement[] = [];
+
   public RequireRole(...allowedRoles: string[]): AuthorizationPolicyBuilder {
     this.Requirements.push(new RolesAuthorizationRequirement(allowedRoles));
     return this;
@@ -32,17 +33,33 @@ export class AuthorizationPolicyBuilder {
     this.Requirements.push(new DenyAnonymousAuthorizationRequirement());
     return this;
   }
-  public AddRequirements(): AuthorizationPolicyBuilder {
+  public AddRequirements(
+    ...requirements: IAuthorizationRequirement[]
+  ): AuthorizationPolicyBuilder {
     return this;
   }
   public AddAuthenticationSchemes(
-    schemes: string[]
+    ...schemes: string[]
   ): AuthorizationPolicyBuilder {
     this.AuthenticationSchemes.push(...schemes);
     return this;
   }
 
   public Build(): AuthorizationPolicy {
-    return new AuthorizationPolicy(this.Requirements);
+    return new AuthorizationPolicy(
+      this.Requirements,
+      this.AuthenticationSchemes
+    );
+  }
+
+  public Combine(policy: AuthorizationPolicy): AuthorizationPolicyBuilder {
+    if (IsNullOrUndefined(policy)) {
+      throw new ArgumentNullException('policy');
+    }
+
+    this.AddAuthenticationSchemes(...policy.AuthenticationSchemes);
+    this.AddRequirements(...policy.Requirements);
+
+    return this;
   }
 }
