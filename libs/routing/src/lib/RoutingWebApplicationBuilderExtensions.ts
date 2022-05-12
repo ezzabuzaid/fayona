@@ -4,18 +4,19 @@ import {
   CoreInjector,
   HttpContext,
   HttpContextBuilder,
+  HttpRouteMetadata,
   IWebApplication,
   IWebApplicationBuilder,
   InvalidOperationException,
   IsNullOrUndefined,
   Metadata,
   Middleware,
+  SaveReturn,
   WEB_APPLICATION_OPTIONS,
   WebApplicationBuilder,
 } from '@fayona/core';
 import { Request, Response } from 'express';
 import * as glob from 'fast-glob';
-import * as promiseStatus from 'promise-status-async';
 import { Context } from 'tiny-injector';
 import { ServiceProvider } from 'tiny-injector/ServiceProvider';
 
@@ -152,20 +153,22 @@ function PatchContextToServiceProvider(context: Context): ServiceProvider {
 
 function AddHttpContext(): void {
   CoreInjector.AddScoped(HttpContext, (context) => {
-    const metadata = CoreInjector.GetRequiredService(Metadata);
     const request: Request = context.getExtra('request');
     const response: Response = context.getExtra('response');
-    const route = metadata.GetHttpRoute(
-      (item) => item.EndpointMap.get(request.url)
-      // FIXME: /example/:id - such route cannot be find because id will be replaced with fixed value
-      // You've to replicate express function that replace those params
-    );
+    // const metadata = CoreInjector.GetRequiredService(Metadata);
+    // const route = SaveReturn(() => {
+    //   return metadata.GetHttpRoute(
+    //     (item) => item.EndpointMap.get(request.url)
+    //     // FIXME: /example/:id - such route cannot be find because id will be replaced with fixed value
+    //     // You've to replicate express function that replace those params
+    //   );
+    // });
     const httpContext = new HttpContextBuilder()
       .SetServiceProvider(PatchContextToServiceProvider(context))
       .SetRequest(request)
       .SetResponse(response)
-      .SetEndpointMetadata(route.EndpointMap.get(request.url))
-      .SetRouteMetadata(route)
+      // .SetEndpointMetadata(route?.EndpointMap.get(request.url))
+      // .SetRouteMetadata(route)
       .Build();
     return httpContext;
   });

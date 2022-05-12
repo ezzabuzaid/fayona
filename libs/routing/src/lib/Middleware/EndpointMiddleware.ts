@@ -6,7 +6,6 @@ import {
 } from '@fayona/core';
 import { InvalidOperationException } from 'tiny-injector';
 
-import { AutoHandler } from '../AutoHandler';
 import { FromBodyModelBinding } from '../ModelBinding/FromBodyModelBinding';
 import { FromHeaderModelBinding } from '../ModelBinding/FromHeaderModelBinding';
 import { FromQueryModelBinding } from '../ModelBinding/FromQueryModelBinding';
@@ -16,10 +15,14 @@ import { HttpResponse } from '../Response';
 
 export class EndpointMiddleware extends Middleware {
   public async Invoke(context: HttpContext, next: any): Promise<void> {
+    const httpEndpointMetadata = context.GetMetadata();
+    if (!httpEndpointMetadata) {
+      await next();
+      return;
+    }
     const request = context.Request;
-    const httpEndpointMetadata = context.EndpointMetadata;
     const parameters: any[] = [];
-    const endpointParameters = context.EndpointMetadata.Parameters.reverse();
+    const endpointParameters = httpEndpointMetadata.Parameters.reverse();
 
     for (const parameterMetadata of endpointParameters) {
       switch (parameterMetadata.Type) {
@@ -76,7 +79,6 @@ export class EndpointMiddleware extends Middleware {
       parameters as []
     ) as unknown as HttpResponse;
     // FIXME: make it clear that all endpoint should return response of type HttpResponse
-    // TODO: check if 4xx and above statuses are considred Problem details
 
     context.Response.status(endpointResponse.StatusCode).json(
       endpointResponse.ToJson()

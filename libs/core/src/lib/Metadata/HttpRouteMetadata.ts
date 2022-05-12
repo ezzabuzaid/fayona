@@ -6,7 +6,7 @@ import { IsNullOrUndefined } from '../Utils/Utils';
 import { HttpEndpointMetadata } from './HttpEndpointMetadata';
 
 export class HttpRouteMetadata {
-  public EndpointMap = new Map();
+  public EndpointMap = new Map<string, HttpEndpointMetadata>();
   constructor(
     public readonly controller: Function,
     public router?: ReturnType<typeof express.Router>,

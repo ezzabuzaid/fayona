@@ -15,6 +15,7 @@
     "ngx-deploy-npm": "^3.1.9",
     "passport": "^0.5.2",
     "promise-status-async": "^1.2.10",
+    "rfc-7807-problem-details": "^0.2.1",
     "tiny-injector": "^0.1.1",
     "tslib": "^2.0.0",
     "tslog": "^3.3.3"

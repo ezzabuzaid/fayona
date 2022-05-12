@@ -1,6 +1,5 @@
 import { HttpContext } from '@fayona/core';
 import {
-  ErrorResponse,
   FromBody,
   FromRoute,
   HttpGet,
@@ -10,6 +9,7 @@ import {
   Route,
   SuccessResponse,
 } from '@fayona/routing';
+import { ProblemDetailsException } from 'rfc-7807-problem-details';
 
 import {
   CreateExampleDto,
@@ -37,10 +37,11 @@ export class ExampleController {
   ) {
     const existingExampleIndex = store.findIndex((it) => it.id === id);
     if (existingExampleIndex < 0) {
-      return ErrorResponse.BadRequest(
-        `Cannot fine an example with ${id}`,
-        'not-found'
-      );
+      return new ProblemDetailsException({
+        type: 'not-found',
+        status: 400,
+        title: `Cannot fine an example with ${id}`,
+      });
     }
     store.splice(existingExampleIndex, 1, new Example(dto.name));
     return SuccessResponse.Ok(dto);
@@ -53,10 +54,11 @@ export class ExampleController {
   ) {
     const existingExampleIndex = store.findIndex((it) => it.id === id);
     if (existingExampleIndex < 0) {
-      return ErrorResponse.BadRequest(
-        `Cannot fine an example with ${id}`,
-        'not-found'
-      );
+      return new ProblemDetailsException({
+        type: 'not-found',
+        status: 400,
+        title: `Cannot fine an example with ${id}`,
+      });
     }
     const existingExample = store[existingExampleIndex];
     existingExample.name = dto.name;
@@ -67,10 +69,11 @@ export class ExampleController {
   public GetExample(@FromRoute('id') id: string) {
     const existingExampleIndex = store.findIndex((it) => it.id === id);
     if (existingExampleIndex < 0) {
-      return ErrorResponse.BadRequest(
-        `Cannot fine an example with ${id}`,
-        'not-found'
-      );
+      return new ProblemDetailsException({
+        type: 'not-found',
+        status: 400,
+        title: `Cannot fine an example with ${id}`,
+      });
     }
     const example = store[existingExampleIndex];
     return SuccessResponse.Ok(new GetExampleDto(example.name, example.id));
