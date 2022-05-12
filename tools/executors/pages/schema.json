@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "type": "object",
+  "cli": "nx",
+  "properties": {
+    "pages": {
+      "type": "array",
+      "description": "List of folder that should be compiled"
+    },
+    "assets": {
+      "type": "array",
+      "description": "List of static application assets.",
+      "default": []
+    },
+    "scripts": {
+      "type": "array",
+      "description": "External Scripts which will be included before the main application entry.",
+      "default": []
+    },
+    "styles": {
+      "type": "array",
+      "description": "External Styles which will be included with the application",
+      "default": []
+    },
+    "outputPath": {
+      "type": "string",
+      "description": "The output path of the generated files."
+    },
+    "main": {
+      "type": "string",
+      "description": "The name of the main entry-point file."
+    },
+    "tsConfig": {
+      "type": "string",
+      "description": "The name of the Typescript configuration file."
+    },
+    "generatePackageJson": {
+      "type": "boolean",
+      "description": "Generates a package.json file with the project's node_module dependencies populated for installing in a container. If a package.json exists in the project's directory, it will be reused with dependencies populated.",
+      "default": false
+    }
+  }
+}

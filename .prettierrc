@@ -1,0 +1,13 @@
+{
+  "singleQuote": true,
+  "importOrder": [
+    "<THIRD_PARTY_MODULES>",
+    "^@ktx/shared/(.*)$",
+    "^@ktx/(.*)$",
+    "^[./]"
+  ],
+  "print-width": 120,
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
+  "importOrderParserPlugins": ["typescript", "decorators-legacy"]
+}

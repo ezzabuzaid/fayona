@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "projects": {
+    "core": "libs/core",
+    "identity": "libs/identity",
+    "playground": "apps/playground",
+    "routing": "libs/routing"
+  }
+}
