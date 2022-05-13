@@ -24,6 +24,7 @@ export function FromServices(
       target[propertyKey as string],
       parameterIndex,
       serviceTypeOrInjectionToken ?? parametersTypes[parameterIndex],
+      parametersTypes[parameterIndex],
       MakeHandlerName(target.constructor, propertyKey as string)
     );
     metadata.RegisterParameter(parameterMetadata);

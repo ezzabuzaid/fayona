@@ -7,7 +7,7 @@ export class FromHeaderModelBinding extends ModelBinding<
   FromHeadersPayloadType,
   Record<string, any>
 > {
-  public override Bind(): FromHeadersPayloadType {
+  public override async Bind(): Promise<FromHeadersPayloadType> {
     const payload = this.ParameterMetadata.Payload;
     let header = null;
     if (typeof payload === 'function') {

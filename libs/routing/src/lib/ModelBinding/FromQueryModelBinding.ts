@@ -7,7 +7,7 @@ export class FromQueryModelBinding extends ModelBinding<
   FromQueryPayloadType,
   Record<string, any>
 > {
-  public Bind(): any {
+  public override async Bind(): Promise<any> {
     const payload = this.ParameterMetadata.Payload;
     let query = null;
     if (typeof payload === 'function') {

@@ -7,7 +7,7 @@ export class FromServiceModelBinding extends ModelBinding<
   FromServicePayloadType,
   ServiceType<any>
 > {
-  public Bind(): FromServicePayloadType {
+  public override async Bind(): Promise<FromServicePayloadType> {
     return this.Variant;
   }
 }

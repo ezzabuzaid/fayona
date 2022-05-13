@@ -1,10 +1,13 @@
 import {
+  ArgumentNullException,
   CoreInjector,
   HttpEndpointMetadata,
   METHODS,
   Metadata,
 } from '@fayona/core';
 import { RequestHandler } from 'express';
+
+import { HttpResponse } from '../Response';
 
 export function HttpPatch(
   endpoint = '/',
@@ -15,6 +18,18 @@ export function HttpPatch(
     propertyKey,
     descriptor: PropertyDescriptor
   ) {
+    const returnType = Reflect.getMetadata(
+      'design:returntype',
+      target,
+      propertyKey
+    );
+
+    if (HttpResponse !== returnType) {
+      throw new ArgumentNullException(
+        `The return type of ${propertyKey.toString()} is not HttpResponse.`
+      );
+    }
+
     const metadata = CoreInjector.GetRequiredService(Metadata);
     metadata.RegisterHttpEndpoint(
       new HttpEndpointMetadata(

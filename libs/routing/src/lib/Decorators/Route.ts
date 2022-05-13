@@ -3,7 +3,9 @@ import {
   HttpEndpointMetadata,
   HttpEndpointMiddlewareMetadata,
   HttpRouteMetadata,
+  InvalidOperationException,
   IsNullOrEmpty,
+  ParameterType,
   sortBy,
 } from '@fayona/core';
 import { Metadata } from '@fayona/core';
@@ -12,6 +14,12 @@ import { RequestHandlerParams } from 'express-serve-static-core';
 import * as path from 'path';
 
 import { IRouterDecorationOption } from '../IRouterDecorationOption';
+import { FromBodyModelBinding } from '../ModelBinding/FromBodyModelBinding';
+import { FromHeaderModelBinding } from '../ModelBinding/FromHeaderModelBinding';
+import { FromQueryModelBinding } from '../ModelBinding/FromQueryModelBinding';
+import { FromRouteModelBinding } from '../ModelBinding/FromRouteModelBinding';
+import { FromServiceModelBinding } from '../ModelBinding/FromServiceModelBinding';
+import { HttpResponse } from '../Response';
 
 /**
  * When no name is provided the name will autamatically be the name of the route,
@@ -63,11 +71,32 @@ export function Route(
     [...endpoints]
       .sort(sortBy('path', true))
       .forEach((httpEndpointMetadata) => {
-        const normalizedEndpoint = path.join('/', httpEndpointMetadata.path!);
-
+        const normalizedEndpoint = path.join(
+          NormalizeEndpoint(constructor, endpoint ?? '/'),
+          '/',
+          httpEndpointMetadata.path!
+        );
         router[httpEndpointMetadata.method!](
           normalizedEndpoint,
-          (req, res, next) => next()
+          async (request, response, next): Promise<any> => {
+            try {
+              const controllerInstance = request.Locate(
+                httpEndpointMetadata.controller
+              );
+
+              const endpointResponse = httpEndpointMetadata.handler!.apply(
+                controllerInstance,
+                await getBindings(request, httpEndpointMetadata)
+              ) as unknown as HttpResponse;
+
+              response
+                .status(endpointResponse.StatusCode)
+                .json(endpointResponse.ToJson());
+              next();
+            } catch (error) {
+              next(error);
+            }
+          }
         );
       });
 
@@ -102,3 +131,59 @@ function PopulateRouteMiddlewares(
   }
   return clonedParentMiddlewares;
 }
+
+const getBindings = async (
+  request: Request,
+  httpEndpointMetadata: HttpEndpointMetadata
+): Promise<any[]> => {
+  const parameters: any[] = [];
+  const endpointParameters = httpEndpointMetadata.Parameters.reverse();
+  for (const parameterMetadata of endpointParameters) {
+    switch (parameterMetadata.Type) {
+      case ParameterType.FROM_HEADER:
+        const modelBinding = new FromHeaderModelBinding(
+          parameterMetadata,
+          request.headers
+        );
+        parameters[parameterMetadata.Index] = await modelBinding.Bind();
+        break;
+      case ParameterType.FROM_ROUTE:
+        const fromRouteModelBinding = new FromRouteModelBinding(
+          parameterMetadata,
+          request.params
+        );
+        parameters[parameterMetadata.Index] =
+          await fromRouteModelBinding.Bind();
+        break;
+      case ParameterType.FROM_QUERY:
+        const fromQueryModelBinding = new FromQueryModelBinding(
+          parameterMetadata,
+          request.query
+        );
+        parameters[parameterMetadata.Index] =
+          await fromQueryModelBinding.Bind();
+        break;
+      case ParameterType.FROM_SERVICES:
+        const fromServiceModelBinding = new FromServiceModelBinding(
+          parameterMetadata,
+          CoreInjector.GetRequiredService(parameterMetadata.Payload)
+        );
+        parameters[parameterMetadata.Index] =
+          await fromServiceModelBinding.Bind();
+        break;
+      case ParameterType.FROM_BODY:
+        const fromBodyModelBinding = new FromBodyModelBinding(
+          parameterMetadata,
+          request.body
+        );
+        parameters[parameterMetadata.Index] = await fromBodyModelBinding.Bind();
+        break;
+
+      default:
+        throw new InvalidOperationException(
+          'An unspported HTTP decorator was used.'
+        );
+    }
+  }
+  return parameters;
+};
