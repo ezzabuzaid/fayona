@@ -2,6 +2,7 @@ import { InvalidOperationException, IsConstructor } from '@fayona/core';
 
 import { FromQueryPayloadType } from '../Metadata/FromQueryParamerterMetadata';
 import { ModelBinding } from './ModelBinding';
+import { ValidateModel } from './ValidateModel';
 
 export class FromQueryModelBinding extends ModelBinding<
   FromQueryPayloadType,
@@ -9,14 +10,12 @@ export class FromQueryModelBinding extends ModelBinding<
 > {
   public override async Bind(): Promise<any> {
     const payload = this.ParameterMetadata.Payload;
-    let query = null;
     if (typeof payload === 'function') {
-      query = payload(this.Variant);
+      return payload(this.Variant);
     } else if (typeof payload === 'string') {
-      query = this.Variant[payload];
+      return this.Variant[payload];
     } else if (IsConstructor(payload)) {
-      // FIXME construct the type
-      query = this.Variant;
+      return ValidateModel(this.ParameterMetadata.Payload, this.Variant);
     } else {
       throw new InvalidOperationException(
         `${
@@ -25,6 +24,5 @@ export class FromQueryModelBinding extends ModelBinding<
           .Variant}`
       );
     }
-    return query;
   }
 }
