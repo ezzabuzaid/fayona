@@ -34,7 +34,7 @@ export class AuthorizationMiddleware extends Middleware {
 
   public async Invoke(context: HttpContext, next: NextFunction): Promise<void> {
     const authorizeData: IAuthorizeData[] =
-      context.EndpointMetadata.Properties.get(IAuthorizeData) ?? [];
+      context.GetMetadata()?.Properties.get(IAuthorizeData) ?? [];
 
     const policy = this.GetPolicy(authorizeData);
     if (policy == null) {

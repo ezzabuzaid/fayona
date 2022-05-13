@@ -1,9 +1,8 @@
 import type { Request, Response } from 'express';
-import { Injectable, ServiceLifetime } from 'tiny-injector';
 import { ServiceProvider } from 'tiny-injector/ServiceProvider';
 
 import { ClaimsPrincipal } from '../Claims';
-import { CORE_SERVICE_COLLECTION, CoreInjector } from '../CoreInjector';
+import { CoreInjector } from '../CoreInjector';
 import { InvalidOperationException } from '../Exceptions/InvalidOperationException';
 import { HttpEndpointMetadata, HttpRouteMetadata, Metadata } from '../Metadata';
 import { IsNullOrUndefined, SaveReturn } from '../Utils/Utils';
@@ -17,15 +16,14 @@ export class HttpContext {
   ) {}
 
   public GetMetadata(): HttpEndpointMetadata | null {
+    const endpointPath = this.Request.route?.path;
     const metadata = CoreInjector.GetRequiredService(Metadata);
     const route = SaveReturn(() => {
-      return metadata.GetHttpRoute(
-        (item) => !!item.EndpointMap.get(this.Request.url)
-        // FIXME: /example/:id - such route cannot be find because id will be replaced with fixed value
-        // You've to replicate express function that replace those params
-      );
+      return metadata.GetHttpRoute((item) => {
+        return !!item?.EndpointMap.get(endpointPath);
+      });
     });
-    return route?.EndpointMap.get(this.Request.url) ?? null;
+    return route?.EndpointMap.get(endpointPath) ?? null;
   }
 }
 

@@ -7,6 +7,7 @@ export abstract class ParameterMetadata<T> {
     public readonly handler: Function,
     public readonly Index: number,
     public readonly Payload: T,
+    public readonly ParamType: any,
     public readonly HandlerName: string
   ) {}
 }

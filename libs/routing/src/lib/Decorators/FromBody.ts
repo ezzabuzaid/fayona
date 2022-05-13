@@ -15,6 +15,7 @@ export function FromBody(): ParameterDecorator {
       target[propertyKey as string],
       parameterIndex,
       parametersTypes[parameterIndex],
+      parametersTypes[parameterIndex],
       MakeHandlerName(target.constructor, propertyKey as string)
     );
     metadata.RegisterParameter(parameterMetadata);

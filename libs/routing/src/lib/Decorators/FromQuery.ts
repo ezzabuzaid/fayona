@@ -23,6 +23,7 @@ export function FromQuery(
       target[propertyKey as string],
       parameterIndex,
       queryParamFnOrName ?? parametersTypes[parameterIndex],
+      parametersTypes[parameterIndex],
       MakeHandlerName(target.constructor, propertyKey as string)
     );
     metadata.RegisterParameter(parameterMetadata);

@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { ServiceType } from 'tiny-injector';
 
 export * from './lib/Decorators/FromBody';
 export * from './lib/Decorators/FromHeaders';
@@ -33,3 +34,13 @@ export * from './lib/RoutingWebApplicationBuilderExtensions';
 // to be used as middleware,
 
 // The middlewares feature can be decoupled to be used as seperate library.
+// eslint-disable-next-line @typescript-eslint/no-namespace
+
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace Express {
+    interface Request {
+      Locate: <T>(serviceType: ServiceType<T>) => T;
+    }
+  }
+}

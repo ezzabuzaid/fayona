@@ -7,6 +7,7 @@
   "dependencies": {
     "@jscutlery/semver": "^2.23.4",
     "@trivago/prettier-plugin-sort-imports": "^3.2.0",
+    "class-validator": "^0.13.2",
     "eslint-plugin-check-file": "^1.1.0",
     "express": "^4.17.3",
     "express-list-endpoints": "^6.0.0",
@@ -15,7 +16,7 @@
     "ngx-deploy-npm": "^3.1.9",
     "passport": "^0.5.2",
     "promise-status-async": "^1.2.10",
-    "rfc-7807-problem-details": "^0.2.1",
+    "rfc-7807-problem-details": "0.2.3",
     "tiny-injector": "^0.1.1",
     "tslib": "^2.0.0",
     "tslog": "^3.3.3"

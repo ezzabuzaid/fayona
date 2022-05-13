@@ -2,10 +2,9 @@
  * This is not a production server yet!
  * This is only a minimal backend to get started.
  */
-import { HttpContext, Middleware, WebApplication } from '@fayona/core';
+import { WebApplication } from '@fayona/core';
 import '@fayona/routing';
 import * as express from 'express';
-import * as endpoint from 'express-list-endpoints';
 import { problemDetailsMiddleware } from 'rfc-7807-problem-details';
 
 import './app/Controllers/ExampleController';
@@ -14,7 +13,7 @@ import { IgnoreFavIconMiddleware } from './app/IgnoreFavIconMiddleware';
 
 co.ExampleController;
 const expressApp = express();
-
+expressApp.use(express.json());
 const builder = WebApplication.CreateBuilder({
   RoutingAdaptar: expressApp,
   Controllers: [],
@@ -29,7 +28,7 @@ expressApp.use((req, res, next) => {
   });
 });
 expressApp.use(
-  problemDetailsMiddleware(() => {
+  problemDetailsMiddleware((options) => {
     //
   })
 );

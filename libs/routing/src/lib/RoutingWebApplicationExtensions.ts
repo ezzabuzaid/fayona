@@ -1,9 +1,7 @@
-import { WebApplication, WebApplicationBuilder } from '@fayona/core';
+import { WebApplication } from '@fayona/core';
 
-import { EndpointMiddleware } from './Middleware/EndpointMiddleware';
 import { HstsMiddlware } from './Middleware/HstsMiddleware';
 import { RequestIdMiddleware } from './Middleware/RequestId';
-import { RoutingMiddleware } from './Middleware/RoutingMiddleware';
 
 declare module '@fayona/core' {
   export interface IWebApplication {
@@ -20,8 +18,6 @@ declare module '@fayona/core' {
     UseHsts(): void;
 
     UseExceptionHandler(): void;
-    UseEndpoint(): void;
-    // UseRouting(): void;
   }
 }
 
@@ -35,39 +31,3 @@ prototype.UseRequestId = function (): void {
 prototype.UseHsts = function (): void {
   this.UseMiddleware(HstsMiddlware);
 };
-
-// prototype.UseRouting = function (): void {
-//   this.UseMiddleware(RoutingMiddleware);
-// };
-
-prototype.UseEndpoint = function (): void {
-  this.UseMiddleware(EndpointMiddleware);
-  // this.UseMiddleware(EndpointMiddleware);
-};
-
-// public UseErrorHandler(action: (error: any) => HttpResponse): void {
-//   this.#Application.use(
-//     (error: Error, req: Request, res: Response, next: NextFunction) => {
-//       if (res.headersSent) {
-//         return next(error);
-//       }
-//       const response = action(error);
-//       res.status(response.statusCode).json(response.toJson());
-//     }
-//   );
-// }
-
-// /**
-//  * FIXME: refactor to .net use exception handler
-//  */
-// public UseNotFoundHandler(): void {
-//   this.#Application.use(
-//     autoHandler((req: Request) => {
-//       throw new ErrorResponse(
-//         `${req.originalUrl} => ${'endpoint_not_found'}`,
-//         StatusCodes.NOT_FOUND,
-//         'not-found'
-//       );
-//     })
-//   );
-// }

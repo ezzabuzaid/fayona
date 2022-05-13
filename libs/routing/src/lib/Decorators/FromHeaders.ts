@@ -8,12 +8,18 @@ export function FromHeader(
 ): ParameterDecorator {
   return (target: any, propertyKey, parameterIndex: number) => {
     const metadata = CoreInjector.GetRequiredService(Metadata);
+    const parametersTypes = Reflect.getMetadata(
+      'design:paramtypes',
+      target,
+      propertyKey
+    );
     metadata.RegisterParameter(
       new FromHeaderParameterMetadata(
         target.constructor,
         target[propertyKey as string],
         parameterIndex,
         header,
+        parametersTypes[parameterIndex],
         MakeHandlerName(target.constructor, propertyKey as string)
       )
     );

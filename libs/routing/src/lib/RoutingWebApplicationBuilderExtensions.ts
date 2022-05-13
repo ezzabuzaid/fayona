@@ -4,14 +4,11 @@ import {
   CoreInjector,
   HttpContext,
   HttpContextBuilder,
-  HttpRouteMetadata,
   IWebApplication,
   IWebApplicationBuilder,
-  InvalidOperationException,
   IsNullOrUndefined,
   Metadata,
   Middleware,
-  SaveReturn,
   WEB_APPLICATION_OPTIONS,
   WebApplicationBuilder,
 } from '@fayona/core';
@@ -44,7 +41,9 @@ prototype.Build = function (): IWebApplication {
   const metadata = CoreInjector.GetRequiredService(Metadata);
   const options = CoreInjector.GetRequiredService(WEB_APPLICATION_OPTIONS);
   const app = originalBuild();
+
   app.RoutingAdaptar = options.RoutingAdaptar;
+
   if (IsNullOrUndefined(options.RoutingAdaptar)) {
     throw new ArgumentNullException('RoutingAdaptar');
   }
@@ -65,6 +64,9 @@ prototype.Build = function (): IWebApplication {
     context.setExtra('request', req);
     context.setExtra('response', res);
 
+    req.Locate = (serviceType: any): any =>
+      CoreInjector.GetRequiredService(serviceType, context);
+
     await InvokeMiddlewares(
       CoreInjector.GetRequiredService(HttpContext, context),
       context
@@ -76,15 +78,11 @@ prototype.Build = function (): IWebApplication {
 
     next();
   });
-
   metadata.GetHttpRoutes().forEach((route) => {
-    options.RoutingAdaptar.use(
-      route.GetPath(),
-      // process.env.SKIP_REGISTERING_ROUTE ? '' : prefixedEndpoint, // For Cloud Function to work
-      route.GetRouter()
-    );
+    // route.GetPath(),
+    // // process.env.SKIP_REGISTERING_ROUTE ? '' : prefixedEndpoint, // For Cloud Function to work
+    options.RoutingAdaptar.use(route.GetRouter());
   });
-
   return app;
 };
 
@@ -117,7 +115,6 @@ async function InvokeMiddlewares(
 ): Promise<void> {
   let index = 0;
   const middlewares = GetMiddlewares(context);
-
   const RequestDelegate = async (): Promise<() => Promise<void>> => {
     index++;
     return async (): Promise<void> => {

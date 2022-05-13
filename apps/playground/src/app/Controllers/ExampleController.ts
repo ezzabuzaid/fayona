@@ -1,4 +1,3 @@
-import { HttpContext } from '@fayona/core';
 import {
   FromBody,
   FromRoute,
@@ -6,6 +5,7 @@ import {
   HttpPatch,
   HttpPost,
   HttpPut,
+  HttpResponse,
   Route,
   SuccessResponse,
 } from '@fayona/routing';
@@ -66,10 +66,10 @@ export class ExampleController {
   }
 
   @HttpGet('/:id')
-  public GetExample(@FromRoute('id') id: string) {
+  public GetExample(@FromRoute('id') id: string): HttpResponse {
     const existingExampleIndex = store.findIndex((it) => it.id === id);
     if (existingExampleIndex < 0) {
-      return new ProblemDetailsException({
+      throw new ProblemDetailsException({
         type: 'not-found',
         status: 400,
         title: `Cannot fine an example with ${id}`,
@@ -79,7 +79,7 @@ export class ExampleController {
     return SuccessResponse.Ok(new GetExampleDto(example.name, example.id));
   }
   @HttpGet('/list')
-  public ListExamples() {
+  public ListExamples(): HttpResponse {
     const examples = store;
     const listExamples = examples.map(
       (it) => new ListExamplesDto(it.name, it.id)
