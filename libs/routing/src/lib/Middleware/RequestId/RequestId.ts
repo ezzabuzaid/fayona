@@ -1,7 +1,7 @@
 import { HttpContext } from '@fayona/core';
 import { Middleware } from '@fayona/core';
 import { AsyncLocalStorage } from 'async_hooks';
-import type { NextFunction, Request, Response } from 'express';
+import type { NextFunction } from 'express';
 
 import { RequestIdOptions } from './RequestIdOptions';
 

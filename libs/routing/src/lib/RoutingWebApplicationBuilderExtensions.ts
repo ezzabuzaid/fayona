@@ -151,20 +151,10 @@ function AddHttpContext(): void {
   CoreInjector.AddScoped(HttpContext, (context) => {
     const request: Request = context.getExtra('request');
     const response: Response = context.getExtra('response');
-    // const metadata = CoreInjector.GetRequiredService(Metadata);
-    // const route = SaveReturn(() => {
-    //   return metadata.GetHttpRoute(
-    //     (item) => item.EndpointMap.get(request.url)
-    //     // FIXME: /example/:id - such route cannot be find because id will be replaced with fixed value
-    //     // You've to replicate express function that replace those params
-    //   );
-    // });
     const httpContext = new HttpContextBuilder()
       .SetServiceProvider(PatchContextToServiceProvider(context))
       .SetRequest(request)
       .SetResponse(response)
-      // .SetEndpointMetadata(route?.EndpointMap.get(request.url))
-      // .SetRouteMetadata(route)
       .Build();
     return httpContext;
   });

@@ -13,7 +13,6 @@ export * from './lib/Decorators/HttpPost';
 export * from './lib/Decorators/HttpPut';
 export * from './lib/Decorators/RemoveMiddleware';
 export * from './lib/Decorators/Route';
-export * from './lib/ExpressToken';
 
 // FIXME: replace it with correct return type
 export * from './lib/Response';

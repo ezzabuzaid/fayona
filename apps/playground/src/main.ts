@@ -21,7 +21,6 @@ const builder = WebApplication.CreateBuilder({
 
 const app = builder.Build();
 app.UseMiddleware(IgnoreFavIconMiddleware);
-app.UseEndpoint();
 expressApp.use((req, res, next) => {
   next({
     statusCode: 404,
