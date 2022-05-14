@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.2.3](https://github.com/ezzabuzaid/fayona/compare/0.2.2...0.2.3) (2022-05-14)
+
+
+### Bug Fixes
+
+* **core:** remove InvalidOperationException from stack trace ([34f41f9](https://github.com/ezzabuzaid/fayona/commit/34f41f9e1c478dd1c13f194102fd449a425b0cc9))
+
 ### [0.2.2](https://github.com/ezzabuzaid/fayona/compare/0.2.1...0.2.2) (2022-05-13)
 
 

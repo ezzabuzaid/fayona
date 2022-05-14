@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.2.3](https://github.com/ezzabuzaid/fayona/compare/0.2.2...0.2.3) (2022-05-14)
+
+
+### Bug Fixes
+
+* **Routing:** remove the ability to add child controllers ([e9bd094](https://github.com/ezzabuzaid/fayona/commit/e9bd094c836be9f029bb400abee2b5dae271eacf))
+
 ### [0.2.2](https://github.com/ezzabuzaid/fayona/compare/0.2.1...0.2.2) (2022-05-13)
 
 
