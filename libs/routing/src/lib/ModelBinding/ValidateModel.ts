@@ -27,7 +27,7 @@ export async function ValidateModel(payload: any, varient: any): Promise<any> {
       'One or more validation errors occurred.',
       400
     );
-    problemDetails['Errors'] = errors;
+    problemDetails['errors'] = errors;
     throw new ProblemDetailsException(problemDetails);
   }
   return payload;
