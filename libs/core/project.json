@@ -14,9 +14,15 @@
       }
     },
     "publish": {
+      "dependsOn": [
+        {
+          "target": "build",
+          "projects": "self"
+        }
+      ],
       "executor": "ngx-deploy-npm:deploy",
       "options": {
-        "noBuild": false,
+        "noBuild": true,
         "access": "public",
         "buildTarget": "production"
       }

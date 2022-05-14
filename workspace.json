@@ -28,7 +28,11 @@
             "releaseAs": "prerelease",
             "preid": "beta",
             "push": true,
-            "postTargets": ["routing:github", "routing:beta-publish"]
+            "postTargets": [
+              "routing:beta-publish",
+              "core:beta-publish",
+              "workspace:github"
+            ]
           }
         },
         "github": {
