@@ -9,11 +9,15 @@ import {
   sortBy,
 } from '@fayona/core';
 import { Metadata } from '@fayona/core';
-import { Request, RequestHandler, Router as expressRouter } from 'express';
+import {
+  Request,
+  RequestHandler,
+  RouterOptions,
+  Router as expressRouter,
+} from 'express';
 import { RequestHandlerParams } from 'express-serve-static-core';
 import * as path from 'path';
 
-import { IRouterDecorationOption } from '../IRouterDecorationOption';
 import { FromBodyModelBinding } from '../ModelBinding/FromBodyModelBinding';
 import { FromHeaderModelBinding } from '../ModelBinding/FromHeaderModelBinding';
 import { FromQueryModelBinding } from '../ModelBinding/FromQueryModelBinding';
@@ -26,10 +30,7 @@ import { HttpResponse } from '../Response';
  * which by convention is the route class name minus the "Controller" suffix.
  * ex., the Controller class name is ExampleController, so the Route name is "example".
  */
-export function Route(
-  endpoint?: string,
-  options: IRouterDecorationOption = {}
-): any {
+export function Route(endpoint?: string, options: RouterOptions = {}): any {
   return function (constructor: Function): ReturnType<ClassDecorator> {
     if (!constructor.name.endsWith('Controller')) {
       throw new Error(
@@ -39,20 +40,6 @@ export function Route(
 
     const metadata = CoreInjector.GetRequiredService(Metadata);
     const router = expressRouter(options);
-
-    if (Array.isArray(options.Children) && options.Children.length > 0) {
-      options.Children.forEach((childController) => {
-        const childRoute = metadata.GetHttpRoute(
-          (route) => route.controller === childController
-        );
-        if (childRoute) {
-          router.use(childRoute.GetPath(), childRoute.GetRouter());
-        } else {
-          throw new Error(`Cannot find @Route for ${childController.name}`);
-        }
-      });
-    }
-    // TODO: Don't add child controller as standalone controller
 
     metadata.RegisterHttpRoute(
       new HttpRouteMetadata(

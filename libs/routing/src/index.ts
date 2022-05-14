@@ -14,7 +14,6 @@ export * from './lib/Decorators/HttpPut';
 export * from './lib/Decorators/RemoveMiddleware';
 export * from './lib/Decorators/Route';
 export * from './lib/ExpressToken';
-export * from './lib/IRouterDecorationOption';
 
 // FIXME: replace it with correct return type
 export * from './lib/Response';

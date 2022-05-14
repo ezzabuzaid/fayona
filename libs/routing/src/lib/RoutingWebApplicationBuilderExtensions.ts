@@ -53,7 +53,6 @@ prototype.Build = function (): IWebApplication {
     require(filePath);
   });
 
-  // TODO: Not found handler should come here - UseExceptionHandler
   // TODO: Fav icon handler should come here - UseStaticFile should be here instead - if an endpoint/file not found throw an error
 
   AddHttpContext();
