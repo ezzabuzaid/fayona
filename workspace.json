@@ -1,6 +1,45 @@
 {
   "version": 2,
   "projects": {
+    "workspace": {
+      "root": "libs",
+      "targets": {
+        "release": {
+          "executor": "@jscutlery/semver:version",
+          "options": {
+            "syncVersions": true,
+            "preset": "conventional",
+            "tagPrefix": "",
+            "baseBranch": "master",
+            "push": true,
+            "postTargets": [
+              "routing:publish",
+              "core:publish",
+              "workspace:github"
+            ]
+          }
+        },
+        "pre-release": {
+          "executor": "@jscutlery/semver:version",
+          "options": {
+            "preset": "conventional",
+            "tagPrefix": "",
+            "baseBranch": "beta",
+            "releaseAs": "prerelease",
+            "preid": "beta",
+            "push": true,
+            "postTargets": ["routing:github", "routing:beta-publish"]
+          }
+        },
+        "github": {
+          "executor": "@jscutlery/semver:github",
+          "options": {
+            "tag": "${tag}",
+            "notes": "${notes}"
+          }
+        }
+      }
+    },
     "core": "libs/core",
     "identity": "libs/identity",
     "playground": "apps/playground",

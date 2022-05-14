@@ -31,7 +31,7 @@ jobs:
 
       - name: Version
         shell: bash
-        run: npx nx affected --base=last-release --target=release --skip-nx-cache --syncVersions=true
+        run: npx nx affected --base=last-release --target=release --skip-nx-cache
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
