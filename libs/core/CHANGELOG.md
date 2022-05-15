@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.2.5](https://github.com/ezzabuzaid/fayona/compare/0.2.4...0.2.5) (2022-05-15)
+
+
+### Bug Fixes
+
+* **Core:** use root service collection ([578a562](https://github.com/ezzabuzaid/fayona/commit/578a56213f866e6b33d36c3c5c0332b0cd6d58e6))
+
 ### [0.2.4](https://github.com/ezzabuzaid/fayona/compare/0.2.3...0.2.4) (2022-05-14)
 
 

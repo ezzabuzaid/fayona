@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.2.5](https://github.com/ezzabuzaid/fayona/compare/0.2.4...0.2.5) (2022-05-15)
+
+
+### Bug Fixes
+
+* **Routing:** change Errors to errors ([19b2fac](https://github.com/ezzabuzaid/fayona/commit/19b2facdf1bc582aaef9782d78d8f5d49c074f9c))
+* **Routing:** pass the incoming body to Validate function ([621ff8a](https://github.com/ezzabuzaid/fayona/commit/621ff8a4cba911d4c55f8f6a5208aeedd1d0c75e))
+
 ### [0.2.4](https://github.com/ezzabuzaid/fayona/compare/0.2.3...0.2.4) (2022-05-14)
 
 
