@@ -1,26 +1,22 @@
-import { ServiceType } from 'tiny-injector';
+import { Action } from '@fayona/core';
+import { Fayona } from '@fayona/routing';
+import { RequestHandler } from 'express';
 
 import { IAuthenticationOptions } from './lib';
-import { IAuthenticationHandler } from './lib/Authentication/IAuthenticationHandler';
-import { AuthorizationOptions } from './lib/AuthorizationOptions';
+import { AuthenticationMiddleware } from './lib/Authentication/AuthenticationMiddleware';
 
-declare module '@fayona/core' {
-  export interface IWebApplicationBuilder {
-    AddAuthorization(optFn: (options: AuthorizationOptions) => void): void;
+export * from './lib/Authentication';
+export * from './lib/Helpers/passport';
 
-    AddAuthentication(
-      optFn: (options: IAuthenticationOptions) => void
-    ): IWebApplicationBuilder;
-
-    AddSchema(
-      handlerType: ServiceType<IAuthenticationHandler>,
-      authenticationScheme: string,
-      displayName?: string
-    ): IWebApplicationBuilder;
-  }
-
-  export interface IWebApplication {
-    UseAuthorization(): IWebApplication;
-    UseAuthentication(): IWebApplication;
+declare module '@fayona/routing' {
+  export interface IFayona {
+    Authentication(
+      configure: Action<IAuthenticationOptions, void>
+    ): RequestHandler;
   }
 }
+
+const prototype: import('@fayona/routing').IFayona = Fayona.prototype as any;
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+prototype['Authentication'] = AuthenticationMiddleware;

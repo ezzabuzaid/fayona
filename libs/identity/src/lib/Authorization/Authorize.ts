@@ -1,6 +1,5 @@
 import {
   CoerceArray,
-  CoreInjector,
   HttpEndpointMetadata,
   InvalidOperationException,
   IsNullOrEmpty,
@@ -8,6 +7,7 @@ import {
   MakeHandlerName,
   Metadata,
 } from '@fayona/core';
+import { Injector } from 'tiny-injector';
 
 import { IAuthenticationOptions } from '../Authentication/AuthenticationOptions';
 import { AuthorizationOptions } from '../AuthorizationOptions';
@@ -15,8 +15,8 @@ import { IAuthorizeData } from '../IAuthorizeData';
 
 export function Authorize(authorizeData?: IAuthorizeData): any {
   const authorizationOptions =
-    CoreInjector.GetRequiredService(AuthorizationOptions);
-  const metadata = CoreInjector.GetRequiredService(Metadata);
+    Injector.GetRequiredService(AuthorizationOptions);
+  const metadata = Injector.GetRequiredService(Metadata);
   const policyName = authorizeData?.Policy;
 
   if (policyName) {
@@ -29,7 +29,7 @@ export function Authorize(authorizeData?: IAuthorizeData): any {
   }
 
   return (target: Object, propertyKey: string): void => {
-    const authenticationOptions = CoreInjector.GetRequiredService(
+    const authenticationOptions = Injector.GetRequiredService(
       IAuthenticationOptions
     );
     const { endpoints } = metadata.GetHttpRoute(

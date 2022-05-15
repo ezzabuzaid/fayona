@@ -1,6 +1,11 @@
+import { Injectable, ServiceLifetime } from 'tiny-injector';
+
 import { IAuthenticationOptions } from './AuthenticationOptions';
 import { AuthenticationScheme } from './AuthenticationScheme';
 
+@Injectable({
+  lifetime: ServiceLifetime.Singleton,
+})
 export class AuthenticationSchemeProvider {
   constructor(private readonly AuthenticationOptions: IAuthenticationOptions) {}
 

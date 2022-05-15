@@ -1,23 +1,20 @@
 import {
   CoerceArray,
-  HttpContext,
   InvalidOperationException,
   IsNullOrEmpty,
   IsNullOrUndefined,
-  MakeHandlerName,
   Metadata,
-  Middleware,
-  NotNullOrEmpty,
 } from '@fayona/core';
+import { HttpContext } from '@fayona/routing';
 import type { NextFunction } from 'express';
 
 import { AuthorizationOptions } from '../AuthorizationOptions';
 import { AuthorizationPolicy } from '../AuthorizationPolicy';
 import { AuthorizationPolicyBuilder } from '../AuthorizationPolicyBuilder';
-import { AuthorizationService } from '../AuthorizationService';
 import { IAuthorizeData } from '../IAuthorizeData';
+import { AuthorizationService } from './AuthorizationService';
 
-export class AuthorizationMiddleware extends Middleware {
+export class AuthorizationMiddleware {
   private readonly AuthorizationService: AuthorizationService;
   private readonly AuthorizationOptions: AuthorizationOptions;
   private readonly Metadata: Metadata;
@@ -26,7 +23,6 @@ export class AuthorizationMiddleware extends Middleware {
     metadata: Metadata,
     authorizationOptions: AuthorizationOptions
   ) {
-    super();
     this.AuthorizationService = authorizationService;
     this.AuthorizationOptions = authorizationOptions;
     this.Metadata = metadata;

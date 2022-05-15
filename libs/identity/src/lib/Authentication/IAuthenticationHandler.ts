@@ -1,11 +1,12 @@
+import { ClaimsPrincipal } from '@fayona/core';
+
 import {
   AuthenticateResult,
   AuthenticationProperties,
 } from './AuthenticateResult';
 
 export abstract class IAuthenticationHandler {
-  public abstract Initialize(): Promise<void>;
-  public abstract Authenticate(): Promise<AuthenticateResult>;
+  public abstract Authenticate(): Promise<ClaimsPrincipal>;
   public abstract Challenge(
     properties?: AuthenticationProperties
   ): Promise<void>;
