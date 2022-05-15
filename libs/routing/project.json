@@ -15,6 +15,7 @@
     "publish": {
       "executor": "ngx-deploy-npm:deploy",
       "options": {
+        "noBuild": true,
         "access": "public",
         "buildTarget": "production"
       }
@@ -22,6 +23,7 @@
     "beta-publish": {
       "executor": "ngx-deploy-npm:deploy",
       "options": {
+        "noBuild": true,
         "access": "public",
         "buildTarget": "production",
         "tag": "beta"

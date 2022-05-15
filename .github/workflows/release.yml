@@ -29,6 +29,10 @@ jobs:
       - name: Set npm NPM_TOKEN
         run: npm config set //registry.npmjs.org/:_authToken ${{secrets.NPM_TOKEN}}
 
+      - name: Build
+        shell: bash
+        run: npx nx run-many --target=build --all
+
       - name: Version
         shell: bash
         run: npx nx run workspace:release
