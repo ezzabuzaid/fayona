@@ -1,161 +1,55 @@
 import {
-  ArgumentNullException,
-  CORE_SERVICE_COLLECTION,
-  CoreInjector,
-  HttpContext,
-  HttpContextBuilder,
-  IWebApplication,
-  IWebApplicationBuilder,
-  IsNullOrUndefined,
+  HttpEndpointMetadata,
+  HttpRouteMetadata,
   Metadata,
-  Middleware,
-  WEB_APPLICATION_OPTIONS,
-  WebApplicationBuilder,
 } from '@fayona/core';
-import { Request, Response } from 'express';
+import { RequestHandler } from 'express';
 import * as glob from 'fast-glob';
-import { Context } from 'tiny-injector';
-import { ServiceProvider } from 'tiny-injector/ServiceProvider';
+import { Context, Injector } from 'tiny-injector';
 
-import { RequestIdOptions } from './Middleware/RequestId';
-import { RouteOptions } from './RouteOptions';
-
-declare module '@fayona/core' {
-  export interface IWebApplicationBuilder {
-    AddRequestId(
-      optFn: (options: RequestIdOptions) => void
-    ): IWebApplicationBuilder;
-    AddHsts(): IWebApplicationBuilder;
-    AddRouting(optFn?: (options: RouteOptions) => void): IWebApplicationBuilder;
-  }
-  export interface WebApplicationOptions {
-    Controllers: string[];
-    RoutingAdaptar: ReturnType<typeof import('express')>;
-  }
+export interface IFayona {
+  Init(options: { controllers: string[] }): RequestHandler;
 }
-const prototype: import('@fayona/core').IWebApplicationBuilder =
-  WebApplicationBuilder.prototype as any;
-const originalBuild = prototype.Build;
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export class Fayona implements IFayona {
+  private Metadata = Injector.GetRequiredService(Metadata);
 
-prototype.Build = function (): IWebApplication {
-  const metadata = CoreInjector.GetRequiredService(Metadata);
-  const options = CoreInjector.GetRequiredService(WEB_APPLICATION_OPTIONS);
-  const app = originalBuild();
-
-  app.RoutingAdaptar = options.RoutingAdaptar;
-
-  if (IsNullOrUndefined(options.RoutingAdaptar)) {
-    throw new ArgumentNullException('RoutingAdaptar');
+  constructor() {
+    Injector.AddScoped(Context, (context) => context);
   }
-
-  // Load the controllers so the decorators can be activated.
-  glob.sync(options.Controllers, { absolute: true }).forEach((filePath) => {
-    require(filePath);
-  });
-
-  // TODO: Fav icon handler should come here - UseStaticFile should be here instead - if an endpoint/file not found throw an error
-
-  AddHttpContext();
-
-  options.RoutingAdaptar.use(async (req, res, next) => {
-    const context = CoreInjector.Create();
-    const dispose = (): void => CoreInjector.Destroy(context);
-    context.setExtra('request', req);
-    context.setExtra('response', res);
-
-    req.Locate = (serviceType: any): any =>
-      CoreInjector.GetRequiredService(serviceType, context);
-
-    await InvokeMiddlewares(
-      CoreInjector.GetRequiredService(HttpContext, context),
-      context
-    );
-
-    ['error', 'end'].forEach((eventName) => {
-      req.on(eventName, dispose);
+  public Init(options: { controllers: string[] }): RequestHandler {
+    // Load the controllers so the decorators can be activated.
+    glob.sync(options.controllers, { absolute: true }).forEach((filePath) => {
+      require(filePath);
     });
 
-    next();
-  });
-  metadata.GetHttpRoutes().forEach((route) => {
-    // route.GetPath(),
-    // // process.env.SKIP_REGISTERING_ROUTE ? '' : prefixedEndpoint, // For Cloud Function to work
-    options.RoutingAdaptar.use(route.GetRouter());
-  });
-  return app;
-};
+    // TODO: Fav icon handler should come here - UseStaticFile should be here instead - if an endpoint/file not found throw an error
 
-prototype.AddRequestId = function (
-  optFn: (options: RequestIdOptions) => void
-): IWebApplicationBuilder {
-  const options = new RequestIdOptions();
-  optFn(options);
-  this.Services.TryAddTransient(RequestIdOptions, () => options);
-  return this;
-};
-prototype.AddHsts = function (): IWebApplicationBuilder {
-  throw new Error('Not Implemented.');
-};
-prototype.AddRouting = function (): IWebApplicationBuilder {
-  throw new Error('Not Implemented.');
-};
+    return (req, res, next) => {
+      const context = Injector.Create();
+      const dispose = (): void => Injector.Destroy(context);
+      context.setExtra('request', req);
+      context.setExtra('response', res);
 
-function GetMiddlewares(context: Context): Middleware[] {
-  try {
-    return CoreInjector.GetServices(Middleware, context);
-  } catch (error) {
-    return [];
-  }
-}
+      req.Inject = (serviceType: any): any =>
+        Injector.GetRequiredService(serviceType, context);
 
-async function InvokeMiddlewares(
-  httpContext: HttpContext,
-  context: Context
-): Promise<void> {
-  let index = 0;
-  const middlewares = GetMiddlewares(context);
-  const RequestDelegate = async (): Promise<() => Promise<void>> => {
-    index++;
-    return async (): Promise<void> => {
-      const mw = middlewares.at(index);
-      if (mw) {
-        await middlewares[index].Invoke(httpContext, await RequestDelegate());
-      }
-      return Promise.resolve();
+      ['error', 'end'].forEach((eventName) => {
+        req.on(eventName, dispose);
+      });
+
+      next();
     };
-  };
-
-  // Invoke first middleware
-  const firstMiddleware = middlewares.at(index);
-  if (firstMiddleware) {
-    await firstMiddleware.Invoke(httpContext, await RequestDelegate());
   }
-}
 
-function PatchContextToServiceProvider(context: Context): ServiceProvider {
-  const serviceProvider = CORE_SERVICE_COLLECTION.BuildServiceProvider();
-  return Object.assign({
-    GetRequiredService: (arg1: any) => {
-      return serviceProvider.GetRequiredService(arg1, context);
-    },
-    GetService: (arg1: any) => {
-      return serviceProvider.GetService(arg1, context);
-    },
-    GetServices: (arg1: any) => {
-      return serviceProvider.GetServices(arg1, context);
-    },
-  });
-}
+  public GetRoutes(): HttpRouteMetadata[] {
+    return this.Metadata.GetHttpRoutes();
+  }
 
-function AddHttpContext(): void {
-  CoreInjector.AddScoped(HttpContext, (context) => {
-    const request: Request = context.getExtra('request');
-    const response: Response = context.getExtra('response');
-    const httpContext = new HttpContextBuilder()
-      .SetServiceProvider(PatchContextToServiceProvider(context))
-      .SetRequest(request)
-      .SetResponse(response)
-      .Build();
-    return httpContext;
-  });
+  public GetEndpoints(): HttpEndpointMetadata[] {
+    return this.Metadata.GetHttpRoutes()
+      .map((route) => route.endpoints)
+      .flat();
+  }
 }
