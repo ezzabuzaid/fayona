@@ -1,22 +1,20 @@
 import {
   ClaimsPrincipal,
-  HttpContext,
   InvalidOperationException,
   IsNullOrUndefined,
 } from '@fayona/core';
+import { HttpContext } from '@fayona/routing';
+import { Injectable, ServiceLifetime } from 'tiny-injector';
 
-import { IdentityInjector } from '../IdentityInjector';
-import {
-  AuthenticateResult,
-  AuthenticationProperties,
-} from './AuthenticateResult';
+import { AuthenticationProperties } from './AuthenticateResult';
 import { IAuthenticationOptions } from './AuthenticationOptions';
-import { AuthenticationScheme } from './AuthenticationScheme';
 import { AuthenticationSchemeProvider } from './AuthenticationSchemeProvider';
-import { AuthenticationTicket } from './AuthenticationTicket';
 import { IAuthenticationHandler } from './IAuthenticationHandler';
 import { IAuthenticationService } from './IAuthenticationService';
 
+@Injectable({
+  lifetime: ServiceLifetime.Scoped,
+})
 export class AuthenticationService extends IAuthenticationService {
   public readonly AuthenticationSchemeProvider: AuthenticationSchemeProvider;
   constructor(
@@ -30,7 +28,7 @@ export class AuthenticationService extends IAuthenticationService {
   public override async Authenticate(
     context: HttpContext,
     scheme?: string | undefined
-  ): Promise<AuthenticateResult> {
+  ): Promise<ClaimsPrincipal> {
     if (IsNullOrUndefined(scheme)) {
       const defaultScheme =
         this.AuthenticationSchemeProvider.GetDefaultAuthenticateScheme();
@@ -50,17 +48,6 @@ export class AuthenticationService extends IAuthenticationService {
       );
     }
     const result = await handler.Authenticate();
-
-    if (result.Succeeded) {
-      return AuthenticateResult.Success(
-        new AuthenticationTicket(
-          result.Principal!,
-          result.Properties!,
-          result.Ticket!.AuthenticationScheme
-        )
-      );
-    }
-
     return result;
   }
 
@@ -90,7 +77,6 @@ export class AuthenticationService extends IAuthenticationService {
     throw new Error('Method not implemented.');
   }
 
-  // in the original source code this is sould be in IAuthenticationHandlerProvider
   private GetHandler(
     context: HttpContext,
     scheme: string
@@ -99,9 +85,7 @@ export class AuthenticationService extends IAuthenticationService {
       (item) => item.Name === scheme
     );
     if (authenticationScheme) {
-      return context.RequestServices.GetRequiredService(
-        authenticationScheme.HandlerType
-      );
+      return context.Request.Inject(authenticationScheme.HandlerType);
     }
     return undefined;
   }
