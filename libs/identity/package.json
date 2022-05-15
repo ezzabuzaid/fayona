@@ -1,5 +1,9 @@
 {
   "name": "@fayona/identity",
   "version": "0.2.4",
-  "type": "commonjs"
+  "type": "commonjs",
+  "peerDependencies": {
+    "@fayona/core": "*",
+    "@fayona/routing": "*"
+  }
 }

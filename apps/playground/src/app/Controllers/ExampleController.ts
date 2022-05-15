@@ -1,6 +1,7 @@
 import {
   FromBody,
   FromRoute,
+  HttpContext,
   HttpGet,
   HttpPatch,
   HttpPost,
@@ -24,8 +25,10 @@ const store: Example[] = [];
 
 @Route('example')
 export class ExampleController {
+  constructor(private httpContext: HttpContext) {}
   @HttpPost('/create')
-  public CreateExample(@FromBody() dto: CreateExampleDto) {
+  public CreateExample(@FromBody() dto: CreateExampleDto): HttpResponse {
+    console.log(this.httpContext.GetMetadata());
     store.push(new Example(dto.name));
     return SuccessResponse.Created(dto);
   }
@@ -34,10 +37,10 @@ export class ExampleController {
   public ReplaceExample(
     @FromRoute('id') id: string,
     @FromBody() dto: ReplaceExampleDto
-  ) {
+  ): HttpResponse {
     const existingExampleIndex = store.findIndex((it) => it.id === id);
     if (existingExampleIndex < 0) {
-      return new ProblemDetailsException({
+      throw new ProblemDetailsException({
         type: 'not-found',
         status: 400,
         title: `Cannot fine an example with ${id}`,
@@ -51,10 +54,10 @@ export class ExampleController {
   public UpdateExample(
     @FromRoute('id') id: string,
     @FromBody() dto: UpdateExampleDto
-  ) {
+  ): HttpResponse {
     const existingExampleIndex = store.findIndex((it) => it.id === id);
     if (existingExampleIndex < 0) {
-      return new ProblemDetailsException({
+      throw new ProblemDetailsException({
         type: 'not-found',
         status: 400,
         title: `Cannot fine an example with ${id}`,

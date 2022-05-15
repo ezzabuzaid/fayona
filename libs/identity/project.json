@@ -3,14 +3,36 @@
   "sourceRoot": "libs/identity/src",
   "targets": {
     "build": {
-      "executor": "./tools/executors/pages:build",
+      "executor": "@nrwl/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/identity",
         "main": "libs/identity/src/index.ts",
         "tsConfig": "libs/identity/tsconfig.lib.json",
-        "assets": ["libs/identity/*.md"],
-        "updateBuildableProjectDepsInPackageJson": true
+        "assets": ["libs/identity/*.md"]
+      }
+    },
+    "publish": {
+      "dependsOn": [
+        {
+          "target": "build",
+          "projects": "self"
+        }
+      ],
+      "executor": "ngx-deploy-npm:deploy",
+      "options": {
+        "noBuild": true,
+        "access": "public",
+        "buildTarget": "production"
+      }
+    },
+    "beta-publish": {
+      "executor": "ngx-deploy-npm:deploy",
+      "options": {
+        "noBuild": false,
+        "access": "public",
+        "buildTarget": "production",
+        "tag": "beta"
       }
     },
     "lint": {

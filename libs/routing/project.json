@@ -3,7 +3,7 @@
   "sourceRoot": "libs/routing/src",
   "targets": {
     "build": {
-      "executor": "./tools/executors/pages:build",
+      "executor": "@nrwl/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/routing",

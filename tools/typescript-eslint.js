@@ -12,6 +12,10 @@ module.exports = {
         "format": ["PascalCase", "camelCase"]
       },
       {
+        "selector": ["typeProperty"],
+        "format": ["PascalCase", "camelCase"]
+      },
+      {
         "selector": "variable",
         "format": ["camelCase", "UPPER_CASE", "PascalCase"]
       },

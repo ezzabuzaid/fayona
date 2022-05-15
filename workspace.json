@@ -15,6 +15,7 @@
             "postTargets": [
               "routing:publish",
               "core:publish",
+              "identity:publish",
               "workspace:github"
             ]
           }
@@ -31,6 +32,7 @@
             "postTargets": [
               "routing:beta-publish",
               "core:beta-publish",
+              "identity:beta-publish",
               "workspace:github"
             ]
           }
