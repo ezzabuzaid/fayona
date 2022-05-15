@@ -1,4 +1,5 @@
-import { CoreInjector, MakeHandlerName, Metadata } from '@fayona/core';
+import { MakeHandlerName, Metadata } from '@fayona/core';
+import { Injector } from 'tiny-injector';
 
 import { FromQueryParamerterMetadata } from '../Metadata/FromQueryParamerterMetadata';
 
@@ -12,7 +13,7 @@ export function FromQuery(
 ): ParameterDecorator {
   return (target: any, propertyKey, parameterIndex: number) => {
     // FIXME: throw an error if queryParamFnOrName and the type parametersTypes[parameterIndex] is not user defined type
-    const metadata = CoreInjector.GetRequiredService(Metadata);
+    const metadata = Injector.GetRequiredService(Metadata);
     const parametersTypes = Reflect.getMetadata(
       'design:paramtypes',
       target,

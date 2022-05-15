@@ -1,4 +1,4 @@
-import { CoreInjector, MakeHandlerName, Metadata } from '@fayona/core';
+import { MakeHandlerName, Metadata } from '@fayona/core';
 import { InjectionToken, Injector, ServiceType } from 'tiny-injector';
 
 import { FromServiceParameterMetadata } from '../Metadata/FromServiceParameterMetadata';
@@ -13,7 +13,7 @@ export function FromServices(
   serviceTypeOrInjectionToken?: any
 ): ParameterDecorator {
   return (target: any, propertyKey, parameterIndex: number) => {
-    const metadata = CoreInjector.GetRequiredService(Metadata);
+    const metadata = Injector.GetRequiredService(Metadata);
     const parametersTypes = Reflect.getMetadata(
       'design:paramtypes',
       target,

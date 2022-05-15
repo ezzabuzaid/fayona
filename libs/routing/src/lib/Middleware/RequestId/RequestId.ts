@@ -1,8 +1,7 @@
-import { HttpContext } from '@fayona/core';
-import { Middleware } from '@fayona/core';
 import { AsyncLocalStorage } from 'async_hooks';
 import type { NextFunction } from 'express';
 
+import { HttpContext } from '../../Http/HttpContext';
 import { RequestIdOptions } from './RequestIdOptions';
 
 const asyncLocalStorage = new AsyncLocalStorage<string>();
@@ -10,10 +9,9 @@ const asyncLocalStorage = new AsyncLocalStorage<string>();
 export const requestId: () => string | undefined = () =>
   asyncLocalStorage.getStore();
 
-export class RequestIdMiddleware extends Middleware {
+export class RequestIdMiddleware {
   private RequestIdOptions: RequestIdOptions;
   constructor(requestIdOptions: RequestIdOptions) {
-    super();
     this.RequestIdOptions = requestIdOptions;
   }
   public async Invoke(context: HttpContext, next: NextFunction): Promise<void> {

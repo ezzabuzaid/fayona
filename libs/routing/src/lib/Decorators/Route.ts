@@ -1,5 +1,4 @@
 import {
-  CoreInjector,
   HttpEndpointMetadata,
   HttpEndpointMiddlewareMetadata,
   HttpRouteMetadata,
@@ -10,13 +9,16 @@ import {
 } from '@fayona/core';
 import { Metadata } from '@fayona/core';
 import {
+  NextFunction,
   Request,
   RequestHandler,
+  Response,
   RouterOptions,
   Router as expressRouter,
 } from 'express';
 import { RequestHandlerParams } from 'express-serve-static-core';
 import * as path from 'path';
+import { Injector } from 'tiny-injector';
 
 import { FromBodyModelBinding } from '../ModelBinding/FromBodyModelBinding';
 import { FromHeaderModelBinding } from '../ModelBinding/FromHeaderModelBinding';
@@ -38,7 +40,7 @@ export function Route(endpoint?: string, options: RouterOptions = {}): any {
       );
     }
 
-    const metadata = CoreInjector.GetRequiredService(Metadata);
+    const metadata = Injector.GetRequiredService(Metadata);
     const router = expressRouter(options);
 
     metadata.RegisterHttpRoute(
@@ -48,12 +50,11 @@ export function Route(endpoint?: string, options: RouterOptions = {}): any {
         NormalizeEndpoint(constructor, endpoint ?? '/')
       )
     );
-    CoreInjector.AddScoped(constructor as any);
+    Injector.AddScoped(constructor as any);
 
     const { endpoints } = metadata.GetHttpRoute(
       (item) => item.controller === constructor
     );
-
     // sort endpoint so paths like /:id will always be at the end
     [...endpoints]
       .sort(sortBy('path', true))
@@ -63,28 +64,33 @@ export function Route(endpoint?: string, options: RouterOptions = {}): any {
           '/',
           httpEndpointMetadata.path!
         );
-        router[httpEndpointMetadata.method!](
-          normalizedEndpoint,
-          async (request, response, next): Promise<any> => {
-            try {
-              const controllerInstance = request.Locate(
-                httpEndpointMetadata.controller
-              );
 
-              const endpointResponse = httpEndpointMetadata.handler!.apply(
-                controllerInstance,
-                await getBindings(request, httpEndpointMetadata)
-              ) as unknown as HttpResponse;
+        const finalHandler = async (
+          request: Request,
+          response: Response,
+          next: NextFunction
+        ): Promise<any> => {
+          try {
+            const controllerInstance = request.Inject(
+              httpEndpointMetadata.controller
+            );
 
-              response
-                .status(endpointResponse.StatusCode)
-                .json(endpointResponse.ToJson());
-              next();
-            } catch (error) {
-              next(error);
-            }
+            const endpointResponse = httpEndpointMetadata.handler!.apply(
+              controllerInstance,
+              await getBindings(request, httpEndpointMetadata)
+            ) as unknown as HttpResponse;
+
+            response
+              .status(endpointResponse.StatusCode)
+              .json(endpointResponse.ToJson());
+            next();
+          } catch (error) {
+            next(error);
           }
-        );
+        };
+
+        httpEndpointMetadata.FullPath = normalizedEndpoint;
+        httpEndpointMetadata.FinalHandler = finalHandler;
       });
 
     return constructor;
@@ -153,7 +159,7 @@ const getBindings = async (
       case ParameterType.FROM_SERVICES:
         const fromServiceModelBinding = new FromServiceModelBinding(
           parameterMetadata,
-          CoreInjector.GetRequiredService(parameterMetadata.Payload)
+          Injector.GetRequiredService(parameterMetadata.Payload)
         );
         parameters[parameterMetadata.Index] =
           await fromServiceModelBinding.Bind();

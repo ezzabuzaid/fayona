@@ -1,5 +1,6 @@
-import { ArgumentNullException, CoreInjector, Metadata } from '@fayona/core';
+import { ArgumentNullException, Metadata } from '@fayona/core';
 import { IsNullOrEmpty, MakeHandlerName } from '@fayona/core';
+import { Injector } from 'tiny-injector';
 
 import { FromRouteParameterMetadata } from '../Metadata/FromRouteParameterMetadata';
 
@@ -8,7 +9,7 @@ export function FromRoute(param: string): ParameterDecorator {
     throw new ArgumentNullException('Must be non empty string', 'param');
   }
   return (target: any, propertyKey, parameterIndex: number) => {
-    const metadata = CoreInjector.GetRequiredService(Metadata);
+    const metadata = Injector.GetRequiredService(Metadata);
     const parametersTypes = Reflect.getMetadata(
       'design:paramtypes',
       target,

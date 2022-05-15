@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import { ServiceType } from 'tiny-injector';
 
 export * from './lib/Decorators/FromBody';
 export * from './lib/Decorators/FromHeaders';
@@ -11,13 +10,12 @@ export * from './lib/Decorators/HttpGet';
 export * from './lib/Decorators/HttpPatch';
 export * from './lib/Decorators/HttpPost';
 export * from './lib/Decorators/HttpPut';
-export * from './lib/Decorators/RemoveMiddleware';
 export * from './lib/Decorators/Route';
+export * from './lib/Http/HttpContext';
 
 // FIXME: replace it with correct return type
 export * from './lib/Response';
 
-export * from './lib/RoutingWebApplicationExtensions';
 export * from './lib/RoutingWebApplicationBuilderExtensions';
 
 // TODO: something to think about
@@ -32,13 +30,3 @@ export * from './lib/RoutingWebApplicationBuilderExtensions';
 // to be used as middleware,
 
 // The middlewares feature can be decoupled to be used as seperate library.
-// eslint-disable-next-line @typescript-eslint/no-namespace
-
-declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
-  namespace Express {
-    interface Request {
-      Locate: <T>(serviceType: ServiceType<T>) => T;
-    }
-  }
-}

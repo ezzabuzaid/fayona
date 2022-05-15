@@ -1,11 +1,11 @@
 import {
   ArgumentNullException,
-  CoreInjector,
   HttpEndpointMetadata,
   METHODS,
   Metadata,
 } from '@fayona/core';
 import { RequestHandler } from 'express';
+import { Injector } from 'tiny-injector';
 
 import { HttpResponse } from '../Response';
 
@@ -30,7 +30,7 @@ export function HttpDelete(
       );
     }
 
-    const metadata = CoreInjector.GetRequiredService(Metadata);
+    const metadata = Injector.GetRequiredService(Metadata);
     metadata.RegisterHttpEndpoint(
       new HttpEndpointMetadata(
         target.constructor,
