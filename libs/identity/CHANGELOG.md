@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.2.5](https://github.com/ezzabuzaid/fayona/compare/0.2.4...0.2.5) (2022-05-15)
+
+
+### Bug Fixes
+
+* **Identity:** return ClaimsPrinicple instead of result class ([4da9143](https://github.com/ezzabuzaid/fayona/commit/4da9143ae58a430874e2be12f1cf1104b49e12b7))
+
 ### [0.2.4](https://github.com/ezzabuzaid/fayona/compare/0.2.3...0.2.4) (2022-05-14)
 
 ### [0.2.3](https://github.com/ezzabuzaid/fayona/compare/0.2.2...0.2.3) (2022-05-14)
