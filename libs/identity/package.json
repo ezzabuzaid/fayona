@@ -1,6 +1,6 @@
 {
   "name": "@fayona/identity",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "type": "commonjs",
   "peerDependencies": {
     "@fayona/core": "*",

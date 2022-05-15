@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.2.6](https://github.com/ezzabuzaid/fayona/compare/0.2.5...0.2.6) (2022-05-15)
+
+
+### Bug Fixes
+
+* **Core:** remove IWebApplication ([4705d37](https://github.com/ezzabuzaid/fayona/commit/4705d376d25de7b8f5fd110d1f92cc269c1683ac))
+* **Routing:** expose full path and final handler ([ad03fbb](https://github.com/ezzabuzaid/fayona/commit/ad03fbb9362522eb90f7a3235ebb69c8abfed3e7))
+
 ### [0.2.5](https://github.com/ezzabuzaid/fayona/compare/0.2.4...0.2.5) (2022-05-15)
 
 
