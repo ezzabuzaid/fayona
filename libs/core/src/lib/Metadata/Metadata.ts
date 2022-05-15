@@ -1,6 +1,5 @@
 import { Injectable, ServiceLifetime } from 'tiny-injector';
 
-import { CORE_SERVICE_COLLECTION } from '../CoreInjector';
 import { InvalidOperationException } from '../Exceptions/InvalidOperationException';
 import { IsNullOrUndefined } from '../Utils/Utils';
 import { HttpEndpointMetadata } from './HttpEndpointMetadata';
@@ -8,7 +7,6 @@ import { HttpRouteMetadata } from './HttpRouteMetadata';
 import { ParameterMetadata } from './ParameterMetadata';
 
 @Injectable({
-  provideIn: CORE_SERVICE_COLLECTION,
   lifetime: ServiceLifetime.Singleton,
 })
 export class Metadata {
