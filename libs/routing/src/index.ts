@@ -1,4 +1,12 @@
+import {
+  HttpEndpointMetadata,
+  HttpRouteMetadata,
+  Metadata,
+} from '@fayona/core';
+import { RequestHandler } from 'express';
+import * as glob from 'fast-glob';
 import 'reflect-metadata';
+import { Context, Injector } from 'tiny-injector';
 
 export * from './lib/Decorators/FromBody';
 export * from './lib/Decorators/FromHeaders';
@@ -16,17 +24,60 @@ export * from './lib/Http/HttpContext';
 // FIXME: replace it with correct return type
 export * from './lib/Response';
 
-export * from './lib/RoutingWebApplicationBuilderExtensions';
+export interface IFayona {
+  Init(options: { controllers: string[] }): RequestHandler;
+  GetEndpoints(): HttpEndpointMetadata[];
+  GetRoutes(): HttpRouteMetadata[];
+}
 
-// TODO: something to think about
-// What if instead of pull the whole routing adaptar (be depndant on it)
-// make fayona middleware "app.use(fayona({controllers:[]}))"
-// think about it you do not actually need all the .net stuff, becuase routing is already configured well, I mean express and koa and so on.
+// FIXME: provide factory abstraction to avoid any dependencies
 
-// this way it can be universal node or deno works the same at the end.
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+export class Fayona implements IFayona {
+  [method: string]: any;
+  private Metadata = Injector.GetRequiredService(Metadata);
 
-// What about middlewares and auth?
-// simply put, fayona can be light as well full framework. for starters, make the routing library only
-// to be used as middleware,
+  constructor() {
+    Injector.AddScoped(Context, (context) => context);
+  }
 
-// The middlewares feature can be decoupled to be used as seperate library.
+  // public Authentication(
+  //   configure: Action<any, void>
+  // ): RequestHandler<ParamsDictionary, any, any, ParsedQs, Record<string, any>> {
+  //   throw new Error('Method not implemented.');
+  // }
+
+  public Init(options: { controllers: string[] }): RequestHandler {
+    // Load the controllers so the decorators can be activated.
+    glob.sync(options.controllers, { absolute: true }).forEach((filePath) => {
+      require(filePath);
+    });
+
+    return (req, res, next) => {
+      const context = Injector.Create();
+      const dispose = (): void => Injector.Destroy(context);
+      context.setExtra('request', req);
+      context.setExtra('response', res);
+
+      req.Inject = (serviceType: any): any =>
+        Injector.GetRequiredService(serviceType, context);
+
+      ['error', 'end'].forEach((eventName) => {
+        req.on(eventName, dispose);
+      });
+
+      next();
+    };
+  }
+
+  public GetRoutes(): HttpRouteMetadata[] {
+    return this.Metadata.GetHttpRoutes();
+  }
+
+  public GetEndpoints(): HttpEndpointMetadata[] {
+    return this.Metadata.GetHttpRoutes()
+      .map((route) => route.endpoints)
+      .flat();
+  }
+}

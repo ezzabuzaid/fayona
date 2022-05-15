@@ -2,7 +2,7 @@
  * This is not a production server yet!
  * This is only a minimal backend to get started.
  */
-import { ClaimsPrincipal } from '@fayona/core';
+import { ClaimsPrincipal, Metadata } from '@fayona/core';
 import {
   AuthenticationProblemDetailsException,
   AuthenticationProperties,
@@ -10,19 +10,14 @@ import {
   FromStrategy,
   IAuthenticationHandler,
 } from '@fayona/identity';
-import { Fayona, HttpContext } from '@fayona/routing';
+import { Fayona, IFayona } from '@fayona/routing';
 import * as express from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import {
   ProblemDetailsException,
   problemDetailsMiddleware,
 } from 'rfc-7807-problem-details';
-import {
-  Injectable,
-  Injector,
-  ServiceCollection,
-  ServiceLifetime,
-} from 'tiny-injector';
+import { Injectable, ServiceLifetime } from 'tiny-injector';
 
 import './app/Controllers/ExampleController';
 
@@ -61,7 +56,7 @@ class JwtBearerHandler extends IAuthenticationHandler {
   }
 }
 
-const fayona = new Fayona();
+const fayona: IFayona = new Fayona();
 const application = express();
 // fayona.GetRoutes().forEach((route) => {
 //   application.use(route.GetRouter());
@@ -74,7 +69,7 @@ application
     })
   )
   .use(
-    fayona['Authentication']((options) => {
+    fayona.Authentication((options) => {
       options.DefaultAuthenticateScheme = 'Bearer'; // must be added
       options.AddScheme(
         new AuthenticationScheme(JwtBearerHandler, 'Bearer', 'JWT Bearer')
