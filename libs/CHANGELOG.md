@@ -2,6 +2,18 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.2.7](https://github.com/ezzabuzaid/fayona/compare/0.2.6...0.2.7) (2022-05-15)
+
+
+### Bug Fixes
+
+* **Core:** remove .net classes ([67af9a7](https://github.com/ezzabuzaid/fayona/commit/67af9a735e9e037b30dd3c108a573bc873cf7435))
+* **Core:** remove IWebApplicationBuilder ([6ec3283](https://github.com/ezzabuzaid/fayona/commit/6ec328390e4e33f7513b1fe13d31f06270dc1532))
+* **Identity:**  add AuthenticationProblemDetailsException ([e07ff20](https://github.com/ezzabuzaid/fayona/commit/e07ff20be490400a35cf88ece7f10cc4a97cc455))
+* **Identity:** throw an error if AuthenticationScheme name is null or undefined ([f485f5c](https://github.com/ezzabuzaid/fayona/commit/f485f5c335e79a541d71c0fe7853db17dcdf0138))
+* **Routing:** remove RemoveMiddleware ([da57d74](https://github.com/ezzabuzaid/fayona/commit/da57d74a0382014aa257181194cfd2cd34c808b8))
+* **Routing:** use Injector instance instead of custom service collection ([fe32423](https://github.com/ezzabuzaid/fayona/commit/fe32423182d711fd68cb472c4ae6ff69849f7ceb))
+
 ### [0.2.6](https://github.com/ezzabuzaid/fayona/compare/0.2.5...0.2.6) (2022-05-15)
 
 
