@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.2.6](https://github.com/ezzabuzaid/fayona/compare/0.2.5...0.2.6) (2022-05-15)
+
+
+### Bug Fixes
+
+* **Core:** remove IWebApplication ([4705d37](https://github.com/ezzabuzaid/fayona/commit/4705d376d25de7b8f5fd110d1f92cc269c1683ac))
+* **Identity:** change AuthenticationMiddleware to function ([6ebd3d3](https://github.com/ezzabuzaid/fayona/commit/6ebd3d3754c8f8f58acbf5f1da42bf2cea3998c5))
+* **Routing:** export routing middlewares as functions ([29618cb](https://github.com/ezzabuzaid/fayona/commit/29618cbc4e7e1c4977d17221507215a5244e3cea))
+* **Routing:** expose full path and final handler ([ad03fbb](https://github.com/ezzabuzaid/fayona/commit/ad03fbb9362522eb90f7a3235ebb69c8abfed3e7))
+
 ### [0.2.5](https://github.com/ezzabuzaid/fayona/compare/0.2.4...0.2.5) (2022-05-15)
 
 
