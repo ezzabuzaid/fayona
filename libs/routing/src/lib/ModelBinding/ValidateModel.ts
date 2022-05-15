@@ -6,7 +6,7 @@ import {
 
 export async function ValidateModel(payload: any, varient: any): Promise<any> {
   const payloadInstance = new payload();
-  Object.assign(payloadInstance, validateOrReject);
+  Object.assign(payloadInstance, varient);
   try {
     await validateOrReject(payloadInstance);
   } catch (error: any) {
