@@ -1,4 +1,8 @@
-import { InvalidOperationException } from '@fayona/core';
+import {
+  ArgumentNullException,
+  InvalidOperationException,
+  IsNullOrUndefined,
+} from '@fayona/core';
 
 import { AuthenticationScheme } from './AuthenticationScheme';
 
@@ -10,13 +14,18 @@ export class IAuthenticationOptions {
   public Schemas: AuthenticationScheme[] = [];
 
   public AddScheme(authenticationScheme: AuthenticationScheme): void {
-    if (this.Schemas.some((item) => item)) {
+    if (this.SchemasMap.has(authenticationScheme.Name)) {
       throw new InvalidOperationException(
-        `${authenticationScheme} already exist.`
+        'Scheme already exists: ' + authenticationScheme.Name
       );
-    } else {
-      this.Schemas.push(authenticationScheme);
-      this.SchemasMap.set(authenticationScheme.Name, authenticationScheme);
     }
+    if (IsNullOrUndefined(authenticationScheme.Name)) {
+      throw new ArgumentNullException(
+        'Cannot be null',
+        'authenticationScheme.Name'
+      );
+    }
+    this.Schemas.push(authenticationScheme);
+    this.SchemasMap.set(authenticationScheme.Name, authenticationScheme);
   }
 }
