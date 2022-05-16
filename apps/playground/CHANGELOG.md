@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.2.8](https://github.com/ezzabuzaid/fayona/compare/0.2.7...0.2.8) (2022-05-16)
+
+
+### Bug Fixes
+
+* **Identity:** add signature to authentication middleware ([2230add](https://github.com/ezzabuzaid/fayona/commit/2230addc4a5f89a0c781a0afa338c5dc1c4184d5))
+* move Fayona class to core ([7547710](https://github.com/ezzabuzaid/fayona/commit/7547710cf6eac45a9b7eb91c7eddca6496551d87))
+
 ### [0.2.7](https://github.com/ezzabuzaid/fayona/compare/0.2.6...0.2.7) (2022-05-15)
 
 ### [0.2.6](https://github.com/ezzabuzaid/fayona/compare/0.2.5...0.2.6) (2022-05-15)
