@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.2.7](https://github.com/ezzabuzaid/fayona/compare/0.2.6...0.2.7) (2022-05-15)
+
+
+### Bug Fixes
+
+* **Routing:** remove RemoveMiddleware ([da57d74](https://github.com/ezzabuzaid/fayona/commit/da57d74a0382014aa257181194cfd2cd34c808b8))
+* **Routing:** use Injector instance instead of custom service collection ([fe32423](https://github.com/ezzabuzaid/fayona/commit/fe32423182d711fd68cb472c4ae6ff69849f7ceb))
+
 ### [0.2.6](https://github.com/ezzabuzaid/fayona/compare/0.2.5...0.2.6) (2022-05-15)
 
 

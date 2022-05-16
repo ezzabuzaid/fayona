@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.2.7](https://github.com/ezzabuzaid/fayona/compare/0.2.6...0.2.7) (2022-05-15)
+
+
+### Bug Fixes
+
+* **Identity:**  add AuthenticationProblemDetailsException ([e07ff20](https://github.com/ezzabuzaid/fayona/commit/e07ff20be490400a35cf88ece7f10cc4a97cc455))
+* **Identity:** throw an error if AuthenticationScheme name is null or undefined ([f485f5c](https://github.com/ezzabuzaid/fayona/commit/f485f5c335e79a541d71c0fe7853db17dcdf0138))
+
 ### [0.2.6](https://github.com/ezzabuzaid/fayona/compare/0.2.5...0.2.6) (2022-05-15)
 
 

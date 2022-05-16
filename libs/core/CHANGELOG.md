@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.2.7](https://github.com/ezzabuzaid/fayona/compare/0.2.6...0.2.7) (2022-05-15)
+
+
+### Bug Fixes
+
+* **Core:** remove .net classes ([67af9a7](https://github.com/ezzabuzaid/fayona/commit/67af9a735e9e037b30dd3c108a573bc873cf7435))
+* **Core:** remove IWebApplicationBuilder ([6ec3283](https://github.com/ezzabuzaid/fayona/commit/6ec328390e4e33f7513b1fe13d31f06270dc1532))
+
 ### [0.2.6](https://github.com/ezzabuzaid/fayona/compare/0.2.5...0.2.6) (2022-05-15)
 
 
