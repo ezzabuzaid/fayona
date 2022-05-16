@@ -1,5 +1,5 @@
-import { Action } from '../Utils/Action';
-import { IsNullOrEmpty, IsNullOrUndefined } from '../Utils/Utils';
+import { Action, IsNullOrEmpty, IsNullOrUndefined } from '@fayona/core';
+
 import { Claim } from './Claim';
 import { ClaimTypes } from './ClaimType';
 

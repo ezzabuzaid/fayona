@@ -1,5 +1,4 @@
-import { ClaimsPrincipal } from '@fayona/core';
-
+import { ClaimsPrincipal } from '../Claims';
 import { AuthenticationTicket } from './AuthenticationTicket';
 
 export interface AuthenticationProperties {}

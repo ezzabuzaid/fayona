@@ -1,11 +1,8 @@
-import {
-  ClaimsPrincipal,
-  InvalidOperationException,
-  IsNullOrUndefined,
-} from '@fayona/core';
-import { HttpContext } from '@fayona/routing';
+import { InvalidOperationException, IsNullOrUndefined } from '@fayona/core';
+import { IHttpContext } from '@fayona/core';
 import { Injectable, ServiceLifetime } from 'tiny-injector';
 
+import { ClaimsPrincipal } from '../Claims';
 import { AuthenticationProperties } from './AuthenticateResult';
 import { IAuthenticationOptions } from './AuthenticationOptions';
 import { AuthenticationSchemeProvider } from './AuthenticationSchemeProvider';
@@ -26,7 +23,7 @@ export class AuthenticationService extends IAuthenticationService {
   }
 
   public override async Authenticate(
-    context: HttpContext,
+    context: IHttpContext,
     scheme?: string | undefined
   ): Promise<ClaimsPrincipal> {
     if (IsNullOrUndefined(scheme)) {
@@ -78,7 +75,7 @@ export class AuthenticationService extends IAuthenticationService {
   }
 
   private GetHandler(
-    context: HttpContext,
+    context: IHttpContext,
     scheme: string
   ): IAuthenticationHandler | undefined {
     const authenticationScheme = this.AuthenticationOptions.Schemas.find(

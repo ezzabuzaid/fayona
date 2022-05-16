@@ -5,14 +5,14 @@ import {
   IsNullOrUndefined,
   Metadata,
 } from '@fayona/core';
-import { HttpContext } from '@fayona/routing';
+import { IHttpContext } from '@fayona/core';
 import type { NextFunction } from 'express';
 
-import { AuthorizationOptions } from '../AuthorizationOptions';
-import { AuthorizationPolicy } from '../AuthorizationPolicy';
-import { AuthorizationPolicyBuilder } from '../AuthorizationPolicyBuilder';
-import { IAuthorizeData } from '../IAuthorizeData';
+import { AuthorizationOptions } from './AuthorizationOptions';
+import { AuthorizationPolicy } from './AuthorizationPolicy';
+import { AuthorizationPolicyBuilder } from './AuthorizationPolicyBuilder';
 import { AuthorizationService } from './AuthorizationService';
+import { IAuthorizeData } from './IAuthorizeData';
 
 export class AuthorizationMiddleware {
   private readonly AuthorizationService: AuthorizationService;
@@ -28,7 +28,10 @@ export class AuthorizationMiddleware {
     this.Metadata = metadata;
   }
 
-  public async Invoke(context: HttpContext, next: NextFunction): Promise<void> {
+  public async Invoke(
+    context: IHttpContext,
+    next: NextFunction
+  ): Promise<void> {
     const authorizeData: IAuthorizeData[] =
       context.GetMetadata()?.Properties.get(IAuthorizeData) ?? [];
 

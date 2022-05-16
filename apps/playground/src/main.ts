@@ -2,15 +2,18 @@
  * This is not a production server yet!
  * This is only a minimal backend to get started.
  */
-import { ClaimsPrincipal, Metadata } from '@fayona/core';
+import '@fayona/core';
+import { CreateFayona } from '@fayona/core';
+import '@fayona/identity';
 import {
   AuthenticationProblemDetailsException,
   AuthenticationProperties,
   AuthenticationScheme,
+  ClaimsPrincipal,
   FromStrategy,
   IAuthenticationHandler,
 } from '@fayona/identity';
-import { Fayona, IFayona } from '@fayona/routing';
+import '@fayona/routing';
 import * as express from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import {
@@ -56,15 +59,18 @@ class JwtBearerHandler extends IAuthenticationHandler {
   }
 }
 
-const fayona: IFayona = new Fayona();
+const fayona = CreateFayona();
+
+fayona.Authentication;
 const application = express();
 // fayona.GetRoutes().forEach((route) => {
 //   application.use(route.GetRouter());
 // });
+
 application
   .use(express.json())
   .use(
-    fayona.Init({
+    fayona.Routing({
       controllers: [],
     })
   )

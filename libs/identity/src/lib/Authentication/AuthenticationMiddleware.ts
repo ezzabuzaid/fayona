@@ -1,20 +1,11 @@
-import {
-  Action,
-  ClaimTypes,
-  ClaimsIdentity,
-  ClaimsPrincipal,
-  IsNullOrUndefined,
-  NotNullOrUndefined,
-} from '@fayona/core';
-import { HttpContext } from '@fayona/routing';
-import { NextFunction, RequestHandler } from 'express';
-import { ProblemDetailsException } from 'rfc-7807-problem-details';
-import { Injectable, Injector, ServiceLifetime } from 'tiny-injector';
+import { Action, NotNullOrUndefined } from '@fayona/core';
+import { HttpContext, IHttpContext } from '@fayona/core';
+import { RequestHandler } from 'express';
+import { Injector } from 'tiny-injector';
 
 import { IAuthenticationOptions } from './AuthenticationOptions';
 import { AuthenticationSchemeProvider } from './AuthenticationSchemeProvider';
 import { AuthenticationService } from './AuthenticationService';
-import { IAuthenticationService } from './IAuthenticationService';
 
 export function AuthenticationMiddleware(
   configure: Action<IAuthenticationOptions, void>
@@ -32,7 +23,7 @@ export function AuthenticationMiddleware(
     );
     const defaultAuthenticate =
       authenticationSchemeProvider.GetDefaultAuthenticateScheme();
-    const httpContext = req.Inject(HttpContext);
+    const httpContext: IHttpContext = req.Inject(HttpContext);
 
     if (NotNullOrUndefined(defaultAuthenticate)) {
       try {

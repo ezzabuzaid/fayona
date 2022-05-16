@@ -1,4 +1,5 @@
-import { IsNullOrEmpty } from '../Utils/Utils';
+import { IsNullOrEmpty } from '@fayona/core';
+
 import { ClaimsIdentity } from './ClaimsIdentity';
 
 // https://github.com/dotnet/runtime/blob/main/src/libraries/System.Security.Claims/src/System/Security/Claims/ClaimsIdentity.cs

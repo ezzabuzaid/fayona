@@ -1,7 +1,7 @@
+import { HttpContext } from '@fayona/core';
 import { AsyncLocalStorage } from 'async_hooks';
 import type { NextFunction } from 'express';
 
-import { HttpContext } from '../../Http/HttpContext';
 import { RequestIdOptions } from './RequestIdOptions';
 
 const asyncLocalStorage = new AsyncLocalStorage<string>();

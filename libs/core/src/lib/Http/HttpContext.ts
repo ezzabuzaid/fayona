@@ -1,17 +1,14 @@
-import {
-  ClaimsPrincipal,
-  HttpEndpointMetadata,
-  Metadata,
-  SaveReturn,
-} from '@fayona/core';
 import type { Request, Response } from 'express';
 import { Context, Injectable, Injector, ServiceLifetime } from 'tiny-injector';
+
+import { HttpEndpointMetadata, Metadata } from '../Metadata';
+import { SaveReturn } from '../Utils/Utils';
+import { IHttpContext } from './IHttpContext';
 
 @Injectable({
   lifetime: ServiceLifetime.Scoped,
 })
-export class HttpContext {
-  public User?: ClaimsPrincipal;
+export class HttpContext implements IHttpContext {
   public readonly Request: Request = this.context.getExtra('request');
   public readonly Response: Response = this.context.getExtra('response');
   constructor(private context: Context) {}

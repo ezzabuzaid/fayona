@@ -10,8 +10,8 @@ import {
 import { Injector } from 'tiny-injector';
 
 import { IAuthenticationOptions } from '../Authentication/AuthenticationOptions';
-import { AuthorizationOptions } from '../AuthorizationOptions';
-import { IAuthorizeData } from '../IAuthorizeData';
+import { AuthorizationOptions } from './AuthorizationOptions';
+import { IAuthorizeData } from './IAuthorizeData';
 
 export function Authorize(authorizeData?: IAuthorizeData): any {
   const authorizationOptions =

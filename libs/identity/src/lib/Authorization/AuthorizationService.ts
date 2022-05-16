@@ -1,13 +1,12 @@
-import { ClaimsPrincipal } from '@fayona/core';
 import { Inject } from 'tiny-injector';
 
-import { AuthorizationEvaluator } from '../AuthorizationEvaluator';
-import { AuthorizationHandlerContext } from '../AuthorizationHandlerContext';
-import { AuthorizationOptions } from '../AuthorizationOptions';
-import { AuthorizationPolicy } from '../AuthorizationPolicy';
-import { AuthorizationResult } from '../AuthorizationResult';
-import { IAuthorizationHandler } from '../IAuthorizationHandler';
-import { IAuthorizationRequirement } from '../IAuthorizationRequirement';
+import { ClaimsPrincipal } from '../Claims';
+import { AuthorizationEvaluator } from './AuthorizationEvaluator';
+import { AuthorizationHandlerContext } from './AuthorizationHandlerContext';
+import { AuthorizationOptions } from './AuthorizationOptions';
+import { AuthorizationPolicy } from './AuthorizationPolicy';
+import { AuthorizationResult } from './AuthorizationResult';
+import { IAuthorizationHandler } from './IAuthorizationHandler';
 
 export class AuthorizationService {
   public AuthorizationOptions: AuthorizationOptions;

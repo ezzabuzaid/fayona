@@ -1,11 +1,8 @@
-import { ClaimsPrincipal } from '@fayona/core';
-import { HttpContext } from '@fayona/routing';
+import { HttpContext } from '@fayona/core';
 import { Injectable } from 'tiny-injector';
 
-import {
-  AuthenticateResult,
-  AuthenticationProperties,
-} from './AuthenticateResult';
+import { ClaimsPrincipal } from '../Claims';
+import { AuthenticationProperties } from './AuthenticateResult';
 
 @Injectable()
 export abstract class IAuthenticationService {

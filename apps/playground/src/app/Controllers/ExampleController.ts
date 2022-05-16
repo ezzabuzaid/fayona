@@ -1,7 +1,7 @@
+import { HttpContext, IHttpContext } from '@fayona/core';
 import {
   FromBody,
   FromRoute,
-  HttpContext,
   HttpGet,
   HttpPatch,
   HttpPost,
@@ -11,6 +11,7 @@ import {
   SuccessResponse,
 } from '@fayona/routing';
 import { ProblemDetailsException } from 'rfc-7807-problem-details';
+import { Inject } from 'tiny-injector';
 
 import {
   CreateExampleDto,
@@ -25,7 +26,7 @@ const store: Example[] = [];
 
 @Route('example')
 export class ExampleController {
-  constructor(private httpContext: HttpContext) {}
+  constructor(@Inject(HttpContext) private httpContext: IHttpContext) {}
   @HttpPost('/create')
   public CreateExample(@FromBody() dto: CreateExampleDto): HttpResponse {
     console.log(this.httpContext.GetMetadata());

@@ -1,17 +1,16 @@
-import { ClaimsPrincipal } from '@fayona/core';
-import { HttpContext } from '@fayona/routing';
+import { HttpContext } from '@fayona/core';
+import type { Strategy } from 'passport';
 import { ProblemDetailsException } from 'rfc-7807-problem-details';
 import { Injectable, ServiceLifetime } from 'tiny-injector';
 
 import { AuthenticationProblemDetailsException } from '../Authentication';
-
-import type passport = require('passport');
+import { ClaimsPrincipal } from '../Claims';
 
 @Injectable({
   lifetime: ServiceLifetime.Transient,
 })
-export class FromStrategy<T extends new (...args: any) => passport.Strategy> {
-  constructor(private _httpContext: HttpContext) {}
+export class FromStrategy<T extends new (...args: any) => Strategy> {
+  constructor(private httpContext: HttpContext) {}
 
   public async Authenticate(
     strategy: T,
@@ -56,7 +55,7 @@ export class FromStrategy<T extends new (...args: any) => passport.Strategy> {
           resolve(user);
         },
       });
-      strategyInstance.authenticate(this._httpContext.Request);
+      strategyInstance.authenticate(this.httpContext.Request);
     });
   }
 }

@@ -1,9 +1,6 @@
-import {
-  ArgumentNullException,
-  ClaimsPrincipal,
-  IsNullOrUndefined,
-} from '@fayona/core';
+import { ArgumentNullException, IsNullOrUndefined } from '@fayona/core';
 
+import { ClaimsPrincipal } from '../Claims';
 import { AuthenticationProperties } from './AuthenticateResult';
 
 export class AuthenticationTicket {

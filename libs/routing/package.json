@@ -4,19 +4,5 @@
   "type": "commonjs",
   "license": "MIT",
   "bugs": "https://github.com/ezzabuzaid/fayona/issues",
-  "homepage": "https://github.com/ezzabuzaid/fayona",
-  "keywords": [
-    "node js",
-    "restful",
-    "rest ful",
-    "rest api",
-    "rest",
-    "fayona",
-    ".net",
-    ".netcore",
-    "nodejs .netcore",
-    "node .netcore",
-    "tiny-injector",
-    "ezzabuzaid"
-  ]
+  "homepage": "https://github.com/ezzabuzaid/fayona"
 }

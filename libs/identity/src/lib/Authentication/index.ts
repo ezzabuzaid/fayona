@@ -6,5 +6,5 @@ export * from './AuthenticationService';
 export * from './AuthenticationTicket';
 export * from './IAuthenticationHandler';
 export * from './IAuthenticationService';
-export * from './index';
 export * from './AuthenticationProblemDetailsException';
+export * from './AuthenticationOptions';

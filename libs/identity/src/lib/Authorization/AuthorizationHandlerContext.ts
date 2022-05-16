@@ -1,5 +1,4 @@
-import { ClaimsPrincipal } from '@fayona/core';
-
+import { ClaimsPrincipal } from '../Claims';
 import { AuthorizationFailureReason } from './AuthorizationFailureReason';
 import { IAuthorizationHandler } from './IAuthorizationHandler';
 import { IAuthorizationRequirement } from './IAuthorizationRequirement';
