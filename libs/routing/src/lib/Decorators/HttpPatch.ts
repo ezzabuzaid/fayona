@@ -18,17 +18,19 @@ export function HttpPatch(
     propertyKey,
     descriptor: PropertyDescriptor
   ) {
-    const returnType = Reflect.getMetadata(
-      'design:returntype',
-      target,
-      propertyKey
-    );
+    // FIXME: to be enabled as build step
 
-    if (HttpResponse !== returnType) {
-      throw new ArgumentNullException(
-        `The return type of ${propertyKey.toString()} is not HttpResponse.`
-      );
-    }
+    // const returnType = Reflect.getMetadata(
+    //   'design:returntype',
+    //   target,
+    //   propertyKey
+    // );
+
+    // if (HttpResponse !== returnType) {
+    //   throw new ArgumentNullException(
+    //     `The return type of ${propertyKey.toString()} is not HttpResponse.`
+    //   );
+    // }
 
     const metadata = Injector.GetRequiredService(Metadata);
     metadata.RegisterHttpEndpoint(
