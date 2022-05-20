@@ -1,5 +1,4 @@
 {
-  "root": "libs/identity",
   "sourceRoot": "libs/identity/src",
   "targets": {
     "build": {

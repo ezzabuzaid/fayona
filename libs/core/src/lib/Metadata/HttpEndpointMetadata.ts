@@ -7,7 +7,7 @@ export class HttpEndpointMetadata {
   public readonly Properties = new Map<any, any>();
   public readonly Parameters: ParameterMetadata<any>[] = [];
   public FullPath?: string;
-  public FinalHandler?: RequestHandler;
+  public FinalHandler?: Function;
 
   constructor(
     public readonly controller: Function,

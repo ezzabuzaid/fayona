@@ -1,5 +1,4 @@
 {
-  "root": "libs/routing",
   "sourceRoot": "libs/routing/src",
   "targets": {
     "build": {

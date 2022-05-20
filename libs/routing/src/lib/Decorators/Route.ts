@@ -9,10 +9,7 @@ import {
 } from '@fayona/core';
 import { Metadata } from '@fayona/core';
 import {
-  NextFunction,
-  Request,
   RequestHandler,
-  Response,
   RouterOptions,
   Router as expressRouter,
 } from 'express';
@@ -20,6 +17,7 @@ import { RequestHandlerParams } from 'express-serve-static-core';
 import * as path from 'path';
 import { Injector } from 'tiny-injector';
 
+import { Factory } from '../Factory';
 import { FromBodyModelBinding } from '../ModelBinding/FromBodyModelBinding';
 import { FromHeaderModelBinding } from '../ModelBinding/FromHeaderModelBinding';
 import { FromQueryModelBinding } from '../ModelBinding/FromQueryModelBinding';
@@ -41,12 +39,16 @@ export function Route(endpoint?: string, options: RouterOptions = {}): any {
     }
 
     const metadata = Injector.GetRequiredService(Metadata);
+    const factory = Injector.GetRequiredService(Factory);
     const router = expressRouter(options);
+
+    // factory.CreateRoute()
+    // factory.OnRouteAdded();
 
     metadata.RegisterHttpRoute(
       new HttpRouteMetadata(
         constructor,
-        router,
+        router, // FIXME: we do not need route anymore - should be removed - fayona should act as route - look at koa/express router and port them
         NormalizeEndpoint(constructor, endpoint ?? '/')
       )
     );
@@ -65,32 +67,20 @@ export function Route(endpoint?: string, options: RouterOptions = {}): any {
           httpEndpointMetadata.path!
         );
 
-        const finalHandler = async (
-          request: Request,
-          response: Response,
-          next: NextFunction
-        ): Promise<any> => {
-          try {
-            const controllerInstance = request.Inject(
-              httpEndpointMetadata.controller
-            );
-
-            const endpointResponse = httpEndpointMetadata.handler!.apply(
-              controllerInstance,
-              await getBindings(request, httpEndpointMetadata)
-            ) as unknown as HttpResponse;
-
-            response
-              .status(endpointResponse.StatusCode)
-              .json(endpointResponse.ToJson());
-            next();
-          } catch (error) {
-            next(error);
-          }
+        const finalHandler = async (...args: any[]): Promise<any> => {
+          // FIXME: move the DI context creation here - you'll have control when to destroy it - but it won't be available out of fayona execution (after final handler finishes it won't be exist for down middlewares)
+          const request = factory.GetRequest(...args);
+          const inject = factory.GetInjector(request);
+          const controllerInstance = inject(httpEndpointMetadata.controller);
+          return httpEndpointMetadata.handler!.apply(
+            controllerInstance,
+            await getBindings(factory, request, httpEndpointMetadata)
+          ) as unknown as HttpResponse;
         };
 
         httpEndpointMetadata.FullPath = normalizedEndpoint;
         httpEndpointMetadata.FinalHandler = finalHandler;
+        factory.OnActionAdded(httpEndpointMetadata);
       });
 
     return constructor;
@@ -126,7 +116,8 @@ function PopulateRouteMiddlewares(
 }
 
 const getBindings = async (
-  request: Request,
+  factory: Factory,
+  request: any,
   httpEndpointMetadata: HttpEndpointMetadata
 ): Promise<any[]> => {
   const parameters: any[] = [];
@@ -136,14 +127,14 @@ const getBindings = async (
       case ParameterType.FROM_HEADER:
         const modelBinding = new FromHeaderModelBinding(
           parameterMetadata,
-          request.headers
+          factory.GetHeaders(request)
         );
         parameters[parameterMetadata.Index] = await modelBinding.Bind();
         break;
       case ParameterType.FROM_ROUTE:
         const fromRouteModelBinding = new FromRouteModelBinding(
           parameterMetadata,
-          request.params
+          factory.GetParams(request)
         );
         parameters[parameterMetadata.Index] =
           await fromRouteModelBinding.Bind();
@@ -151,7 +142,7 @@ const getBindings = async (
       case ParameterType.FROM_QUERY:
         const fromQueryModelBinding = new FromQueryModelBinding(
           parameterMetadata,
-          request.query
+          factory.GetQuery(request)
         );
         parameters[parameterMetadata.Index] =
           await fromQueryModelBinding.Bind();
@@ -167,7 +158,7 @@ const getBindings = async (
       case ParameterType.FROM_BODY:
         const fromBodyModelBinding = new FromBodyModelBinding(
           parameterMetadata,
-          request.body
+          factory.GetBody(request)
         );
         parameters[parameterMetadata.Index] = await fromBodyModelBinding.Bind();
         break;

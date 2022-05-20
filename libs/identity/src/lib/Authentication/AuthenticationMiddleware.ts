@@ -1,5 +1,6 @@
 import { Action, NotNullOrUndefined } from '@fayona/core';
 import { HttpContext, IHttpContext } from '@fayona/core';
+import { Factory } from '@fayona/routing';
 import { RequestHandler } from 'express';
 import { Injector } from 'tiny-injector';
 
@@ -16,14 +17,16 @@ export function AuthenticationMiddleware(
     return authenticationOptions;
   });
 
-  return async (req, res, next) => {
-    const authenticationService = req.Inject(AuthenticationService);
-    const authenticationSchemeProvider = req.Inject(
-      AuthenticationSchemeProvider
-    );
+  return async (...args: any[]) => {
+    const factory = Injector.GetRequiredService(Factory);
+    const request = factory.GetRequest(...args);
+    const inject = factory.GetInjector(request);
+    const delegate = factory.GetDelegate(...args);
+    const authenticationService = inject(AuthenticationService);
+    const authenticationSchemeProvider = inject(AuthenticationSchemeProvider);
     const defaultAuthenticate =
       authenticationSchemeProvider.GetDefaultAuthenticateScheme();
-    const httpContext: IHttpContext = req.Inject(HttpContext);
+    const httpContext: IHttpContext = inject(HttpContext);
 
     if (NotNullOrUndefined(defaultAuthenticate)) {
       try {
@@ -33,9 +36,9 @@ export function AuthenticationMiddleware(
         );
         httpContext.User = result;
       } catch (error) {
-        next(error);
+        delegate(error);
       }
     }
-    next();
+    delegate();
   };
 }

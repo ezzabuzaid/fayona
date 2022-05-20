@@ -1,13 +1,6 @@
-import {
-  ArgumentNullException,
-  HttpEndpointMetadata,
-  METHODS,
-  Metadata,
-} from '@fayona/core';
+import { HttpEndpointMetadata, METHODS, Metadata } from '@fayona/core';
 import { RequestHandler } from 'express';
 import { Injector } from 'tiny-injector';
-
-import { HttpResponse } from '../Response';
 
 export function HttpPatch(
   endpoint = '/',

@@ -1,6 +1,6 @@
 import { InvalidOperationException, IsNullOrUndefined } from '@fayona/core';
 import { IHttpContext } from '@fayona/core';
-import { Injectable, ServiceLifetime } from 'tiny-injector';
+import { Context, Injectable, Injector, ServiceLifetime } from 'tiny-injector';
 
 import { ClaimsPrincipal } from '../Claims';
 import { AuthenticationProperties } from './AuthenticateResult';
@@ -16,7 +16,8 @@ export class AuthenticationService extends IAuthenticationService {
   public readonly AuthenticationSchemeProvider: AuthenticationSchemeProvider;
   constructor(
     private readonly AuthenticationOptions: IAuthenticationOptions,
-    authenticationSchemeProvider: AuthenticationSchemeProvider
+    authenticationSchemeProvider: AuthenticationSchemeProvider,
+    private context: Context
   ) {
     super();
     this.AuthenticationSchemeProvider = authenticationSchemeProvider;
@@ -82,7 +83,10 @@ export class AuthenticationService extends IAuthenticationService {
       (item) => item.Name === scheme
     );
     if (authenticationScheme) {
-      return context.Request.Inject(authenticationScheme.HandlerType);
+      return Injector.GetRequiredService(
+        authenticationScheme.HandlerType,
+        this.context
+      );
     }
     return undefined;
   }

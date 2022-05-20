@@ -25,7 +25,6 @@ declare global {
     }
   }
 }
-
 export function CreateFayona(): import('@fayona/core').IFayona & IFayona {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
