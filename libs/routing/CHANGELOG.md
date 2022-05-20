@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.2.9](https://github.com/ezzabuzaid/fayona/compare/0.2.8...0.2.9) (2022-05-20)
+
+
+### Bug Fixes
+
+* delegate the responsibility of binding routes to the user ([9a4c0da](https://github.com/ezzabuzaid/fayona/commit/9a4c0dae83c4dce8da6dc1f8f51febd07571390f))
+* remove express router deps ([c1c9e3f](https://github.com/ezzabuzaid/fayona/commit/c1c9e3f0ca1f19766f9e9de0dead1dab32e0ad1a))
+* **Routing:** remove prior validation of http action return type ([dd9abe8](https://github.com/ezzabuzaid/fayona/commit/dd9abe893bd8750374bae050529be190dfa51329))
+
 ### [0.2.8](https://github.com/ezzabuzaid/fayona/compare/0.2.7...0.2.8) (2022-05-16)
 
 

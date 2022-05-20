@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.2.9](https://github.com/ezzabuzaid/fayona/compare/0.2.8...0.2.9) (2022-05-20)
+
+
+### Bug Fixes
+
+* delegate the responsibility of binding routes to the user ([9a4c0da](https://github.com/ezzabuzaid/fayona/commit/9a4c0dae83c4dce8da6dc1f8f51febd07571390f))
+
 ### [0.2.8](https://github.com/ezzabuzaid/fayona/compare/0.2.7...0.2.8) (2022-05-16)
 
 
