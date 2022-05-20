@@ -40,18 +40,19 @@ export function Route(endpoint?: string, options: RouterOptions = {}): any {
 
     const metadata = Injector.GetRequiredService(Metadata);
     const factory = Injector.GetRequiredService(Factory);
-    const router = expressRouter(options);
+    // const router = expressRouter(options);
 
     // factory.CreateRoute()
     // factory.OnRouteAdded();
 
-    metadata.RegisterHttpRoute(
-      new HttpRouteMetadata(
-        constructor,
-        router, // FIXME: we do not need route anymore - should be removed - fayona should act as route - look at koa/express router and port them
-        NormalizeEndpoint(constructor, endpoint ?? '/')
-      )
-    );
+    // metadata.RegisterHttpRoute(
+    //   new HttpRouteMetadata(
+    //     constructor,
+    //     router, // FIXME: we do not need route anymore - should be removed - fayona should act as route - look at koa/express router and port them
+    //     NormalizeEndpoint(constructor, endpoint ?? '/')
+    //   )
+    // );
+
     Injector.AddScoped(constructor as any);
 
     const { endpoints } = metadata.GetHttpRoute(

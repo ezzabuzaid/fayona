@@ -69,20 +69,20 @@ export class Metadata {
     }
   }
 
-  public RegisterHttpRoute(httpRouteMetadata: HttpRouteMetadata): void {
-    try {
-      const metadata = this.GetHttpRoute(
-        (item) => item.controller === httpRouteMetadata.controller
-      );
-      metadata.SetRouter(httpRouteMetadata.router!, httpRouteMetadata.path!);
-    } catch (error) {
-      if (error instanceof InvalidOperationException) {
-        throw new InvalidOperationException(
-          `Looks like "${httpRouteMetadata.controller.name}" controlller doesn't contain any endpoints`
-        );
-      }
-    }
-  }
+  // public RegisterHttpRoute(httpRouteMetadata: HttpRouteMetadata): void {
+  //   try {
+  //     const metadata = this.GetHttpRoute(
+  //       (item) => item.controller === httpRouteMetadata.controller
+  //     );
+  //     metadata.SetRouter(httpRouteMetadata.router!, httpRouteMetadata.path!);
+  //   } catch (error) {
+  //     if (error instanceof InvalidOperationException) {
+  //       throw new InvalidOperationException(
+  //         `Looks like "${httpRouteMetadata.controller.name}" controlller doesn't contain any endpoints`
+  //       );
+  //     }
+  //   }
+  // }
 
   public GetHttpRoutes(): HttpRouteMetadata[] {
     return Array.from(this.#Routes);

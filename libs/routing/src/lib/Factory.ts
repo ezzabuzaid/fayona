@@ -2,8 +2,8 @@ import { HttpEndpointMetadata } from '@fayona/core';
 import { ServiceType } from 'tiny-injector';
 
 export abstract class Factory {
-  public abstract CreateRoute(): any; // FIXME: should contain type that at least have the minmum needed apis
-  public abstract OnRouteAdded(): void;
+  // public abstract CreateRoute(): any; // FIXME: should contain type that at least have the minmum needed apis
+  // public abstract OnRouteAdded(): void;
   public abstract OnActionAdded(
     httpEndpointMetadata: HttpEndpointMetadata
   ): void;
