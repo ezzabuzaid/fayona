@@ -30,5 +30,5 @@ export async function ValidateModel(payload: any, varient: any): Promise<any> {
     problemDetails['errors'] = errors;
     throw new ProblemDetailsException(problemDetails);
   }
-  return payload;
+  return payloadInstance;
 }
