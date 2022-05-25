@@ -2,6 +2,8 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.2.10](https://github.com/ezzabuzaid/fayona/compare/0.2.9...0.2.10) (2022-05-25)
+
 ### [0.2.9](https://github.com/ezzabuzaid/fayona/compare/0.2.8...0.2.9) (2022-05-20)
 
 
