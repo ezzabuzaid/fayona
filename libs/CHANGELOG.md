@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.2.10](https://github.com/ezzabuzaid/fayona/compare/0.2.9...0.2.10) (2022-05-25)
+
+
+### Bug Fixes
+
+* **routing:** @FromBody returns user class type instead of the final instance ([c02f457](https://github.com/ezzabuzaid/fayona/commit/c02f457cf8cd01ce60c495ed9509733ef71ac330))
+
 ### [0.2.9](https://github.com/ezzabuzaid/fayona/compare/0.2.8...0.2.9) (2022-05-20)
 
 
