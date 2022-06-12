@@ -6,7 +6,8 @@
     "start": "nx run playground:serve",
     "core": "nx run core:build --skip-nx-cache && nx run core:build --watch --skip-nx-cache",
     "routing": "nx run routing:build --skip-nx-cache && nx run routing:build --watch --skip-nx-cache",
-    "identity": "nx run identity:build --skip-nx-cache && nx run identity:build --watch --skip-nx-cache"
+    "identity": "nx run identity:build --skip-nx-cache && nx run identity:build --watch --skip-nx-cache",
+    "openapi": "nx run openapi:build --skip-nx-cache && nx run openapi:build --watch --skip-nx-cache"
   },
   "private": true,
   "dependencies": {
@@ -14,6 +15,7 @@
     "@trivago/prettier-plugin-sort-imports": "^3.2.0",
     "@types/passport-jwt": "^3.0.6",
     "class-validator": "^0.13.2",
+    "deepmerge": "^4.2.2",
     "eslint-plugin-check-file": "^1.1.0",
     "express": "^4.17.3",
     "express-list-endpoints": "^6.0.0",
@@ -21,13 +23,15 @@
     "jsonwebtoken": "^8.5.1",
     "nanoid": "^3.3.2",
     "ngx-deploy-npm": "^3.1.9",
+    "openapi3-ts": "^2.0.2",
     "passport": "^0.5.2",
     "passport-jwt": "^4.0.0",
     "promise-status-async": "^1.2.10",
     "rfc-7807-problem-details": "1.1.0",
     "tiny-injector": "^0.1.1",
     "tslib": "^2.0.0",
-    "tslog": "^3.3.3"
+    "tslog": "^3.3.3",
+    "typescript-json-schema": "^0.53.1"
   },
   "devDependencies": {
     "@nrwl/cli": "14.1.7",
@@ -50,6 +54,9 @@
     "nx": "14.1.7",
     "prettier": "^2.5.1",
     "ts-jest": "27.1.4",
+    "ts-node": "9.1.1",
+    "ttypescript": "^1.5.13",
+    "typed-emitter": "^2.1.0",
     "typescript": "~4.6.2"
   }
 }

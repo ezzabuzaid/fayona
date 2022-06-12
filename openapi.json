@@ -1,0 +1,378 @@
+{
+  "paths": {
+    "/example/two": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Response Description test",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "StatusCode": { "type": "number", "example": 202 },
+                    "Message": { "type": "string" },
+                    "Data": {
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "'ReplaceExampleDto Name'"
+                        },
+                        "oldExample": {
+                          "properties": {
+                            "name": { "type": "string" },
+                            "id": { "type": "string" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "deprecated": false,
+        "tags": ["ExampleController"]
+      }
+    },
+    "/example/": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Response Description test",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "StatusCode": { "type": "number", "example": 202 },
+                    "Message": { "type": "string" },
+                    "Data": {
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "'ReplaceExampleDto Name'"
+                        },
+                        "oldExample": {
+                          "properties": {
+                            "name": { "type": "string" },
+                            "id": { "type": "string" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "deprecated": false,
+            "required": false,
+            "name": "ss",
+            "schema": { "type": "string" }
+          }
+        ],
+        "deprecated": false,
+        "tags": ["ExampleController"]
+      }
+    },
+    "/example/:id": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Response Description test",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "StatusCode": { "type": "number", "example": 202 },
+                    "Message": { "type": "string" },
+                    "Data": {
+                      "properties": {
+                        "name": { "type": "string" },
+                        "id": { "type": "string" },
+                        "street": { "type": "boolean" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "deprecated": false,
+            "required": true,
+            "name": "id",
+            "schema": { "type": "string" }
+          },
+          {
+            "in": "query",
+            "deprecated": false,
+            "required": false,
+            "schema": {
+              "properties": {
+                "name": { "type": "string" },
+                "id": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "deprecated": false,
+        "tags": ["ExampleController"]
+      }
+    },
+    "/example/create": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Response Description test",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "StatusCode": { "type": "number", "example": 202 },
+                    "Message": { "type": "string" },
+                    "Data": {
+                      "properties": {
+                        "name": { "type": "string" },
+                        "id": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": { "type": "string" },
+                  "age": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "deprecated": false,
+        "description": "'Example Description'",
+        "summary": "'Example Summary'",
+        "tags": ["ExampleController"]
+      }
+    },
+    "/example/replace/:id": {
+      "put": {
+        "responses": {
+          "200": {
+            "description": "Response Description test",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "StatusCode": { "type": "number", "example": 202 },
+                    "Message": { "type": "string" },
+                    "Data": {
+                      "properties": {
+                        "name": { "type": "string" },
+                        "id": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "description": "Custom Request Body Description",
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "'ReplaceExampleDto Name'"
+                  },
+                  "oldExample": {
+                    "properties": {
+                      "name": { "type": "string" },
+                      "id": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "deprecated": true,
+            "required": false,
+            "description": "Test Param Message",
+            "name": "test",
+            "schema": { "type": "number" }
+          },
+          {
+            "in": "path",
+            "deprecated": false,
+            "required": true,
+            "name": "id",
+            "schema": { "type": "string" }
+          }
+        ],
+        "deprecated": false,
+        "tags": ["ExampleController"]
+      }
+    },
+    "/example/update": {
+      "patch": {
+        "responses": {
+          "200": {
+            "description": "Response Description test",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "StatusCode": { "type": "number", "example": 202 },
+                    "Message": { "type": "string" },
+                    "Data": { "properties": { "name": { "type": "string" } } }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "properties": { "name": { "type": "string" } } }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "path",
+            "deprecated": false,
+            "required": true,
+            "name": "id",
+            "schema": { "type": "string" }
+          }
+        ],
+        "deprecated": false,
+        "tags": ["ExampleController"]
+      }
+    },
+    "/example/list": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Response Description test",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "StatusCode": { "type": "number", "example": 202 },
+                    "Message": { "type": "string" },
+                    "Data": {
+                      "type": "array",
+                      "items": {
+                        "properties": {
+                          "name": { "type": "string" },
+                          "id": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "deprecated": false,
+        "tags": ["ExampleController"]
+      }
+    }
+  },
+  "openapi": "3.0.0",
+  "security": [{}],
+  "components": {
+    "schemas": {
+      "HttpResponse": {
+        "properties": {
+          "StatusCode": {
+            "uniqueItems": true,
+            "type": "array",
+            "items": {
+              "type": "number",
+              "enum": [
+                202, 502, 400, 409, 100, 201, 417, 424, 403, 504, 410, 505, 418,
+                419, 507, 500, 411, 423, 420, 405, 301, 302, 207, 300, 511, 204,
+                203, 406, 404, 501, 304, 200, 206, 402, 308, 412, 428, 102, 407,
+                431, 408, 413, 414, 416, 205, 303, 503, 101, 307, 429, 401, 451,
+                422, 415, 305, 421
+              ]
+            }
+          },
+          "Message": { "type": "string" },
+          "Data": { "type": "object", "properties": {} }
+        }
+      },
+      "ReplaceExampleDto": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "'ReplaceExampleDto Name'"
+          },
+          "oldExample": {
+            "properties": {
+              "name": { "type": "string" },
+              "id": { "type": "string" }
+            }
+          }
+        }
+      },
+      "GetExampleDto": {
+        "properties": {
+          "name": { "type": "string" },
+          "id": { "type": "string" },
+          "street": { "type": "boolean" }
+        }
+      },
+      "CreateExampleDto": {
+        "properties": {
+          "name": { "type": "string" },
+          "age": { "type": "string" }
+        }
+      },
+      "Example": {
+        "properties": {
+          "name": { "type": "string" },
+          "id": { "type": "string" }
+        }
+      },
+      "UpdateExampleDto": { "properties": { "name": { "type": "string" } } },
+      "ListExamplesDto": {
+        "properties": {
+          "name": { "type": "string" },
+          "id": { "type": "string" }
+        }
+      }
+    }
+  },
+  "info": { "title": "Fayona", "version": "1.0.0" }
+}

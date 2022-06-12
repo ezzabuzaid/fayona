@@ -1,18 +1,13 @@
 import {
   HttpEndpointMetadata,
   HttpEndpointMiddlewareMetadata,
-  HttpRouteMetadata,
   InvalidOperationException,
   IsNullOrEmpty,
+  Metadata,
   ParameterType,
   sortBy,
 } from '@fayona/core';
-import { Metadata } from '@fayona/core';
-import {
-  RequestHandler,
-  RouterOptions,
-  Router as expressRouter,
-} from 'express';
+import { RequestHandler, RouterOptions } from 'express';
 import { RequestHandlerParams } from 'express-serve-static-core';
 import * as path from 'path';
 import { Injector } from 'tiny-injector';
@@ -40,18 +35,6 @@ export function Route(endpoint?: string, options: RouterOptions = {}): any {
 
     const metadata = Injector.GetRequiredService(Metadata);
     const factory = Injector.GetRequiredService(Factory);
-    // const router = expressRouter(options);
-
-    // factory.CreateRoute()
-    // factory.OnRouteAdded();
-
-    // metadata.RegisterHttpRoute(
-    //   new HttpRouteMetadata(
-    //     constructor,
-    //     router, // FIXME: we do not need route anymore - should be removed - fayona should act as route - look at koa/express router and port them
-    //     NormalizeEndpoint(constructor, endpoint ?? '/')
-    //   )
-    // );
 
     Injector.AddScoped(constructor as any);
 
@@ -76,7 +59,7 @@ export function Route(endpoint?: string, options: RouterOptions = {}): any {
           return httpEndpointMetadata.handler!.apply(
             controllerInstance,
             await getBindings(factory, request, httpEndpointMetadata)
-          ) as unknown as HttpResponse;
+          ) as unknown as HttpResponse<unknown>;
         };
 
         httpEndpointMetadata.FullPath = normalizedEndpoint;

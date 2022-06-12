@@ -1,0 +1,8 @@
+{
+  "name": "@fayona/openapi",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "license": "MIT",
+  "bugs": "https://github.com/ezzabuzaid/fayona/issues",
+  "homepage": "https://github.com/ezzabuzaid/fayona"
+}

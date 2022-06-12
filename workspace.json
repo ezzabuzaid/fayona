@@ -1,6 +1,11 @@
 {
   "version": 2,
   "projects": {
+    "core": "libs/core",
+    "identity": "libs/identity",
+    "playground": "apps/playground",
+    "openapi": "libs/openapi",
+    "routing": "libs/routing",
     "workspace": {
       "root": "libs",
       "targets": {
@@ -16,6 +21,7 @@
               "routing:publish",
               "core:publish",
               "identity:publish",
+              "openapi:publish",
               "workspace:github"
             ]
           }
@@ -33,6 +39,7 @@
               "routing:beta-publish",
               "core:beta-publish",
               "identity:beta-publish",
+              "openapi:publish",
               "workspace:github"
             ]
           }
@@ -45,10 +52,6 @@
           }
         }
       }
-    },
-    "core": "libs/core",
-    "identity": "libs/identity",
-    "playground": "apps/playground",
-    "routing": "libs/routing"
+    }
   }
 }

@@ -6,6 +6,16 @@
       "executor": "@nrwl/node:webpack",
       "outputs": ["{options.outputPath}"],
       "options": {
+        "transformers": [
+          {
+            "name": "@fayona/openapi",
+            "options": {
+              "baseUrl": "http://localhost:3000",
+              "name": "Fayona",
+              "version": "1.0.0"
+            }
+          }
+        ],
         "outputPath": "dist/apps/playground",
         "main": "apps/playground/src/main.ts",
         "tsConfig": "apps/playground/tsconfig.app.json",

@@ -1,0 +1,50 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/openapi/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/openapi",
+        "main": "libs/openapi/src/index.ts",
+        "tsConfig": "libs/openapi/tsconfig.lib.json",
+        "assets": ["libs/openapi/*.md"]
+      }
+    },
+    "publish": {
+      "executor": "ngx-deploy-npm:deploy",
+      "options": {
+        "noBuild": true,
+        "access": "public",
+        "buildTarget": "production"
+      }
+    },
+    "beta-publish": {
+      "executor": "ngx-deploy-npm:deploy",
+      "options": {
+        "noBuild": true,
+        "access": "public",
+        "buildTarget": "production",
+        "tag": "beta"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/openapi/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/openapi"],
+      "options": {
+        "jestConfig": "libs/openapi/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

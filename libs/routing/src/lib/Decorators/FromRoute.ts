@@ -1,11 +1,17 @@
-import { ArgumentNullException, Metadata } from '@fayona/core';
-import { IsNullOrEmpty, MakeHandlerName } from '@fayona/core';
+import {
+  ArgumentNullException,
+  IsNullOrEmpty,
+  MakeHandlerName,
+  Metadata,
+} from '@fayona/core';
 import { Injector } from 'tiny-injector';
 
 import { FromRouteParameterMetadata } from '../Metadata/FromRouteParameterMetadata';
 
 export function FromRoute(param: string): ParameterDecorator {
   if (IsNullOrEmpty(param)) {
+    // TODO: move it as build step to prevent runtime failure
+    // throw error if any other stype beside string or number is used
     throw new ArgumentNullException('Must be non empty string', 'param');
   }
   return (target: any, propertyKey, parameterIndex: number) => {

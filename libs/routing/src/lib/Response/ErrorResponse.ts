@@ -2,13 +2,13 @@ import { StatusCodes, getReasonPhrase } from 'http-status-codes';
 
 import { HttpResponse } from './HttpResponse';
 
-export class ErrorResponse extends HttpResponse {
+export class ErrorResponse extends HttpResponse<unknown> {
   constructor(
     message: string,
     statusCode = StatusCodes.BAD_REQUEST,
     public Code?: string
   ) {
-    super(statusCode, message);
+    super(undefined, statusCode, message);
   }
 
   public static BadRequest(message: string, code: string): ErrorResponse {
