@@ -3,4 +3,5 @@ export interface IOptions {
   name: string;
   version: string;
   description: string;
+  fileName: string;
 }

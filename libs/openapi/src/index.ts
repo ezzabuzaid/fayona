@@ -14,13 +14,14 @@ import { IOptions } from './lib/IOptions';
 import { JsonSpec } from './lib/Serializer/JsonSpec';
 import { Serializer } from './lib/Serializer/Serializer';
 import { SerializerUtility } from './lib/Serializer/SerializerUtility';
-import { CHECKER_TOKEN, PROGRAM_TOKEN } from './lib/Tokens';
+import { CHECKER_TOKEN, OPTIONS_TOKEN, PROGRAM_TOKEN } from './lib/Tokens';
 
 let serializer: Serializer;
 
 export const before = (options: IOptions, program: ts.Program) => {
   GlobalEventEmitter.emit('options', options);
   const checker = program.getTypeChecker();
+  Injector.AddSingleton(OPTIONS_TOKEN, () => options);
   Injector.AddSingleton(PROGRAM_TOKEN, () => program);
   Injector.AddSingleton(CHECKER_TOKEN, () => checker);
   serializer = Injector.GetRequiredService(Serializer);
@@ -105,13 +106,11 @@ process.on('exit', () => {
 });
 
 function writeOpenApi(json: string) {
-  writeFileSync('openapi.json', json, 'utf-8');
+  const options = Injector.GetRequiredService(OPTIONS_TOKEN);
+  writeFileSync(options.fileName ?? 'openapi.json', json, 'utf-8');
 }
 
 // https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md
-
-// The needed operations
-// https://github.com/domaindrivendev/Swashbuckle.AspNetCore#swashbuckleaspnetcoreannotations
 
 export * from './lib/Annotations/ApiParameter';
 export * from './lib/Annotations/Obsolete';
