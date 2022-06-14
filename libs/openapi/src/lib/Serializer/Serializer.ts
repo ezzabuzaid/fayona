@@ -37,21 +37,21 @@ export class Serializer {
     defaultRequired = false
   ): openapi.ParameterObject {
     const [parameterNameArg] = this.utility.GetDecoratorArgs(node, name)!;
-    const [messageArg, requiredArg] =
-      this.utility.GetDecoratorArgs(node, Annotations.Parameter) ?? [];
-    const obsolete = this.utility.GetDecoratorArgs(node, Annotations.Obsolete);
     const symbol = this._checker.getSymbolAtLocation(node.name);
     if (!symbol) {
       throw new Error(`Cannot find symbol for ${node.name.getText()}`);
     }
-
+    const schema = this.jsonSpec.GenerateSchemaFromSymbol(symbol);
+    const { deprecated, description, required, ...restOfSchema } = schema;
+    const isRequired = !!required?.length ?? defaultRequired;
     return {
       in: _in,
-      deprecated: !!obsolete,
-      required: Parser.ParseBoolean(requiredArg, defaultRequired),
-      description: (messageArg as ts.StringLiteral)?.text,
-      name: (parameterNameArg as ts.StringLiteral)?.text,
-      schema: this.jsonSpec.GenerateSchemaFromSymbol(symbol),
+      deprecated,
+      description,
+      required: isRequired, // the name of symbol will be in required array so if array is not empty then it is required
+      allowEmptyValue: !isRequired,
+      name: (parameterNameArg as ts.StringLiteral)?.text ?? node.name.getText(),
+      schema: restOfSchema,
     };
   }
 

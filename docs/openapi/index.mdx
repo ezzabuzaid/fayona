@@ -1,0 +1,126 @@
+### Enrich HTTP Action
+
+Enrich the generated Operation metadata by decorating actions with a OpenApiOperation
+
+```typescript
+@Route('/product')
+class ProductController {
+  @HttpPost()
+  @OpenApiOperation({
+    Summary: 'Creates a new product',
+    Description: 'Requires admin privileges',
+    OperationId: 'CreateProduct',
+    Tags: ['Purchase', 'Products'],
+  })
+  public Create(@FromBody() product: Product): HttpResponse<{ id: string }>;
+}
+```
+
+### Enrich HTTP Action Request Body
+
+Enrich the generated Operation metadata by decorating actions with a OpenApiRequestBody
+
+```typescript
+@Route('/product')
+class ProductController {
+  @HttpPost()
+  @OpenApiOperation({
+    Summary: 'Creates a new product',
+    Description: 'Requires admin privileges',
+    OperationId: 'CreateProduct',
+    Tags: ['Purchase', 'Products'],
+  })
+  public Create(
+    @FromBody()
+    @SwaggerRequestBody('The product payload', true)
+    product: Product
+  ): HttpResponse<{ id: string }>;
+}
+```
+
+> All params are optional except `Summary`
+
+### Enrich HTTP action response
+
+> `OpenApiResponse` is under development
+
+### OpenApiSchema
+
+You can decorate "path", "query" or "header" bound parameters or properties (i.e. decorated with `@FromRoute`, `@FromQuery` or `@FromHeader`) with a `@OpenApiSchema` to enrich the corresponding Parameter metadata, also you can decorate classes properties
+
+- Usage with `FromQuery`
+
+```typescript
+@Route('/product')
+class ProductController {
+  @HttpPost()
+  public Create(
+    @FromQuery('keywords')
+    @OpenApiSchema({
+      Description: 'List of keywords',
+      Deprecated: true,
+    })
+    keywords: string
+  ): HttpResponse<{ id: string }>;
+}
+```
+
+- Usage with `FromRoute`
+
+```typescript
+@Route('/product')
+class ProductController {
+  @HttpGet('/:id')
+  public Create(
+    @FromQuery('id')
+    @OpenApiSchema({
+      Description: 'Order id',
+      Format: 'int32',
+    })
+    productId: int
+  ): HttpResponse<{ id: string }>;
+}
+```
+
+- Usage with `FromHeader`
+
+```typescript
+@Route('/product')
+class ProductController {
+  @HttpGet('/:id')
+  public Create(
+    @FromHeader('X-Owner-API-KEY')
+    @OpenApiSchema({
+      Description: 'Project owner api key',
+      Format: 'uuid',
+    })
+    projectApiKey: int
+  ): HttpResponse<{ id: string }>;
+}
+```
+
+- Usage with properties
+
+```typescript
+class CreateProductDto {
+  @OpenApiSchema({
+    Title: 'Product market price',
+    Description: 'Market price - can be from 1$ - 20$',
+    Format: 'int32',
+  })
+  public Price: string;
+
+  @OpenApiSchema({
+    Description: 'Assign to product',
+    WriteOnly: true,
+  })
+  public owners: string[];
+}
+@Route('/product')
+class ProductController {
+  @HttpPost('/')
+  public Create(
+    @FromBody() dto: CreateProductDto
+  ): HttpResponse<{ id: string }>;
+}
+```

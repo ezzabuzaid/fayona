@@ -116,8 +116,9 @@ export class JsonSpec {
 
   public GenerateSchemaFromSymbol(symbol: ts.Symbol): openapi.SchemaObject {
     const typeName = this.utility.GetSymbolType(symbol);
+    const parser = new Parser();
     if (isPrimitive(typeName)) {
-      return { type: typeName as any };
+      return parser.ParsePrimitive(symbol);
     }
     return this.GenerateSchemaFromTypeName(typeName);
   }

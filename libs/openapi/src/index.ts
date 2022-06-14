@@ -112,7 +112,6 @@ function writeOpenApi(json: string) {
 
 // https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.1.0.md
 
-export * from './lib/Annotations/ApiParameter';
 export * from './lib/Annotations/Obsolete';
 export * from './lib/Annotations/Operation';
 export * from './lib/Annotations/RequestBody';

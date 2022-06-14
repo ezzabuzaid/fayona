@@ -35,6 +35,7 @@ export class Parser {
       Required,
       ReadOnly,
       WriteOnly,
+      Deprecated,
     } = this.utility.ObjectReferenceToObjectLiteral(
       objectRefArg as ts.ObjectLiteralExpression
     );
@@ -46,6 +47,8 @@ export class Parser {
       nullable: this.ParseBoolean(Nullable, false) || undefined,
       writeOnly: this.ParseBoolean(WriteOnly, false) || undefined,
       readOnly: this.ParseBoolean(ReadOnly, false) || undefined,
+      deprecated: this.ParseBoolean(Deprecated, false) || undefined,
+      // FIXME: add support for default
       format: Format,
       title: Title,
       description: Description,

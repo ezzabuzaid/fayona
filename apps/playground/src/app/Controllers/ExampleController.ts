@@ -2,8 +2,8 @@ import { HttpContext, IHttpContext } from '@fayona/core';
 import {
   OpenApiObsolete,
   OpenApiOperation,
-  OpenApiParameter,
   OpenApiRequestBody,
+  OpenApiSchema,
 } from '@fayona/openapi';
 import {
   FromBody,
@@ -41,7 +41,12 @@ export class ExampleController {
   }
   @HttpGet('/')
   public GetFirstExample(
-    @FromQuery('ss') examplesasss: string
+    @OpenApiSchema({
+      Description: 'examplesasss Description',
+      Deprecated: true,
+    })
+    @FromQuery('ss')
+    examplesasss: string
   ): Promise<HttpResponse<ReplaceExampleDto>> {
     const example = store[0];
     return Promise.resolve(
@@ -82,7 +87,6 @@ export class ExampleController {
   @HttpPut('/replace/:id')
   public ReplaceExample(
     @OpenApiObsolete()
-    @OpenApiParameter('Test Param Message', false)
     @FromRoute('test')
     test: number,
     @FromRoute('id') id: string,

@@ -1,7 +1,7 @@
 export const enum Annotations {
-  Parameter = 'OpenApiParameter',
-  Obsolete = 'OpenApiObsolete',
   Operation = 'OpenApiOperation',
+  Response = 'OpenApiResponse',
+  Obsolete = 'OpenApiObsolete',
   RequestBody = 'OpenApiRequestBody',
   Schema = 'OpenApiSchema',
 }
