@@ -2,6 +2,18 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.4.0](https://github.com/ezzabuzaid/fayona/compare/0.3.0...0.4.0) (2022-06-14)
+
+
+### Features
+
+* **openapi:** add support for deprecated ([e92a08f](https://github.com/ezzabuzaid/fayona/commit/e92a08fa796af71ccb3be40e41d9c0ba8977df52))
+
+
+### Bug Fixes
+
+* **openapi:** add an option to change default generated name ([3ef4cce](https://github.com/ezzabuzaid/fayona/commit/3ef4cce7b75bcf27f8142b246a123387e03ae383))
+
 ## [0.3.0](https://github.com/ezzabuzaid/fayona/compare/0.2.10...0.3.0) (2022-06-12)
 
 
