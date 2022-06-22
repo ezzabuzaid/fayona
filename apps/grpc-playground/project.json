@@ -1,0 +1,49 @@
+{
+  "sourceRoot": "apps/grpc-playground/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/node:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "transformers": [
+          {
+            "name": "@fayona/grpc"
+          }
+        ],
+        "outputPath": "dist/apps/grpc-playground",
+        "main": "apps/grpc-playground/src/main.ts",
+        "tsConfig": "apps/grpc-playground/tsconfig.app.json",
+        "assets": ["apps/grpc-playground/src/assets"]
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false,
+
+          "fileReplacements": [
+            {
+              "replace": "apps/grpc-playground/src/environments/environment.ts",
+              "with": "apps/grpc-playground/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/node:node",
+      "options": {
+        "buildTarget": "grpc-playground:build"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/grpc-playground/**/*.ts"]
+      }
+    }
+  },
+  "tags": []
+}

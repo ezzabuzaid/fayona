@@ -48,7 +48,7 @@ export class Serializer {
       in: _in,
       deprecated,
       description,
-      required: isRequired, // the name of symbol will be in required array so if array is not empty then it is required
+      required: isRequired || undefined, // the name of symbol will be in required array so if array is not empty then it is required
       allowEmptyValue: !isRequired,
       name: (parameterNameArg as ts.StringLiteral)?.text ?? node.name.getText(),
       schema: restOfSchema,

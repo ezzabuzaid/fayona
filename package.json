@@ -7,10 +7,13 @@
     "core": "nx run core:build --skip-nx-cache && nx run core:build --watch --skip-nx-cache",
     "routing": "nx run routing:build --skip-nx-cache && nx run routing:build --watch --skip-nx-cache",
     "identity": "nx run identity:build --skip-nx-cache && nx run identity:build --watch --skip-nx-cache",
-    "openapi": "nx run openapi:build --skip-nx-cache && nx run openapi:build --watch --skip-nx-cache"
+    "openapi": "nx run openapi:build --skip-nx-cache && nx run openapi:build --watch --skip-nx-cache",
+    "grpc": "nx run grpc:build --skip-nx-cache && nx run grpc:build --watch --skip-nx-cache"
   },
   "private": true,
   "dependencies": {
+    "@grpc/grpc-js": "^1.6.7",
+    "@grpc/proto-loader": "^0.6.13",
     "@jscutlery/semver": "^2.23.4",
     "@trivago/prettier-plugin-sort-imports": "^3.2.0",
     "@types/passport-jwt": "^3.0.6",

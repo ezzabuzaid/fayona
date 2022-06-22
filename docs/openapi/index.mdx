@@ -1,3 +1,94 @@
+# OpenAPI
+
+You can generate **OpenAPI Specification** from Fayona via decorators - Typescript transformer is used behind the scene to extract data.
+
+## Setup
+
+The `@fayona/openapi` only generate .json file contains the metadata that was generated using the transformer so you've to take care of using the appropriate client to your needs.
+
+### Transformer Options & Webpack
+
+TBD
+
+### NX
+
+Usage with **NX** is pretty simple all you've to do is to locate the API project `project.json` file
+
+```json
+{
+  "executor": "@nrwl/node:webpack",
+  "outputs": ["{options.outputPath}"],
+  "options": {
+    "transformers": [
+      {
+        "name": "@fayona/openapi",
+        "options": {
+          "baseUrl": "http://localhost:3000",
+          "name": "Fayona",
+          "version": "1.0.0",
+          "fileName": "swagger.json"
+        }
+      }
+    ],
+    "outputPath": "dist/apps/playground",
+    "main": "apps/playground/src/main.ts",
+    "tsConfig": "apps/playground/tsconfig.app.json",
+    "assets": ["apps/playground/src/assets"]
+  }
+}
+```
+
+In case you want to provide different options for each build configuration you can do the following
+
+```json
+{
+  "executor": "@nrwl/node:webpack",
+  "outputs": ["{options.outputPath}"],
+  "options": {
+    "outputPath": "dist/apps/playground",
+    "main": "apps/playground/src/main.ts",
+    "tsConfig": "apps/playground/tsconfig.app.json",
+    "assets": ["apps/playground/src/assets"]
+  },
+  "configurations": {
+    "production": {
+      "transformers": [
+        {
+          "name": "@fayona/openapi",
+          "options": {
+            "baseUrl": "http://example.com",
+            "name": "Fayona",
+            "version": "1.0.0",
+            "fileName": "prod-swagger.json"
+          }
+        }
+      ]
+    },
+    "development": {
+      "transformers": [
+        {
+          "name": "@fayona/openapi",
+          "options": {
+            "baseUrl": "http://localhost:3000",
+            "name": "Fayona",
+            "version": "1.0.0",
+            "fileName": "dev-swagger.json"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+### Node.js Swagger UI
+
+TBD
+
+### Postman
+
+TBD
+
 ### Enrich HTTP Action
 
 Enrich the generated Operation metadata by decorating actions with a OpenApiOperation

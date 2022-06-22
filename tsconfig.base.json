@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@fayona/core": ["libs/core/src/index.ts"],
+      "@fayona/grpc": ["libs/grpc/src/index.ts"],
       "@fayona/identity": ["libs/identity/src/index.ts"],
       "@fayona/openapi": ["libs/openapi/src/index.ts"],
       "@fayona/routing": ["libs/routing/src/index.ts"]

@@ -2,9 +2,11 @@
   "version": 2,
   "projects": {
     "core": "libs/core",
+    "grpc": "libs/grpc",
+    "grpc-playground": "apps/grpc-playground",
     "identity": "libs/identity",
-    "playground": "apps/playground",
     "openapi": "libs/openapi",
+    "playground": "apps/playground",
     "routing": "libs/routing",
     "workspace": {
       "root": "libs",
