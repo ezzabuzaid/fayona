@@ -16,27 +16,28 @@ export * from './lib/Decorators/HttpGet';
 export * from './lib/Decorators/HttpPatch';
 export * from './lib/Decorators/HttpPost';
 export * from './lib/Decorators/HttpPut';
-
 export * from './lib/Decorators/Route';
 export * from './lib/Factory';
-
 // FIXME: replace it with correct return type
 export * from './lib/Response';
+
 interface IRoutingOptions {
-  controllers: string[];
+  controllers?: string[];
 }
 declare module '@fayona/core' {
   export interface IFayona {
-    Routing(options: IRoutingOptions): RequestHandler;
+    Routing(options?: IRoutingOptions): RequestHandler;
   }
 }
 const prototype: import('@fayona/core').IFayona = Fayona.prototype as any;
 
-prototype.Routing = function (options: IRoutingOptions): RequestHandler {
+prototype.Routing = function (options?: IRoutingOptions): RequestHandler {
   // Load the controllers so the decorators can be activated.
-  glob.sync(options.controllers, { absolute: true }).forEach((filePath) => {
-    require(filePath);
-  });
+  if (options?.controllers) {
+    glob.sync(options.controllers, { absolute: true }).forEach((filePath) => {
+      require(filePath);
+    });
+  }
 
   return (...args: any[]) => {
     const factory = Injector.GetRequiredService(Factory);

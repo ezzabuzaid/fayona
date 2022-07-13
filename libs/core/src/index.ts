@@ -1,5 +1,5 @@
 import { Fayona } from './lib/Fayona/Fayona';
-import { IFayona } from './lib/Fayona/IFayona';
+import { IFayona, IFayonaOptions } from './lib/Fayona/IFayona';
 
 export * from './lib/Exceptions/ArgumentException';
 export * from './lib/Exceptions/InvalidOperationException';
@@ -12,8 +12,10 @@ export * from './lib/Utils/Action';
 export * from './lib/Utils/SortFunctor';
 export * from './lib/Utils/Utils';
 
-export function CreateFayona(): import('@fayona/core').IFayona & IFayona {
+export function CreateFayona(
+  options?: IFayonaOptions
+): import('@fayona/core').IFayona & IFayona {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  return new Fayona();
+  return new Fayona(options);
 }
