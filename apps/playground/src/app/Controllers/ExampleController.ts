@@ -58,6 +58,7 @@ export class ExampleController {
     @FromRoute('id') id: string,
     @FromQuery() examplesasss: Example
   ): Promise<HttpResponse<GetExampleDto>> {
+    console.log(examplesasss);
     const existingExampleIndex = store.findIndex((it) => it.id === id);
     if (existingExampleIndex < 0) {
       throw new ProblemDetailsException({

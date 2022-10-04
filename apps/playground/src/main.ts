@@ -27,3 +27,4 @@ application
 
 const port = process.env.port || 3333;
 const server = application.listen(port);
+console.log(`${new Date()} Server running at http://localhost:${port}`);

@@ -40,7 +40,7 @@ export function GenerateAlphabeticString(stringLength = 5): string {
   return randomString;
 }
 
-export function IsConstructor(value: any): value is ServiceType<any> {
+export function IsConstructor<T = ServiceType<any>>(value: any): value is T {
   if (IsNullOrUndefined(value)) {
     return false;
   }

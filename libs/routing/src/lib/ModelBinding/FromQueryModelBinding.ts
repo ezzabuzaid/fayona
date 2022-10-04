@@ -1,4 +1,5 @@
 import { InvalidOperationException, IsConstructor } from '@fayona/core';
+import { ClassType } from 'tiny-injector/Types';
 
 import { FromQueryPayloadType } from '../Metadata/FromQueryParamerterMetadata';
 import { ModelBinding } from './ModelBinding';
@@ -10,12 +11,12 @@ export class FromQueryModelBinding extends ModelBinding<
 > {
   public override async Bind(): Promise<any> {
     const payload = this.ParameterMetadata.Payload;
-    if (typeof payload === 'function') {
-      return payload(this.Variant);
+    if (IsConstructor<ClassType<any>>(payload)) {
+      return ValidateModel(payload, this.Variant);
     } else if (typeof payload === 'string') {
       return this.Variant[payload];
-    } else if (IsConstructor(payload)) {
-      return ValidateModel(this.ParameterMetadata.Payload, this.Variant);
+    } else if (typeof payload === 'function') {
+      return payload(this.Variant);
     } else {
       throw new InvalidOperationException(
         `${
