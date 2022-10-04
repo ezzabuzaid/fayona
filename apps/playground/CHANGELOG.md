@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.5.1](https://github.com/ezzabuzaid/fayona/compare/0.5.0...0.5.1) (2022-10-04)
+
+
+### Bug Fixes
+
+* **routing:** call class type functions before standard functions in FromQuery ([5b12d6b](https://github.com/ezzabuzaid/fayona/commit/5b12d6b8f016fc95a480248dba28dfb244ce466d))
+
 ## [0.5.0](https://github.com/ezzabuzaid/fayona/compare/0.4.0...0.5.0) (2022-06-22)
 
 ## [0.4.0](https://github.com/ezzabuzaid/fayona/compare/0.3.0...0.4.0) (2022-06-14)
