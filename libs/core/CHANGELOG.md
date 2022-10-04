@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.5.0](https://github.com/ezzabuzaid/fayona/compare/0.4.0...0.5.0) (2022-06-22)
+
+
+### Bug Fixes
+
+* **core:** use TryAddScoped when adding the Context ([082c14e](https://github.com/ezzabuzaid/fayona/commit/082c14e62d1fc2ad819786c296ece3bdeea68c7f))
+
 ## [0.4.0](https://github.com/ezzabuzaid/fayona/compare/0.3.0...0.4.0) (2022-06-14)
 
 ## [0.3.0](https://github.com/ezzabuzaid/fayona/compare/0.2.10...0.3.0) (2022-06-12)
