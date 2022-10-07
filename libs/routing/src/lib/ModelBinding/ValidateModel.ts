@@ -6,7 +6,8 @@ import {
 
 export async function ValidateModel(payload: any, varient: any): Promise<any> {
   const payloadInstance = new payload();
-  Object.assign(payloadInstance, varient);
+  Merge(payloadInstance, varient);
+
   try {
     await validateOrReject(payloadInstance);
   } catch (error: any) {
@@ -31,4 +32,16 @@ export async function ValidateModel(payload: any, varient: any): Promise<any> {
     throw new ProblemDetailsException(problemDetails);
   }
   return payloadInstance;
+}
+
+function Merge<T extends Record<string, any>>(
+  thisType: T,
+  payload: Partial<T>
+): void {
+  for (const key in thisType) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (thisType.hasOwnProperty(key) && payload[key] !== undefined) {
+      (thisType as any)[key] = payload[key];
+    }
+  }
 }
