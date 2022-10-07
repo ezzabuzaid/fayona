@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.5.2](https://github.com/ezzabuzaid/fayona/compare/0.5.1...0.5.2) (2022-10-07)
+
+
+### Bug Fixes
+
+* **routing:** remove assigning bulk properties to FromQuery model ([f83b413](https://github.com/ezzabuzaid/fayona/commit/f83b41368161c63c8a134665e18b73e318951c1d))
+
 ### [0.5.1](https://github.com/ezzabuzaid/fayona/compare/0.5.0...0.5.1) (2022-10-04)
 
 
