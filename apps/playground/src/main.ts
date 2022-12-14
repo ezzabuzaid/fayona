@@ -1,15 +1,17 @@
-import '@fayona/core';
-import '@fayona/identity';
-import '@fayona/routing';
+import './RouteFactory';
+
 import {
   ProblemDetailsException,
   problemDetailsMiddleware,
 } from 'rfc-7807-problem-details';
 import { Injector } from 'tiny-injector';
 
+import '@fayona/core';
+import '@fayona/identity';
+import '@fayona/routing';
+
 import { EXPRESS_TOKEN } from './ExpressToken';
-import './RouteFactory';
-import './app/Controllers/ExampleController';
+import './app/Controllers';
 
 const application = Injector.GetRequiredService(EXPRESS_TOKEN);
 
@@ -21,6 +23,9 @@ application
   })
   .use(
     problemDetailsMiddleware.express((configure) => {
+      if (process.env['NODE_ENV'] === 'development') {
+        configure.rethrow(Error);
+      }
       configure.mapToStatusCode(Error, 500);
     })
   );

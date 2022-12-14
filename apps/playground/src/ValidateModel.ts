@@ -4,12 +4,9 @@ import {
   ProblemDetailsException,
 } from 'rfc-7807-problem-details';
 
-export async function ValidateModel(payload: any, varient: any): Promise<any> {
-  const payloadInstance = new payload();
-  Merge(payloadInstance, varient);
-
+export async function ValidateModel(payload: any): Promise<any> {
   try {
-    await validateOrReject(payloadInstance);
+    await validateOrReject(payload);
   } catch (error: any) {
     const errors = error.reduce(
       (
@@ -30,18 +27,5 @@ export async function ValidateModel(payload: any, varient: any): Promise<any> {
     );
     problemDetails['errors'] = errors;
     throw new ProblemDetailsException(problemDetails);
-  }
-  return payloadInstance;
-}
-
-function Merge<T extends Record<string, any>>(
-  thisType: T,
-  payload: Partial<T>
-): void {
-  for (const key in thisType) {
-    // eslint-disable-next-line no-prototype-builtins
-    if (thisType.hasOwnProperty(key) && payload[key] !== undefined) {
-      (thisType as any)[key] = payload[key];
-    }
   }
 }

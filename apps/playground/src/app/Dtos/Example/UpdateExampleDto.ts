@@ -1,3 +1,9 @@
+import { AutoMap } from '@automapper/classes';
+import { IsNotEmpty, IsString } from 'class-validator';
+
 export class UpdateExampleDto {
-  name!: string;
+  @AutoMap()
+  @IsString()
+  @IsNotEmpty()
+  public name!: string;
 }

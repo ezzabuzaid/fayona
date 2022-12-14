@@ -1,3 +1,6 @@
+import { ProblemDetailsException } from 'rfc-7807-problem-details';
+import { Inject } from 'tiny-injector';
+
 import { HttpContext, IHttpContext } from '@fayona/core';
 import {
   OpenApiObsolete,
@@ -17,8 +20,6 @@ import {
   Route,
   SuccessResponse,
 } from '@fayona/routing';
-import { ProblemDetailsException } from 'rfc-7807-problem-details';
-import { Inject } from 'tiny-injector';
 
 import {
   CreateExampleDto,

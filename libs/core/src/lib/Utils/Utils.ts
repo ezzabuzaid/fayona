@@ -58,7 +58,7 @@ export function CoerceArray<T>(value: T | T[]): T[] {
   return Array.isArray(value) ? value : [value];
 }
 
-export function SaveReturn<T>(fn: (...args: any[]) => T): T | null {
+export function SafeReturn<T>(fn: (...args: any[]) => T): T | null {
   try {
     return fn();
   } catch (error) {

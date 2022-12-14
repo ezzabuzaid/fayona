@@ -1,9 +1,11 @@
 {
+  "name": "playground",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/playground/src",
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/node:webpack",
+      "executor": "@nrwl/webpack:webpack",
       "outputs": ["{options.outputPath}"],
       "options": {
         "transformers": [
@@ -19,7 +21,9 @@
         "outputPath": "dist/apps/playground",
         "main": "apps/playground/src/main.ts",
         "tsConfig": "apps/playground/tsconfig.app.json",
-        "assets": ["apps/playground/src/assets"]
+        "assets": ["apps/playground/src/assets"],
+        "target": "node",
+        "compiler": "tsc"
       },
       "configurations": {
         "production": {

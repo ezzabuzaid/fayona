@@ -1,9 +1,9 @@
 {
   "singleQuote": true,
   "importOrder": [
+    "^./RouteFactory$",
     "<THIRD_PARTY_MODULES>",
-    "^@ktx/shared/(.*)$",
-    "^@ktx/(.*)$",
+    "^@fayona/(.*)$",
     "^[./]"
   ],
   "print-width": 120,

@@ -1,5 +1,3 @@
-import { isNumber, isString } from 'class-validator';
-
 import { FromRoutePayloadType } from '../Metadata/FromRouteParameterMetadata';
 import { ModelBinding } from './ModelBinding';
 

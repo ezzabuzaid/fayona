@@ -1,4 +1,5 @@
 {
+  "name": "grpc",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/grpc/src",
   "projectType": "library",
@@ -14,7 +15,7 @@
       }
     },
     "publish": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "command": "node tools/scripts/publish.mjs grpc {args.ver} {args.tag}"
       },
@@ -34,7 +35,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/grpc"],
+      "outputs": ["{workspaceRoot}/coverage/libs/grpc"],
       "options": {
         "jestConfig": "libs/grpc/jest.config.ts",
         "passWithNoTests": true

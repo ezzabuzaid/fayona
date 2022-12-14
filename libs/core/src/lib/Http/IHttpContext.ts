@@ -1,5 +1,6 @@
-import { HttpEndpointMetadata } from '@fayona/core';
 import { Request, Response } from 'express';
+
+import { HttpEndpointMetadata } from '../Metadata';
 
 export interface IHttpContext {
   Response: Response;

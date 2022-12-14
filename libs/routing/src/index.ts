@@ -1,8 +1,9 @@
-import { Fayona } from '@fayona/core';
 import { RequestHandler } from 'express';
 import * as glob from 'fast-glob';
 import 'reflect-metadata';
 import { Injector } from 'tiny-injector';
+
+import { Fayona } from '@fayona/core';
 
 import { Factory } from './lib/Factory';
 
@@ -18,6 +19,11 @@ export * from './lib/Decorators/HttpPost';
 export * from './lib/Decorators/HttpPut';
 export * from './lib/Decorators/Route';
 export * from './lib/Factory';
+export * from './lib/Metadata/FromBodyParameterMetadata';
+export * from './lib/Metadata/FromHeaderParameterMetadata';
+export * from './lib/Metadata/FromQueryParamerterMetadata';
+export * from './lib/Metadata/FromRouteParameterMetadata';
+export * from './lib/Metadata/FromServiceParameterMetadata';
 // FIXME: replace it with correct return type
 export * from './lib/Response';
 

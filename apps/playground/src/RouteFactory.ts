@@ -1,5 +1,3 @@
-import { HttpEndpointMetadata } from '@fayona/core';
-import { Factory } from '@fayona/routing';
 import * as express from 'express';
 import {
   Inject,
@@ -8,16 +6,63 @@ import {
   ServiceType,
 } from 'tiny-injector';
 
+import { HttpEndpointMetadata, IsConstructor } from '@fayona/core';
+import {
+  Factory,
+  FromBodyParameterMetadata,
+  FromHeaderParameterMetadata,
+  FromQueryParamerterMetadata,
+  FromRouteParameterMetadata,
+} from '@fayona/routing';
+
 import { EXPRESS_TOKEN } from './ExpressToken';
+import { ValidateModel } from './ValidateModel';
+import { mapper } from './mappings';
 
 // fayona.GetRoutes().forEach((route) => {
 //   application.use(route.GetRouter());
 // });
+
 @Injectable({
   serviceType: Factory,
   lifetime: ServiceLifetime.Singleton,
 })
 export class RouteFactory extends Factory {
+  public async GetBody(
+    metadata: FromBodyParameterMetadata,
+    request: any
+  ): Promise<Record<string, any>> {
+    const body = mapper.map(request.body, metadata.ParamType);
+    await ValidateModel(body);
+    return body;
+  }
+
+  public GetParams(
+    metadata: FromRouteParameterMetadata,
+    request: any
+  ): Record<string, string> {
+    return request.params;
+  }
+
+  public GetQuery(
+    metadata: FromQueryParamerterMetadata,
+    request: any
+  ): Record<string, string> {
+    if (IsConstructor<any>(metadata.ParamType)) {
+      const query = mapper.map(request.query, metadata.ParamType);
+      ValidateModel(query);
+      return query;
+    }
+    return request.query;
+  }
+
+  public GetHeaders(
+    metadata: FromHeaderParameterMetadata,
+    request: any
+  ): Record<string, string | string[]> {
+    return request.headers;
+  }
+
   constructor(
     @Inject(EXPRESS_TOKEN) private _application: ReturnType<typeof express>
   ) {
@@ -32,21 +77,6 @@ export class RouteFactory extends Factory {
     injector: (serviceType: ServiceType<T>) => T
   ): void {
     request.___Inject = (serviceType) => injector(serviceType);
-  }
-
-  public GetBody(request: express.Request): Record<string, any> {
-    return request.body;
-  }
-  public GetParams(request: express.Request): Record<string, string> {
-    return request.params;
-  }
-  public GetQuery(request: express.Request): Record<string, any> {
-    return request.query;
-  }
-  public GetHeaders(
-    request: express.Request
-  ): Record<string, string | string[]> {
-    return request.headers;
   }
 
   public OnRouteAdded(): void {

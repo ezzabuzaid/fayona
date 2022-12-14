@@ -1,16 +1,15 @@
+import { RouterOptions } from 'express';
+import * as path from 'path';
+import { Injector } from 'tiny-injector';
+
 import {
   HttpEndpointMetadata,
-  HttpEndpointMiddlewareMetadata,
   InvalidOperationException,
   IsNullOrEmpty,
   Metadata,
   ParameterType,
   sortBy,
 } from '@fayona/core';
-import { RequestHandler, RouterOptions } from 'express';
-import { RequestHandlerParams } from 'express-serve-static-core';
-import * as path from 'path';
-import { Injector } from 'tiny-injector';
 
 import { Factory } from '../Factory';
 import { FromBodyModelBinding } from '../ModelBinding/FromBodyModelBinding';
@@ -82,22 +81,22 @@ function NormalizeEndpoint(target: Function, endpoint: string): string {
   return path.normalize(path.join('/', mappedValue, '/'));
 }
 
-function PopulateRouteMiddlewares(
-  listRemoveEndpointMiddlewareMetadata: HttpEndpointMiddlewareMetadata[],
-  parentMiddlewares?: RequestHandler[] | RequestHandlerParams[]
-): RequestHandlerParams[] {
-  const clonedParentMiddlewares = parentMiddlewares?.slice(0) ?? [];
-  const middlewares = listRemoveEndpointMiddlewareMetadata.map(
-    (endpointMiddleware) => endpointMiddleware.middleware.toString()
-  );
-  const index = clonedParentMiddlewares.findIndex((parentMiddleware) =>
-    middlewares.includes(parentMiddleware.toString())
-  );
-  if (index !== -1) {
-    clonedParentMiddlewares.splice(index, 1);
-  }
-  return clonedParentMiddlewares;
-}
+// function PopulateRouteMiddlewares(
+//   listRemoveEndpointMiddlewareMetadata: HttpEndpointMiddlewareMetadata[],
+//   parentMiddlewares?: RequestHandler[] | RequestHandlerParams[]
+// ): RequestHandlerParams[] {
+//   const clonedParentMiddlewares = parentMiddlewares?.slice(0) ?? [];
+//   const middlewares = listRemoveEndpointMiddlewareMetadata.map(
+//     (endpointMiddleware) => endpointMiddleware.middleware.toString()
+//   );
+//   const index = clonedParentMiddlewares.findIndex((parentMiddleware) =>
+//     middlewares.includes(parentMiddleware.toString())
+//   );
+//   if (index !== -1) {
+//     clonedParentMiddlewares.splice(index, 1);
+//   }
+//   return clonedParentMiddlewares;
+// }
 
 const getBindings = async (
   factory: Factory,
@@ -111,14 +110,14 @@ const getBindings = async (
       case ParameterType.FROM_HEADER:
         const modelBinding = new FromHeaderModelBinding(
           parameterMetadata,
-          factory.GetHeaders(request)
+          await factory.GetHeaders(parameterMetadata, request)
         );
         parameters[parameterMetadata.Index] = await modelBinding.Bind();
         break;
       case ParameterType.FROM_ROUTE:
         const fromRouteModelBinding = new FromRouteModelBinding(
           parameterMetadata,
-          factory.GetParams(request)
+          await factory.GetParams(parameterMetadata, request)
         );
         parameters[parameterMetadata.Index] =
           await fromRouteModelBinding.Bind();
@@ -126,7 +125,7 @@ const getBindings = async (
       case ParameterType.FROM_QUERY:
         const fromQueryModelBinding = new FromQueryModelBinding(
           parameterMetadata,
-          factory.GetQuery(request)
+          await factory.GetQuery(parameterMetadata, request)
         );
         parameters[parameterMetadata.Index] =
           await fromQueryModelBinding.Bind();
@@ -142,7 +141,7 @@ const getBindings = async (
       case ParameterType.FROM_BODY:
         const fromBodyModelBinding = new FromBodyModelBinding(
           parameterMetadata,
-          factory.GetBody(request)
+          await factory.GetBody(parameterMetadata, request)
         );
         parameters[parameterMetadata.Index] = await fromBodyModelBinding.Bind();
         break;

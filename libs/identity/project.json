@@ -1,5 +1,8 @@
 {
+  "name": "identity",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/identity/src",
+  "implicitDependencies": ["core", "routing"],
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
@@ -37,7 +40,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/identity"],
+      "outputs": ["{workspaceRoot}/coverage/libs/identity"],
       "options": {
         "jestConfig": "libs/identity/jest.config.ts",
         "passWithNoTests": true

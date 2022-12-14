@@ -1,9 +1,11 @@
 {
+  "name": "grpc-playground",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/grpc-playground/src",
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/node:webpack",
+      "executor": "@nrwl/webpack:webpack",
       "outputs": ["{options.outputPath}"],
       "options": {
         "transformers": [
@@ -14,14 +16,15 @@
         "outputPath": "dist/apps/grpc-playground",
         "main": "apps/grpc-playground/src/main.ts",
         "tsConfig": "apps/grpc-playground/tsconfig.app.json",
-        "assets": ["apps/grpc-playground/src/assets"]
+        "assets": ["apps/grpc-playground/src/assets"],
+        "target": "node",
+        "compiler": "tsc"
       },
       "configurations": {
         "production": {
           "optimization": true,
           "extractLicenses": true,
           "inspect": false,
-
           "fileReplacements": [
             {
               "replace": "apps/grpc-playground/src/environments/environment.ts",
