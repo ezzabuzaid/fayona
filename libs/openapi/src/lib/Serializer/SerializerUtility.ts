@@ -87,7 +87,7 @@ export class SerializerUtility {
   public GetDecorator(node: ts.Node, name: DecoratorName): ts.Decorator {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    return (node.decorators ?? []).find(
+    return (ts.getDecorators(node) ?? []).find(
       (item) =>
         ts.isCallExpression(item.expression) &&
         ts.isIdentifier(item.expression.expression) &&

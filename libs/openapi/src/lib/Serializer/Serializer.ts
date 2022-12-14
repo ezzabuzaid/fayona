@@ -123,7 +123,7 @@ export class Serializer {
   ): openapi.PathsObject | undefined {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const actionDecorator = (node.decorators ?? []).find((dec) =>
+    const actionDecorator = (ts.getDecorators(node) ?? []).find((dec) =>
       this.utility.IsActionDecorator(dec)
     );
     if (!actionDecorator) {
