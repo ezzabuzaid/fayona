@@ -1,6 +1,6 @@
 {
   "name": "@fayona/grpc",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "type": "commonjs",
   "devDependencies": {
     "@types/events": "^3.0.0"
