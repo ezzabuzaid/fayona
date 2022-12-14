@@ -29,7 +29,7 @@
     "nanoid": "^3.3.2",
     "ngx-deploy-npm": "^3.1.9",
     "openapi3-ts": "^2.0.2",
-    "passport": "^0.5.2",
+    "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
     "promise-status-async": "^1.2.10",
     "rfc-7807-problem-details": "1.2.0",
